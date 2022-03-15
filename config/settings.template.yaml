@@ -1,0 +1,32 @@
+app:
+  appName: amp-rsa-apollo
+  publishStage: production
+  scope: amplience-presales
+bigcommerce:
+  apiUrl: https://api.bigcommerce.com
+  storeHash: <bc store hash>
+  apiToken: <bc api token>
+commercetools:
+  authUrl: https://auth.europe-west1.gcp.commercetools.com
+  apiUrl: https://api.europe-west1.gcp.commercetools.com
+  project: <ct project key>
+  client_id: <ct client id>
+  client_secret: <ct client secret>
+  defaultScopes:
+    - view_products:<ct project key>
+    - view_categories:<ct project key>
+    - view_published_products:<ct project key>
+    - create_anonymous_token:<ct project key>
+  defaultFacets:
+    - type: standard
+      field: variants.attributes.color.label.en
+      title: Color
+    - type: standard
+      field: variants.attributes.designer.key
+      title: Designer
+    - type: standard
+      field: variants.attributes.size
+      title: Size
+    - type: standard
+      field: variants.attributes.style.key
+      title: Style

@@ -1,0 +1,8 @@
+copilot
+cdk
+node_modules
+npm-debug.log
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+.git
+.gitignore
