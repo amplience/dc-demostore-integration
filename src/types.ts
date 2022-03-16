@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import fetch from 'cross-fetch'
+import fetch from 'isomorphic-unfetch'
 import URI from 'urijs'
 
 export class Prices {
@@ -188,14 +188,6 @@ export class AMPRSAConfiguration {
     cms?: any
     commerce?: any
     googlemaps?: any
-}
-
-export class ConfigLocator {
-    hub: string
-    environment: string
-    constructor(configLocatorString: string) {
-        [this.hub, this.environment] = configLocatorString.split(':')
-    }
 }
 
 export async function fetchFromQueryContext(url: string, context: QueryContext) {

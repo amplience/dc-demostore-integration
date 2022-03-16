@@ -1,6 +1,6 @@
 import _, { Dictionary } from 'lodash'
-import { Codec } from './codec'
-import { CMSCodec, CommerceCodec, ConfigCodec } from '..';
+import { Codec, CodecConfiguration } from './codec'
+import { CommerceCodec, ConfigCodec } from '..';
 
 export class CodecType {
     vendor: string
@@ -11,7 +11,6 @@ export class CodecType {
 
 export class CodecManager {
     codecTypes: {} = {}
-    credentialLookupStrategy: (key: string) => any = __ => {}
     startTime: number
     cachedCodecs: Dictionary<Codec> = {}
 
@@ -23,6 +22,7 @@ export class CodecManager {
         let key: string = `${codecType.vendor}-${codecType.codecType}`
         let existing: CodecType = this.codecTypes[key]
         if (!existing) {
+            // console.log(`registerCodecType: ${key}`)
             this.codecTypes[key] = codecType
         }
     }
@@ -31,45 +31,30 @@ export class CodecManager {
         return await this.getCodec(codecKey, "commerce") as CommerceCodec
     }
 
-    async getCMSCodec(codecKey: string | any): Promise<CMSCodec> {
-        return await this.getCodec(codecKey, "cms") as CMSCodec
+    async getConfigCodec(configLocator: string): Promise<ConfigCodec> {
+        return await this.getCodec({ value: configLocator }, "config") as ConfigCodec
     }
 
-    async getConfigCodec(codecKey: string | any): Promise<ConfigCodec> {
-        return await this.getCodec(codecKey, "config") as ConfigCodec
-    }
-
-    async getCodec(codecKey: string | any, codecType: string): Promise<Codec> {
-        let credentials: any = codecKey
-
-        if (typeof codecKey === 'string') {
-            credentials = await this.credentialLookupStrategy(codecKey)
-            if (!credentials) {
-                throw `[ aria ] no credentials found for codec key [ ${codecKey} ]`
-            }    
-        }
-        else if (typeof codecKey === 'object') {
-            codecKey = 'none'
-        }
- 
+    async getCodec(config: CodecConfiguration, codecType: string): Promise<Codec> { 
         // console.log(`[ aria ] registered codecs: ${_.map(Object.values(this.codecTypes), ct => `${ct.vendor}-${ct.codecType}`)}`)
         let codecs: CodecType[] = _.filter(Object.values(this.codecTypes), (c: CodecType) => {
-            return (codecType === c.codecType) && c.validate(credentials)
+            return (codecType === c.codecType) && c.validate(config)
         })
+
         if (_.isEmpty(codecs)) {
-            throw `[ aria ] no codecs found matching [ ${ codecKey === 'none' ? JSON.stringify(credentials) : codecKey } ]`
+            throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
         }
         else if (codecs.length > 1) {
-            throw `[ aria ] multiple codecs found for key [ ${codecKey} ], must specify vendor in request`
+            throw `[ aria ] multiple codecs found for schema [ ${JSON.stringify(config)} ], further disambiguation required`
         }
 
-        if (credentials?._meta?.deliveryId && this.cachedCodecs[credentials?._meta?.deliveryId]) {
-            return this.cachedCodecs[credentials?._meta?.deliveryId]
+        if (config?._meta?.deliveryId && this.cachedCodecs[config?._meta?.deliveryId]) {
+            return this.cachedCodecs[config?._meta?.deliveryId]
         }
 
-        let codec = codecs[0].create(credentials)
+        let codec = codecs[0].create(config)
         await codec.start()
-        this.cachedCodecs[credentials?._meta?.deliveryId] = codec
+        this.cachedCodecs[config?._meta?.deliveryId] = codec
         return codec
     }    
 }
@@ -81,4 +66,5 @@ if (!global.codecManager) {
 // create the codec manager and register types we know about
 export const codecManager = global.codecManager
 
-import './codecs'
+import './codecs/amplience'
+import './codecs/rest'

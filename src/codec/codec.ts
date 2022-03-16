@@ -6,24 +6,16 @@ import { nanoid } from 'nanoid'
 export abstract class Codec {
     config: CodecConfiguration
     codecId: string = nanoid(8)
-    
+
     constructor(config: CodecConfiguration) {
         this.config = config
     }
 
-    async start() {}
-
-    get key() {
-        return this.config.codecKey
-    }
+    async start() { }
 }
 
 export abstract class ConfigCodec extends Codec {
     abstract getConfig(): Promise<any>
-}
-
-export abstract class CMSCodec extends Codec {
-    abstract getContentItem(args): Promise<ContentItem>
 }
 
 let defaultArgs = {
@@ -39,20 +31,13 @@ let defaultArgs = {
  *
  * @public
  */
- export class CodecConfiguration {
-    codecKey: string
-
-    constructor(key: string) {
-        this.codecKey = key
+export class CodecConfiguration {
+    _meta?: {
+        deliveryKey?: string
+        deliveryId: string
+        schema: string
     }
-
-    get vendor() {
-        return _.first(this.codecKey.split('/'))
-    }
-
-    get key() {
-        return _.last(this.codecKey.split('/'))
-    }
+    value?: string
 }
 
 /**
@@ -60,7 +45,7 @@ let defaultArgs = {
  *
  * @public
  */
- export abstract class CommerceCodec extends Codec {
+export abstract class CommerceCodec extends Codec {
     productOperation: Operation
     categoryOperation: Operation
 
@@ -81,7 +66,7 @@ let defaultArgs = {
     }
 
     async getProductsForCategory(category, args) {
-        throw `getProductsForCategory must be implemented`        
+        throw `getProductsForCategory must be implemented`
     }
 
     // future api
