@@ -18,11 +18,9 @@
     }
   },
   "include": [
-    "src/**/*",
-    "config/**/*"
+    "src/**/*"
   ],
   "exclude": [
-    "node_modules",
-    "**/all_*.json"
+    "node_modules"
   ]
 }

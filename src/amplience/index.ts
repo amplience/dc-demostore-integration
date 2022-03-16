@@ -1,15 +1,12 @@
 import _ from 'lodash'
-import { CodecConfiguration, ConfigCodec } from '../../codec'
-import { CodecType, codecManager } from '../../codec-manager'
-import { AMPRSAConfiguration } from '../../../types'
+import { AMPRSAConfiguration } from '../types'
 import { ContentItem } from 'dc-management-sdk-js'
 
-export class AmplienceConfigCodec extends ConfigCodec {
+export class AmplienceClient {
     hub: string
     environment: string
 
     constructor(key: string) {
-        super({})
         this.hub = key.split(':')[0]
         this.environment = key.split(':')[1]
     }
@@ -35,23 +32,3 @@ export class AmplienceConfigCodec extends ConfigCodec {
         return obj as AMPRSAConfiguration
     }
 }
-
-const type: CodecType = {
-    vendor: 'amplience',
-    codecType: 'config',
-
-    validate: (config: any) => {
-        return config.value
-    },
-
-    create: (config: CodecConfiguration) => {
-        if (!config.value) {
-            throw `[ aria ] config.value not found`
-        }
-        return new AmplienceConfigCodec(config.value)
-    }
-}
-export default type
-
-// register myself with codecManager
-codecManager.registerCodecType(type)

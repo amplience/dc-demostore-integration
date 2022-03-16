@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import { ContentItem } from 'dc-management-sdk-js'
 import { Operation } from '../operation'
 import { nanoid } from 'nanoid'
+import { CommerceAPI } from '..'
 
 export abstract class Codec {
     config: CodecConfiguration
@@ -12,10 +12,6 @@ export abstract class Codec {
     }
 
     async start() { }
-}
-
-export abstract class ConfigCodec extends Codec {
-    abstract getConfig(): Promise<any>
 }
 
 let defaultArgs = {
@@ -41,11 +37,11 @@ export class CodecConfiguration {
 }
 
 /**
- * CommerceCodec is the base class for codecs implementing the CommerceClient interface.
+ * CommerceCodec is the base class for codecs implementing the CommerceAPI interface.
  *
  * @public
  */
-export abstract class CommerceCodec extends Codec {
+export abstract class CommerceCodec extends Codec implements CommerceAPI {
     productOperation: Operation
     categoryOperation: Operation
 

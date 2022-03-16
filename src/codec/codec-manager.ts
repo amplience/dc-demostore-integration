@@ -1,6 +1,6 @@
 import _, { Dictionary } from 'lodash'
 import { Codec, CodecConfiguration } from './codec'
-import { CommerceCodec, ConfigCodec } from '..';
+import { CommerceCodec } from '..';
 
 export class CodecType {
     vendor: string
@@ -29,10 +29,6 @@ export class CodecManager {
     
     async getCommerceCodec(codecKey: string | any): Promise<CommerceCodec> {
         return await this.getCodec(codecKey, "commerce") as CommerceCodec
-    }
-
-    async getConfigCodec(configLocator: string): Promise<ConfigCodec> {
-        return await this.getCodec({ value: configLocator }, "config") as ConfigCodec
     }
 
     async getCodec(config: CodecConfiguration, codecType: string): Promise<Codec> { 
@@ -66,5 +62,4 @@ if (!global.codecManager) {
 // create the codec manager and register types we know about
 export const codecManager = global.codecManager
 
-import './codecs/amplience'
 import './codecs/rest'
