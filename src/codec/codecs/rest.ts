@@ -1,10 +1,9 @@
-import _ from 'lodash'
-import { Product, Category, Variant, QueryContext } from '../../../types'
-import { CommerceCodec, CodecConfiguration } from '../../../codec/codec'
-import { CodecType, codecManager } from '../../../codec/codec-manager'
-import { Dictionary } from 'lodash'
+import _, { Dictionary } from 'lodash'
+import { Product, Category, Variant, QueryContext, CategoryResults, ProductResults } from '../../types'
+import { CodecConfiguration, Codec, registerCodec } from '..'
+import { CommerceAPI } from '../..'
 
-const getAttribute = (variant: Variant, attributeName: string) => _.get(_.find(variant.attributes, att => att.name === attributeName), 'value')
+const getAttribute = (variant: Variant, attributeName: string, defaultValue: string) => _.get(_.find(variant.attributes, att => att.name === attributeName), 'value') || defaultValue
 
 export interface RestCommerceCodecConfig extends CodecConfiguration {
     productURL: string
@@ -12,7 +11,30 @@ export interface RestCommerceCodecConfig extends CodecConfiguration {
     translationsURL: string
 }
 
-export class RestCommerceCodec extends CommerceCodec {
+const getCategoryIdsFromCategory = (category: Category): string[] => {
+    let ids = [category.id]
+    if (category.parent) {
+        ids = _.concat(ids, getCategoryIdsFromCategory(category.parent))
+    }
+    return ids
+}
+
+const trimVariants = (prod: Product) => ({
+    ...prod,
+    variants: prod.variants.length > 0 ? [_.first(prod.variants)!] : []
+})
+
+export class RestCommerceCodec extends Codec implements CommerceAPI {
+    // codec generator conformance
+    static SchemaURI = 'https://amprsa.net/site/integration/rest'
+    static async getInstance(config: RestCommerceCodecConfig): Promise<RestCommerceCodec> {
+        let codec = new RestCommerceCodec(config)
+        await codec.start()
+        return codec
+    }
+    // end codec generator conformance
+
+    config: RestCommerceCodecConfig
     categories: Category[] = []
     products: Product[] = []
     translations: Dictionary<Dictionary<string>> = {}
@@ -21,29 +43,27 @@ export class RestCommerceCodec extends CommerceCodec {
         console.log(`[ rest-codec-${this.codecId} ] loading start...`)
         const startTime = new Date()
 
-        let restConfig = this.config as RestCommerceCodecConfig
-        this.products = await (await fetch(restConfig.productURL)).json()
-        this.categories = await (await fetch(restConfig.categoryURL)).json()
-        this.translations = await (await fetch(restConfig.translationsURL)).json()
+        this.products = await (await fetch(this.config.productURL)).json()
+        this.categories = await (await fetch(this.config.categoryURL)).json()
+        this.translations = await (await fetch(this.config.translationsURL)).json()
 
         console.log(`[ rest-codec-${this.codecId} ] products loaded: ${this.products.length}`)
         console.log(`[ rest-codec-${this.codecId} ] categories loaded: ${this.categories.length}`)
-
-        const duration = new Date().getTime() - startTime.getTime()
-        console.log(`[ rest-codec-${this.codecId} ] loading duration: ${duration}`)
+        console.log(`[ rest-codec-${this.codecId} ] loading duration: ${new Date().getTime() - startTime.getTime()}`)
     }
+
+    filterCategoryId = (category: Category) => (product: Product): boolean =>
+        _.includes(_.flatMap(_.filter(this.categories, cat => _.includes(_.map(product.categories, 'id'), cat.id)), getCategoryIdsFromCategory), category.id)
 
     translatePrice = (price: string, context: QueryContext) =>
         new Intl.NumberFormat(context.getLocale(), { style: 'currency', currency: context.currency }).format(parseFloat(price))
 
     mapProduct = (context: QueryContext) => (product: Product) => {
-        product.imageSetId = getAttribute(product.variants[0], 'articleNumberMax')
+        product.imageSetId = getAttribute(product.variants[0], 'articleNumberMax', '')
         _.each(product.variants, (variant: Variant) => {
-            _.each(variant.attributes, (value, key) => {
-                variant.articleNumberMax = getAttribute(variant, 'articleNumberMax') || ''
-                variant.size = getAttribute(variant, 'size') || ''
-                variant.color = getAttribute(variant, 'color') || ''
-            })
+            variant.articleNumberMax = getAttribute(variant, 'articleNumberMax', '')
+            variant.size = getAttribute(variant, 'size', '')
+            variant.color = getAttribute(variant, 'color', '')
 
             // map currency code
             variant.listPrice = variant.prices.list && this.translatePrice(variant.prices.list, context) || ''
@@ -52,30 +72,10 @@ export class RestCommerceCodec extends CommerceCodec {
         return product
     }
 
-    mapCategory = (context: QueryContext, depth: number = 0) => (category?: Category): Category => {
-        if (!category) {
-            throw new Error(`Category not found`)
-        }
-
-        const getCategoryIdsFromCategory = (category: Category): string[] => {
-            let ids = [category.id]
-            if (category.parent) {
-                ids = _.concat(ids, getCategoryIdsFromCategory(category.parent))
-            }
-            return ids
-        }
-
-        const filterCategoryId = (product: Product): boolean =>
-            _.includes(_.flatMap(_.filter(this.categories, cat => _.includes(_.map(product.categories, 'id'), cat.id)), getCategoryIdsFromCategory), category.id)
-
-        const trimVariants = (prod: Product) => ({
-            ...prod,
-            variants: prod.variants.length > 0 ? [_.first(prod.variants)!] : []
-        })
-
+    mapCategory = (context: QueryContext, depth: number = 0) => (category: Category): Category => {
         // remove all but the first variant since if this is for a category mapping
         let products = depth === 0 && !!context.args?.includeProducts ?
-            _.take(_.filter(_.map(this.products, trimVariants), filterCategoryId), context.args.limit || 12) : 
+            _.take(_.filter(_.map(this.products, trimVariants), this.filterCategoryId(category)), context.args.limit || 12) :
             []
 
         // search for name matching 'query' if it was provided
@@ -89,8 +89,7 @@ export class RestCommerceCodec extends CommerceCodec {
         }
     }
 
-    // yes!
-    async getProduct(context: QueryContext) {
+    async getProduct(context: QueryContext): Promise<Product> {
         let product =
             context.args.id && _.find(this.products, prod => context.args.id === prod.id) ||
             context.args.key && _.find(this.products, prod => context.args.key === prod.slug) ||
@@ -101,9 +100,8 @@ export class RestCommerceCodec extends CommerceCodec {
         return this.mapProduct(context)(product)
     }
 
-    // yes!
-    async getProducts(context: QueryContext) {
-        let products = 
+    async getProducts(context: QueryContext): Promise<ProductResults> {
+        let products =
             context.args.productIds && _.filter(this.products, prod => context.args.productIds.split(',').includes(prod.id)) ||
             context.args.keyword && _.filter(this.products, prod => prod.name.toLowerCase().indexOf(context.args.keyword) > -1)
 
@@ -121,29 +119,17 @@ export class RestCommerceCodec extends CommerceCodec {
         }
     }
 
-    // yes!
-    async getCategory(context: QueryContext) {
+    async getCategory(context: QueryContext): Promise<Category> {
         let category = _.find(this.categories, cat => context.args?.id === cat.id || context.args?.key === cat.slug)
         if (!category) {
             throw new Error(`Category not found for args: ${JSON.stringify(context.args)}`)
         }
         return this.mapCategory(context)(category)
     }
-}
 
-const type: CodecType = {
-    vendor: 'rest',
-    codecType: 'commerce',
-
-    validate: (x: any) => {
-        return x._meta.schema === 'https://amprsa.net/site/integration/rest'
-    },
-
-    create: (config: RestCommerceCodecConfig) => {
-        return new RestCommerceCodec(config)
+    async getCategories(context: QueryContext): Promise<CategoryResults> {
+        throw new Error(`[ aria ] RestCommerceCodec.getCategories() not yet implemented`)
     }
 }
-export default type
 
-// register myself with codecManager
-codecManager.registerCodecType(type)
+registerCodec(RestCommerceCodec)

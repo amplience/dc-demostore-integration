@@ -1,11 +1,9 @@
 import { AmplienceClient } from './amplience'
-import { codecManager } from './codec/codec-manager'
+import { getCodec } from './codec'
 import { AMPRSAConfiguration, Category, CategoryResults, Product, ProductResults, QueryContext } from './types'
 
 export * from './types'
-export * from './codec/codec'
-export * from './codec/codec-manager'
-export * from './operation'
+export { registerCodec } from './codec'
 
 export interface CommerceAPI {
     getProduct:     (args: QueryContext) => Promise<Product>
@@ -19,5 +17,5 @@ export const getConfig = async (configLocator: string): Promise<AMPRSAConfigurat
 }
 
 export const getCommerceAPI = async (configLocator: string): Promise<CommerceAPI> => {
-    return await codecManager.getCommerceCodec((await getConfig(configLocator)).commerce)
+    return await getCodec((await getConfig(configLocator)).commerce)
 }

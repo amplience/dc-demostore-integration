@@ -1,6 +1,4 @@
 import _ from 'lodash'
-import fetch from 'isomorphic-unfetch'
-import URI from 'urijs'
 
 export class Prices {
     sale?: string
@@ -94,10 +92,6 @@ export class ListArgs extends CommonArgs {
     offset?: number
 }
 
-export class Context {
-    backendKey?: string
-}
-
 export class GetCategoryArgs extends CommonArgs {
     id?: string
     slug?: string
@@ -148,38 +142,6 @@ export class QueryContext {
     getLocale(): string {
         return this.locale || `${this.language}-${this.country}`
     }
-
-    async fetch(url: string) {
-        let uri = new URI(url)
-        uri.addQuery(this.args)
-        console.log(`[ aria ] fetch ${uri.toString()}`)
-        let start = new Date().valueOf()
-        let results = (await (await fetch(uri.toString(), {
-            headers: {
-                'x-aria-locale':    this.locale,
-                'x-aria-language':  this.language,
-                'x-aria-country':   this.country,
-                'x-aria-currency':  this.currency,
-                'x-aria-segment':   this.segment,
-                'x-aria-app-url':   this.appUrl
-            }
-        })).json())
-
-        console.log(`[ aria ] fetch [ ${url} ]: ${new Date().valueOf() - start} ms`)
-        return results
-    }
-}
-
-export function createQueryContext(req) {
-    return new QueryContext({
-        args:       _.omit(req.query, 'operation'),
-        locale:     req.headers['x-aria-locale'],
-        language:   req.headers['x-aria-language'],
-        country:    req.headers['x-aria-country'],
-        currency:   req.headers['x-aria-currency'],
-        segment:    req.headers['x-aria-segment'],
-        appUrl:     req.headers['x-aria-app-url']
-    })
 }
 
 export class AMPRSAConfiguration {
@@ -187,11 +149,6 @@ export class AMPRSAConfiguration {
     url?: string
     cms?: any
     commerce?: any
-    googlemaps?: any
-}
-
-export async function fetchFromQueryContext(url: string, context: QueryContext) {
-    return await context.fetch(url)
 }
 
 export default { QueryContext }
