@@ -10,9 +10,9 @@ ARIA uses codecs in order to determine how and where to get data from. The codec
 ## Codecs in use
 
 ### Rest Codec
-Located in `codec/codecs/rest`.
+Located in `codec/codecs/rest.ts`.
 
-This codec loads a series of JSON objects to mimic a commerce API. These JSON objects are preloaded and then stored with interfactes to:
+This codec loads a series of JSON objects to mimic a commerce API. These JSON objects are preloaded and then stored with interfaces to:
 * getProduct
 * getProducts
 * getCategory
