@@ -11,7 +11,3 @@ logs
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 Dockerfile.old
-
-cdk/node_modules
-
-dist
