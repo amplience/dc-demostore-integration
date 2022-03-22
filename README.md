@@ -33,4 +33,4 @@ Example: [categories.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/
 
 Format: Key values for textual translations
 
-Example: [translations.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json)
+Example: [translations.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json) 

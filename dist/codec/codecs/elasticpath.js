@@ -64,7 +64,7 @@ const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, functi
     let productPrice = (_j = (_h = (_g = product.attributes) === null || _g === void 0 ? void 0 : _g.price) === null || _h === void 0 ? void 0 : _h.USD) === null || _j === void 0 ? void 0 : _j.amount;
     let prices = yield api.getPrices('Retail Pricing');
     let price = lodash_1.default.find(prices, price => { var _a, _b; return ((_a = price.attributes.sku) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === ((_b = product.attributes.sku) === null || _b === void 0 ? void 0 : _b.toLowerCase()); });
-    productPrice = util_1.formatMoneyString(((_k = price === null || price === void 0 ? void 0 : price.attributes.currencies.USD) === null || _k === void 0 ? void 0 : _k.amount) / 100, { currency: 'USD' });
+    productPrice = (0, util_1.formatMoneyString)(((_k = price === null || price === void 0 ? void 0 : price.attributes.currencies.USD) === null || _k === void 0 ? void 0 : _k.amount) / 100, { currency: 'USD' });
     lodash_1.default.each((_l = product.attributes) === null || _l === void 0 ? void 0 : _l.extensions, (extension, key) => {
         lodash_1.default.each(extension, (v, k) => {
             if (k.indexOf('image') > -1) {
@@ -145,7 +145,7 @@ class ElasticPathCommerceCodec extends __1.Codec {
     constructor(config) {
         super(config);
         if (!rest) {
-            rest = rest_client_1.default(config);
+            rest = (0, rest_client_1.default)(config);
         }
     }
     start() {
