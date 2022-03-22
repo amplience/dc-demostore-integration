@@ -263,8 +263,8 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                     return {
                         sku: variant.sku || product.key,
                         prices: {
-                            list: (0, util_1.formatMoneyString)(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context),
-                            sale: (0, util_1.formatMoneyString)(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context)
+                            list: util_1.formatMoneyString(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context),
+                            sale: util_1.formatMoneyString(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context)
                         },
                         images: lodash_1.default.map(variant.images, mapImage),
                         attributes: lodash_1.default.map(variant.attributes, (att) => ({ name: att.name, value: self.localize(att.value, context) }))
@@ -294,7 +294,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                     let applicableDiscounts = lodash_1.default.filter(cartDiscounts, (cd) => cd.cartPredicate === `customer.customerGroup.key = "${segment.toUpperCase()}"`);
                     return lodash_1.default.map(products, (product) => {
                         return Object.assign(Object.assign({}, product), { variants: lodash_1.default.map(product.variants, (variant) => {
-                                let sale = (0, currency_js_1.default)(variant.prices.list).value;
+                                let sale = currency_js_1.default(variant.prices.list).value;
                                 lodash_1.default.each(applicableDiscounts, (discount) => {
                                     if (discount.target.type === 'lineItems') {
                                         let [predicateKey, predicateValue] = discount.target.predicate.split(" = ");
@@ -306,7 +306,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                                         }
                                     }
                                 });
-                                variant.prices.sale = (0, currency_js_1.default)(sale).format();
+                                variant.prices.sale = currency_js_1.default(sale).format();
                                 return variant;
                             }) });
                     });

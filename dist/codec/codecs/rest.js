@@ -124,7 +124,7 @@ const getInstance = (config) => __awaiter(void 0, void 0, void 0, function* () {
         loading_state = 2;
         return codec;
     }
-    yield (0, util_1.sleep)(100);
+    yield util_1.sleep(100);
     return getInstance(config);
 });
 exports.default = {

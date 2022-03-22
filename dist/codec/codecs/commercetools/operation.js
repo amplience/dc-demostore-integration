@@ -83,7 +83,7 @@ class Operation {
                 }
                 console.log(`[ ${context.method.toUpperCase()} ] ${requestParams.url}`);
                 // next, execute the request with headers gotten from the backend
-                let response = yield (0, axios_1.default)(Object.assign(Object.assign({}, requestParams), { httpsAgent }));
+                let response = yield axios_1.default(Object.assign(Object.assign({}, requestParams), { httpsAgent }));
                 // log the response object
                 // mask the auth token first if there is one
                 if (requestParams.headers['authorization']) {
