@@ -54,7 +54,7 @@ const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
         }
         catch (error) {
             if (error.response.status === 429) {
-                yield util_1.sleep(1000);
+                yield (0, util_1.sleep)(1000);
                 // console.log(`[ get ] ${apiUrl}${config.url} [ rate limited ]`)
                 return yield get(config);
             }

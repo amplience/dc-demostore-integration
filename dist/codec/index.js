@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -33,7 +37,7 @@ const nanoid_1 = require("nanoid");
 const util_1 = require("../util");
 class Codec {
     constructor(config) {
-        this.codecId = nanoid_1.nanoid(8);
+        this.codecId = (0, nanoid_1.nanoid)(8);
         this.config = config;
     }
 }
@@ -50,14 +54,14 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     if (codecLoadingState === 0) { // not loaded
         codecLoadingState = 1;
-        exports.registerCodec(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/rest')))).default);
-        exports.registerCodec(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/commercetools')))).default);
-        exports.registerCodec(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/elasticpath')))).default);
+        (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/rest')))).default);
+        (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/commercetools')))).default);
+        (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/elasticpath')))).default);
         codecLoadingState = 2;
     }
     else if (codecLoadingState === 1) { // actively loading
-        yield util_1.sleep(100);
-        return yield exports.getCodec(config);
+        yield (0, util_1.sleep)(100);
+        return yield (0, exports.getCodec)(config);
     }
     let deliveryId = ((_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.deliveryId) || '';
     if (!cachedCodecs[deliveryId]) {

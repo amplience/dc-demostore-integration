@@ -34,8 +34,3 @@ Example: [categories.json](https://nova-amprsa-product-catalog.s3.us-east-2.amaz
 Format: Key values for textual translations
 
 Example: [translations.json](https://nova-amprsa-product-catalog.s3.us-east-2.amazonaws.com/translations.json)
-
-
-
-
-
