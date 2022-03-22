@@ -43,9 +43,6 @@ const api = {
         let catalog: Catalog = _.find(catalogs, cat => cat.attributes?.name === name)
         return await Promise.all(catalog.attributes.hierarchy_ids.map(async (id: string) => (await rest.get({ url: `/pcm/hierarchies/${id}` })).data))
     },
-    getProductsByHierarchyId: async (id: string): Promise<Moltin.Product[]> => {
-        return (await rest.get({ url: `/pcm/hierarchies/${id}/products` })).data
-    },
     getProductsByNodeId: async (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => {
         return (await rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products` })).data
     },
@@ -66,6 +63,10 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
     }
 
     let product: AttributedProduct = await api.getProductById(skeletonProduct.id)
+    if (!product) {
+        return undefined
+    }
+
     let attributes: Attribute[] = []
     let images: ProductImage[] = []
 
@@ -76,7 +77,7 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
 
     let productPrice = product.attributes?.price?.USD?.amount
     let prices: Price[] = await api.getPrices('Retail Pricing')
-    let price = _.find(prices, price => price.attributes.sku.toLowerCase() === product.attributes.sku.toLowerCase())
+    let price = _.find(prices, price => price.attributes.sku?.toLowerCase() === product.attributes.sku?.toLowerCase())
     productPrice = formatMoneyString(price?.attributes.currencies.USD?.amount / 100, { currency: 'USD' })
 
     _.each(product.attributes?.extensions, (extension, key) => {
@@ -141,14 +142,14 @@ const populateCategory = async (category: CategoryWithHierarchyId): Promise<Cate
 })
 
 const getProductsFromCategory = async (category: CategoryWithHierarchyId): Promise<Product[]> => {
-    let products: Product[] = []
+    let products: Moltin.Product[] = []
     if (category.id === category.hierarchyId) {
-        products = await Promise.all((await api.getProductsByHierarchyId(category.hierarchyId)).map(await mapProduct))
+        products = _.flatten(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))))
     }
     else if (category.hierarchyId) {
-        products = await Promise.all((await api.getProductsByNodeId(category.hierarchyId, category.id)).map(await mapProduct))
+        products = await api.getProductsByNodeId(category.hierarchyId, category.id)
     }
-    return products
+    return await Promise.all(products.map(await mapProduct))
 }
 
 const expandCategory = (category: Category) => [category, ..._.flatMapDeep(category.children, expandCategory)]

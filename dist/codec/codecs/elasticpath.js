@@ -34,9 +34,6 @@ const api = {
         let catalog = lodash_1.default.find(catalogs, cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === name; });
         return yield Promise.all(catalog.attributes.hierarchy_ids.map((id) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url: `/pcm/hierarchies/${id}` })).data; })));
     }),
-    getProductsByHierarchyId: (id) => __awaiter(void 0, void 0, void 0, function* () {
-        return (yield rest.get({ url: `/pcm/hierarchies/${id}/products` })).data;
-    }),
     getProductsByNodeId: (hierarchyId, nodeId) => __awaiter(void 0, void 0, void 0, function* () {
         return (yield rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products` })).data;
     }),
@@ -55,6 +52,9 @@ const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, functi
         return undefined;
     }
     let product = yield api.getProductById(skeletonProduct.id);
+    if (!product) {
+        return undefined;
+    }
     let attributes = [];
     let images = [];
     if ((_c = (_b = product.relationships.main_image) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.id) {
@@ -63,7 +63,7 @@ const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, functi
     }
     let productPrice = (_j = (_h = (_g = product.attributes) === null || _g === void 0 ? void 0 : _g.price) === null || _h === void 0 ? void 0 : _h.USD) === null || _j === void 0 ? void 0 : _j.amount;
     let prices = yield api.getPrices('Retail Pricing');
-    let price = lodash_1.default.find(prices, price => price.attributes.sku.toLowerCase() === product.attributes.sku.toLowerCase());
+    let price = lodash_1.default.find(prices, price => { var _a, _b; return ((_a = price.attributes.sku) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === ((_b = product.attributes.sku) === null || _b === void 0 ? void 0 : _b.toLowerCase()); });
     productPrice = (0, util_1.formatMoneyString)(((_k = price === null || price === void 0 ? void 0 : price.attributes.currencies.USD) === null || _k === void 0 ? void 0 : _k.amount) / 100, { currency: 'USD' });
     lodash_1.default.each((_l = product.attributes) === null || _l === void 0 ? void 0 : _l.extensions, (extension, key) => {
         lodash_1.default.each(extension, (v, k) => {
@@ -127,12 +127,12 @@ const populateCategory = (category) => __awaiter(void 0, void 0, void 0, functio
 const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
     let products = [];
     if (category.id === category.hierarchyId) {
-        products = yield Promise.all((yield api.getProductsByHierarchyId(category.hierarchyId)).map(yield mapProduct));
+        products = lodash_1.default.flatten(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))));
     }
     else if (category.hierarchyId) {
-        products = yield Promise.all((yield api.getProductsByNodeId(category.hierarchyId, category.id)).map(yield mapProduct));
+        products = yield api.getProductsByNodeId(category.hierarchyId, category.id);
     }
-    return products;
+    return yield Promise.all(products.map(yield mapProduct));
 });
 const expandCategory = (category) => [category, ...lodash_1.default.flatMapDeep(category.children, expandCategory)];
 const locateCategoryForKey = (slug) => __awaiter(void 0, void 0, void 0, function* () {
