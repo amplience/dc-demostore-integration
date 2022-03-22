@@ -21,16 +21,16 @@ This codec loads a series of JSON objects to mimic a commerce API. These JSON ob
 
 Format: An array of products
 
-Example: [products.json](https://nova-amprsa-product-catalog.s3.us-east-2.amazonaws.com/products.json)
+Example: [products.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/products.json)
 
 #### Categories
 
 Format: Category Hierarchy
 
-Example: [categories.json](https://nova-amprsa-product-catalog.s3.us-east-2.amazonaws.com/categories.json)
+Example: [categories.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/categories.json)
 
 #### Translations
 
 Format: Key values for textual translations
 
-Example: [translations.json](https://nova-amprsa-product-catalog.s3.us-east-2.amazonaws.com/translations.json)
+Example: [translations.json](https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json)

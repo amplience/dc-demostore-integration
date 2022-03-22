@@ -142,7 +142,7 @@ const getInstance = async (config: RestCommerceCodecConfig): Promise<RestCommerc
 
 export default {
     // codec generator conformance
-    SchemaURI: 'https://amprsa.net/site/integration/rest',
+    SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getInstance
     // end codec generator conformance
 }

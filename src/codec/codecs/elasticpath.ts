@@ -204,7 +204,7 @@ export class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
 
 export default {
     // codec generator conformance
-    SchemaURI: 'https://amprsa.net/site/integration/elasticpath',
+    SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getInstance: async (config) => {
         let codec = new ElasticPathCommerceCodec(config)
         await codec.start()

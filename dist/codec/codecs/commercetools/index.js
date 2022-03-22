@@ -320,7 +320,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
 }
 exports.default = {
     // codec generator conformance
-    SchemaURI: 'https://amprsa.net/site/integration/commercetools',
+    SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getInstance: (config) => __awaiter(void 0, void 0, void 0, function* () {
         return new CommerceToolsCodec(config);
     })

@@ -188,7 +188,7 @@ class ElasticPathCommerceCodec extends __1.Codec {
 exports.ElasticPathCommerceCodec = ElasticPathCommerceCodec;
 exports.default = {
     // codec generator conformance
-    SchemaURI: 'https://amprsa.net/site/integration/elasticpath',
+    SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getInstance: (config) => __awaiter(void 0, void 0, void 0, function* () {
         let codec = new ElasticPathCommerceCodec(config);
         yield codec.start();

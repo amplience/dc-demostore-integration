@@ -129,7 +129,7 @@ const getInstance = (config) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.default = {
     // codec generator conformance
-    SchemaURI: 'https://amprsa.net/site/integration/rest',
+    SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getInstance
     // end codec generator conformance
 };
