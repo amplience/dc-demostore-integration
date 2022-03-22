@@ -34,6 +34,7 @@ const bulldozeCategories = cat => {
 let categories = [];
 let products = [];
 let translations = {};
+const getProductsForCategory = (category) => lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
 class RestCommerceCodec extends __1.Codec {
     constructor() {
         super(...arguments);
@@ -52,7 +53,10 @@ class RestCommerceCodec extends __1.Codec {
             return product;
         };
         this.mapCategory = (context, depth = 0) => (category) => {
-            category.products = lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
+            category.products = lodash_1.default.take([
+                ...lodash_1.default.filter(category, getProductsForCategory),
+                ...lodash_1.default.flatMap(category.children, getProductsForCategory)
+            ], 20);
             return category;
         };
     }

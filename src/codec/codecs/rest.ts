@@ -35,6 +35,8 @@ let categories: Category[] = []
 let products: Product[] = []
 let translations: Dictionary<Dictionary<string>> = {}
 
+const getProductsForCategory = (category: Category) => _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
+
 class RestCommerceCodec extends Codec implements CommerceAPI {
     config: RestCommerceCodecConfig
 
@@ -80,7 +82,10 @@ class RestCommerceCodec extends Codec implements CommerceAPI {
     }
 
     mapCategory = (context: QueryContext, depth: number = 0) => (category: Category): Category => {
-        category.products = _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
+        category.products = _.take([
+            ..._.filter(category, getProductsForCategory),
+            ..._.flatMap(category.children, getProductsForCategory)
+        ], 20)
         return category
     }
 
