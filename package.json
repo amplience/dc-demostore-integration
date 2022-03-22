@@ -1,5 +1,5 @@
 {
-  "name": "@amplience/aria",
+  "name": "@amplience/dc-demostore-integration",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "main": "dist/index.js",
