@@ -1,3 +1,4 @@
+import { Method } from 'axios'
 import _ from 'lodash'
 
 export class Prices {
@@ -121,13 +122,13 @@ export class GetAttributeArgs {
 
 export class QueryContext {
     args:       any
-    locale:     string
-    language:   string
-    country:    string
-    currency:   string
-    segment:    string
-    appUrl:     string
-    method:     string = 'get'
+    locale:     string = 'en-US'
+    language:   string = 'en'
+    country:    string = 'US'
+    currency:   string = 'USD'
+    segment:    string = ''
+    appUrl:     string = ''
+    method:     Method = 'get'
 
     constructor(obj?: any) {
         this.args =     obj?.args || {}

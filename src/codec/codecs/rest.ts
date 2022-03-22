@@ -1,7 +1,8 @@
 import _, { Dictionary } from 'lodash'
 import { Product, Category, Variant, QueryContext, CategoryResults, ProductResults } from '../../types'
-import { CodecConfiguration, Codec, registerCodec } from '..'
+import { CodecConfiguration, Codec, registerCodec, CodecGenerator } from '..'
 import { CommerceAPI } from '../..'
+import { sleep } from '../../util'
 
 const getAttribute = (variant: Variant, attributeName: string, defaultValue: string) => _.get(_.find(variant.attributes, att => att.name === attributeName), 'value') || defaultValue
 
@@ -19,41 +20,47 @@ const getCategoryIdsFromCategory = (category: Category): string[] => {
     return ids
 }
 
-const trimVariants = (prod: Product) => ({
-    ...prod,
-    variants: prod.variants.length > 0 ? [_.first(prod.variants)!] : []
-})
+let codec: RestCommerceCodec = undefined
+let loading_state: number = 0
 
-export class RestCommerceCodec extends Codec implements CommerceAPI {
-    // codec generator conformance
-    static SchemaURI = 'https://amprsa.net/site/integration/rest'
-    static async getInstance(config: RestCommerceCodecConfig): Promise<RestCommerceCodec> {
-        let codec = new RestCommerceCodec(config)
-        await codec.start()
-        return codec
-    }
-    // end codec generator conformance
+const topLevelCategorySlugs = ['women', 'men', 'accessories', 'new', 'sale']
 
+let allCategories: Category[] = []
+const bulldozeCategories = cat => {
+    allCategories.push(cat)
+    _.each(cat.children, bulldozeCategories)
+}
+
+let categories: Category[] = []
+let products: Product[] = []
+let translations: Dictionary<Dictionary<string>> = {}
+
+class RestCommerceCodec extends Codec implements CommerceAPI {
     config: RestCommerceCodecConfig
-    categories: Category[] = []
-    products: Product[] = []
-    translations: Dictionary<Dictionary<string>> = {}
 
     async start() {
         console.log(`[ rest-codec-${this.codecId} ] loading start...`)
         const startTime = new Date()
 
-        this.products = await (await fetch(this.config.productURL)).json()
-        this.categories = await (await fetch(this.config.categoryURL)).json()
-        this.translations = await (await fetch(this.config.translationsURL)).json()
+        products = await (await fetch(this.config.productURL)).json()
+        categories = await (await fetch(this.config.categoryURL)).json()
+        translations = await (await fetch(this.config.translationsURL)).json()
 
-        console.log(`[ rest-codec-${this.codecId} ] products loaded: ${this.products.length}`)
-        console.log(`[ rest-codec-${this.codecId} ] categories loaded: ${this.categories.length}`)
+        // bulldoze the category array so we have them easily accessible
+        _.each(categories, bulldozeCategories)
+
+        allCategories = allCategories.map(category => ({
+            ...category,
+            products: _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
+        }))
+
+        console.log(`[ rest-codec-${this.codecId} ] products loaded: ${products.length}`)
+        console.log(`[ rest-codec-${this.codecId} ] categories loaded: ${categories.length}`)
         console.log(`[ rest-codec-${this.codecId} ] loading duration: ${new Date().getTime() - startTime.getTime()}`)
     }
 
     filterCategoryId = (category: Category) => (product: Product): boolean =>
-        _.includes(_.flatMap(_.filter(this.categories, cat => _.includes(_.map(product.categories, 'id'), cat.id)), getCategoryIdsFromCategory), category.id)
+        _.includes(_.flatMap(_.filter(categories, cat => _.includes(_.map(product.categories, 'id'), cat.id)), getCategoryIdsFromCategory), category.id)
 
     translatePrice = (price: string, context: QueryContext) =>
         new Intl.NumberFormat(context.getLocale(), { style: 'currency', currency: context.currency }).format(parseFloat(price))
@@ -73,58 +80,43 @@ export class RestCommerceCodec extends Codec implements CommerceAPI {
     }
 
     mapCategory = (context: QueryContext, depth: number = 0) => (category: Category): Category => {
-        // remove all but the first variant since if this is for a category mapping
-        let products = depth === 0 && !!context.args?.includeProducts ?
-            _.take(_.filter(_.map(this.products, trimVariants), this.filterCategoryId(category)), context.args.limit || 12) :
-            []
-
-        // search for name matching 'query' if it was provided
-        products = _.filter(products, prod => _.isEmpty(context.args.query) || prod.name.toLowerCase().indexOf(context.args.query.toLowerCase()) > -1)
-
-        return {
-            ...category,
-            children: depth < 2 ? _.map(category.children, this.mapCategory(context, depth + 1)) : [],
-            name: this.translations[category.name][`${context.language}-${context.country}`] || category.name,
-            products: _.map(products, this.mapProduct(context))
-        }
+        category.products = _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
+        return category
     }
 
     async getProduct(context: QueryContext): Promise<Product> {
         let product =
-            context.args.id && _.find(this.products, prod => context.args.id === prod.id) ||
-            context.args.key && _.find(this.products, prod => context.args.key === prod.slug) ||
-            context.args.sku && _.find(this.products, prod => _.map(prod.variants, 'sku').includes(context.args.sku))
+            context.args.id && _.find(products, prod => context.args.id === prod.id) ||
+            context.args.key && _.find(products, prod => context.args.key === prod.slug) ||
+            context.args.sku && _.find(products, prod => _.map(prod.variants, 'sku').includes(context.args.sku))
         if (!product) {
             throw new Error(`Product not found for args: ${JSON.stringify(context.args)}`)
         }
         return this.mapProduct(context)(product)
     }
 
-    async getProducts(context: QueryContext): Promise<ProductResults> {
-        let products =
-            context.args.productIds && _.filter(this.products, prod => context.args.productIds.split(',').includes(prod.id)) ||
-            context.args.keyword && _.filter(this.products, prod => prod.name.toLowerCase().indexOf(context.args.keyword) > -1)
+    async getProducts(context: QueryContext): Promise<Product[]> {
+        let filtered =
+            context.args.productIds && _.filter(products, prod => context.args.productIds.split(',').includes(prod.id)) ||
+            context.args.keyword && _.filter(products, prod => prod.name.toLowerCase().indexOf(context.args.keyword) > -1) ||
+            context.args.categoryId && _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), context.args.categoryId))
 
-        if (!products) {
+        if (!filtered) {
             throw new Error(`Products not found for args: ${JSON.stringify(context.args)}`)
         }
-        return {
-            meta: context.args.limit && {
-                limit: context.args.limit,
-                count: context.args.count,
-                offset: context.args.offset,
-                total: context.args.total
-            },
-            results: _.map(products, this.mapProduct(context))
-        }
+        return _.map(filtered, this.mapProduct(context))
     }
 
     async getCategory(context: QueryContext): Promise<Category> {
-        let category = _.find(this.categories, cat => context.args?.id === cat.id || context.args?.key === cat.slug)
+        let category = _.find(allCategories, cat => context.args?.id === cat.id || context.args?.key === cat.slug)
         if (!category) {
             throw new Error(`Category not found for args: ${JSON.stringify(context.args)}`)
         }
         return this.mapCategory(context)(category)
+    }
+
+    async getMegaMenu(): Promise<Category[]> {
+        return categories
     }
 
     async getCategories(context: QueryContext): Promise<CategoryResults> {
@@ -132,4 +124,26 @@ export class RestCommerceCodec extends Codec implements CommerceAPI {
     }
 }
 
-registerCodec(RestCommerceCodec)
+const getInstance = async (config: RestCommerceCodecConfig): Promise<RestCommerceCodec> => {
+    if (codec && loading_state !== 1) {
+        return codec
+    }
+    else if (loading_state === 0) {
+        loading_state = 1
+        codec = new RestCommerceCodec(config)
+        await codec.start()
+        loading_state = 2
+        return codec
+    }
+
+    await sleep(100)
+    return getInstance(config)
+}
+
+export default {
+    // codec generator conformance
+    SchemaURI: 'https://amprsa.net/site/integration/rest',
+    getInstance
+    // end codec generator conformance
+}
+// registerCodec(RestCommerceCodec)
