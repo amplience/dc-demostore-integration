@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { AMPRSAConfiguration } from '../types'
+import { DemoStoreConfiguration } from '../types'
 import { ContentItem } from 'dc-management-sdk-js'
 
 export class AmplienceClient {
@@ -18,7 +18,7 @@ export class AmplienceClient {
         return (await response.json()).content
     }
 
-    async getConfig(): Promise<AMPRSAConfiguration> {
+    async getConfig(): Promise<DemoStoreConfiguration> {
         let obj: any = await this.getContentItem({ key: `aria/env/${this.environment}` })
         if (!obj) {
             throw `[ aria ] Couldn't find config with key '${this.hub}:${this.environment}'`
@@ -29,6 +29,6 @@ export class AmplienceClient {
         obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
         obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
 
-        return obj as AMPRSAConfiguration
+        return obj as DemoStoreConfiguration
     }
 }

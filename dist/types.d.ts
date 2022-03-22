@@ -108,7 +108,7 @@ export declare class QueryContext {
     constructor(obj?: any);
     getLocale(): string;
 }
-export declare class AMPRSAConfiguration {
+export declare class DemoStoreConfiguration {
     algolia?: any;
     url?: string;
     cms?: any;

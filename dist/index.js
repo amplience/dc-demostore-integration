@@ -26,6 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommerceAPIFromCodecConfig = exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = void 0;
 const amplience_1 = require("./amplience");
 const codec_1 = require("./codec");
+const types_1 = require("./types");
+exports.default = { DemoStoreConfiguration: types_1.DemoStoreConfiguration };
 __exportStar(require("./types"), exports);
 __exportStar(require("./codec"), exports);
 class CommerceAPI {

@@ -1,6 +1,8 @@
 import { AmplienceClient } from './amplience'
 import { CodecConfiguration, getCodec } from './codec'
-import { AMPRSAConfiguration, Category, CategoryResults, Product, ProductResults, QueryContext } from './types'
+import { DemoStoreConfiguration, Category, Product, QueryContext } from './types'
+
+export default { DemoStoreConfiguration }
 
 export * from './types'
 export * from './codec'
@@ -12,7 +14,7 @@ export class CommerceAPI {
     getMegaMenu:    ()                   => Promise<Category[]>
 }
 
-export const getConfig = async (configLocator: string): Promise<AMPRSAConfiguration> => {
+export const getConfig = async (configLocator: string): Promise<DemoStoreConfiguration> => {
     return await new AmplienceClient(configLocator).getConfig()
 }
 

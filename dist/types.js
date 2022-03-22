@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AMPRSAConfiguration = exports.QueryContext = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.ListArgs = exports.CommonArgs = exports.SearchResult = exports.Category = exports.Variant = exports.Attribute = exports.Product = exports.CommerceObject = exports.Keyed = exports.Identifiable = exports.CategoryResults = exports.ProductResults = exports.ResultsMeta = exports.ProductImage = exports.Prices = void 0;
+exports.DemoStoreConfiguration = exports.QueryContext = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.ListArgs = exports.CommonArgs = exports.SearchResult = exports.Category = exports.Variant = exports.Attribute = exports.Product = exports.CommerceObject = exports.Keyed = exports.Identifiable = exports.CategoryResults = exports.ProductResults = exports.ResultsMeta = exports.ProductImage = exports.Prices = void 0;
 class Prices {
 }
 exports.Prices = Prices;
@@ -83,7 +83,7 @@ class QueryContext {
     }
 }
 exports.QueryContext = QueryContext;
-class AMPRSAConfiguration {
+class DemoStoreConfiguration {
 }
-exports.AMPRSAConfiguration = AMPRSAConfiguration;
+exports.DemoStoreConfiguration = DemoStoreConfiguration;
 exports.default = { QueryContext };

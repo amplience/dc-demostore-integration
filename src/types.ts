@@ -145,7 +145,7 @@ export class QueryContext {
     }
 }
 
-export class AMPRSAConfiguration {
+export class DemoStoreConfiguration {
     algolia?: any
     url?: string
     cms?: any
