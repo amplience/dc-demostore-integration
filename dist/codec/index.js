@@ -51,12 +51,13 @@ const registerCodec = (codec) => {
 exports.registerCodec = registerCodec;
 let codecLoadingState = 0;
 const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a, _b, _c;
     if (codecLoadingState === 0) { // not loaded
         codecLoadingState = 1;
         (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/rest')))).default);
         (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/commercetools')))).default);
         (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/elasticpath')))).default);
+        (0, exports.registerCodec)(yield (yield Promise.resolve().then(() => __importStar(require('./codecs/fabric')))).default);
         codecLoadingState = 2;
     }
     else if (codecLoadingState === 1) { // actively loading
@@ -69,6 +70,7 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
         if (!codecGenerator) {
             throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
         }
+        console.log(`[ aria ] using codec for schema [ ${(_c = config === null || config === void 0 ? void 0 : config._meta) === null || _c === void 0 ? void 0 : _c.schema} ]`);
         cachedCodecs[deliveryId] = yield codecGenerator.getInstance(config);
     }
     return cachedCodecs[deliveryId];

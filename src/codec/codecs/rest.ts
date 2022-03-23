@@ -51,10 +51,10 @@ class RestCommerceCodec extends Codec implements CommerceAPI {
         // bulldoze the category array so we have them easily accessible
         _.each(categories, bulldozeCategories)
 
-        allCategories = allCategories.map(category => ({
-            ...category,
-            products: _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
-        }))
+        // allCategories = allCategories.map(category => ({
+        //     ...category,
+        //     products: getProductsForCategory(category)
+        // }))
 
         console.log(`[ rest-codec-${this.codecId} ] products loaded: ${products.length}`)
         console.log(`[ rest-codec-${this.codecId} ] categories loaded: ${categories.length}`)
@@ -83,9 +83,9 @@ class RestCommerceCodec extends Codec implements CommerceAPI {
 
     mapCategory = (context: QueryContext, depth: number = 0) => (category: Category): Category => {
         category.products = _.take([
-            ..._.filter(category, getProductsForCategory),
+            ...getProductsForCategory(category),
             ..._.flatMap(category.children, getProductsForCategory)
-        ], 20)
+        ], 12)
         return category
     }
 
@@ -94,10 +94,9 @@ class RestCommerceCodec extends Codec implements CommerceAPI {
             context.args.id && _.find(products, prod => context.args.id === prod.id) ||
             context.args.key && _.find(products, prod => context.args.key === prod.slug) ||
             context.args.sku && _.find(products, prod => _.map(prod.variants, 'sku').includes(context.args.sku))
-        if (!product) {
-            throw new Error(`Product not found for args: ${JSON.stringify(context.args)}`)
+        if (product) {
+            return this.mapProduct(context)(product)
         }
-        return this.mapProduct(context)(product)
     }
 
     async getProducts(context: QueryContext): Promise<Product[]> {
@@ -121,7 +120,7 @@ class RestCommerceCodec extends Codec implements CommerceAPI {
     }
 
     async getMegaMenu(): Promise<Category[]> {
-        return categories
+        return _.filter(categories, cat => !cat.parent)
     }
 
     async getCategories(context: QueryContext): Promise<CategoryResults> {

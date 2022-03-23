@@ -39,6 +39,7 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
         registerCodec(await (await import('./codecs/rest')).default)
         registerCodec(await (await import('./codecs/commercetools')).default)
         registerCodec(await (await import('./codecs/elasticpath')).default)
+        registerCodec(await (await import('./codecs/fabric')).default)
         codecLoadingState = 2
     }
     else if (codecLoadingState === 1) { // actively loading
@@ -52,6 +53,7 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
         if (!codecGenerator) {
             throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
         }
+        console.log(`[ aria ] using codec for schema [ ${config?._meta?.schema} ]`)
         cachedCodecs[deliveryId] = await codecGenerator.getInstance(config)
     }
     return cachedCodecs[deliveryId]

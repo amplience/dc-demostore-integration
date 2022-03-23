@@ -54,9 +54,9 @@ class RestCommerceCodec extends __1.Codec {
         };
         this.mapCategory = (context, depth = 0) => (category) => {
             category.products = lodash_1.default.take([
-                ...lodash_1.default.filter(category, getProductsForCategory),
+                ...getProductsForCategory(category),
                 ...lodash_1.default.flatMap(category.children, getProductsForCategory)
-            ], 20);
+            ], 12);
             return category;
         };
     }
@@ -69,7 +69,10 @@ class RestCommerceCodec extends __1.Codec {
             translations = yield (yield fetch(this.config.translationsURL)).json();
             // bulldoze the category array so we have them easily accessible
             lodash_1.default.each(categories, bulldozeCategories);
-            allCategories = allCategories.map(category => (Object.assign(Object.assign({}, category), { products: lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id)) })));
+            // allCategories = allCategories.map(category => ({
+            //     ...category,
+            //     products: getProductsForCategory(category)
+            // }))
             console.log(`[ rest-codec-${this.codecId} ] products loaded: ${products.length}`);
             console.log(`[ rest-codec-${this.codecId} ] categories loaded: ${categories.length}`);
             console.log(`[ rest-codec-${this.codecId} ] loading duration: ${new Date().getTime() - startTime.getTime()}`);
@@ -80,10 +83,9 @@ class RestCommerceCodec extends __1.Codec {
             let product = context.args.id && lodash_1.default.find(products, prod => context.args.id === prod.id) ||
                 context.args.key && lodash_1.default.find(products, prod => context.args.key === prod.slug) ||
                 context.args.sku && lodash_1.default.find(products, prod => lodash_1.default.map(prod.variants, 'sku').includes(context.args.sku));
-            if (!product) {
-                throw new Error(`Product not found for args: ${JSON.stringify(context.args)}`);
+            if (product) {
+                return this.mapProduct(context)(product);
             }
-            return this.mapProduct(context)(product);
         });
     }
     getProducts(context) {
@@ -108,7 +110,7 @@ class RestCommerceCodec extends __1.Codec {
     }
     getMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            return categories;
+            return lodash_1.default.filter(categories, cat => !cat.parent);
         });
     }
     getCategories(context) {
