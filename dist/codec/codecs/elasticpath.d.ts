@@ -1,7 +1,7 @@
 import { Product, Category, QueryContext } from '../../types';
 import { CodecConfiguration, Codec } from '..';
 import { CommerceAPI } from '../..';
-import Moltin, { Price } from '@moltin/sdk';
+import Moltin, { PriceBook, PriceBookPriceBase } from '@moltin/sdk';
 export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
     client_id: string;
     client_secret: string;
@@ -18,11 +18,11 @@ export interface NodeLocator {
     hierarchyId: string;
     nodeId: string;
 }
-export interface CategoryWithHierarchyId extends Category {
+export interface ElasticPathCategory extends Category {
     hierarchyId: string;
 }
-export interface PriceBookPrice extends Price {
-    pricebookName: string;
+export interface PriceBookPrice extends PriceBookPriceBase {
+    pricebook: PriceBook;
 }
 export declare class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
     config: ElasticPathCommerceCodecConfig;

@@ -17,7 +17,7 @@ declare class CommerceToolsCodec extends Codec implements CommerceAPI {
     getMegaMenu(): Promise<Category[]>;
     getProduct(query: QueryContext): Promise<Product>;
     getProducts(query: QueryContext): Promise<Product[]>;
-    getCategoryHierarchy(query: QueryContext): Promise<any>;
+    getCategoryHierarchy(query: QueryContext): Promise<Category[]>;
     getCategories(query: QueryContext): Promise<CategoryResults>;
     getCategory(query: QueryContext): Promise<Category>;
     getProductsForCategory(parent: Category, query: QueryContext): Promise<any>;

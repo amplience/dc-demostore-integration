@@ -2,7 +2,7 @@ import _, { Dictionary } from 'lodash'
 import { Product, Category, QueryContext, Attribute, ProductImage } from '../../types'
 import { CodecConfiguration, Codec } from '..'
 import { CommerceAPI } from '../..'
-import Moltin, { Catalog, Hierarchy, Price, File, PriceBook } from '@moltin/sdk'
+import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase, Variation, Option } from '@moltin/sdk'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../common/rest-client'
 import { formatMoneyString } from '../../util'
 
@@ -25,27 +25,41 @@ export interface NodeLocator {
     nodeId: string
 }
 
-export interface CategoryWithHierarchyId extends Category {
+export interface ElasticPathCategory extends Category {
     hierarchyId: string
 }
 
-export interface PriceBookPrice extends Price {
-    pricebookName: string
+export interface PriceBookPrice extends PriceBookPriceBase {
+    pricebook: PriceBook
 }
 
 const api = {
     getProductById: async (id: string): Promise<AttributedProduct> => (await rest.get({ url: `/pcm/products/${id}` })).data,
+    getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first((await rest.get({ url: `/pcm/products/?filter=like(sku,string:${sku})` })).data),
     getFileById: async (id: string): Promise<File> => (await rest.get({ url: `/v2/files/${id}` })).data,
-    getPricesForSku: async (sku: string): Promise<PriceBookPrice[]> => {
-        return await Promise.all((await rest.get({ url: `/pcm/pricebooks` })).data.map(async pricebook => ({
-            ..._.first((await rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` }))?.data),
-            pricebook: pricebook.attributes.name
-        })))
+    getPricebooks: async (): Promise<PriceBook[]> => (await rest.get({ url: `/pcm/pricebooks` })).data,
+    getPricebookById: async (id: string): Promise<PriceBook> => (await rest.get({ url: `/pcm/pricebooks/${id}` })).data,
+    getHierarchyById: async (id: string): Promise<Hierarchy> => (await rest.get({ url: `/pcm/hierarchies/${id}` })).data,
+    getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first((await rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` })).data),
+    getPriceForSku: async (sku: string): Promise<Price> => {
+        let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
+        let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === catalog.attributes.pricebook_id && !!price.attributes.currencies) ||
+            _.find(prices, price => !!price.attributes.currencies)
+        return {
+            ...priceBookPrice.attributes.currencies['USD'],
+            currency: 'USD'
+        }
+    },
+    getPricesForSku: async (sku: string): Promise<PriceBookPriceBase[]> => await Promise.all((await api.getPricebooks()).map(async pricebook => ({
+        ...await api.getPriceForSkuInPricebook(sku, pricebook),
+        pricebook
+    }))),
+    getCatalog: async (name: string): Promise<Catalog> => {
+        let catalogs = (await rest.get({ url: '/catalogs' })).data
+        return _.find(catalogs, cat => cat.attributes?.name === name)
     },
     getMegaMenu: async (name: string): Promise<Hierarchy[]> => {
-        let catalogs = (await rest.get({ url: '/catalogs' })).data
-        let catalog: Catalog = _.find(catalogs, cat => cat.attributes?.name === name)
-        return await Promise.all(catalog.attributes.hierarchy_ids.map(async (id: string) => (await rest.get({ url: `/pcm/hierarchies/${id}` })).data))
+        return await Promise.all((await api.getCatalog(name)).attributes.hierarchy_ids.map(await api.getHierarchyById))
     },
     getProductsByNodeId: async (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => {
         return (await rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products` })).data
@@ -79,13 +93,8 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
         images.push({ url: mainImage?.link?.href })
     }
 
-    let productPrice = product.attributes?.price?.USD?.amount
-    let prices: PriceBookPrice[] = await api.getPricesForSku(product.attributes.sku?.toLowerCase())
-
-    let price = _.find(prices, price => price.pricebook === 'Retail Pricing' && !!price.attributes) ||
-        _.find(prices, price => !!price.attributes)
-
-    productPrice = formatMoneyString(price?.attributes.currencies.USD?.amount / 100, { currency: 'USD' })
+    let price = await api.getPriceForSku(product.attributes.sku)
+    let productPrice = formatMoneyString(price.amount / 100, { currency: 'USD' })
 
     _.each(product.attributes?.extensions, (extension, key) => {
         _.each(extension, (v, k) => {
@@ -111,24 +120,31 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
         id: product.id
     }]
 
+    // .map(opt => {
+    //     return {
+    //         sku: product.attributes.sku,
+    //         prices: {
+    //             list: productPrice,
+    //         },
+    //         listPrice: productPrice,
+    //         salePrice: productPrice,
+    //         images,
+    //         attributes: _.concat(attributes, [{ name: v.name, value: opt.name }]),
+    //         key: product.attributes.slug,
+    //         id: product.id
+    //     }
+    // })
+
     // variants
     if (!_.isEmpty((product.meta as any).variation_matrix)) {
-        let variationMatrix = (product.meta as any).variation_matrix
-        variants = _.flatMap(product.meta.variations?.map(v => {
-            return v.options.map(opt => {
-                return {
-                    sku: product.attributes.sku,
-                    prices: {
-                        list: productPrice,
-                    },
-                    listPrice: productPrice,
-                    salePrice: productPrice,
-                    images,
-                    attributes: _.concat(attributes, [{ name: v.name, value: opt.name }]),
-                    key: product.attributes.slug,
-                    id: product.id
-                }
-            })
+        let variationMatrix: Dictionary<Dictionary<string>> = (product.meta as any).variation_matrix
+        let x = _.flatMap(Object.keys(variationMatrix).map(key => {
+            let variation = variationMatrix[key]
+            let z = _.map
+
+            return {
+
+            }
         }))
     }
 
@@ -145,7 +161,7 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
     }
 }
 
-const mapNode = (hierarchy: Hierarchy) => async (node: Moltin.Node): Promise<CategoryWithHierarchyId> => ({
+const mapNode = (hierarchy: Hierarchy) => async (node: Moltin.Node): Promise<ElasticPathCategory> => ({
     hierarchyId: hierarchy.id,
     name: node.attributes.name,
     id: node.id,
@@ -155,7 +171,7 @@ const mapNode = (hierarchy: Hierarchy) => async (node: Moltin.Node): Promise<Cat
     products: []
 })
 
-const mapHierarchy = async (hierarchy: Hierarchy): Promise<CategoryWithHierarchyId> => ({
+const mapHierarchy = async (hierarchy: Hierarchy): Promise<ElasticPathCategory> => ({
     hierarchyId: hierarchy.id,
     name: hierarchy.attributes.name,
     id: hierarchy.id,
@@ -167,12 +183,12 @@ const mapHierarchy = async (hierarchy: Hierarchy): Promise<CategoryWithHierarchy
 // end mappers
 
 // utility methods
-const populateCategory = async (category: CategoryWithHierarchyId): Promise<CategoryWithHierarchyId> => ({
+const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
     ...category,
     products: await getProductsFromCategory(category)
 })
 
-const getProductsFromCategory = async (category: CategoryWithHierarchyId): Promise<Product[]> => {
+const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
     let products: Moltin.Product[] = []
     if (category.id === category.hierarchyId) {
         products = _.flatten(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))))
@@ -185,13 +201,14 @@ const getProductsFromCategory = async (category: CategoryWithHierarchyId): Promi
 
 const expandCategory = (category: Category) => [category, ..._.flatMapDeep(category.children, expandCategory)]
 
-const locateCategoryForKey = async (slug: string): Promise<CategoryWithHierarchyId> => {
+const locateCategoryForKey = async (slug: string): Promise<ElasticPathCategory> => {
     let category = _.find(_.flatMapDeep(megaMenu, expandCategory), c => c.slug === slug)
     return await populateCategory(category)
 }
 // end utility methods
 
 let megaMenu: Category[] = []
+let catalog: Catalog
 export class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
     config: ElasticPathCommerceCodecConfig
 
@@ -204,6 +221,7 @@ export class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
 
     async start() {
         await rest.authenticate()
+        catalog = await api.getCatalog(this.config.catalog_name)
         megaMenu = await Promise.all((await api.getMegaMenu(this.config.catalog_name)).map(await mapHierarchy))
     }
 
@@ -219,8 +237,8 @@ export class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
             }))
         }
         else if (context.args.keyword) {
-            console.warn(`keyword search not available in elasticpath`)
-            return []
+            // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
+            return [await mapProduct(await api.getProductBySku(context.args.keyword))]
         }
         throw new Error(`[ ep ] keyword or productIds required`)
     }
