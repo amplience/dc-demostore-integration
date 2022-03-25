@@ -4,6 +4,7 @@ export declare class AmplienceClient {
     hub: string;
     environment: string;
     constructor(key: string);
+    toString(): string;
     getContentItem(args: any): Promise<ContentItem>;
     getConfig(): Promise<DemoStoreConfiguration>;
 }

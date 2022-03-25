@@ -1,3 +1,4 @@
+import CryptKeeper from '../common/crypt-keeper'
 import _, { Dictionary } from 'lodash'
 import { nanoid } from 'nanoid'
 import { sleep } from '../util'
@@ -13,6 +14,7 @@ export interface CodecConfiguration {
         deliveryId: string
         schema: string
     }
+    locator?: string
 }
 
 export abstract class Codec {
@@ -20,6 +22,12 @@ export abstract class Codec {
     codecId: string = nanoid(8)
 
     constructor(config: CodecConfiguration) {
+        let keeper = CryptKeeper(config)
+        _.each(config, (value, key) => {
+            if (typeof value === 'string') {
+                config[key] = keeper.decrypt(value)
+            }
+        })
         this.config = config
     }
 }

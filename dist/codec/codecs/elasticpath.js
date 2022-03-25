@@ -21,13 +21,11 @@ const util_1 = require("../../util");
 const api = {
     getProductById: (id) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url: `/pcm/products/${id}` })).data; }),
     getFileById: (id) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url: `/v2/files/${id}` })).data; }),
-    getPrices: (name) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a;
-        let retailPricebook = lodash_1.default.find((yield rest.get({ url: `/pcm/pricebooks` })).data, pb => pb.attributes.name === name);
-        if (retailPricebook) {
-            return (_a = (yield rest.get({ url: `/pcm/pricebooks/${retailPricebook.id}/prices` }))) === null || _a === void 0 ? void 0 : _a.data;
-        }
-        return [];
+    getPricesForSku: (sku) => __awaiter(void 0, void 0, void 0, function* () {
+        return yield Promise.all((yield rest.get({ url: `/pcm/pricebooks` })).data.map((pricebook) => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            return (Object.assign(Object.assign({}, lodash_1.default.first((_a = (yield rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` }))) === null || _a === void 0 ? void 0 : _a.data)), { pricebook: pricebook.attributes.name }));
+        })));
     }),
     getMegaMenu: (name) => __awaiter(void 0, void 0, void 0, function* () {
         let catalogs = (yield rest.get({ url: '/catalogs' })).data;
@@ -47,7 +45,7 @@ const api = {
 let rest = undefined;
 // mappers
 const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+    var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     if (!skeletonProduct) {
         return undefined;
     }
@@ -62,10 +60,11 @@ const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, functi
         images.push({ url: (_f = mainImage === null || mainImage === void 0 ? void 0 : mainImage.link) === null || _f === void 0 ? void 0 : _f.href });
     }
     let productPrice = (_j = (_h = (_g = product.attributes) === null || _g === void 0 ? void 0 : _g.price) === null || _h === void 0 ? void 0 : _h.USD) === null || _j === void 0 ? void 0 : _j.amount;
-    let prices = yield api.getPrices('Retail Pricing');
-    let price = lodash_1.default.find(prices, price => { var _a, _b; return ((_a = price.attributes.sku) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === ((_b = product.attributes.sku) === null || _b === void 0 ? void 0 : _b.toLowerCase()); });
-    productPrice = (0, util_1.formatMoneyString)(((_k = price === null || price === void 0 ? void 0 : price.attributes.currencies.USD) === null || _k === void 0 ? void 0 : _k.amount) / 100, { currency: 'USD' });
-    lodash_1.default.each((_l = product.attributes) === null || _l === void 0 ? void 0 : _l.extensions, (extension, key) => {
+    let prices = yield api.getPricesForSku((_k = product.attributes.sku) === null || _k === void 0 ? void 0 : _k.toLowerCase());
+    let price = lodash_1.default.find(prices, price => price.pricebook === 'Retail Pricing' && !!price.attributes) ||
+        lodash_1.default.find(prices, price => !!price.attributes);
+    productPrice = (0, util_1.formatMoneyString)(((_l = price === null || price === void 0 ? void 0 : price.attributes.currencies.USD) === null || _l === void 0 ? void 0 : _l.amount) / 100, { currency: 'USD' });
+    lodash_1.default.each((_m = product.attributes) === null || _m === void 0 ? void 0 : _m.extensions, (extension, key) => {
         lodash_1.default.each(extension, (v, k) => {
             if (k.indexOf('image') > -1) {
                 images.push({ url: v });
@@ -75,26 +74,48 @@ const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, functi
             }
         });
     });
+    let variants = [{
+            sku: product.attributes.sku,
+            prices: {
+                list: productPrice,
+            },
+            listPrice: productPrice,
+            salePrice: productPrice,
+            images,
+            attributes,
+            key: product.attributes.slug,
+            id: product.id
+        }];
+    // variants
+    if (!lodash_1.default.isEmpty(product.meta.variation_matrix)) {
+        let variationMatrix = product.meta.variation_matrix;
+        variants = lodash_1.default.flatMap((_o = product.meta.variations) === null || _o === void 0 ? void 0 : _o.map(v => {
+            return v.options.map(opt => {
+                return {
+                    sku: product.attributes.sku,
+                    prices: {
+                        list: productPrice,
+                    },
+                    listPrice: productPrice,
+                    salePrice: productPrice,
+                    images,
+                    attributes: lodash_1.default.concat(attributes, [{ name: v.name, value: opt.name }]),
+                    key: product.attributes.slug,
+                    id: product.id
+                };
+            });
+        }));
+    }
     return {
         id: product.id,
         slug: product.attributes.slug,
         key: product.attributes.slug,
         name: product.attributes.name,
         shortDescription: product.attributes.description,
+        longDescription: product.attributes.description,
         productType: product.type,
         categories: [],
-        variants: [{
-                sku: product.attributes.sku,
-                prices: {
-                    list: productPrice,
-                },
-                listPrice: productPrice,
-                salePrice: productPrice,
-                images,
-                attributes,
-                key: product.attributes.slug,
-                id: product.id
-            }]
+        variants
     };
 });
 const mapNode = (hierarchy) => (node) => __awaiter(void 0, void 0, void 0, function* () {
@@ -145,13 +166,13 @@ class ElasticPathCommerceCodec extends __1.Codec {
     constructor(config) {
         super(config);
         if (!rest) {
-            rest = (0, rest_client_1.default)(config);
+            rest = (0, rest_client_1.default)(this.config);
         }
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield rest.authenticate();
-            megaMenu = yield Promise.all((yield api.getMegaMenu('Teacher Specials')).map(yield mapHierarchy));
+            megaMenu = yield Promise.all((yield api.getMegaMenu(this.config.catalog_name)).map(yield mapHierarchy));
         });
     }
     // commerce codec api implementation

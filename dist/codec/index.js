@@ -31,13 +31,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCodec = exports.registerCodec = exports.Codec = void 0;
+const crypt_keeper_1 = __importDefault(require("../common/crypt-keeper"));
+const lodash_1 = __importDefault(require("lodash"));
 const nanoid_1 = require("nanoid");
 const util_1 = require("../util");
 class Codec {
     constructor(config) {
         this.codecId = (0, nanoid_1.nanoid)(8);
+        let keeper = (0, crypt_keeper_1.default)(config);
+        lodash_1.default.each(config, (value, key) => {
+            if (typeof value === 'string') {
+                config[key] = keeper.decrypt(value);
+            }
+        });
         this.config = config;
     }
 }

@@ -22,14 +22,12 @@ const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
     let authenticatedAxios: AxiosInstance
 
     const authenticate = async() => {
-        console.log(`authenticating to ${auth_url}`)
         let response = await axios.post(auth_url, qs.stringify({
             grant_type: 'client_credentials',
             client_id,
             client_secret
         }))
         const auth = response.data
-        console.log(`authenticated to ${auth_url}`)
 
         authenticatedAxios = axios.create({
             baseURL: api_url,

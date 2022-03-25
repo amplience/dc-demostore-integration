@@ -19,14 +19,12 @@ const cache = {};
 const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
     let authenticatedAxios;
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(`authenticating to ${auth_url}`);
         let response = yield axios_1.default.post(auth_url, qs_1.default.stringify({
             grant_type: 'client_credentials',
             client_id,
             client_secret
         }));
         const auth = response.data;
-        console.log(`authenticated to ${auth_url}`);
         authenticatedAxios = axios_1.default.create({
             baseURL: api_url,
             headers: {

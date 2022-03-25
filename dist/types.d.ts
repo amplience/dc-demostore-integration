@@ -113,6 +113,7 @@ export declare class DemoStoreConfiguration {
     url?: string;
     cms?: any;
     commerce?: any;
+    locator: string;
 }
 declare const _default: {
     QueryContext: typeof QueryContext;

@@ -19,11 +19,13 @@ class AmplienceClient {
         this.hub = key.split(':')[0];
         this.environment = key.split(':')[1];
     }
+    toString() {
+        return [this.hub, this.environment].join(':');
+    }
     getContentItem(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
-            let url = `https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`;
-            let response = yield fetch(url);
+            let response = yield fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
             return (yield response.json()).content;
         });
     }
@@ -31,12 +33,13 @@ class AmplienceClient {
         return __awaiter(this, void 0, void 0, function* () {
             let obj = yield this.getContentItem({ key: `aria/env/${this.environment}` });
             if (!obj) {
-                throw `[ aria ] Couldn't find config with key '${this.hub}:${this.environment}'`;
+                throw `[ aria ] Couldn't find config with key '${this.toString()}'`;
             }
             obj.commerce = obj.commerce && (yield this.getContentItem({ id: obj.commerce.id }));
             obj.cms.hubs = lodash_1.default.keyBy(obj.cms.hubs, 'key');
             obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
             obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
+            obj.locator = this.toString();
             return obj;
         });
     }

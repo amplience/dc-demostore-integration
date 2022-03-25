@@ -22,12 +22,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommerceAPIFromCodecConfig = exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = void 0;
+exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = exports.CryptKeeper = void 0;
 const amplience_1 = require("./amplience");
 const codec_1 = require("./codec");
-const types_1 = require("./types");
-exports.default = { DemoStoreConfiguration: types_1.DemoStoreConfiguration };
+const crypt_keeper_1 = __importDefault(require("./common/crypt-keeper"));
+exports.CryptKeeper = crypt_keeper_1.default;
 __exportStar(require("./types"), exports);
 __exportStar(require("./codec"), exports);
 class CommerceAPI {
@@ -38,10 +41,12 @@ const getConfig = (configLocator) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.getConfig = getConfig;
 const getCommerceAPI = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield (0, codec_1.getCodec)((yield (0, exports.getConfig)(configLocator)).commerce);
+    let demostoreConfig = yield (0, exports.getConfig)(configLocator);
+    let config = yield (0, codec_1.getCodec)(Object.assign(Object.assign({}, demostoreConfig.commerce), { locator: demostoreConfig.locator }));
+    return config;
+    // return await getCodec(config.commerce)
 });
 exports.getCommerceAPI = getCommerceAPI;
-const getCommerceAPIFromCodecConfig = (codecConfig) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield (0, codec_1.getCodec)(codecConfig);
-});
-exports.getCommerceAPIFromCodecConfig = getCommerceAPIFromCodecConfig;
+// export const getCommerceAPIFromCodecConfig = async (codecConfig: CodecConfiguration): Promise<CommerceAPI> => {
+//     return await getCodec(codecConfig)
+// }

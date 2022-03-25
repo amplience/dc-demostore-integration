@@ -8,6 +8,7 @@ export interface CodecConfiguration {
         deliveryId: string;
         schema: string;
     };
+    locator?: string;
 }
 export declare abstract class Codec {
     config: CodecConfiguration;

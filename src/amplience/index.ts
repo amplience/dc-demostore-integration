@@ -11,23 +11,27 @@ export class AmplienceClient {
         this.environment = key.split(':')[1]
     }
 
+    toString(): string {
+        return [this.hub, this.environment].join(':')
+    }
+
     async getContentItem(args: any): Promise<ContentItem> {
         let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
-        let url = `https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`
-        let response = await fetch(url)
+        let response = await fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
         return (await response.json()).content
     }
 
     async getConfig(): Promise<DemoStoreConfiguration> {
         let obj: any = await this.getContentItem({ key: `aria/env/${this.environment}` })
         if (!obj) {
-            throw `[ aria ] Couldn't find config with key '${this.hub}:${this.environment}'`
+            throw `[ aria ] Couldn't find config with key '${this.toString()}'`
         }
 
         obj.commerce = obj.commerce && await this.getContentItem({ id: obj.commerce.id })
         obj.cms.hubs = _.keyBy(obj.cms.hubs, 'key')
         obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
         obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
+        obj.locator = this.toString()
 
         return obj as DemoStoreConfiguration
     }

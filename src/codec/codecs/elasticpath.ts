@@ -1,8 +1,8 @@
-import _ from 'lodash'
+import _, { Dictionary } from 'lodash'
 import { Product, Category, QueryContext, Attribute, ProductImage } from '../../types'
 import { CodecConfiguration, Codec } from '..'
 import { CommerceAPI } from '../..'
-import Moltin, { Catalog, Hierarchy, Price, File } from '@moltin/sdk'
+import Moltin, { Catalog, Hierarchy, Price, File, PriceBook } from '@moltin/sdk'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../common/rest-client'
 import { formatMoneyString } from '../../util'
 
@@ -12,6 +12,7 @@ export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
     api_url: string
     auth_url: string
     pcm_url: string
+    catalog_name: string
 }
 
 export interface AttributedProduct extends Moltin.Product {
@@ -28,15 +29,18 @@ export interface CategoryWithHierarchyId extends Category {
     hierarchyId: string
 }
 
+export interface PriceBookPrice extends Price {
+    pricebookName: string
+}
+
 const api = {
     getProductById: async (id: string): Promise<AttributedProduct> => (await rest.get({ url: `/pcm/products/${id}` })).data,
     getFileById: async (id: string): Promise<File> => (await rest.get({ url: `/v2/files/${id}` })).data,
-    getPrices: async (name: string): Promise<Price[]> => {
-        let retailPricebook = _.find((await rest.get({ url: `/pcm/pricebooks` })).data, pb => pb.attributes.name === name)
-        if (retailPricebook) {
-            return (await rest.get({ url: `/pcm/pricebooks/${retailPricebook.id}/prices` }))?.data
-        }
-        return []
+    getPricesForSku: async (sku: string): Promise<PriceBookPrice[]> => {
+        return await Promise.all((await rest.get({ url: `/pcm/pricebooks` })).data.map(async pricebook => ({
+            ..._.first((await rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` }))?.data),
+            pricebook: pricebook.attributes.name
+        })))
     },
     getMegaMenu: async (name: string): Promise<Hierarchy[]> => {
         let catalogs = (await rest.get({ url: '/catalogs' })).data
@@ -76,8 +80,11 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
     }
 
     let productPrice = product.attributes?.price?.USD?.amount
-    let prices: Price[] = await api.getPrices('Retail Pricing')
-    let price = _.find(prices, price => price.attributes.sku?.toLowerCase() === product.attributes.sku?.toLowerCase())
+    let prices: PriceBookPrice[] = await api.getPricesForSku(product.attributes.sku?.toLowerCase())
+
+    let price = _.find(prices, price => price.pricebook === 'Retail Pricing' && !!price.attributes) ||
+        _.find(prices, price => !!price.attributes)
+
     productPrice = formatMoneyString(price?.attributes.currencies.USD?.amount / 100, { currency: 'USD' })
 
     _.each(product.attributes?.extensions, (extension, key) => {
@@ -91,26 +98,50 @@ const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> 
         })
     })
 
+    let variants = [{
+        sku: product.attributes.sku,
+        prices: {
+            list: productPrice,
+        },
+        listPrice: productPrice,
+        salePrice: productPrice,
+        images,
+        attributes,
+        key: product.attributes.slug,
+        id: product.id
+    }]
+
+    // variants
+    if (!_.isEmpty((product.meta as any).variation_matrix)) {
+        let variationMatrix = (product.meta as any).variation_matrix
+        variants = _.flatMap(product.meta.variations?.map(v => {
+            return v.options.map(opt => {
+                return {
+                    sku: product.attributes.sku,
+                    prices: {
+                        list: productPrice,
+                    },
+                    listPrice: productPrice,
+                    salePrice: productPrice,
+                    images,
+                    attributes: _.concat(attributes, [{ name: v.name, value: opt.name }]),
+                    key: product.attributes.slug,
+                    id: product.id
+                }
+            })
+        }))
+    }
+
     return {
         id: product.id,
         slug: product.attributes.slug,
         key: product.attributes.slug,
         name: product.attributes.name,
         shortDescription: product.attributes.description,
+        longDescription: product.attributes.description,
         productType: product.type,
         categories: [],
-        variants: [{
-            sku: product.attributes.sku,
-            prices: {
-                list: productPrice,
-            },
-            listPrice: productPrice,
-            salePrice: productPrice,
-            images,
-            attributes,
-            key: product.attributes.slug,
-            id: product.id
-        }]
+        variants
     }
 }
 
@@ -162,16 +193,18 @@ const locateCategoryForKey = async (slug: string): Promise<CategoryWithHierarchy
 
 let megaMenu: Category[] = []
 export class ElasticPathCommerceCodec extends Codec implements CommerceAPI {
+    config: ElasticPathCommerceCodecConfig
+
     constructor(config: ElasticPathCommerceCodecConfig) {
         super(config)
         if (!rest) {
-            rest = OAuthRestClient(config)
+            rest = OAuthRestClient(this.config)
         }
     }
 
     async start() {
         await rest.authenticate()
-        megaMenu = await Promise.all((await api.getMegaMenu('Teacher Specials')).map(await mapHierarchy))
+        megaMenu = await Promise.all((await api.getMegaMenu(this.config.catalog_name)).map(await mapHierarchy))
     }
 
     // commerce codec api implementation
