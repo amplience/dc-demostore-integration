@@ -1,11 +1,11 @@
-# Amplience Reference Integration Architecture (ARIA)
+# @amplience/dc-demostore-integration
 
-ARIA is a service written in Node.js that is intended to manage a number of different types of services, including but not limited to:
+Amplience Demo Store Integration is a service written in Node.js that is intended to manage a number of different types of services, including but not limited to:
 
 * commerce services (get catalog, get products)
 * cms services
 
-ARIA uses codecs in order to determine how and where to get data from. The codecs required are configured in Amplience Dynamic Content as "Content" and not "Code".
+dc-demostore-integration uses codecs in order to determine how and where to get data from. The codecs required are configured in Amplience Dynamic Content as "Content" and not "Code".
 
 ## Codecs in use
 
