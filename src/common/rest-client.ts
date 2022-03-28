@@ -49,7 +49,7 @@ const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
                 setTimeout(() => {
                     console.log(`[ delete ] ${config.url}`)
                     delete cache[config.url]
-                }, 600000)
+                }, 10000)
             }
             else {
                 // console.log(`[ get ] ${apiUrl}${config.url} [ cached ]`)
