@@ -7,8 +7,6 @@ export interface FabricCommerceCodecConfig extends CodecConfiguration {
     accountId: string;
 }
 export declare class FabricCommerceCodec extends Codec implements CommerceAPI {
-    constructor(config: FabricCommerceCodecConfig);
-    start(): Promise<void>;
     getProduct(context: QueryContext): Promise<Product>;
     getProducts(context: QueryContext): Promise<Product[]>;
     getCategory(context: QueryContext): Promise<Category>;
@@ -16,6 +14,5 @@ export declare class FabricCommerceCodec extends Codec implements CommerceAPI {
 }
 declare const _default: {
     SchemaURI: string;
-    getInstance: (config: any) => Promise<FabricCommerceCodec>;
 };
 export default _default;

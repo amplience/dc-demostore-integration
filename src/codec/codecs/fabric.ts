@@ -61,17 +61,17 @@ const locateCategoryForKey = async (key: string): Promise<Category> => {
 }
 
 export class FabricCommerceCodec extends Codec implements CommerceAPI {
-    constructor(config: FabricCommerceCodecConfig) {
-        super(config)
-        if (!rest) {
-            rest = FabricRestClient(config)
-        }
-    }
+    // constructor(config: FabricCommerceCodecConfig) {
+    //     super(config)
+    //     if (!rest) {
+    //         rest = FabricRestClient(config)
+    //     }
+    // }
 
-    async start() {
-        await rest.authenticate()
-        console.log(`authenticated to [ fabric ]`)
-    }
+    // async start() {
+    //     await rest.authenticate()
+    //     console.log(`authenticated to [ fabric ]`)
+    // }
 
     // commerce codec api implementation
     async getProduct(context: QueryContext): Promise<Product> {
@@ -165,10 +165,10 @@ export class FabricCommerceCodec extends Codec implements CommerceAPI {
 export default {
     // codec generator conformance
     SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
-    getInstance: async (config) => {
-        let codec = new FabricCommerceCodec(config)
-        await codec.start()
-        return codec
-    }
+    // getInstance: async (config) => {
+    //     let codec = new FabricCommerceCodec(config)
+    //     await codec.start()
+    //     return codec
+    // }
     // end codec generator conformance
 }

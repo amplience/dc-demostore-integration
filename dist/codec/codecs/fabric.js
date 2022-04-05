@@ -58,18 +58,16 @@ const locateCategoryForKey = (key) => __awaiter(void 0, void 0, void 0, function
     return lodash_1.default.find(lodash_1.default.flatMapDeep(megaMenu, expandCategory), c => c.key === key);
 });
 class FabricCommerceCodec extends __1.Codec {
-    constructor(config) {
-        super(config);
-        if (!rest) {
-            rest = FabricRestClient(config);
-        }
-    }
-    start() {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield rest.authenticate();
-            console.log(`authenticated to [ fabric ]`);
-        });
-    }
+    // constructor(config: FabricCommerceCodecConfig) {
+    //     super(config)
+    //     if (!rest) {
+    //         rest = FabricRestClient(config)
+    //     }
+    // }
+    // async start() {
+    //     await rest.authenticate()
+    //     console.log(`authenticated to [ fabric ]`)
+    // }
     // commerce codec api implementation
     getProduct(context) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -163,10 +161,10 @@ exports.FabricCommerceCodec = FabricCommerceCodec;
 exports.default = {
     // codec generator conformance
     SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
-    getInstance: (config) => __awaiter(void 0, void 0, void 0, function* () {
-        let codec = new FabricCommerceCodec(config);
-        yield codec.start();
-        return codec;
-    })
+    // getInstance: async (config) => {
+    //     let codec = new FabricCommerceCodec(config)
+    //     await codec.start()
+    //     return codec
+    // }
     // end codec generator conformance
 };

@@ -24,11 +24,11 @@ const getAttributeValue = (attributes = [], name) => {
     return lodash_1.default.get(lodash_1.default.find(attributes, att => att.name === name), 'value');
 };
 class CommerceToolsCodec extends codec_1.Codec {
-    constructor(config) {
-        super(config);
-        this.productOperation = new CommerceToolsProductOperation(config);
-        this.categoryOperation = new CommerceToolsCategoryOperation(config);
-    }
+    // constructor(config: CodecConfiguration) {
+    //     super(config)
+    //     this.productOperation = new CommerceToolsProductOperation(config)
+    //     this.categoryOperation = new CommerceToolsCategoryOperation(config)
+    // }
     getMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.getCategoryHierarchy(new types_1.QueryContext({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }));

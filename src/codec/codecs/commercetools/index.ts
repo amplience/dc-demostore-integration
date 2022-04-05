@@ -26,11 +26,11 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
     productOperation: Operation
     categoryOperation: Operation
 
-    constructor(config: CodecConfiguration) {
-        super(config)
-        this.productOperation = new CommerceToolsProductOperation(config)
-        this.categoryOperation = new CommerceToolsCategoryOperation(config)
-    }
+    // constructor(config: CodecConfiguration) {
+    //     super(config)
+    //     this.productOperation = new CommerceToolsProductOperation(config)
+    //     this.categoryOperation = new CommerceToolsCategoryOperation(config)
+    // }
 
     async getMegaMenu(): Promise<Category[]> {
         return await this.getCategoryHierarchy(new QueryContext({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }))
