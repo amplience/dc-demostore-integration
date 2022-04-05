@@ -1,5 +1,5 @@
-import { QueryContext } from '../../../types';
-import { CodecConfiguration } from '../../';
+import { QueryContext } from '../types';
+import { CodecConfiguration } from '../codec';
 /**
  * The base class for all operations.
  *

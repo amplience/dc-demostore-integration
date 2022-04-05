@@ -16,7 +16,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const urijs_1 = __importDefault(require("urijs"));
 const axios_1 = __importDefault(require("axios"));
 const currency_js_1 = __importDefault(require("currency.js"));
-const operation_1 = require("./operation");
+const operation_1 = require("../../../common/operation");
 const types_1 = require("../../../types");
 const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
@@ -119,6 +119,16 @@ class CommerceToolsOperation extends operation_1.Operation {
     }
     authenticate() {
         return __awaiter(this, void 0, void 0, function* () {
+            const rest = (0, rest_client_1.default)(this.config);
+            yield rest.authenticate({
+                grant_type: 'client_credentials',
+                scope: this.config.scope
+            }, {
+                auth: {
+                    username: this.config.client_id,
+                    password: this.config.client_secret
+                }
+            });
             if (!this.accessToken) {
                 let response = yield axios_1.default.post(`${this.config.auth_url}/oauth/token?grant_type=client_credentials&scope=${lodash_1.default.first(lodash_1.default.split(this.config.scope, ' '))}`, {}, {
                     auth: {
@@ -318,11 +328,72 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
         };
     }
 }
-exports.default = {
-    // codec generator conformance
+const rest_client_1 = __importDefault(require("../../../common/rest-client"));
+const qs_1 = __importDefault(require("qs"));
+const cats = ['women', 'men', 'new', 'sale', 'accessories'];
+const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
-    getInstance: (config) => __awaiter(void 0, void 0, void 0, function* () {
-        return new CommerceToolsCodec(config);
-    })
-    // end codec generator conformance
+    getAPI: function (config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }));
+            yield rest.authenticate({
+                grant_type: 'client_credentials'
+            }, {
+                auth: {
+                    username: config.client_id,
+                    password: config.client_secret
+                }
+            });
+            const api = {
+                getTopLevelCategories: () => __awaiter(this, void 0, void 0, function* () {
+                    return yield Promise.all(cats.map((cat) => __awaiter(this, void 0, void 0, function* () {
+                        return (yield rest.get({ url: `/categories/key=${cat}` }));
+                    })));
+                }),
+                populateChildren: (category) => __awaiter(this, void 0, void 0, function* () {
+                    let query = qs_1.default.stringify({ where: `parent(id="${category.id}")` });
+                    return Object.assign(Object.assign({}, category), { children: (yield rest.get({ url: `/categories?${query}` })).results });
+                })
+            };
+            const mappers = {};
+            return {
+                getProduct: function (query) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let product = api.getProduct(query);
+                        if (product) {
+                            return mappers.mapProduct(product, query);
+                        }
+                    });
+                },
+                getProducts: function (query) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let filtered = api.getProducts(query);
+                        if (!filtered) {
+                            throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`);
+                        }
+                        return filtered.map(prod => mappers.mapProduct(prod, query));
+                    });
+                },
+                getCategory: function (query) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let category = api.getCategory(query);
+                        if (!category) {
+                            throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`);
+                        }
+                        return mappers.mapCategory(api.populateCategory(category, query));
+                    });
+                },
+                getMegaMenu: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let categories = yield api.getTopLevelCategories();
+                        return yield Promise.all(categories.map((category) => __awaiter(this, void 0, void 0, function* () {
+                            return yield api.populateChildren(category);
+                        })));
+                    });
+                }
+            };
+        });
+    }
 };
+exports.default = commerceToolsCodec;
+(0, codec_1.registerCodec)(commerceToolsCodec);

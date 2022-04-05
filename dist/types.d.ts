@@ -38,7 +38,7 @@ export declare class Product extends CommerceObject {
     imageSetId?: string;
     categories: Category[];
     variants: Variant[];
-    productType: string;
+    productType?: string;
 }
 export declare class Attribute {
     name: string;

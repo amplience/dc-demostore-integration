@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
-import qs from 'qs'
 import { sleep } from '../util'
 import { Dictionary } from 'lodash'
+import qs from 'qs'
 
 interface OAuthAuthorization {
     access_token: string
@@ -14,20 +14,18 @@ interface OAuthAuthorization {
 const cache: Dictionary<AxiosResponse> = {}
 
 export interface OAuthRestClientInterface {
-    authenticate: () => Promise<void>
+    authenticate: (payload: any, config: AxiosRequestConfig) => Promise<void>
     get: (config: AxiosRequestConfig) => Promise<any>
 }
 
-const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
+const OAuthRestClient = ({ api_url, auth_url }) => {
     let authenticatedAxios: AxiosInstance
 
-    const authenticate = async() => {
-        let response = await axios.post(auth_url, qs.stringify({
-            grant_type: 'client_credentials',
-            client_id,
-            client_secret
-        }))
+    const authenticate = async (payload: any, config: AxiosRequestConfig = {}) => {
+        let response = await axios.post(auth_url, qs.stringify(payload), config)
         const auth = response.data
+
+        console.log(auth)
 
         authenticatedAxios = axios.create({
             baseURL: api_url,
@@ -35,25 +33,12 @@ const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
                 Authorization: `${auth.token_type} ${auth.access_token}`
             }
         })
-        setTimeout(() => { authenticate() }, auth.expires_in * 99)
+        setTimeout(() => { authenticate(payload) }, auth.expires_in * 99)
     }
 
     const get = async (config: AxiosRequestConfig): Promise<any> => {
         try {
-            let response: AxiosResponse = cache[config.url]
-            if (!response) {
-                // console.log(`[ get ] ${api_url}${config.url}`)
-
-                response = await authenticatedAxios(config)
-                cache[config.url] = response
-                setTimeout(() => {
-                    console.log(`[ delete ] ${config.url}`)
-                    delete cache[config.url]
-                }, 10000)
-            }
-            else {
-                // console.log(`[ get ] ${apiUrl}${config.url} [ cached ]`)
-            }
+            let response = await authenticatedAxios(config)
             return response.data
         } catch (error: any) {
             if (error.response.status === 429) {
@@ -75,7 +60,7 @@ const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
     }
 
     return {
-        authenticate,    
+        authenticate,
         get
     }
 }

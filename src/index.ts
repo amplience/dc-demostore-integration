@@ -8,10 +8,10 @@ export * from './codec'
 export { CryptKeeper }
 
 export class CommerceAPI {
-    getProduct:     (args: QueryContext) => Promise<Product>
-    getProducts:    (args: QueryContext) => Promise<Product[]>
-    getCategory:    (args: QueryContext) => Promise<Category>
-    getMegaMenu:    ()                   => Promise<Category[]>
+    getProduct  : (args: QueryContext) => Promise<Product>
+    getProducts : (args: QueryContext) => Promise<Product[]>
+    getCategory : (args: QueryContext) => Promise<Category>
+    getMegaMenu : ()                   => Promise<Category[]>
 }
 
 export const getConfig = async (configLocator: string): Promise<DemoStoreConfiguration> => {
@@ -25,9 +25,4 @@ export const getCommerceAPI = async (configLocator: string): Promise<CommerceAPI
         locator: demostoreConfig.locator
     })
     return config
-    // return await getCodec(config.commerce)
 }
-
-// export const getCommerceAPIFromCodecConfig = async (codecConfig: CodecConfiguration): Promise<CommerceAPI> => {
-//     return await getCodec(codecConfig)
-// }

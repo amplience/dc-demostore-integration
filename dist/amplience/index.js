@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AmplienceClient = void 0;
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("..");
 class AmplienceClient {
     constructor(key) {
         this.hub = key.split(':')[0];
@@ -26,7 +27,14 @@ class AmplienceClient {
         return __awaiter(this, void 0, void 0, function* () {
             let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
             let response = yield fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
-            return (yield response.json()).content;
+            let content = Object.assign(Object.assign({}, (yield response.json()).content), { locator: this.toString() });
+            let keeper = (0, __1.CryptKeeper)(content);
+            lodash_1.default.each(content, (value, key) => {
+                if (typeof value === 'string') {
+                    content[key] = keeper.decrypt(value);
+                }
+            });
+            return content;
         });
     }
     getConfig() {

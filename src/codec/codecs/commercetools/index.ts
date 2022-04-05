@@ -3,7 +3,7 @@ import URI from 'urijs'
 import axios from 'axios'
 import currency from 'currency.js'
 
-import { Operation } from './operation'
+import { Operation } from '../../../common/operation'
 import { Attribute, Category, CategoryResults, Product, ProductResults, QueryContext } from '../../../types'
 import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
 import { CommerceAPI } from '../../../index'
@@ -14,10 +14,10 @@ const getAttributeValue = (attributes: Attribute[] = [], name: string) => {
 }
 
 export interface CommerceToolsCodecConfiguration extends CodecConfiguration {
-    client_id:      string
-    client_secret:  string
     auth_url:       string
     api_url:        string
+    client_id:      string
+    client_secret:  string
     project:        string
     scope:          string
 }
@@ -143,6 +143,17 @@ class CommerceToolsOperation extends Operation {
     }
 
     async authenticate() {
+        const rest: OAuthRestClientInterface = OAuthRestClient(this.config)
+        await rest.authenticate({
+            grant_type: 'client_credentials',
+            scope: this.config.scope
+        }, {
+            auth: {
+                username: this.config.client_id,
+                password: this.config.client_secret
+            }
+        })
+
         if (!this.accessToken) {
             let response: any = await axios.post(
                 `${this.config.auth_url}/oauth/token?grant_type=client_credentials&scope=${_.first(_.split(this.config.scope, ' '))}`, {}, {
@@ -362,11 +373,74 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
     }
 }
 
-export default {
-    // codec generator conformance
+import { findInMegaMenu } from '../common'
+import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
+import qs from 'qs'
+
+const cats = ['women', 'men', 'new', 'sale', 'accessories']
+const commerceToolsCodec: Codec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
-    getInstance: async (config) => {
-        return new CommerceToolsCodec(config)
+    getAPI: async function (config: CommerceToolsCodecConfiguration): Promise<CommerceAPI> {
+        const rest: OAuthRestClientInterface = OAuthRestClient({
+            ...config,
+            api_url: `${config.api_url}/${config.project}`
+        })
+
+        await rest.authenticate({
+            grant_type: 'client_credentials'
+        }, {
+            auth: {
+                username: config.client_id,
+                password: config.client_secret
+            }
+        })
+
+        const api: any = {
+            getTopLevelCategories: async(): Promise<Category[]> => {
+                return await Promise.all(cats.map(async cat => {
+                    return (await rest.get({ url: `/categories/key=${cat}` }))
+                }))
+            },
+            populateChildren: async(category: Category): Promise<Category> => {
+                let query = qs.stringify({ where: `parent(id="${category.id}")` })
+                return {
+                    ...category,
+                    children: (await rest.get({ url: `/categories?${query}` })).results
+                }
+            }
+        }
+        const mappers: any = {}
+
+        return {
+            getProduct: async function (query: QueryContext): Promise<Product> {
+                let product = api.getProduct(query)
+                if (product) {
+                    return mappers.mapProduct(product, query)
+                }
+            },
+            getProducts: async function (query: QueryContext): Promise<Product[]> {
+                let filtered: Product[] = api.getProducts(query)
+                if (!filtered) {
+                    throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`)
+                }
+                return filtered.map(prod => mappers.mapProduct(prod, query))
+            },
+            getCategory: async function (query: QueryContext): Promise<Category> {
+                let category = api.getCategory(query)
+                if (!category) {
+                    throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`)
+                }
+                return mappers.mapCategory(api.populateCategory(category, query))
+            },
+            getMegaMenu: async function (): Promise<Category[]> {
+                let categories = await api.getTopLevelCategories()
+                return await Promise.all(categories.map(async category => {
+                    return await api.populateChildren(category)
+                }))
+            }
+        }
     }
-    // end codec generator conformance
 }
+
+export default commerceToolsCodec
+registerCodec(commerceToolsCodec)

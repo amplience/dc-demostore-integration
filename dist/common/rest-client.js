@@ -13,41 +13,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-const qs_1 = __importDefault(require("qs"));
 const util_1 = require("../util");
+const qs_1 = __importDefault(require("qs"));
 const cache = {};
-const OAuthRestClient = ({ api_url, auth_url, client_id, client_secret }) => {
+const OAuthRestClient = ({ api_url, auth_url }) => {
     let authenticatedAxios;
-    const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
-        let response = yield axios_1.default.post(auth_url, qs_1.default.stringify({
-            grant_type: 'client_credentials',
-            client_id,
-            client_secret
-        }));
+    const authenticate = (payload, config = {}) => __awaiter(void 0, void 0, void 0, function* () {
+        let response = yield axios_1.default.post(auth_url, qs_1.default.stringify(payload), config);
         const auth = response.data;
+        console.log(auth);
         authenticatedAxios = axios_1.default.create({
             baseURL: api_url,
             headers: {
                 Authorization: `${auth.token_type} ${auth.access_token}`
             }
         });
-        setTimeout(() => { authenticate(); }, auth.expires_in * 99);
+        setTimeout(() => { authenticate(payload); }, auth.expires_in * 99);
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let response = cache[config.url];
-            if (!response) {
-                // console.log(`[ get ] ${api_url}${config.url}`)
-                response = yield authenticatedAxios(config);
-                cache[config.url] = response;
-                setTimeout(() => {
-                    console.log(`[ delete ] ${config.url}`);
-                    delete cache[config.url];
-                }, 10000);
-            }
-            else {
-                // console.log(`[ get ] ${apiUrl}${config.url} [ cached ]`)
-            }
+            let response = yield authenticatedAxios(config);
             return response.data;
         }
         catch (error) {

@@ -44,9 +44,5 @@ const getCommerceAPI = (configLocator) => __awaiter(void 0, void 0, void 0, func
     let demostoreConfig = yield (0, exports.getConfig)(configLocator);
     let config = yield (0, codec_1.getCodec)(Object.assign(Object.assign({}, demostoreConfig.commerce), { locator: demostoreConfig.locator }));
     return config;
-    // return await getCodec(config.commerce)
 });
 exports.getCommerceAPI = getCommerceAPI;
-// export const getCommerceAPIFromCodecConfig = async (codecConfig: CodecConfiguration): Promise<CommerceAPI> => {
-//     return await getCodec(codecConfig)
-// }

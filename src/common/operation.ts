@@ -1,8 +1,8 @@
 import _ from 'lodash'
 import https from 'https'
 
-import { QueryContext } from '../../../types'
-import { CodecConfiguration } from '../../'
+import { QueryContext } from '../types'
+import { CodecConfiguration } from '../codec'
 import axios, { AxiosRequestConfig, Method } from 'axios'
 
 /**

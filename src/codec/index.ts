@@ -1,12 +1,5 @@
-import CryptKeeper from '../common/crypt-keeper'
 import _, { Dictionary } from 'lodash'
-import { nanoid } from 'nanoid'
 import { sleep } from '../util'
-
-export interface CodecGenerator {
-    SchemaURI: string
-    getInstance: (config: CodecConfiguration) => Promise<Codec>
-}
 
 export interface CodecConfiguration {
     _meta?: {
@@ -17,52 +10,33 @@ export interface CodecConfiguration {
     locator?: string
 }
 
-export abstract class Codec {
-    config: CodecConfiguration
-    codecId: string = nanoid(8)
-
-    constructor(config: CodecConfiguration) {
-        let keeper = CryptKeeper(config)
-        _.each(config, (value, key) => {
-            if (typeof value === 'string') {
-                config[key] = keeper.decrypt(value)
-            }
-        })
-        this.config = config
-    }
+export class Codec {
+    SchemaURI: string
+    async getAPI(config: CodecConfiguration): Promise<any> {}
 }
 
-const codecTypes: Dictionary<CodecGenerator> = {}
-const cachedCodecs: Dictionary<Codec> = {}
+const codecs: Dictionary<Codec> = {}
+const cachedCodecs: Dictionary<any> = {}
 
-export const registerCodec = (codec: CodecGenerator) => {
-    console.log(`[ aria ] register codec ${codec.SchemaURI}`)
-    codecTypes[codec.SchemaURI] = codec
+export const registerCodec = (codec: Codec) => {
+    console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`)
+    codecs[codec.SchemaURI] = codec
 }
 
-let codecLoadingState = 0
 export const getCodec = async (config: CodecConfiguration): Promise<any> => {
-    if (codecLoadingState === 0) { // not loaded
-        codecLoadingState = 1
-        registerCodec(await (await import('./codecs/rest')).default)
-        registerCodec(await (await import('./codecs/commercetools')).default)
-        registerCodec(await (await import('./codecs/elasticpath')).default)
-        registerCodec(await (await import('./codecs/fabric')).default)
-        codecLoadingState = 2
-    }
-    else if (codecLoadingState === 1) { // actively loading
-        await sleep(100)
-        return await getCodec(config)
-    }
-
     let deliveryId = config?._meta?.deliveryId || ''
     if (!cachedCodecs[deliveryId]) {
-        let codecGenerator: CodecGenerator = codecTypes[config?._meta?.schema]
-        if (!codecGenerator) {
+        let codec: Codec = codecs[config?._meta?.schema]
+        if (!codec) {
             throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
         }
-        console.log(`[ aria ] using codec for schema [ ${config?._meta?.schema} ]`)
-        cachedCodecs[deliveryId] = await codecGenerator.getInstance(config)
+        console.log(`[ aria ] use codec [ ${config?._meta?.schema} ]`)
+        cachedCodecs[deliveryId] = await codec.getAPI(config)
     }
     return cachedCodecs[deliveryId]
 }
+
+import './codecs/bigcommerce'
+import './codecs/commercetools'
+import './codecs/elasticpath'
+import './codecs/rest'

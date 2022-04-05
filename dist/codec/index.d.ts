@@ -1,7 +1,3 @@
-export interface CodecGenerator {
-    SchemaURI: string;
-    getInstance: (config: CodecConfiguration) => Promise<Codec>;
-}
 export interface CodecConfiguration {
     _meta?: {
         deliveryKey?: string;
@@ -10,10 +6,13 @@ export interface CodecConfiguration {
     };
     locator?: string;
 }
-export declare abstract class Codec {
-    config: CodecConfiguration;
-    codecId: string;
-    constructor(config: CodecConfiguration);
+export declare class Codec {
+    SchemaURI: string;
+    getAPI(config: CodecConfiguration): Promise<any>;
 }
-export declare const registerCodec: (codec: CodecGenerator) => void;
+export declare const registerCodec: (codec: Codec) => void;
 export declare const getCodec: (config: CodecConfiguration) => Promise<any>;
+import './codecs/bigcommerce';
+import './codecs/commercetools';
+import './codecs/elasticpath';
+import './codecs/rest';

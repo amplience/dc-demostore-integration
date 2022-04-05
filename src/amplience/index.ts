@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { DemoStoreConfiguration } from '../types'
 import { ContentItem } from 'dc-management-sdk-js'
+import { CryptKeeper } from '..'
 
 export class AmplienceClient {
     hub: string
@@ -18,7 +19,18 @@ export class AmplienceClient {
     async getContentItem(args: any): Promise<ContentItem> {
         let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
         let response = await fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
-        return (await response.json()).content
+        let content = {
+            ...(await response.json()).content,
+            locator: this.toString()
+        }
+
+        let keeper = CryptKeeper(content)
+        _.each(content, (value, key) => {
+            if (typeof value === 'string') {
+                content[key] = keeper.decrypt(value)
+            }
+        })
+        return content
     }
 
     async getConfig(): Promise<DemoStoreConfiguration> {
