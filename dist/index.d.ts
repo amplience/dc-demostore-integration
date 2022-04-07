@@ -5,6 +5,8 @@ export * from './types';
 export * from './codec';
 export { CryptKeeper };
 export { OAuthRestClient };
+import { SFCCCodecConfiguration } from './codec/codecs/sfcc';
+export { SFCCCodecConfiguration };
 export declare class CommerceAPI {
     getProduct: (args: QueryContext) => Promise<Product>;
     getProducts: (args: QueryContext) => Promise<Product[]>;
