@@ -14,5 +14,6 @@ export declare const registerCodec: (codec: Codec) => void;
 export declare const getCodec: (config: CodecConfiguration) => Promise<any>;
 import './codecs/bigcommerce';
 import './codecs/commercetools';
+import './codecs/sfcc';
 import './codecs/elasticpath';
 import './codecs/rest';

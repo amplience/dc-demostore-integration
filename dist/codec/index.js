@@ -17,27 +17,23 @@ class Codec {
 }
 exports.Codec = Codec;
 const codecs = {};
-const cachedCodecs = {};
 const registerCodec = (codec) => {
     console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`);
     codecs[codec.SchemaURI] = codec;
 };
 exports.registerCodec = registerCodec;
 const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
-    let deliveryId = ((_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.deliveryId) || '';
-    if (!cachedCodecs[deliveryId]) {
-        let codec = codecs[(_b = config === null || config === void 0 ? void 0 : config._meta) === null || _b === void 0 ? void 0 : _b.schema];
-        if (!codec) {
-            throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
-        }
-        console.log(`[ aria ] use codec [ ${(_c = config === null || config === void 0 ? void 0 : config._meta) === null || _c === void 0 ? void 0 : _c.schema} ]`);
-        cachedCodecs[deliveryId] = yield codec.getAPI(config);
+    var _a, _b;
+    let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema];
+    if (!codec) {
+        throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    return cachedCodecs[deliveryId];
+    console.log(`[ aria ] use codec [ ${(_b = config === null || config === void 0 ? void 0 : config._meta) === null || _b === void 0 ? void 0 : _b.schema} ]`);
+    return yield codec.getAPI(config);
 });
 exports.getCodec = getCodec;
 require("./codecs/bigcommerce");
 require("./codecs/commercetools");
+require("./codecs/sfcc");
 require("./codecs/elasticpath");
 require("./codecs/rest");

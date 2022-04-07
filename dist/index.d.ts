@@ -1,8 +1,10 @@
 import CryptKeeper from './common/crypt-keeper';
+import OAuthRestClient from './common/rest-client';
 import { DemoStoreConfiguration, Category, Product, QueryContext } from './types';
 export * from './types';
 export * from './codec';
 export { CryptKeeper };
+export { OAuthRestClient };
 export declare class CommerceAPI {
     getProduct: (args: QueryContext) => Promise<Product>;
     getProducts: (args: QueryContext) => Promise<Product[]>;

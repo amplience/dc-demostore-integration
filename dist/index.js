@@ -26,11 +26,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = exports.CryptKeeper = void 0;
+exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = exports.OAuthRestClient = exports.CryptKeeper = void 0;
 const amplience_1 = require("./amplience");
 const codec_1 = require("./codec");
 const crypt_keeper_1 = __importDefault(require("./common/crypt-keeper"));
 exports.CryptKeeper = crypt_keeper_1.default;
+const rest_client_1 = __importDefault(require("./common/rest-client"));
+exports.OAuthRestClient = rest_client_1.default;
 __exportStar(require("./types"), exports);
 __exportStar(require("./codec"), exports);
 class CommerceAPI {

@@ -18,7 +18,7 @@ export interface OAuthRestClientInterface {
     get: (config: AxiosRequestConfig) => Promise<any>
 }
 
-const OAuthRestClient = ({ api_url, auth_url }) => {
+export const OAuthRestClient = ({ api_url, auth_url }) => {
     let authenticatedAxios: AxiosInstance
 
     const authenticate = async (payload: any, config: AxiosRequestConfig = {}) => {
@@ -62,24 +62,6 @@ const OAuthRestClient = ({ api_url, auth_url }) => {
     return {
         authenticate,
         get
-    }
-}
-
-class OAuthRestClientx {
-    apiUrl: string
-    authUrl: string
-    clientId: string
-    clientSecret: string
-
-    auth: OAuthAuthorization
-
-    authenticatedAxios: AxiosInstance
-
-    constructor({ apiUrl, authUrl, clientId, clientSecret }) {
-        this.apiUrl = apiUrl
-        this.authUrl = authUrl
-        this.clientId = clientId
-        this.clientSecret = clientSecret
     }
 }
 

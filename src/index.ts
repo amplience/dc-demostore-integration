@@ -1,11 +1,13 @@
 import { AmplienceClient } from './amplience'
 import { CodecConfiguration, getCodec } from './codec'
 import CryptKeeper from './common/crypt-keeper'
+import OAuthRestClient from './common/rest-client'
 import { DemoStoreConfiguration, Category, Product, QueryContext } from './types'
 
 export * from './types'
 export * from './codec'
 export { CryptKeeper }
+export { OAuthRestClient }
 
 export class CommerceAPI {
     getProduct  : (args: QueryContext) => Promise<Product>

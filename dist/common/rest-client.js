@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OAuthRestClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../util");
 const qs_1 = __importDefault(require("qs"));
@@ -56,12 +57,5 @@ const OAuthRestClient = ({ api_url, auth_url }) => {
         get
     };
 };
-class OAuthRestClientx {
-    constructor({ apiUrl, authUrl, clientId, clientSecret }) {
-        this.apiUrl = apiUrl;
-        this.authUrl = authUrl;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-    }
-}
-exports.default = OAuthRestClient;
+exports.OAuthRestClient = OAuthRestClient;
+exports.default = exports.OAuthRestClient;
