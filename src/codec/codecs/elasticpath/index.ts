@@ -114,7 +114,7 @@ const epCodec: Codec = {
             getProducts: async function (query: QueryContext): Promise<Product[]> {
                 if (query.args.productIds) {
                     return await Promise.all(query.args.productIds.split(',').map(async productId => {
-                        return await this.getProduct(new QueryContext({ args: { id: productId } }))
+                        return await this.getProduct(qc({ args: { id: productId } }))
                     }))
                 }
                 else if (query.args.keyword) {
@@ -138,3 +138,7 @@ const epCodec: Codec = {
 
 export default epCodec
 registerCodec(epCodec)
+
+function qc(arg0: { args: { id: any } }): any {
+    throw new Error('Function not implemented.')
+}

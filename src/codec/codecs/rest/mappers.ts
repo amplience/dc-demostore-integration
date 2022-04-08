@@ -9,22 +9,17 @@ const getCategoryIdsFromCategory = (category: Category): string[] => {
     return ids
 }
 
-const getAttribute = (variant: Variant, attributeName: string, defaultValue: string) => _.get(_.find(variant.attributes, att => att.name === attributeName), 'value') || defaultValue
-
 const translatePrice = (price: string, context: QueryContext) =>
-    new Intl.NumberFormat(context.getLocale(), { style: 'currency', currency: context.currency }).format(parseFloat(price))
+    new Intl.NumberFormat(context.locale, { style: 'currency', currency: context.currency }).format(parseFloat(price))
 
 export default {
     mapProduct: (product: Product, context: QueryContext) => ({
         ...product,
-        imageSetId: getAttribute(product.variants[0], 'articleNumberMax', ''),
+        imageSetId: product.variants[0].attributes['articleNumberMax'],
         variants: product.variants.map(variant => ({
             ...variant,
-            articleNumberMax: getAttribute(variant, 'articleNumberMax', ''),
-            size: getAttribute(variant, 'size', ''),
-            color: getAttribute(variant, 'color', ''),
-            listPrice: variant.prices.list && translatePrice(variant.prices.list, context) || '',
-            salePrice: variant.prices.sale && translatePrice(variant.prices.sale, context) || ''
+            listPrice: variant.listPrice && translatePrice(variant.listPrice, context) || '',
+            salePrice: variant.salePrice && translatePrice(variant.salePrice, context) || ''
         }))
     }),
 

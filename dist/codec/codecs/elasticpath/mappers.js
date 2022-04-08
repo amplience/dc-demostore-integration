@@ -24,7 +24,8 @@ const mappers = (api) => {
         if (!product) {
             return undefined;
         }
-        let attributes = [];
+        // let attributes: Attribute[] = []
+        let attributes = {};
         let images = [];
         if ((_b = (_a = product.relationships.main_image) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.id) {
             let mainImage = yield api.getFileById((_d = (_c = product.relationships.main_image) === null || _c === void 0 ? void 0 : _c.data) === null || _d === void 0 ? void 0 : _d.id);
@@ -38,7 +39,7 @@ const mappers = (api) => {
                     images.push({ url: v });
                 }
                 else if (v) {
-                    attributes.push({ name: k, value: v });
+                    attributes[k] = v;
                 }
             });
         });
@@ -80,7 +81,6 @@ const mappers = (api) => {
         return {
             id: product.id,
             slug: product.attributes.slug,
-            key: product.attributes.slug,
             name: product.attributes.name,
             shortDescription: product.attributes.description,
             longDescription: product.attributes.description,
@@ -95,7 +95,6 @@ const mappers = (api) => {
             name: node.attributes.name,
             id: node.id,
             slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
-            key: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
             children: yield Promise.all((yield api.getChildrenByNodeId(hierarchy.id, node.id)).map(yield mapNode(hierarchy))),
             products: []
         });
@@ -106,7 +105,6 @@ const mappers = (api) => {
             name: hierarchy.attributes.name,
             id: hierarchy.id,
             slug: hierarchy.attributes.slug,
-            key: hierarchy.attributes.slug,
             children: yield Promise.all((yield api.getChildrenByHierarchyId(hierarchy.id)).map(yield mapNode(hierarchy))),
             products: []
         });

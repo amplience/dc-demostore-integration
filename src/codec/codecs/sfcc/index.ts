@@ -36,7 +36,6 @@ const sfccCodec: Codec = {
             getProductsForCategory: cat =>  fetch(`/products?categories:in=${cat.id}`),
             mapCategory: (cat: SFCCCategory): Category => ({
                 id: cat.id,
-                key: cat.id,
                 slug: cat.id,
                 name: cat.name,
                 children: cat.categories?.map(api.mapCategory),

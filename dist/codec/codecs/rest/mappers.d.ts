@@ -1,29 +1,23 @@
 import { QueryContext, Product, Category } from "../../../types";
+import _ from "lodash";
 declare const _default: {
     mapProduct: (product: Product, context: QueryContext) => {
         imageSetId: string;
         variants: {
-            articleNumberMax: string;
-            size: string;
-            color: string;
             listPrice: string;
             salePrice: string;
             sku: string;
-            prices: import("../../../types").Prices;
             defaultImage?: import("../../../types").ProductImage;
             images: import("../../../types").ProductImage[];
-            attributes: import("../../../types").Attribute[];
-            key: string;
-            id: string;
+            attributes: _.Dictionary<string>;
         }[];
         shortDescription?: string;
         longDescription?: string;
         categories: Category[];
         productType?: string;
         slug: string;
-        name: string;
-        key: string;
         id: string;
+        name: string;
     };
     mapCategory: (category: Category) => {
         key: string;
@@ -31,8 +25,8 @@ declare const _default: {
         children: Category[];
         products: Product[];
         slug: string;
-        name: string;
         id: string;
+        name: string;
     };
 };
 export default _default;

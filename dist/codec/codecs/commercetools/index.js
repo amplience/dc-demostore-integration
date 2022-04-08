@@ -20,18 +20,10 @@ const operation_1 = require("../../../common/operation");
 const types_1 = require("../../../types");
 const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
-const getAttributeValue = (attributes = [], name) => {
-    return lodash_1.default.get(lodash_1.default.find(attributes, att => att.name === name), 'value');
-};
 class CommerceToolsCodec extends codec_1.Codec {
-    // constructor(config: CodecConfiguration) {
-    //     super(config)
-    //     this.productOperation = new CommerceToolsProductOperation(config)
-    //     this.categoryOperation = new CommerceToolsCategoryOperation(config)
-    // }
     getMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.getCategoryHierarchy(new types_1.QueryContext({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }));
+            return yield this.getCategoryHierarchy((0, types_1.qc)({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }));
         });
     }
     getProduct(query) {
@@ -48,10 +40,9 @@ class CommerceToolsCodec extends codec_1.Codec {
         return __awaiter(this, void 0, void 0, function* () {
             let filter = query.args.id && ((c) => c.id === query.args.id) ||
                 query.args.slug && ((c) => c.slug === query.args.slug) ||
-                query.args.key && ((c) => c.key === query.args.key) ||
                 query.args.categorySlugs && ((c) => lodash_1.default.includes(query.args.categorySlugs, c.slug)) ||
                 ((c) => { var _a; return !((_a = c.parent) === null || _a === void 0 ? void 0 : _a.id); });
-            let categories = lodash_1.default.get(yield this.categoryOperation.get(new types_1.QueryContext(Object.assign(Object.assign({}, query), { args: {} }))), 'results');
+            let categories = lodash_1.default.get(yield this.categoryOperation.get((0, types_1.qc)(Object.assign(Object.assign({}, query), { args: {} }))), 'results');
             let populateChildren = (category) => {
                 category.children = lodash_1.default.filter(categories, (c) => c.parent && c.parent.id === category.id);
                 lodash_1.default.each(category.children, populateChildren);
@@ -69,7 +60,7 @@ class CommerceToolsCodec extends codec_1.Codec {
     }
     getCategory(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            let x = lodash_1.default.find(yield this.getCategoryHierarchy(query), (c) => c.id === query.args.id || c.slug === query.args.slug || c.key === query.args.key);
+            let x = lodash_1.default.find(yield this.getCategoryHierarchy(query), (c) => c.id === query.args.id || c.slug === query.args.slug);
             if (x) {
                 x.products = yield this.getProductsForCategory(x, query);
             }
@@ -78,7 +69,7 @@ class CommerceToolsCodec extends codec_1.Codec {
     }
     getProductsForCategory(parent, query) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.productOperation.get(new types_1.QueryContext(Object.assign(Object.assign({}, query), { args: { filter: `categories.id: subtree("${parent.id}")` } })))).results;
+            return (yield this.productOperation.get((0, types_1.qc)(Object.assign(Object.assign({}, query), { args: { filter: `categories.id: subtree("${parent.id}")` } })))).results;
         });
     }
 }
@@ -186,7 +177,7 @@ class CommerceToolsCategoryOperation extends CommerceToolsOperation {
             get: { get: () => super.get }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            return yield _super.get.call(this, new types_1.QueryContext(Object.assign(Object.assign({}, context), { args: Object.assign(Object.assign({}, context.args), { limit: 500, where: context.args.slug && [`slug(${context.language || 'en'}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
+            return yield _super.get.call(this, (0, types_1.qc)(Object.assign(Object.assign({}, context), { args: Object.assign(Object.assign({}, context.args), { limit: 500, where: context.args.slug && [`slug(${context.language || 'en'}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
                         context.args.id && [`id="${context.args.id}"`] }) })));
         });
     }
@@ -236,7 +227,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                 };
             }
             else {
-                return yield _super.get.call(this, new types_1.QueryContext(Object.assign(Object.assign({}, context), { args: {
+                return yield _super.get.call(this, (0, types_1.qc)(Object.assign(Object.assign({}, context), { args: {
                         expand: ['categories[*]'],
                         priceCountry: context.country,
                         priceCurrency: context.currency,
@@ -267,8 +258,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                 id: product.id,
                 name: self.localize(product.name, context),
                 slug: self.localize(product.slug, context),
-                // longDescription: product.metaDescription && self.localize(product.metaDescription, context),
-                imageSetId: getAttributeValue((_a = product.variants[0]) === null || _a === void 0 ? void 0 : _a.attributes, 'articleNumberMax'),
+                imageSetId: (_a = product.variants[0]) === null || _a === void 0 ? void 0 : _a.attributes['articleNumberMax'],
                 variants: lodash_1.default.map(lodash_1.default.concat(product.variants, [product.masterVariant]), (variant) => {
                     return {
                         sku: variant.sku || product.key,
@@ -300,7 +290,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                 let segment = context.segment;
                 if (!lodash_1.default.isEmpty(segment) && segment !== 'null' && segment !== 'undefined') {
                     let discountOperation = new CommerceToolsCartDiscountOperation(self.config);
-                    let cartDiscounts = (yield discountOperation.get(new types_1.QueryContext())).results;
+                    let cartDiscounts = (yield discountOperation.get((0, types_1.qc)({}))).results;
                     let applicableDiscounts = lodash_1.default.filter(cartDiscounts, (cd) => cd.cartPredicate === `customer.customerGroup.key = "${segment.toUpperCase()}"`);
                     return lodash_1.default.map(products, (product) => {
                         return Object.assign(Object.assign({}, product), { variants: lodash_1.default.map(product.variants, (variant) => {

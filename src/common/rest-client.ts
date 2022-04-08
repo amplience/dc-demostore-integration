@@ -25,15 +25,13 @@ export const OAuthRestClient = ({ api_url, auth_url }) => {
         let response = await axios.post(auth_url, qs.stringify(payload), config)
         const auth = response.data
 
-        console.log(auth)
-
         authenticatedAxios = axios.create({
             baseURL: api_url,
             headers: {
                 Authorization: `${auth.token_type} ${auth.access_token}`
             }
         })
-        setTimeout(() => { authenticate(payload) }, auth.expires_in * 99)
+        setTimeout(() => { authenticate(payload, config) }, auth.expires_in * 999)
     }
 
     const get = async (config: AxiosRequestConfig): Promise<any> => {

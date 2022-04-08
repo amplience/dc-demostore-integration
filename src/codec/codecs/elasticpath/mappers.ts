@@ -1,4 +1,4 @@
-import { Attribute, Product, ProductImage } from "../../../types"
+import { Product, ProductImage } from "../../../types"
 import { formatMoneyString } from "../../../util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
@@ -15,7 +15,8 @@ const mappers = (api: any) => {
             return undefined
         }
     
-        let attributes: Attribute[] = []
+        // let attributes: Attribute[] = []
+        let attributes: Dictionary<string> = {}
         let images: ProductImage[] = []
     
         if (product.relationships.main_image?.data?.id) {
@@ -32,7 +33,7 @@ const mappers = (api: any) => {
                     images.push({ url: v })
                 }
                 else if (v) {
-                    attributes.push({ name: k, value: v })
+                    attributes[k] = v
                 }
             })
         })
@@ -81,7 +82,6 @@ const mappers = (api: any) => {
         return {
             id: product.id,
             slug: product.attributes.slug,
-            key: product.attributes.slug,
             name: product.attributes.name,
             shortDescription: product.attributes.description,
             longDescription: product.attributes.description,
@@ -96,7 +96,6 @@ const mappers = (api: any) => {
         name: node.attributes.name,
         id: node.id,
         slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
-        key: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
         children: await Promise.all((await api.getChildrenByNodeId(hierarchy.id, node.id)).map(await mapNode(hierarchy))),
         products: []
     })
@@ -106,7 +105,6 @@ const mappers = (api: any) => {
         name: hierarchy.attributes.name,
         id: hierarchy.id,
         slug: hierarchy.attributes.slug,
-        key: hierarchy.attributes.slug,
         children: await Promise.all((await api.getChildrenByHierarchyId(hierarchy.id)).map(await mapNode(hierarchy))),
         products: []
     })

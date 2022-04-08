@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, Attribute, ProductImage } from '../../types'
+import { Product, Category, QueryContext, ProductImage } from '../../types'
 import { CodecConfiguration, Codec } from '..'
 import { CommerceAPI } from '../..'
 import Moltin, { Catalog, Hierarchy, Price, File } from '@moltin/sdk'
@@ -123,22 +123,18 @@ export class FabricCommerceCodec extends Codec implements CommerceAPI {
                 id: prod.itemId,
                 name: productName,
                 slug: slugify(productName, { lower: true }),
-                key: slugify(productName, { lower: true }),
                 productType: prod.type,
                 shortDescription: '',
                 longDescription: '',
                 categories: [],
                 variants: [{
-                    id: prod.itemId,
                     sku: _.find(attributes, att => att.name === 'sku').value,
                     images: [{
                         url: _.find(attributes, att => att.name === 'Image 1').value
                     }],
-                    prices: {},
                     listPrice: '',
                     salePrice: '',
-                    attributes,
-                    key: ''
+                    attributes: prod.attributes
                 }]
             }
         })

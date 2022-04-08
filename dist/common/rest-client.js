@@ -22,14 +22,13 @@ const OAuthRestClient = ({ api_url, auth_url }) => {
     const authenticate = (payload, config = {}) => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield axios_1.default.post(auth_url, qs_1.default.stringify(payload), config);
         const auth = response.data;
-        console.log(auth);
         authenticatedAxios = axios_1.default.create({
             baseURL: api_url,
             headers: {
                 Authorization: `${auth.token_type} ${auth.access_token}`
             }
         });
-        setTimeout(() => { authenticate(payload); }, auth.expires_in * 99);
+        setTimeout(() => { authenticate(payload, config); }, auth.expires_in * 999);
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
         try {

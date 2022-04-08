@@ -11,9 +11,8 @@ const getCategoryIdsFromCategory = (category) => {
     }
     return ids;
 };
-const getAttribute = (variant, attributeName, defaultValue) => lodash_1.default.get(lodash_1.default.find(variant.attributes, att => att.name === attributeName), 'value') || defaultValue;
-const translatePrice = (price, context) => new Intl.NumberFormat(context.getLocale(), { style: 'currency', currency: context.currency }).format(parseFloat(price));
+const translatePrice = (price, context) => new Intl.NumberFormat(context.locale, { style: 'currency', currency: context.currency }).format(parseFloat(price));
 exports.default = {
-    mapProduct: (product, context) => (Object.assign(Object.assign({}, product), { imageSetId: getAttribute(product.variants[0], 'articleNumberMax', ''), variants: product.variants.map(variant => (Object.assign(Object.assign({}, variant), { articleNumberMax: getAttribute(variant, 'articleNumberMax', ''), size: getAttribute(variant, 'size', ''), color: getAttribute(variant, 'color', ''), listPrice: variant.prices.list && translatePrice(variant.prices.list, context) || '', salePrice: variant.prices.sale && translatePrice(variant.prices.sale, context) || '' }))) })),
+    mapProduct: (product, context) => (Object.assign(Object.assign({}, product), { imageSetId: product.variants[0].attributes['articleNumberMax'], variants: product.variants.map(variant => (Object.assign(Object.assign({}, variant), { listPrice: variant.listPrice && translatePrice(variant.listPrice, context) || '', salePrice: variant.salePrice && translatePrice(variant.salePrice, context) || '' }))) })),
     mapCategory: (category) => (Object.assign(Object.assign({}, category), { key: category.slug }))
 };

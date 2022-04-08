@@ -4,14 +4,10 @@ import axios from 'axios'
 import currency from 'currency.js'
 
 import { Operation } from '../../../common/operation'
-import { Attribute, Category, CategoryResults, Product, ProductResults, QueryContext } from '../../../types'
+import { Category, Product, QueryContext, qc } from '../../../types'
 import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
 import { CommerceAPI } from '../../../index'
 import { formatMoneyString } from '../../../util'
-
-const getAttributeValue = (attributes: Attribute[] = [], name: string) => {
-    return _.get(_.find(attributes, att => att.name === name), 'value')
-}
 
 export interface CommerceToolsCodecConfiguration extends CodecConfiguration {
     auth_url:       string
@@ -26,14 +22,8 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
     productOperation: Operation
     categoryOperation: Operation
 
-    // constructor(config: CodecConfiguration) {
-    //     super(config)
-    //     this.productOperation = new CommerceToolsProductOperation(config)
-    //     this.categoryOperation = new CommerceToolsCategoryOperation(config)
-    // }
-
     async getMegaMenu(): Promise<Category[]> {
-        return await this.getCategoryHierarchy(new QueryContext({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }))
+        return await this.getCategoryHierarchy(qc({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }))
     }
 
     async getProduct(query: QueryContext): Promise<Product> {
@@ -48,11 +38,10 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
         let filter =
             query.args.id && ((c: Category) => c.id === query.args.id) ||
             query.args.slug && ((c: Category) => c.slug === query.args.slug) ||
-            query.args.key && ((c: Category) => c.key === query.args.key) ||
             query.args.categorySlugs && ((c: Category) => _.includes(query.args.categorySlugs, c.slug)) ||
             ((c: Category) => !c.parent?.id)
 
-        let categories = _.get(await this.categoryOperation.get(new QueryContext({ ...query, args: {} })), 'results')
+        let categories = _.get(await this.categoryOperation.get(qc({ ...query, args: {} })), 'results')
         let populateChildren = (category: Category) => {
             category.children = _.filter(categories, (c: Category) => c.parent && c.parent.id === category.id)
             _.each(category.children, populateChildren)
@@ -63,13 +52,13 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
         return x
     }
 
-    async getCategories(query: QueryContext): Promise<CategoryResults> {
+    async getCategories(query: QueryContext): Promise<Category[]> {
         throw new Error(`[ aria ] CommerceToolsCodec.getCategories() not yet implemented`)
         // return await this.getCategoryHierarchy(query)
     }
 
     async getCategory(query: QueryContext): Promise<Category> {
-        let x: any = _.find(await this.getCategoryHierarchy(query), (c: Category) => c.id === query.args.id || c.slug === query.args.slug || c.key === query.args.key)
+        let x: any = _.find(await this.getCategoryHierarchy(query), (c: Category) => c.id === query.args.id || c.slug === query.args.slug)
         if (x) {
             x.products = await this.getProductsForCategory(x, query)
         }
@@ -77,7 +66,7 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
     }
 
     async getProductsForCategory(parent: Category, query: QueryContext) {
-        return (await this.productOperation.get(new QueryContext({
+        return (await this.productOperation.get(qc({
             ...query,
             args: { filter: `categories.id: subtree("${parent.id}")` }
         }))).results
@@ -209,7 +198,7 @@ class CommerceToolsCategoryOperation extends CommerceToolsOperation {
     }
 
     async get(context: QueryContext) {
-        return await super.get(new QueryContext({
+        return await super.get(qc({
             ...context,
             args: {
                 ...context.args,
@@ -273,7 +262,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
             }
         }
         else {
-            return await super.get(new QueryContext({
+            return await super.get(qc({
                 ...context,
                 args: {
                     expand: ['categories[*]'],
@@ -307,8 +296,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
                 id: product.id,
                 name: self.localize(product.name, context),
                 slug: self.localize(product.slug, context),
-                // longDescription: product.metaDescription && self.localize(product.metaDescription, context),
-                imageSetId: getAttributeValue(product.variants[0]?.attributes, 'articleNumberMax'),
+                imageSetId: product.variants[0]?.attributes['articleNumberMax'],
                 variants: _.map(_.concat(product.variants, [product.masterVariant]), (variant: any) => {
                     return {
                         sku: variant.sku || product.key,
@@ -340,7 +328,7 @@ class CommerceToolsProductOperation extends CommerceToolsOperation {
             let segment = context.segment
             if (!_.isEmpty(segment) && segment !== 'null' && segment !== 'undefined') {
                 let discountOperation = new CommerceToolsCartDiscountOperation(self.config)
-                let cartDiscounts = (await discountOperation.get(new QueryContext())).results
+                let cartDiscounts = (await discountOperation.get(qc({}))).results
                 let applicableDiscounts = _.filter(cartDiscounts, (cd: any) => cd.cartPredicate === `customer.customerGroup.key = "${segment.toUpperCase()}"`)
 
                 return _.map(products, (product: any) => {

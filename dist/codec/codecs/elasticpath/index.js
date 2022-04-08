@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const types_1 = require("../../../types");
 const __1 = require("../..");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
@@ -94,7 +93,7 @@ const epCodec = {
                     return __awaiter(this, void 0, void 0, function* () {
                         if (query.args.productIds) {
                             return yield Promise.all(query.args.productIds.split(',').map((productId) => __awaiter(this, void 0, void 0, function* () {
-                                return yield this.getProduct(new types_1.QueryContext({ args: { id: productId } }));
+                                return yield this.getProduct(qc({ args: { id: productId } }));
                             })));
                         }
                         else if (query.args.keyword) {
@@ -123,3 +122,6 @@ const epCodec = {
 };
 exports.default = epCodec;
 (0, __1.registerCodec)(epCodec);
+function qc(arg0) {
+    throw new Error('Function not implemented.');
+}

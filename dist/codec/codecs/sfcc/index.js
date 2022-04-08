@@ -38,7 +38,6 @@ const sfccCodec = {
                 var _a;
                 return ({
                     id: cat.id,
-                    key: cat.id,
                     slug: cat.id,
                     name: cat.name,
                     children: (_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api.mapCategory),

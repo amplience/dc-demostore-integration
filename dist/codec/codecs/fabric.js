@@ -119,22 +119,18 @@ class FabricCommerceCodec extends __1.Codec {
                     id: prod.itemId,
                     name: productName,
                     slug: (0, slugify_1.default)(productName, { lower: true }),
-                    key: (0, slugify_1.default)(productName, { lower: true }),
                     productType: prod.type,
                     shortDescription: '',
                     longDescription: '',
                     categories: [],
                     variants: [{
-                            id: prod.itemId,
                             sku: lodash_1.default.find(attributes, att => att.name === 'sku').value,
                             images: [{
                                     url: lodash_1.default.find(attributes, att => att.name === 'Image 1').value
                                 }],
-                            prices: {},
                             listPrice: '',
                             salePrice: '',
-                            attributes,
-                            key: ''
+                            attributes: prod.attributes
                         }]
                 };
             });

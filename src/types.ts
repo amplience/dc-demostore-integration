@@ -1,10 +1,5 @@
 import { Method } from 'axios'
-import _ from 'lodash'
-
-export class Prices {
-    sale?: string
-    list?: string
-}
+import _, { Dictionary } from 'lodash'
 
 export class ProductImage {
     url: string
@@ -12,34 +7,13 @@ export class ProductImage {
     thumb?: string
 }
 
-export class ResultsMeta {
-    limit: number
-    offset: number
-    count: number
-    total: number
-}
-
-export class ProductResults {
-    meta: ResultsMeta
-    results: [Product]
-}
-
-export class CategoryResults {
-    meta: ResultsMeta
-    results: [Category]
-}
-
 export class Identifiable {
     id: string
-}
-
-export class Keyed extends Identifiable {
-    key: string
-}
-
-export class CommerceObject extends Keyed {
-    slug: string
     name: string
+}
+
+export class CommerceObject extends Identifiable {
+    slug: string
 }
 
 export class Product extends CommerceObject {
@@ -51,23 +25,13 @@ export class Product extends CommerceObject {
     productType?: string
 }
 
-export class Attribute {
-    name: string
-    value: string
-}
-
-export class Variant extends Keyed {
+export class Variant {
     sku: string
-    prices: Prices
     listPrice: string
     salePrice: string
     defaultImage?: ProductImage
     images: ProductImage[]
-    attributes: Attribute[]
-
-    color?: string
-    size?: string
-    articleNumberMax?: string
+    attributes: Dictionary<string>
 }
 
 export class Category extends CommerceObject {
@@ -76,40 +40,23 @@ export class Category extends CommerceObject {
     products: Product[]
 }
 
-export class SearchResult {
-    products: Product[]
-}
-
-export type GraphqlConfig = {
-    graphqlUrl: string;
-    backendKey: string;
-}
-
-export class CommonArgs {
-}
-
-export class ListArgs extends CommonArgs {
-    limit?: number
-    offset?: number
-}
-
-export class GetCategoryArgs extends CommonArgs {
+export class GetCategoryArgs {
     id?: string
     slug?: string
 }
 
-export class GetCategoryProductArgs extends CommonArgs {
+export class GetCategoryProductArgs {
     full?: boolean
     segment?: string
 }
 
-export class GetProductsArgs extends ListArgs {
+export class GetProductsArgs {
     keyword?: string
     segment?: string
     productIds?: string
 }
 
-export class GetProductArgs extends CommonArgs {
+export class GetProductArgs {
     id?: string
     sku?: string
     slug?: string
@@ -121,29 +68,34 @@ export class GetAttributeArgs {
 }
 
 export class QueryContext {
-    args:       any
-    locale:     string = 'en-US'
-    language:   string = 'en'
-    country:    string = 'US'
-    currency:   string = 'USD'
-    segment:    string = ''
-    appUrl:     string = ''
-    method:     Method = 'get'
-
-    constructor(obj?: any) {
-        this.args =     obj?.args || {}
-        this.locale =   obj?.locale || 'en-US'
-        this.language = obj?.language || 'en'
-        this.country =  obj?.country || 'US'
-        this.currency = obj?.currency || 'USD'
-        this.segment =  obj?.segment || ''
-        this.appUrl =   obj?.appUrl || ''
-    }
-
-    getLocale(): string {
-        return this.locale || `${this.language}-${this.country}`
-    }
+    args: any
+    locale: string = 'en-US'
+    language: string = 'en'
+    country: string = 'US'
+    currency: string = 'USD'
+    segment: string = ''
+    appUrl: string = ''
+    method: Method = 'get'
 }
+
+export const qc = (args: any,
+    locale: string = 'en-US',
+    language: string = 'en',
+    country: string = 'US',
+    currency: string = 'USD',
+    segment: string = '',
+    appUrl: string = '',
+    method: Method = 'get',
+) => ({
+    args,
+    locale,
+    language,
+    country,
+    currency,
+    segment,
+    appUrl,
+    method
+})
 
 export class DemoStoreConfiguration {
     algolia?: any
