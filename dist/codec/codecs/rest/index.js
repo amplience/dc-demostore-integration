@@ -23,14 +23,9 @@ const restCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[ rest-codec ] loading start...`);
-            const startTime = new Date();
             products = yield (yield fetch(config.productURL)).json();
             categories = yield (yield fetch(config.categoryURL)).json();
             translations = yield (yield fetch(config.translationsURL)).json();
-            console.log(`[ rest-codec ] products loaded: ${products.length}`);
-            console.log(`[ rest-codec ] categories loaded: ${categories.length}`);
-            console.log(`[ rest-codec ] loading duration: ${new Date().getTime() - startTime.getTime()}`);
             const api = {
                 getProductsForCategory: (category) => lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id)),
                 getProduct: (query) => {

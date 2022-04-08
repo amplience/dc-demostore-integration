@@ -13,6 +13,6 @@ const getCategoryIdsFromCategory = (category) => {
 };
 const translatePrice = (price, context) => new Intl.NumberFormat(context.locale, { style: 'currency', currency: context.currency }).format(parseFloat(price));
 exports.default = {
-    mapProduct: (product, context) => (Object.assign(Object.assign({}, product), { imageSetId: product.variants[0].attributes['articleNumberMax'], variants: product.variants.map(variant => (Object.assign(Object.assign({}, variant), { listPrice: variant.listPrice && translatePrice(variant.listPrice, context) || '', salePrice: variant.salePrice && translatePrice(variant.salePrice, context) || '' }))) })),
+    mapProduct: (product, context) => (Object.assign(Object.assign({}, product), { imageSetId: product.variants[0].attributes['articleNumberMax'] || '', variants: product.variants.map(variant => (Object.assign(Object.assign({}, variant), { listPrice: variant.listPrice && translatePrice(variant.listPrice, context) || '', salePrice: variant.salePrice && translatePrice(variant.salePrice, context) || '' }))) })),
     mapCategory: (category) => (Object.assign(Object.assign({}, category), { key: category.slug }))
 };

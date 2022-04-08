@@ -15,6 +15,8 @@ export class Codec {
 }
 
 const codecs: Dictionary<Codec> = {}
+const cache: Dictionary<Codec> = {}
+
 export const registerCodec = (codec: Codec) => {
     console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`)
     codecs[codec.SchemaURI] = codec
@@ -25,7 +27,6 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
-    console.log(`[ aria ] use codec [ ${config?._meta?.schema} ]`)
     return await codec.getAPI(config)
 }
 

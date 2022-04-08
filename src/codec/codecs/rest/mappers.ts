@@ -15,7 +15,7 @@ const translatePrice = (price: string, context: QueryContext) =>
 export default {
     mapProduct: (product: Product, context: QueryContext) => ({
         ...product,
-        imageSetId: product.variants[0].attributes['articleNumberMax'],
+        imageSetId: product.variants[0].attributes['articleNumberMax'] || '',
         variants: product.variants.map(variant => ({
             ...variant,
             listPrice: variant.listPrice && translatePrice(variant.listPrice, context) || '',

@@ -18,16 +18,9 @@ let translations: Dictionary<Dictionary<string>> = {}
 const restCodec: Codec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: async function (config: RestCommerceCodecConfig): Promise<CommerceAPI> {
-        console.log(`[ rest-codec ] loading start...`)
-        const startTime = new Date()
-
         products = await (await fetch(config.productURL)).json()
         categories = await (await fetch(config.categoryURL)).json()
         translations = await (await fetch(config.translationsURL)).json()
-
-        console.log(`[ rest-codec ] products loaded: ${products.length}`)
-        console.log(`[ rest-codec ] categories loaded: ${categories.length}`)
-        console.log(`[ rest-codec ] loading duration: ${new Date().getTime() - startTime.getTime()}`)
 
         const api = {
             getProductsForCategory: (category: Category) => _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id)),

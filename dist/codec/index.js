@@ -17,18 +17,18 @@ class Codec {
 }
 exports.Codec = Codec;
 const codecs = {};
+const cache = {};
 const registerCodec = (codec) => {
     console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`);
     codecs[codec.SchemaURI] = codec;
 };
 exports.registerCodec = registerCodec;
 const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema];
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    console.log(`[ aria ] use codec [ ${(_b = config === null || config === void 0 ? void 0 : config._meta) === null || _b === void 0 ? void 0 : _b.schema} ]`);
     return yield codec.getAPI(config);
 });
 exports.getCodec = getCodec;
