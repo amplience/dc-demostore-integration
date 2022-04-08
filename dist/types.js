@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DemoStoreConfiguration = exports.qc = exports.QueryContext = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.Identifiable = exports.ProductImage = void 0;
+exports.DemoStoreConfiguration = exports.qc = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.Identifiable = exports.ProductImage = void 0;
 class ProductImage {
 }
 exports.ProductImage = ProductImage;
@@ -34,30 +34,14 @@ exports.GetProductArgs = GetProductArgs;
 class GetAttributeArgs {
 }
 exports.GetAttributeArgs = GetAttributeArgs;
-class QueryContext {
-    constructor() {
-        this.locale = 'en-US';
-        this.language = 'en';
-        this.country = 'US';
-        this.currency = 'USD';
-        this.segment = '';
-        this.appUrl = '';
-        this.method = 'get';
-    }
-}
-exports.QueryContext = QueryContext;
-const qc = (args, locale = 'en-US', language = 'en', country = 'US', currency = 'USD', segment = '', appUrl = '', method = 'get') => ({
-    args,
-    locale,
+const qc = (args, locale = 'en-US', language = 'en', country = 'US', currency = 'USD', segment = '', appUrl = '', method = 'get') => (Object.assign(Object.assign({}, args), { locale,
     language,
     country,
     currency,
     segment,
     appUrl,
-    method
-});
+    method }));
 exports.qc = qc;
 class DemoStoreConfiguration {
 }
 exports.DemoStoreConfiguration = DemoStoreConfiguration;
-exports.default = { QueryContext };

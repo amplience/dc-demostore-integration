@@ -67,15 +67,15 @@ export class GetAttributeArgs {
     name: string
 }
 
-export class QueryContext {
+export interface QueryContext {
     args: any
-    locale: string = 'en-US'
-    language: string = 'en'
-    country: string = 'US'
-    currency: string = 'USD'
-    segment: string = ''
-    appUrl: string = ''
-    method: Method = 'get'
+    locale: string
+    language: string
+    country: string
+    currency: string
+    segment: string
+    appUrl: string
+    method: Method
 }
 
 export const qc = (args: any,
@@ -86,8 +86,8 @@ export const qc = (args: any,
     segment: string = '',
     appUrl: string = '',
     method: Method = 'get',
-) => ({
-    args,
+): QueryContext => ({
+    ...args,
     locale,
     language,
     country,
@@ -104,5 +104,3 @@ export class DemoStoreConfiguration {
     commerce?: any
     locator: string
 }
-
-export default { QueryContext }

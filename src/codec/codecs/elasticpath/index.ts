@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext } from '../../../types'
+import { Product, Category, QueryContext, qc } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
@@ -138,7 +138,3 @@ const epCodec: Codec = {
 
 export default epCodec
 registerCodec(epCodec)
-
-function qc(arg0: { args: { id: any } }): any {
-    throw new Error('Function not implemented.')
-}

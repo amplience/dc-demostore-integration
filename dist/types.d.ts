@@ -55,7 +55,7 @@ export declare class GetProductArgs {
 export declare class GetAttributeArgs {
     name: string;
 }
-export declare class QueryContext {
+export interface QueryContext {
     args: any;
     locale: string;
     language: string;
@@ -65,16 +65,7 @@ export declare class QueryContext {
     appUrl: string;
     method: Method;
 }
-export declare const qc: (args: any, locale?: string, language?: string, country?: string, currency?: string, segment?: string, appUrl?: string, method?: Method) => {
-    args: any;
-    locale: string;
-    language: string;
-    country: string;
-    currency: string;
-    segment: string;
-    appUrl: string;
-    method: Method;
-};
+export declare const qc: (args: any, locale?: string, language?: string, country?: string, currency?: string, segment?: string, appUrl?: string, method?: Method) => QueryContext;
 export declare class DemoStoreConfiguration {
     algolia?: any;
     url?: string;
@@ -82,7 +73,3 @@ export declare class DemoStoreConfiguration {
     commerce?: any;
     locator: string;
 }
-declare const _default: {
-    QueryContext: typeof QueryContext;
-};
-export default _default;
