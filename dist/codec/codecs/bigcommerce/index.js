@@ -70,6 +70,11 @@ const bigCommerceCodec = {
                 return __awaiter(this, void 0, void 0, function* () {
                     return (yield api.getCategoryTree()).map(mappers_1.mapCategory);
                 });
+            },
+            getCustomerGroups: function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    return [];
+                });
             }
         };
     })

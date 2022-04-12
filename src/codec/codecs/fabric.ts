@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, ProductImage } from '../../types'
+import { Product, Category, QueryContext, ProductImage, CustomerGroup } from '../../types'
 import { CodecConfiguration, Codec } from '..'
 import { CommerceAPI } from '../..'
 import Moltin, { Catalog, Hierarchy, Price, File } from '@moltin/sdk'
@@ -154,6 +154,10 @@ export class FabricCommerceCodec extends Codec implements CommerceAPI {
                 throw new Error('megaMenu node not found')
             }
         }
+    }
+
+    async getCustomerGroups(): Promise<CustomerGroup[]> {
+        return []
     }
     // end commerce codec api implementation
 }

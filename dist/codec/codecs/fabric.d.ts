@@ -1,4 +1,4 @@
-import { Product, Category, QueryContext } from '../../types';
+import { Product, Category, QueryContext, CustomerGroup } from '../../types';
 import { CodecConfiguration, Codec } from '..';
 import { CommerceAPI } from '../..';
 export interface FabricCommerceCodecConfig extends CodecConfiguration {
@@ -11,6 +11,7 @@ export declare class FabricCommerceCodec extends Codec implements CommerceAPI {
     getProducts(context: QueryContext): Promise<Product[]>;
     getCategory(context: QueryContext): Promise<Category>;
     getMegaMenu(): Promise<Category[]>;
+    getCustomerGroups(): Promise<CustomerGroup[]>;
 }
 declare const _default: {
     SchemaURI: string;

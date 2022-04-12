@@ -2,9 +2,9 @@
 import _ from 'lodash'
 import axios from 'axios'
 import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
-import { Category, CommerceAPI, Product, QueryContext } from '../../../index'
+import { Category, CommerceAPI, CustomerGroup, OAuthRestClient, Product, QueryContext } from '../../../index'
 import { findInMegaMenu } from '../common'
-import { SFCCCategory } from './types'
+import { SFCCCategory, SFCCCustomerGroup } from './types'
 
 export interface SFCCCodecConfiguration extends CodecConfiguration {
     api_url: string
@@ -21,24 +21,46 @@ const sfccCodec: Codec = {
         const fetch = async (url: string): Promise<any> => (await axios.request({
             method: 'get',
             url,
-            baseURL: `${config.api_url}/s/${config.site_id}/dw/shop/v20_4`,
+            baseURL: config.api_url,
             params: {
                 client_id: config.client_id
             }
         })).data
 
+        console.log(JSON.stringify(config, undefined, 4))
+
+        let rest = OAuthRestClient(config)
+        await rest.authenticate({
+            grant_type: 'client_credentials'
+        }, {
+            headers: {
+                Authorization: 'Basic ' + config.api_token,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+
+        const authenticatedFetch = async url => (await rest.get({ url })).data
+
         const api = {
-            getCategoryTree: () =>          fetch(`/categories/root?levels=4`),
-            getCategory: (slug: string) =>  fetch(`/categories/${slug}`),
+            getCategory: async (slug: string = 'root'): Promise<Category> => {
+                return api.mapCategory(await fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`))
+            },
+            getCustomerGroups: async (): Promise<CustomerGroup[]> => {
+                return (await authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup)
+            },
             getProducts: () =>              fetch(`/products`),
             searchProducts: keyword =>      fetch(`/products?keyword=${keyword}`),
             getProductById: id =>           fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat =>  fetch(`/products?categories:in=${cat.id}`),
+            mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => ({
+                ...group,
+                name: group.id
+            }),
             mapCategory: (cat: SFCCCategory): Category => ({
                 id: cat.id,
                 slug: cat.id,
                 name: cat.name,
-                children: cat.categories?.map(api.mapCategory),
+                children: cat.categories?.map(api.mapCategory) || [],
                 products: []
             })
         }
@@ -71,8 +93,10 @@ const sfccCodec: Codec = {
                 }
             },
             getMegaMenu: async function (): Promise<Category[]> {
-                let tree = await api.getCategoryTree()
-                return tree.categories.map(api.mapCategory)
+                return await (await api.getCategory()).children
+            },
+            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+                return await api.getCustomerGroups()
             }
         }
     }

@@ -9,6 +9,8 @@ export declare class Identifiable {
     id: string;
     name: string;
 }
+export declare class CustomerGroup extends Identifiable {
+}
 export declare class CommerceObject extends Identifiable {
     slug: string;
 }

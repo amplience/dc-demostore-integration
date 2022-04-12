@@ -1,5 +1,5 @@
 import _, { Dictionary } from 'lodash'
-import { Product, Category, QueryContext } from '../../../types'
+import { Product, Category, QueryContext, CustomerGroup } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import mappers from './mappers'
@@ -70,6 +70,9 @@ const restCodec: Codec = {
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return categories.filter(cat => !cat.parent).map(mappers.mapCategory)
+            },
+            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+                return []
             }
         }
     }

@@ -34,6 +34,7 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getCodec = getCodec;
 require("./codecs/bigcommerce");
 require("./codecs/commercetools");
+require("./codecs/fabric");
 require("./codecs/sfcc");
 require("./codecs/elasticpath");
 require("./codecs/rest");

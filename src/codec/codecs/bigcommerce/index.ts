@@ -2,7 +2,7 @@
 import _ from 'lodash'
 import axios from 'axios'
 import { Codec, registerCodec } from '../../../codec'
-import { Category, CommerceAPI, Product, QueryContext } from '../../../index'
+import { Category, CommerceAPI, CustomerGroup, Product, QueryContext } from '../../../index'
 import { BigCommerceCodecConfiguration } from './types'
 import { mapProduct, mapCategory } from './mappers'
 import { findInMegaMenu } from '../common'
@@ -57,6 +57,9 @@ const bigCommerceCodec: Codec = {
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return (await api.getCategoryTree()).map(mapCategory)
+            },
+            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+                return []
             }
         }
     }

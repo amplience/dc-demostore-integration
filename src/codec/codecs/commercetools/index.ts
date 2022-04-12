@@ -4,7 +4,7 @@ import axios from 'axios'
 import currency from 'currency.js'
 
 import { Operation } from '../../../common/operation'
-import { Category, Product, QueryContext, qc } from '../../../types'
+import { Category, Product, QueryContext, qc, CustomerGroup } from '../../../types'
 import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
 import { CommerceAPI } from '../../../index'
 import { formatMoneyString } from '../../../util'
@@ -32,6 +32,10 @@ class CommerceToolsCodec extends Codec implements CommerceAPI {
 
     async getProducts(query: QueryContext): Promise<Product[]> {
         return await this.productOperation.get(query)
+    }
+
+    async getCustomerGroups(): Promise<CustomerGroup[]> {
+        return []
     }
 
     async getCategoryHierarchy(query: QueryContext) {
@@ -425,6 +429,9 @@ const commerceToolsCodec: Codec = {
                 return await Promise.all(categories.map(async category => {
                     return await api.populateChildren(category)
                 }))
+            },
+            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+                return []
             }
         }
     }

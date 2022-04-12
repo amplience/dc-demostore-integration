@@ -1,3 +1,4 @@
 import { Category } from "../../types";
 declare const findInMegaMenu: (categories: Category[], slug: string) => Category;
-export { findInMegaMenu };
+declare const flattenCategories: (categories: Category[]) => Category[];
+export { findInMegaMenu, flattenCategories };

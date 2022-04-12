@@ -14,3 +14,9 @@ export interface SFCCCategory {
     c_slotBannerImage?: string;
     c_alternativeUrl?: string;
 }
+export interface SFCCCustomerGroup {
+    _type: string;
+    _resource_state: string;
+    id: string;
+    link: string;
+}

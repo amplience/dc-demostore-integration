@@ -36,6 +36,11 @@ class CommerceToolsCodec extends codec_1.Codec {
             return yield this.productOperation.get(query);
         });
     }
+    getCustomerGroups() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
     getCategoryHierarchy(query) {
         return __awaiter(this, void 0, void 0, function* () {
             let filter = query.args.id && ((c) => c.id === query.args.id) ||
@@ -379,6 +384,11 @@ const commerceToolsCodec = {
                         return yield Promise.all(categories.map((category) => __awaiter(this, void 0, void 0, function* () {
                             return yield api.populateChildren(category);
                         })));
+                    });
+                },
+                getCustomerGroups: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return [];
                     });
                 }
             };

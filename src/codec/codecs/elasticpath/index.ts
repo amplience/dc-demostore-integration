@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, qc } from '../../../types'
+import { Product, Category, QueryContext, qc, CustomerGroup } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
@@ -131,6 +131,9 @@ const epCodec: Codec = {
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return megaMenu
+            },
+            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+                return []
             }
         }
     }

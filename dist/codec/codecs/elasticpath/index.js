@@ -116,6 +116,11 @@ const epCodec = {
                     return __awaiter(this, void 0, void 0, function* () {
                         return megaMenu;
                     });
+                },
+                getCustomerGroups: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return [];
+                    });
                 }
             };
         });

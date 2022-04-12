@@ -80,6 +80,11 @@ const restCodec = {
                     return __awaiter(this, void 0, void 0, function* () {
                         return categories.filter(cat => !cat.parent).map(mappers_1.default.mapCategory);
                     });
+                },
+                getCustomerGroups: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return [];
+                    });
                 }
             };
         });

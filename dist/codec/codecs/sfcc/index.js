@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const codec_1 = require("../../../codec");
+const index_1 = require("../../../index");
 const sfccCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
@@ -21,26 +22,42 @@ const sfccCodec = {
             return (yield axios_1.default.request({
                 method: 'get',
                 url,
-                baseURL: `${config.api_url}/s/${config.site_id}/dw/shop/v20_4`,
+                baseURL: config.api_url,
                 params: {
                     client_id: config.client_id
                 }
             })).data;
         });
+        console.log(JSON.stringify(config, undefined, 4));
+        let rest = (0, index_1.OAuthRestClient)(config);
+        yield rest.authenticate({
+            grant_type: 'client_credentials'
+        }, {
+            headers: {
+                Authorization: 'Basic ' + config.api_token,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        const authenticatedFetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
         const api = {
-            getCategoryTree: () => fetch(`/categories/root?levels=4`),
-            getCategory: (slug) => fetch(`/categories/${slug}`),
+            getCategory: (slug = 'root') => __awaiter(void 0, void 0, void 0, function* () {
+                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`));
+            }),
+            getCustomerGroups: () => __awaiter(void 0, void 0, void 0, function* () {
+                return (yield authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup);
+            }),
             getProducts: () => fetch(`/products`),
             searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
             getProductById: id => fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
+            mapCustomerGroup: (group) => (Object.assign(Object.assign({}, group), { name: group.id })),
             mapCategory: (cat) => {
                 var _a;
                 return ({
                     id: cat.id,
                     slug: cat.id,
                     name: cat.name,
-                    children: (_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api.mapCategory),
+                    children: ((_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api.mapCategory)) || [],
                     products: []
                 });
             }
@@ -76,8 +93,12 @@ const sfccCodec = {
             },
             getMegaMenu: function () {
                 return __awaiter(this, void 0, void 0, function* () {
-                    let tree = yield api.getCategoryTree();
-                    return tree.categories.map(api.mapCategory);
+                    return yield (yield api.getCategory()).children;
+                });
+            },
+            getCustomerGroups: function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    return yield api.getCustomerGroups();
                 });
             }
         };

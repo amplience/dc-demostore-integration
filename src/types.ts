@@ -12,6 +12,8 @@ export class Identifiable {
     name: string
 }
 
+export class CustomerGroup extends Identifiable {}
+
 export class CommerceObject extends Identifiable {
     slug: string
 }

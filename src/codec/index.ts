@@ -32,6 +32,7 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
 
 import './codecs/bigcommerce'
 import './codecs/commercetools'
+import './codecs/fabric'
 import './codecs/sfcc'
 import './codecs/elasticpath'
 import './codecs/rest'
