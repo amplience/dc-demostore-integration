@@ -7,8 +7,8 @@ declare const _default: {
             listPrice: string;
             salePrice: string;
             sku: string;
-            defaultImage?: import("../../../types").ProductImage;
-            images: import("../../../types").ProductImage[];
+            defaultImage?: import("../../../types").Image;
+            images: import("../../../types").Image[];
             attributes: _.Dictionary<string>;
         }[];
         shortDescription?: string;
@@ -22,6 +22,7 @@ declare const _default: {
     mapCategory: (category: Category) => {
         key: string;
         parent?: Category;
+        image?: import("../../../types").Image;
         children: Category[];
         products: Product[];
         slug: string;

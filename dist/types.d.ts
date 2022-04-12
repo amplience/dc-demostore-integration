@@ -1,8 +1,7 @@
 import { Method } from 'axios';
 import { Dictionary } from 'lodash';
-export declare class ProductImage {
+export declare class Image {
     url: string;
-    large?: string;
     thumb?: string;
 }
 export declare class Identifiable {
@@ -26,12 +25,13 @@ export declare class Variant {
     sku: string;
     listPrice: string;
     salePrice: string;
-    defaultImage?: ProductImage;
-    images: ProductImage[];
+    defaultImage?: Image;
+    images: Image[];
     attributes: Dictionary<string>;
 }
 export declare class Category extends CommerceObject {
     parent?: Category;
+    image?: Image;
     children: Category[];
     products: Product[];
 }

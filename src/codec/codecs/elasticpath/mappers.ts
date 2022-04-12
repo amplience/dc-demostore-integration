@@ -1,4 +1,4 @@
-import { Product, ProductImage } from "../../../types"
+import { Product, Image } from "../../../types"
 import { formatMoneyString } from "../../../util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
@@ -17,7 +17,7 @@ const mappers = (api: any) => {
     
         // let attributes: Attribute[] = []
         let attributes: Dictionary<string> = {}
-        let images: ProductImage[] = []
+        let images: Image[] = []
     
         if (product.relationships.main_image?.data?.id) {
             let mainImage = await api.getFileById(product.relationships.main_image?.data?.id)

@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, ProductImage, CustomerGroup } from '../../types'
+import { Product, Category, QueryContext, Image, CustomerGroup } from '../../types'
 import { CodecConfiguration, Codec } from '..'
 import { CommerceAPI } from '../..'
 import Moltin, { Catalog, Hierarchy, Price, File } from '@moltin/sdk'

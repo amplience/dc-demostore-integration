@@ -58,6 +58,7 @@ const sfccCodec = {
                     id: cat.id,
                     slug: cat.id,
                     name: cat.name,
+                    image: { url: cat.image },
                     children: ((_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api.mapCategory)) || [],
                     products: []
                 });

@@ -1,9 +1,8 @@
 import { Method } from 'axios'
 import _, { Dictionary } from 'lodash'
 
-export class ProductImage {
+export class Image {
     url: string
-    large?: string
     thumb?: string
 }
 
@@ -31,13 +30,14 @@ export class Variant {
     sku: string
     listPrice: string
     salePrice: string
-    defaultImage?: ProductImage
-    images: ProductImage[]
+    defaultImage?: Image
+    images: Image[]
     attributes: Dictionary<string>
 }
 
 export class Category extends CommerceObject {
     parent?: Category
+    image?: Image
     children: Category[]
     products: Product[]
 }
