@@ -28,7 +28,7 @@ const sfccCodec = {
                 }
             })).data;
         });
-        console.log(JSON.stringify(config, undefined, 4));
+        // authenticated fetch based on oauth creds passed in (not needed for store apis)
         let rest = (0, index_1.OAuthRestClient)(config);
         yield rest.authenticate({
             grant_type: 'client_credentials'
@@ -39,6 +39,7 @@ const sfccCodec = {
             }
         });
         const authenticatedFetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
+        // end authenticated fetch
         const api = {
             getCategory: (slug = 'root') => __awaiter(void 0, void 0, void 0, function* () {
                 return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`));

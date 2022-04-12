@@ -3,7 +3,6 @@ import _ from 'lodash'
 import axios from 'axios'
 import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CustomerGroup, OAuthRestClient, Product, QueryContext } from '../../../index'
-import { findInMegaMenu } from '../common'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
 
 export interface SFCCCodecConfiguration extends CodecConfiguration {
@@ -27,8 +26,7 @@ const sfccCodec: Codec = {
             }
         })).data
 
-        console.log(JSON.stringify(config, undefined, 4))
-
+        // authenticated fetch based on oauth creds passed in (not needed for store apis)
         let rest = OAuthRestClient(config)
         await rest.authenticate({
             grant_type: 'client_credentials'
@@ -38,8 +36,8 @@ const sfccCodec: Codec = {
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         })
-
         const authenticatedFetch = async url => (await rest.get({ url })).data
+        // end authenticated fetch
 
         const api = {
             getCategory: async (slug: string = 'root'): Promise<Category> => {
