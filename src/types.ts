@@ -42,6 +42,13 @@ export class Category extends CommerceObject {
     products: Product[]
 }
 
+export class Promotion extends Identifiable {
+    description: string
+    promoCode?: string
+    isActive: boolean
+    image?: Image
+}
+
 export class GetCategoryArgs {
     id?: string
     slug?: string

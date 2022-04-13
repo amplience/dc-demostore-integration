@@ -35,6 +35,12 @@ export declare class Category extends CommerceObject {
     children: Category[];
     products: Product[];
 }
+export declare class Promotion extends Identifiable {
+    description: string;
+    promoCode?: string;
+    isActive: boolean;
+    image?: Image;
+}
 export declare class GetCategoryArgs {
     id?: string;
     slug?: string;

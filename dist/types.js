@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DemoStoreConfiguration = exports.qc = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.CustomerGroup = exports.Identifiable = exports.Image = void 0;
+exports.DemoStoreConfiguration = exports.qc = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.Promotion = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.CustomerGroup = exports.Identifiable = exports.Image = void 0;
 class Image {
 }
 exports.Image = Image;
@@ -22,6 +22,9 @@ exports.Variant = Variant;
 class Category extends CommerceObject {
 }
 exports.Category = Category;
+class Promotion extends Identifiable {
+}
+exports.Promotion = Promotion;
 class GetCategoryArgs {
 }
 exports.GetCategoryArgs = GetCategoryArgs;
