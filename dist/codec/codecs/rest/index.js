@@ -44,10 +44,10 @@ const restCodec = {
                     var _a;
                     return (0, common_1.findInMegaMenu)(categories, (_a = query.args) === null || _a === void 0 ? void 0 : _a.slug);
                 },
-                populateCategory: (category, context) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take([
+                populateCategory: (category, context) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(lodash_1.default.uniqBy([
                         ...api.getProductsForCategory(category),
                         ...lodash_1.default.flatMap(category.children, api.getProductsForCategory)
-                    ], 12) }))
+                    ], 'slug'), 12) }))
             };
             return {
                 getProduct: function (query) {

@@ -40,10 +40,10 @@ const restCodec: Codec = {
             },
             populateCategory: (category: Category, context: QueryContext): Category => ({
                 ...category,
-                products: _.take([
+                products: _.take(_.uniqBy([
                     ...api.getProductsForCategory(category),
                     ..._.flatMap(category.children, api.getProductsForCategory)
-                ], 12)
+                ], 'slug'), 12)
             })
         }
 
