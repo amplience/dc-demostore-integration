@@ -8,16 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCodec = exports.registerCodec = exports.Codec = void 0;
+const lodash_1 = __importDefault(require("lodash"));
 class Codec {
     getAPI(config) {
         return __awaiter(this, void 0, void 0, function* () { });
     }
+    canUseConfiguration(config) { return false; }
 }
 exports.Codec = Codec;
 const codecs = {};
-const cache = {};
 const registerCodec = (codec) => {
     console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`);
     codecs[codec.SchemaURI] = codec;
@@ -25,7 +29,7 @@ const registerCodec = (codec) => {
 exports.registerCodec = registerCodec;
 const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema];
+    let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema] || lodash_1.default.find(Object.values(codecs), c => c.canUseConfiguration(config));
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
@@ -34,7 +38,6 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
 exports.getCodec = getCodec;
 require("./codecs/bigcommerce");
 require("./codecs/commercetools");
-require("./codecs/fabric");
 require("./codecs/sfcc");
 require("./codecs/elasticpath");
 require("./codecs/rest");

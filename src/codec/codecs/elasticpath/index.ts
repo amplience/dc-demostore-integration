@@ -136,6 +136,9 @@ const epCodec: Codec = {
                 return []
             }
         }
+    },
+    canUseConfiguration: function (config: any): boolean {
+        return config.client_id && config.client_secret && config.pcm_url && config.auth_url && config.api_url && config.catalog_name
     }
 }
 

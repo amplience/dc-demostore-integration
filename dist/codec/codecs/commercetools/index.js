@@ -393,6 +393,9 @@ const commerceToolsCodec = {
                 }
             };
         });
+    },
+    canUseConfiguration: function (config) {
+        return config.project && config.client_id && config.client_secret && config.auth_url && config.api_url && config.scope;
     }
 };
 exports.default = commerceToolsCodec;

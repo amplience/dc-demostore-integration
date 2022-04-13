@@ -46,10 +46,10 @@ const sfccCodec: Codec = {
             getCustomerGroups: async (): Promise<CustomerGroup[]> => {
                 return (await authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup)
             },
-            getProducts: () =>              fetch(`/products`),
-            searchProducts: keyword =>      fetch(`/products?keyword=${keyword}`),
-            getProductById: id =>           fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat =>  fetch(`/products?categories:in=${cat.id}`),
+            getProducts: () => fetch(`/products`),
+            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
+            getProductById: id => fetch(`/products/${id}?include=images,variants`),
+            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
             mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => ({
                 ...group,
                 name: group.id
@@ -63,7 +63,7 @@ const sfccCodec: Codec = {
                 products: []
             })
         }
-    
+
         return {
             getProduct: async function (query: QueryContext): Promise<Product> {
                 // if (query.args.id) {
@@ -98,6 +98,9 @@ const sfccCodec: Codec = {
                 return await api.getCustomerGroups()
             }
         }
+    },
+    canUseConfiguration: function (config: any): boolean {
+        return config.client_id && config.client_secret && config.site_id && config.auth_url && config.api_url && config.api_token
     }
 }
 

@@ -124,6 +124,9 @@ const epCodec = {
                 }
             };
         });
+    },
+    canUseConfiguration: function (config) {
+        return config.client_id && config.client_secret && config.pcm_url && config.auth_url && config.api_url && config.catalog_name;
     }
 };
 exports.default = epCodec;

@@ -77,7 +77,10 @@ const bigCommerceCodec = {
                 });
             }
         };
-    })
+    }),
+    canUseConfiguration: function (config) {
+        return config.api_url && config.api_token && config.store_hash;
+    }
 };
 exports.default = bigCommerceCodec;
 (0, codec_1.registerCodec)(bigCommerceCodec);

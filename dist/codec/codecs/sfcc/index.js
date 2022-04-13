@@ -104,7 +104,10 @@ const sfccCodec = {
                 });
             }
         };
-    })
+    }),
+    canUseConfiguration: function (config) {
+        return config.client_id && config.client_secret && config.site_id && config.auth_url && config.api_url && config.api_token;
+    }
 };
 exports.default = sfccCodec;
 (0, codec_1.registerCodec)(sfccCodec);

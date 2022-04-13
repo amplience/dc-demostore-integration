@@ -88,6 +88,9 @@ const restCodec = {
                 }
             };
         });
+    },
+    canUseConfiguration: function (config) {
+        return config.productURL && config.categoryURL && config.translationsURL;
     }
 };
 exports.default = restCodec;

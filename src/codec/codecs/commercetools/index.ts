@@ -388,12 +388,12 @@ const commerceToolsCodec: Codec = {
         })
 
         const api: any = {
-            getTopLevelCategories: async(): Promise<Category[]> => {
-                return await Promise.all(cats.map(async cat => {
+            getTopLevelCategories: async (): Promise<Category[]> => {
+                return await Promise.all(cats.map(async (cat) => {
                     return (await rest.get({ url: `/categories/key=${cat}` }))
                 }))
             },
-            populateChildren: async(category: Category): Promise<Category> => {
+            populateChildren: async (category: Category): Promise<Category> => {
                 let query = qs.stringify({ where: `parent(id="${category.id}")` })
                 return {
                     ...category,
@@ -426,7 +426,7 @@ const commerceToolsCodec: Codec = {
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 let categories = await api.getTopLevelCategories()
-                return await Promise.all(categories.map(async category => {
+                return await Promise.all(categories.map(async (category) => {
                     return await api.populateChildren(category)
                 }))
             },
@@ -434,6 +434,9 @@ const commerceToolsCodec: Codec = {
                 return []
             }
         }
+    },
+    canUseConfiguration: function (config: any): boolean {
+        return config.project && config.client_id && config.client_secret && config.auth_url && config.api_url && config.scope
     }
 }
 

@@ -1,7 +1,7 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, registerCodec } from '../../../codec'
+import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CustomerGroup, Product, QueryContext } from '../../../index'
 import { BigCommerceCodecConfiguration } from './types'
 import { mapProduct, mapCategory } from './mappers'
@@ -21,13 +21,13 @@ const bigCommerceCodec: Codec = {
         })).data.data
 
         const api = {
-            getCategoryTree: () =>          fetch(`/categories/tree`),
-            getProducts: () =>              fetch(`/products`),
-            searchProducts: keyword =>      fetch(`/products?keyword=${keyword}`),
-            getProductById: id =>           fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat =>  fetch(`/products?categories:in=${cat.id}`)
+            getCategoryTree: () => fetch(`/categories/tree`),
+            getProducts: () => fetch(`/products`),
+            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
+            getProductById: id => fetch(`/products/${id}?include=images,variants`),
+            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
         }
-    
+
         return {
             getProduct: async function (query: QueryContext): Promise<Product> {
                 if (query.args.id) {
@@ -37,7 +37,7 @@ const bigCommerceCodec: Codec = {
             },
             getProducts: async function (query: QueryContext): Promise<Product[]> {
                 if (query.args.productIds) {
-                    return await Promise.all(query.args.productIds.split(',').map(async id => mapProduct(await api.getProductById(id))))
+                    return await Promise.all(query.args.productIds.split(',').map(async (id) => mapProduct(await api.getProductById(id))))
                 }
                 else if (query.args.keyword) {
                     return (await api.searchProducts(query.args.keyword)).map(mapProduct)
@@ -62,6 +62,9 @@ const bigCommerceCodec: Codec = {
                 return []
             }
         }
+    },
+    canUseConfiguration: function (config: any): boolean {
+        return config.api_url && config.api_token && config.store_hash
     }
 }
 

@@ -75,6 +75,9 @@ const restCodec: Codec = {
                 return []
             }
         }
+    },
+    canUseConfiguration: function (config: any): boolean {
+        return config.productURL && config.categoryURL && config.translationsURL
     }
 }
 
