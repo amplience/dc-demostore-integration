@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, qc, CustomerGroup } from '../../../types'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
@@ -105,29 +105,29 @@ const epCodec: Codec = {
         }
 
         return {
-            getProduct: async function (query: QueryContext): Promise<Product> {
-                if (query.args.id) {
-                    return mapper.mapProduct(await api.getProductById(query.args.id))
+            getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
+                if (args.id) {
+                    return mapper.mapProduct(await api.getProductById(args.id))
                 }
                 throw new Error(`getProduct(): must specify id`)
             },
-            getProducts: async function (query: QueryContext): Promise<Product[]> {
-                if (query.args.productIds) {
-                    return await Promise.all(query.args.productIds.split(',').map(async productId => {
-                        return await this.getProduct(qc({ args: { id: productId } }))
+            getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
+                if (args.productIds) {
+                    return await Promise.all(args.productIds.split(',').map(async productId => {
+                        return await this.getProduct({ id: productId })
                     }))
                 }
-                else if (query.args.keyword) {
+                else if (args.keyword) {
                     // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
-                    return [await mapper.mapProduct(await api.getProductBySku(query.args.keyword))]
+                    return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
                 }
                 throw new Error(`getProducts(): must specify either productIds or keyword`)
             },
-            getCategory: async function (query: QueryContext): Promise<Category> {
-                if (!query.args.slug) {
+            getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
+                if (!args.slug) {
                     throw new Error(`getCategory(): must specify slug`)
                 }
-                return await populateCategory(findInMegaMenu(megaMenu, query.args.slug) as ElasticPathCategory)
+                return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return megaMenu

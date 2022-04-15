@@ -6,9 +6,9 @@ export interface CodecConfiguration {
     };
     locator?: string;
 }
-export declare class Codec {
+export interface Codec {
     SchemaURI: string;
-    getAPI(config: CodecConfiguration): Promise<any>;
+    getAPI(config: CodecConfiguration): Promise<API>;
     canUseConfiguration(config: CodecConfiguration): boolean;
 }
 export declare const registerCodec: (codec: Codec) => void;
@@ -18,3 +18,4 @@ import './codecs/commercetools';
 import './codecs/sfcc';
 import './codecs/elasticpath';
 import './codecs/rest';
+import { API } from '..';

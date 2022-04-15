@@ -9,10 +9,10 @@ export interface CodecConfiguration {
     locator?: string
 }
 
-export class Codec {
+export interface Codec {
     SchemaURI: string
-    async getAPI(config: CodecConfiguration): Promise<any> { }
-    canUseConfiguration(config: CodecConfiguration): boolean { return false }
+    getAPI(config: CodecConfiguration): Promise<API>
+    canUseConfiguration(config: CodecConfiguration): boolean
 }
 
 const codecs: Dictionary<Codec> = {}
@@ -26,7 +26,21 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
-    return await codec.getAPI(config)
+    let api = await codec.getAPI(config)
+
+    _.each(Object.keys(api), key => {
+        let method = api[key]
+        api[key] = async (args: CommonArgs): Promise<any> => await method({
+            locale: 'en-US',
+            language: 'en',
+            country: 'US',
+            currency: 'USD',
+            segment: '',
+            ...args
+        })
+    })
+
+    return api
 }
 
 import './codecs/bigcommerce'
@@ -34,3 +48,4 @@ import './codecs/commercetools'
 import './codecs/sfcc'
 import './codecs/elasticpath'
 import './codecs/rest'
+import { API, CommerceAPI, CommonArgs } from '..'

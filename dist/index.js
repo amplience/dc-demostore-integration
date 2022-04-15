@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommerceAPIFromConfig = exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = exports.flattenCategories = exports.OAuthRestClient = exports.CryptKeeper = void 0;
+exports.getCommerceAPIFromConfig = exports.getCommerceAPI = exports.getConfig = exports.CommerceAPI = exports.API = exports.flattenCategories = exports.OAuthRestClient = exports.CryptKeeper = void 0;
 const amplience_1 = require("./amplience");
 const codec_1 = require("./codec");
 const crypt_keeper_1 = __importDefault(require("./common/crypt-keeper"));
@@ -38,7 +38,10 @@ Object.defineProperty(exports, "flattenCategories", { enumerable: true, get: fun
 __exportStar(require("./types"), exports);
 __exportStar(require("./codec"), exports);
 __exportStar(require("./common/paginator"), exports);
-class CommerceAPI {
+class API {
+}
+exports.API = API;
+class CommerceAPI extends API {
 }
 exports.CommerceAPI = CommerceAPI;
 const getConfig = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {

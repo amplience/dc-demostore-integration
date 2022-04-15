@@ -13,384 +13,122 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const urijs_1 = __importDefault(require("urijs"));
-const axios_1 = __importDefault(require("axios"));
-const currency_js_1 = __importDefault(require("currency.js"));
-const operation_1 = require("../../../common/operation");
-const types_1 = require("../../../types");
 const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
-class CommerceToolsCodec extends codec_1.Codec {
-    getMegaMenu() {
+const rest_client_1 = __importDefault(require("../../../common/rest-client"));
+const cats = ['women', 'men', 'new', 'sale', 'accessories'];
+let rest;
+// caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
+let categories;
+const api = {
+    getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () {
+        if (args.id) {
+            return lodash_1.default.first((yield rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results);
+        }
+        throw new Error(`getProduct(): id must be specified`);
+    }),
+    getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () {
+        if (args.productIds) {
+            let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',');
+            return (yield rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results;
+        }
+        else if (args.keyword) {
+            return (yield rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results;
+        }
+        throw new Error(`getProducts(): productIds or keyword must be specified`);
+    }),
+    getCategories: function () {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.getCategoryHierarchy((0, types_1.qc)({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }));
-        });
-    }
-    getProduct(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.productOperation.get(query);
-        });
-    }
-    getProducts(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.productOperation.get(query);
-        });
-    }
-    getCustomerGroups() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return [];
-        });
-    }
-    getCategoryHierarchy(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let filter = query.args.id && ((c) => c.id === query.args.id) ||
-                query.args.slug && ((c) => c.slug === query.args.slug) ||
-                query.args.categorySlugs && ((c) => lodash_1.default.includes(query.args.categorySlugs, c.slug)) ||
-                ((c) => { var _a; return !((_a = c.parent) === null || _a === void 0 ? void 0 : _a.id); });
-            let categories = lodash_1.default.get(yield this.categoryOperation.get((0, types_1.qc)(Object.assign(Object.assign({}, query), { args: {} }))), 'results');
-            let populateChildren = (category) => {
-                category.children = lodash_1.default.filter(categories, (c) => c.parent && c.parent.id === category.id);
-                lodash_1.default.each(category.children, populateChildren);
-                return category;
-            };
-            let x = lodash_1.default.map(lodash_1.default.filter(categories, filter), populateChildren);
-            return x;
-        });
-    }
-    getCategories(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            throw new Error(`[ aria ] CommerceToolsCodec.getCategories() not yet implemented`);
-            // return await this.getCategoryHierarchy(query)
-        });
-    }
-    getCategory(query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let x = lodash_1.default.find(yield this.getCategoryHierarchy(query), (c) => c.id === query.args.id || c.slug === query.args.slug);
-            if (x) {
-                x.products = yield this.getProductsForCategory(x, query);
+            if (!categories) {
+                categories = (yield rest.get({ url: `/categories?limit=500` })).results;
             }
-            return x;
+            return categories;
         });
-    }
-    getProductsForCategory(parent, query) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.productOperation.get((0, types_1.qc)(Object.assign(Object.assign({}, query), { args: { filter: `categories.id: subtree("${parent.id}")` } })))).results;
-        });
-    }
-}
-const mapImage = (image) => image && ({ url: image.url });
-class CommerceToolsOperation extends operation_1.Operation {
-    getBaseURL() {
-        return `${this.config.api_url}/${this.config.project}/`;
-    }
-    getURL(context) {
-        return `${this.getBaseURL()}${this.getRequestPath(context)}`;
-    }
-    getRequest(context) {
-        let uri = new urijs_1.default(this.getURL(context));
-        let query = Object.assign({ limit: context.args.limit, offset: context.args.offset, where: context.args.where, filter: context.args.filter }, context.args);
-        // add any filters based on the args
-        uri.addQuery(query);
-        return uri.toString();
-    }
-    localize(text, context) {
-        if (!text) {
-            console.error(new Error().stack);
-        }
-        if (text.label) {
-            text = text.label;
-        }
-        if (typeof text === 'string') {
-            return text;
-        }
-        if (typeof text === 'boolean') {
-            let b = text;
-            return b;
-        }
-        let localized = text[context.language] || text['en'] || text[Object.keys(text)[0]];
-        // if (_.isEmpty(localized)) {
-        //     console.log(`localize: ${JSON.stringify(text)}`)
-        // }
-        return localized;
-    }
-    authenticate() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const rest = (0, rest_client_1.default)(this.config);
-            yield rest.authenticate({
-                grant_type: 'client_credentials',
-                scope: this.config.scope
-            }, {
-                auth: {
-                    username: this.config.client_id,
-                    password: this.config.client_secret
-                }
-            });
-            if (!this.accessToken) {
-                let response = yield axios_1.default.post(`${this.config.auth_url}/oauth/token?grant_type=client_credentials&scope=${lodash_1.default.first(lodash_1.default.split(this.config.scope, ' '))}`, {}, {
-                    auth: {
-                        username: this.config.client_id,
-                        password: this.config.client_secret
-                    }
-                });
-                this.accessToken = `${response.data.token_type} ${response.data.access_token}`;
+    },
+    getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () {
+        return (yield api.getCategories()).find(cat => cat.slug.en === args.slug);
+    }),
+    getProductsForCategory: (category) => __awaiter(void 0, void 0, void 0, function* () {
+        return (yield rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results;
+    })
+};
+const getMapper = (args) => {
+    args = {
+        language: args.language || 'en',
+        country: args.country || 'US',
+        currency: args.currency || 'USD'
+    };
+    return {
+        findPrice: (variant) => {
+            let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
+                variant.prices.find(price => price.value.currencyCode === args.currency) ||
+                lodash_1.default.first(variant.prices);
+            return (0, util_1.formatMoneyString)((price.value.centAmount / Math.pow(10, price.value.fractionDigits)), args);
+        },
+        mapCategory: (category) => ({
+            id: category.id,
+            name: getMapper(args).localize(category.name),
+            slug: getMapper(args).localize(category.slug),
+            children: categories.filter(cat => { var _a; return ((_a = cat.parent) === null || _a === void 0 ? void 0 : _a.id) === category.id; }).map(getMapper(args).mapCategory),
+            products: []
+        }),
+        localize: (localizable) => {
+            return localizable[args.language] || localizable.en;
+        },
+        getAttributeValue: (attribute) => {
+            if (typeof attribute.value === 'string') {
+                return attribute.value;
             }
-            return this.accessToken;
-        });
-    }
-    translateResponse(data, mapper = ((x) => x)) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // a commercetools response will be either a single object, or an array in 'results'
-            // if it is an array, limit, count, total, and offset are provided on the object
-            let r = data.results || [data];
-            return {
-                meta: data.limit && {
-                    limit: data.limit,
-                    count: data.count,
-                    offset: data.offset,
-                    total: data.total
-                },
-                results: yield Promise.all(r.map(yield mapper))
-            };
-        });
-    }
-    getHeaders() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return { authorization: yield this.authenticate() };
-        });
-    }
-}
-// category operation
-class CommerceToolsCategoryOperation extends CommerceToolsOperation {
-    export(context) {
-        let self = this;
-        return function (category) {
-            return {
-                id: category.id,
-                parent: category.parent || {},
-                ancestors: category.ancestors,
-                name: self.localize(category.name, context),
-                slug: self.localize(category.slug, context),
-                key: category.slug.en
-            };
-        };
-    }
-    getRequestPath(context) {
-        return context.args.key ? `categories/key=${context.args.key}` : `categories`;
-    }
-    get(context) {
-        const _super = Object.create(null, {
-            get: { get: () => super.get }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield _super.get.call(this, (0, types_1.qc)(Object.assign(Object.assign({}, context), { args: Object.assign(Object.assign({}, context.args), { limit: 500, where: context.args.slug && [`slug(${context.language || 'en'}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
-                        context.args.id && [`id="${context.args.id}"`] }) })));
-        });
-    }
-}
-// end category operations
-// cart discount operation
-class CommerceToolsCartDiscountOperation extends CommerceToolsOperation {
-    getRequestPath(context) {
-        return `cart-discounts`;
-    }
-}
-// end cart discount operations
-// product operation
-class CommerceToolsProductOperation extends CommerceToolsOperation {
-    getRequestPath(context) {
-        if (context.args.keyword || context.args.filter) {
-            return `product-projections/search`;
-        }
-        else {
-            return context.args.key ? `product-projections/key=${context.args.key}` : `product-projections`;
-        }
-    }
-    get(context) {
-        const _super = Object.create(null, {
-            get: { get: () => super.get }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            if (context.args.all) {
-                let getCategories = (limit, offset) => __awaiter(this, void 0, void 0, function* () {
-                    return yield _super.get.call(this, Object.assign(Object.assign({}, context.args), { limit,
-                        offset, expand: ['categories[*]'] }));
-                });
-                let results = [];
-                let total = -1;
-                while (total === -1 || results.length < total) {
-                    let response = yield getCategories(100, results.length);
-                    results = results.concat(response.results);
-                    total = response.meta.total;
-                    console.log(`[ ct ] retrieved products: ${results.length}/${total}`);
-                }
-                return {
-                    meta: {
-                        total: results.length,
-                        count: results.length
-                    },
-                    results
-                };
+            else if (typeof attribute.value.label === 'string') {
+                return attribute.value.label;
+            }
+            else if (attribute.value.label) {
+                return getMapper(args).localize(attribute.value.label);
             }
             else {
-                return yield _super.get.call(this, (0, types_1.qc)(Object.assign(Object.assign({}, context), { args: {
-                        expand: ['categories[*]'],
-                        priceCountry: context.country,
-                        priceCurrency: context.currency,
-                        [`text.${context.language}`]: context.args.keyword,
-                        filter: context.args.filter ||
-                            context.args.productIds && [`id:${lodash_1.default.map(context.args.productIds.split(','), (x) => `"${x}"`).join(',')}`],
-                        where: context.args.id && [`id="${context.args.id}"`] ||
-                            context.args.slug && [`slug(${context.language}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
-                            context.args.sku && [`variants(sku="${context.args.sku}")`]
-                    } })));
+                return getMapper(args).localize(attribute.value);
             }
-        });
-    }
-    post(context) {
-        const _super = Object.create(null, {
-            post: { get: () => super.post }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            context.args = Object.assign(Object.assign({}, context.args), { body: this.import(context.args.product) });
-            return yield _super.post.call(this, context);
-        });
-    }
-    export(context) {
-        let self = this;
-        return function (product) {
-            var _a;
-            return {
-                id: product.id,
-                name: self.localize(product.name, context),
-                slug: self.localize(product.slug, context),
-                imageSetId: (_a = product.variants[0]) === null || _a === void 0 ? void 0 : _a.attributes['articleNumberMax'],
-                variants: lodash_1.default.map(lodash_1.default.concat(product.variants, [product.masterVariant]), (variant) => {
-                    return {
-                        sku: variant.sku || product.key,
-                        prices: {
-                            list: (0, util_1.formatMoneyString)(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context),
-                            sale: (0, util_1.formatMoneyString)(lodash_1.default.get(variant.scopedPrice || lodash_1.default.first(variant.prices), 'value.centAmount') / 100, context)
-                        },
-                        images: lodash_1.default.map(variant.images, mapImage),
-                        attributes: lodash_1.default.map(variant.attributes, (att) => ({ name: att.name, value: self.localize(att.value, context) }))
-                    };
-                }),
-                categories: lodash_1.default.map(product.categories, function (cat) {
-                    let category = cat.obj || cat;
-                    return {
-                        id: category.id,
-                        parent: category.parent,
-                        ancestors: category.ancestors
-                    };
-                }),
-                productType: product.productType.id,
-                key: product.slug.en
-            };
-        };
-    }
-    postProcessor(context) {
-        let self = this;
-        return function (products) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let segment = context.segment;
-                if (!lodash_1.default.isEmpty(segment) && segment !== 'null' && segment !== 'undefined') {
-                    let discountOperation = new CommerceToolsCartDiscountOperation(self.config);
-                    let cartDiscounts = (yield discountOperation.get((0, types_1.qc)({}))).results;
-                    let applicableDiscounts = lodash_1.default.filter(cartDiscounts, (cd) => cd.cartPredicate === `customer.customerGroup.key = "${segment.toUpperCase()}"`);
-                    return lodash_1.default.map(products, (product) => {
-                        return Object.assign(Object.assign({}, product), { variants: lodash_1.default.map(product.variants, (variant) => {
-                                let sale = (0, currency_js_1.default)(variant.prices.list).value;
-                                lodash_1.default.each(applicableDiscounts, (discount) => {
-                                    if (discount.target.type === 'lineItems') {
-                                        let [predicateKey, predicateValue] = discount.target.predicate.split(" = ");
-                                        if (discount.target.predicate === '1 = 1' || (predicateKey === 'productType.id' && `"${product.productType}"` === predicateValue)) {
-                                            if (discount.value.type === 'relative') {
-                                                // permyriad is pct off * 10000
-                                                sale = sale * (1 - discount.value.permyriad / 10000);
-                                            }
-                                        }
-                                    }
-                                });
-                                variant.prices.sale = (0, currency_js_1.default)(sale).format();
-                                return variant;
-                            }) });
-                    });
-                }
-                else {
-                    return products;
-                }
-            });
-        };
-    }
-}
-const rest_client_1 = __importDefault(require("../../../common/rest-client"));
-const qs_1 = __importDefault(require("qs"));
-const cats = ['women', 'men', 'new', 'sale', 'accessories'];
+        },
+        mapProduct: (product) => (Object.assign(Object.assign({}, product), { name: getMapper(args).localize(product.name), slug: getMapper(args).localize(product.slug), variants: product.variants.map((variant) => (Object.assign(Object.assign({}, variant), { listPrice: getMapper(args).findPrice(variant), 
+                // todo: get discounted price
+                salePrice: getMapper(args).findPrice(variant), attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getMapper(args).getAttributeValue)) }))), categories: [] }))
+    };
+};
 const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }));
-            yield rest.authenticate({
-                grant_type: 'client_credentials'
-            }, {
-                auth: {
-                    username: config.client_id,
-                    password: config.client_secret
-                }
-            });
-            const api = {
-                getTopLevelCategories: () => __awaiter(this, void 0, void 0, function* () {
-                    return yield Promise.all(cats.map((cat) => __awaiter(this, void 0, void 0, function* () {
-                        return (yield rest.get({ url: `/categories/key=${cat}` }));
-                    })));
-                }),
-                populateChildren: (category) => __awaiter(this, void 0, void 0, function* () {
-                    let query = qs_1.default.stringify({ where: `parent(id="${category.id}")` });
-                    return Object.assign(Object.assign({}, category), { children: (yield rest.get({ url: `/categories?${query}` })).results });
-                })
-            };
-            const mappers = {};
+            if (!rest) {
+                rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }));
+                yield rest.authenticate({
+                    grant_type: 'client_credentials'
+                }, {
+                    auth: {
+                        username: config.client_id,
+                        password: config.client_secret
+                    }
+                });
+            }
             return {
-                getProduct: function (query) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let product = api.getProduct(query);
-                        if (product) {
-                            return mappers.mapProduct(product, query);
-                        }
-                    });
-                },
-                getProducts: function (query) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let filtered = api.getProducts(query);
-                        if (!filtered) {
-                            throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`);
-                        }
-                        return filtered.map(prod => mappers.mapProduct(prod, query));
-                    });
-                },
-                getCategory: function (query) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let category = api.getCategory(query);
-                        if (!category) {
-                            throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`);
-                        }
-                        return mappers.mapCategory(api.populateCategory(category, query));
-                    });
-                },
-                getMegaMenu: function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let categories = yield api.getTopLevelCategories();
-                        return yield Promise.all(categories.map((category) => __awaiter(this, void 0, void 0, function* () {
-                            return yield api.populateChildren(category);
-                        })));
-                    });
-                },
-                getCustomerGroups: function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        return [];
-                    });
-                }
+                getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
+                    return getMapper(args).mapProduct(yield api.getProduct(args));
+                }),
+                getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
+                    return (yield api.getProducts(args)).map(getMapper(args).mapProduct);
+                }),
+                getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
+                    let category = getMapper(args).mapCategory(yield api.getCategory(args));
+                    // hydrate products into the category
+                    return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(getMapper(args).mapProduct) });
+                }),
+                getMegaMenu: (args) => __awaiter(this, void 0, void 0, function* () {
+                    // for the megaMenu, only get categories that have their slugs in 'cats'
+                    let categories = (yield api.getCategories()).filter(cat => cats.includes(cat.slug.en));
+                    return categories.map(getMapper(args).mapCategory);
+                }),
+                getCustomerGroups: (args) => __awaiter(this, void 0, void 0, function* () {
+                    return [];
+                })
             };
         });
     },

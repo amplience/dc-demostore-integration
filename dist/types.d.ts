@@ -1,5 +1,5 @@
-import { Method } from 'axios';
 import { Dictionary } from 'lodash';
+import { CodecConfiguration } from './codec';
 export declare class Image {
     url: string;
     thumb?: string;
@@ -19,7 +19,6 @@ export declare class Product extends CommerceObject {
     imageSetId?: string;
     categories: Category[];
     variants: Variant[];
-    productType?: string;
 }
 export declare class Variant {
     sku: string;
@@ -41,25 +40,6 @@ export declare class Promotion extends Identifiable {
     isActive: boolean;
     image?: Image;
 }
-export declare class GetCategoryArgs {
-    id?: string;
-    slug?: string;
-}
-export declare class GetCategoryProductArgs {
-    full?: boolean;
-    segment?: string;
-}
-export declare class GetProductsArgs {
-    keyword?: string;
-    segment?: string;
-    productIds?: string;
-}
-export declare class GetProductArgs {
-    id?: string;
-    sku?: string;
-    slug?: string;
-    segment?: string;
-}
 export declare class GetAttributeArgs {
     name: string;
 }
@@ -70,14 +50,26 @@ export interface QueryContext {
     country: string;
     currency: string;
     segment: string;
-    appUrl: string;
-    method: Method;
 }
-export declare const qc: (args: any, locale?: string, language?: string, country?: string, currency?: string, segment?: string, appUrl?: string, method?: Method) => QueryContext;
+export interface CommonArgs {
+    locale?: string;
+    language?: string;
+    country?: string;
+    currency?: string;
+    segment?: string;
+}
+export interface GetCommerceObjectArgs extends CommonArgs {
+    id?: string;
+    slug?: string;
+}
+export interface GetProductsArgs extends CommonArgs {
+    keyword?: string;
+    productIds?: string;
+}
 export declare class DemoStoreConfiguration {
     algolia?: any;
     url?: string;
     cms?: any;
-    commerce?: any;
+    commerce?: CodecConfiguration;
     locator: string;
 }

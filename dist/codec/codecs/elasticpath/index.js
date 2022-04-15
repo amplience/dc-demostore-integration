@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const types_1 = require("../../../types");
 const __1 = require("../..");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
@@ -82,34 +81,34 @@ const epCodec = {
                 return yield Promise.all(products.map(yield mapper.mapProduct));
             });
             return {
-                getProduct: function (query) {
+                getProduct: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        if (query.args.id) {
-                            return mapper.mapProduct(yield api.getProductById(query.args.id));
+                        if (args.id) {
+                            return mapper.mapProduct(yield api.getProductById(args.id));
                         }
                         throw new Error(`getProduct(): must specify id`);
                     });
                 },
-                getProducts: function (query) {
+                getProducts: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        if (query.args.productIds) {
-                            return yield Promise.all(query.args.productIds.split(',').map((productId) => __awaiter(this, void 0, void 0, function* () {
-                                return yield this.getProduct((0, types_1.qc)({ args: { id: productId } }));
+                        if (args.productIds) {
+                            return yield Promise.all(args.productIds.split(',').map((productId) => __awaiter(this, void 0, void 0, function* () {
+                                return yield this.getProduct({ id: productId });
                             })));
                         }
-                        else if (query.args.keyword) {
+                        else if (args.keyword) {
                             // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
-                            return [yield mapper.mapProduct(yield api.getProductBySku(query.args.keyword))];
+                            return [yield mapper.mapProduct(yield api.getProductBySku(args.keyword))];
                         }
                         throw new Error(`getProducts(): must specify either productIds or keyword`);
                     });
                 },
-                getCategory: function (query) {
+                getCategory: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        if (!query.args.slug) {
+                        if (!args.slug) {
                             throw new Error(`getCategory(): must specify slug`);
                         }
-                        return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, query.args.slug));
+                        return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
                     });
                 },
                 getMegaMenu: function () {

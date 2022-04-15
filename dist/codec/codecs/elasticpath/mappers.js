@@ -84,7 +84,6 @@ const mappers = (api) => {
             name: product.attributes.name,
             shortDescription: product.attributes.description,
             longDescription: product.attributes.description,
-            productType: product.type,
             categories: [],
             variants
         };

@@ -1,5 +1,5 @@
 import _, { Dictionary } from 'lodash'
-import { Product, Category, QueryContext, CustomerGroup } from '../../../types'
+import { Product, Category, QueryContext, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import mappers from './mappers'
@@ -23,22 +23,22 @@ const restCodec: Codec = {
         translations = await (await fetch(config.translationsURL)).json()
 
         const api = {
-            getProductsForCategory: (category: Category) => _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id)),
-            getProduct: (query: QueryContext) => {
-                return query.args.id && _.find(products, prod => query.args.id === prod.id) ||
-                    query.args.key && _.find(products, prod => query.args.key === prod.slug) ||
-                    query.args.sku && _.find(products, prod => _.map(prod.variants, 'sku').includes(query.args.sku))
+            getProductsForCategory: (category: Category) => { 
+                return _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
             },
-            getProducts: (query: QueryContext): Product[] => {
-                let productIds: string[] = query.args.productIds?.split(',')
+            getProduct: (args: GetCommerceObjectArgs) => {
+                return args.id && _.find(products, prod => args.id === prod.id) ||
+                    args.slug && _.find(products, prod => args.slug === prod.slug)
+            },
+            getProducts: (args: GetProductsArgs): Product[] => {
+                let productIds: string[] = args.productIds?.split(',')
                 return productIds && _.filter(products, prod => productIds.includes(prod.id)) ||
-                    query.args.keyword && _.filter(products, prod => prod.name.toLowerCase().indexOf(query.args.keyword) > -1) ||
-                    query.args.categoryId && _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), query.args.categoryId))
+                    args.keyword && _.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1)
             },
-            getCategory: (query: QueryContext) => {
-                return findInMegaMenu(categories, query.args?.slug)
+            getCategory: (args: GetCommerceObjectArgs) => {
+                return api.populateCategory(findInMegaMenu(categories, args.slug))
             },
-            populateCategory: (category: Category, context: QueryContext): Category => ({
+            populateCategory: (category: Category): Category => ({
                 ...category,
                 products: _.take(_.uniqBy([
                     ...api.getProductsForCategory(category),
@@ -48,25 +48,25 @@ const restCodec: Codec = {
         }
 
         return {
-            getProduct: async function (query: QueryContext): Promise<Product> {
-                let product = api.getProduct(query)
+            getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
+                let product = api.getProduct(args)
                 if (product) {
-                    return mappers.mapProduct(product, query)
+                    return mappers.mapProduct(product, args)
                 }
             },
-            getProducts: async function (query: QueryContext): Promise<Product[]> {
-                let filtered: Product[] = api.getProducts(query)
+            getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
+                let filtered: Product[] = api.getProducts(args)
                 if (!filtered) {
-                    throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`)
+                    throw new Error(`Products not found for args: ${JSON.stringify(args)}`)
                 }
-                return filtered.map(prod => mappers.mapProduct(prod, query))
+                return filtered.map(prod => mappers.mapProduct(prod, args))
             },
-            getCategory: async function (query: QueryContext): Promise<Category> {
-                let category = api.getCategory(query)
+            getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
+                let category = api.getCategory(args)
                 if (!category) {
-                    throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`)
+                    throw new Error(`Category not found for args: ${JSON.stringify(args)}`)
                 }
-                return mappers.mapCategory(api.populateCategory(category, query))
+                return mappers.mapCategory(api.populateCategory(category))
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return categories.filter(cat => !cat.parent).map(mappers.mapCategory)

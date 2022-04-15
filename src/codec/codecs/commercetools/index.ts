@@ -1,436 +1,148 @@
 import _ from 'lodash'
-import URI from 'urijs'
-import axios from 'axios'
-import currency from 'currency.js'
-
-import { Operation } from '../../../common/operation'
-import { Category, Product, QueryContext, qc, CustomerGroup } from '../../../types'
-import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
-import { CommerceAPI } from '../../../index'
+import { Codec, registerCodec } from '../../../codec'
+import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
-
-export interface CommerceToolsCodecConfiguration extends CodecConfiguration {
-    auth_url:       string
-    api_url:        string
-    client_id:      string
-    client_secret:  string
-    project:        string
-    scope:          string
-}
-
-class CommerceToolsCodec extends Codec implements CommerceAPI {
-    productOperation: Operation
-    categoryOperation: Operation
-
-    async getMegaMenu(): Promise<Category[]> {
-        return await this.getCategoryHierarchy(qc({ args: { categorySlugs: ['women', 'men', 'accessories', 'sale', 'new'] } }))
-    }
-
-    async getProduct(query: QueryContext): Promise<Product> {
-        return await this.productOperation.get(query)
-    }
-
-    async getProducts(query: QueryContext): Promise<Product[]> {
-        return await this.productOperation.get(query)
-    }
-
-    async getCustomerGroups(): Promise<CustomerGroup[]> {
-        return []
-    }
-
-    async getCategoryHierarchy(query: QueryContext) {
-        let filter =
-            query.args.id && ((c: Category) => c.id === query.args.id) ||
-            query.args.slug && ((c: Category) => c.slug === query.args.slug) ||
-            query.args.categorySlugs && ((c: Category) => _.includes(query.args.categorySlugs, c.slug)) ||
-            ((c: Category) => !c.parent?.id)
-
-        let categories = _.get(await this.categoryOperation.get(qc({ ...query, args: {} })), 'results')
-        let populateChildren = (category: Category) => {
-            category.children = _.filter(categories, (c: Category) => c.parent && c.parent.id === category.id)
-            _.each(category.children, populateChildren)
-            return category
-        }
-
-        let x = _.map(_.filter(categories, filter), populateChildren)
-        return x
-    }
-
-    async getCategories(query: QueryContext): Promise<Category[]> {
-        throw new Error(`[ aria ] CommerceToolsCodec.getCategories() not yet implemented`)
-        // return await this.getCategoryHierarchy(query)
-    }
-
-    async getCategory(query: QueryContext): Promise<Category> {
-        let x: any = _.find(await this.getCategoryHierarchy(query), (c: Category) => c.id === query.args.id || c.slug === query.args.slug)
-        if (x) {
-            x.products = await this.getProductsForCategory(x, query)
-        }
-        return x
-    }
-
-    async getProductsForCategory(parent: Category, query: QueryContext) {
-        return (await this.productOperation.get(qc({
-            ...query,
-            args: { filter: `categories.id: subtree("${parent.id}")` }
-        }))).results
-    }
-}
-
-const mapImage = (image: any) => image && ({ url: image.url })
-
-class CommerceToolsOperation extends Operation {
-    config: CommerceToolsCodecConfiguration
-    accessToken?: string
-
-    getBaseURL() {
-        return `${this.config.api_url}/${this.config.project}/`
-    }
-
-    getURL(context: QueryContext) {
-        return `${this.getBaseURL()}${this.getRequestPath(context)}`
-    }
-
-    getRequest(context: QueryContext) {
-        let uri = new URI(this.getURL(context))
-
-        let query = {
-            limit: context.args.limit,
-            offset: context.args.offset,
-            where: context.args.where,
-            filter: context.args.filter,
-            ...context.args,
-        }
-
-        // add any filters based on the args
-        uri.addQuery(query)
-
-        return uri.toString()
-    }
-
-    localize(text: any, context: QueryContext) {
-        if (!text) {
-            console.error(new Error().stack)
-        }
-
-        if (text.label) {
-            text = text.label
-        }
-
-        if (typeof text === 'string') {
-            return text
-        }
-
-        if (typeof text === 'boolean') {
-            let b: Boolean = text
-            return b
-        }
-
-        let localized = text[context.language] || text['en'] || text[Object.keys(text)[0]]
-
-        // if (_.isEmpty(localized)) {
-        //     console.log(`localize: ${JSON.stringify(text)}`)
-        // }
-
-        return localized
-    }
-
-    async authenticate() {
-        const rest: OAuthRestClientInterface = OAuthRestClient(this.config)
-        await rest.authenticate({
-            grant_type: 'client_credentials',
-            scope: this.config.scope
-        }, {
-            auth: {
-                username: this.config.client_id,
-                password: this.config.client_secret
-            }
-        })
-
-        if (!this.accessToken) {
-            let response: any = await axios.post(
-                `${this.config.auth_url}/oauth/token?grant_type=client_credentials&scope=${_.first(_.split(this.config.scope, ' '))}`, {}, {
-                auth: {
-                    username: this.config.client_id,
-                    password: this.config.client_secret
-                }
-            })
-            this.accessToken = `${response.data.token_type} ${response.data.access_token}`
-        }
-        return this.accessToken
-    }
-
-    async translateResponse(data: any, mapper = ((x: any) => x)) {
-        // a commercetools response will be either a single object, or an array in 'results'
-        // if it is an array, limit, count, total, and offset are provided on the object
-
-        let r = data.results || [data]
-        return {
-            meta: data.limit && {
-                limit: data.limit,
-                count: data.count,
-                offset: data.offset,
-                total: data.total
-            },
-            results: await Promise.all(r.map(await mapper))
-        }
-    }
-
-    async getHeaders() {
-        return { authorization: await this.authenticate() }
-    }
-}
-
-// category operation
-class CommerceToolsCategoryOperation extends CommerceToolsOperation {
-    export(context: QueryContext) {
-        let self = this
-        return function (category: any) {
-            return {
-                id: category.id,
-                parent: category.parent || {},
-                ancestors: category.ancestors,
-                name: self.localize(category.name, context),
-                slug: self.localize(category.slug, context),
-                key: category.slug.en
-            }
-        }
-    }
-
-    getRequestPath(context: QueryContext) {
-        return context.args.key ? `categories/key=${context.args.key}` : `categories`
-    }
-
-    async get(context: QueryContext) {
-        return await super.get(qc({
-            ...context,
-            args: {
-                ...context.args,
-                limit: 500,
-                where:
-                    context.args.slug && [`slug(${context.language || 'en'}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
-                    context.args.id && [`id="${context.args.id}"`]
-            }
-        }))
-    }
-}
-// end category operations
-
-// cart discount operation
-class CommerceToolsCartDiscountOperation extends CommerceToolsOperation {
-    getRequestPath(context: QueryContext) {
-        return `cart-discounts`
-    }
-}
-// end cart discount operations
-
-// product operation
-class CommerceToolsProductOperation extends CommerceToolsOperation {
-    getRequestPath(context: QueryContext) {
-        if (context.args.keyword || context.args.filter) {
-            return `product-projections/search`
-        }
-        else {
-            return context.args.key ? `product-projections/key=${context.args.key}` : `product-projections`
-        }
-    }
-
-    async get(context: QueryContext) {
-        if (context.args.all) {
-            let getCategories = async (limit: number, offset: number) => {
-                return await super.get({
-                    ...context.args,
-                    limit,
-                    offset,
-                    expand: ['categories[*]'],
-                })
-            }
-
-            let results: any[] = []
-            let total = -1
-
-            while (total === -1 || results.length < total) {
-                let response = await getCategories(100, results.length)
-                results = results.concat(response.results)
-                total = response.meta.total
-
-                console.log(`[ ct ] retrieved products: ${results.length}/${total}`)
-            }
-
-            return {
-                meta: {
-                    total: results.length,
-                    count: results.length
-                },
-                results
-            }
-        }
-        else {
-            return await super.get(qc({
-                ...context,
-                args: {
-                    expand: ['categories[*]'],
-                    priceCountry: context.country,
-                    priceCurrency: context.currency,
-                    [`text.${context.language}`]: context.args.keyword,
-                    filter:
-                        context.args.filter ||
-                        context.args.productIds && [`id:${_.map(context.args.productIds.split(','), (x: any) => `"${x}"`).join(',')}`],
-                    where:
-                        context.args.id && [`id="${context.args.id}"`] ||
-                        context.args.slug && [`slug(${context.language}="${context.args.slug}") or slug(en="${context.args.slug}")`] ||
-                        context.args.sku && [`variants(sku="${context.args.sku}")`]
-                }
-            }))
-        }
-    }
-
-    async post(context: QueryContext) {
-        context.args = {
-            ...context.args,
-            body: this.import(context.args.product)
-        }
-        return await super.post(context)
-    }
-
-    export(context: QueryContext) {
-        let self = this
-        return function (product: any) {
-            return {
-                id: product.id,
-                name: self.localize(product.name, context),
-                slug: self.localize(product.slug, context),
-                imageSetId: product.variants[0]?.attributes['articleNumberMax'],
-                variants: _.map(_.concat(product.variants, [product.masterVariant]), (variant: any) => {
-                    return {
-                        sku: variant.sku || product.key,
-                        prices: {
-                            list: formatMoneyString(_.get(variant.scopedPrice || _.first(variant.prices), 'value.centAmount') / 100, context),
-                            sale: formatMoneyString(_.get(variant.scopedPrice || _.first(variant.prices), 'value.centAmount') / 100, context)
-                        },
-                        images: _.map(variant.images, mapImage),
-                        attributes: _.map(variant.attributes, (att: any) => ({ name: att.name, value: self.localize(att.value, context) }))
-                    }
-                }),
-                categories: _.map(product.categories, function (cat: any) {
-                    let category = cat.obj || cat
-                    return {
-                        id: category.id,
-                        parent: category.parent,
-                        ancestors: category.ancestors
-                    }
-                }),
-                productType: product.productType.id,
-                key: product.slug.en
-            }
-        }
-    }
-
-    postProcessor(context: QueryContext) {
-        let self = this
-        return async function (products: any[]) {
-            let segment = context.segment
-            if (!_.isEmpty(segment) && segment !== 'null' && segment !== 'undefined') {
-                let discountOperation = new CommerceToolsCartDiscountOperation(self.config)
-                let cartDiscounts = (await discountOperation.get(qc({}))).results
-                let applicableDiscounts = _.filter(cartDiscounts, (cd: any) => cd.cartPredicate === `customer.customerGroup.key = "${segment.toUpperCase()}"`)
-
-                return _.map(products, (product: any) => {
-                    return {
-                        ...product,
-                        variants: _.map(product.variants, (variant: any) => {
-                            let sale = currency(variant.prices.list).value
-                            _.each(applicableDiscounts, (discount: any) => {
-                                if (discount.target.type === 'lineItems') {
-                                    let [predicateKey, predicateValue] = discount.target.predicate.split(" = ")
-                                    if (discount.target.predicate === '1 = 1' || (predicateKey === 'productType.id' && `"${product.productType}"` === predicateValue)) {
-                                        if (discount.value.type === 'relative') {
-                                            // permyriad is pct off * 10000
-                                            sale = sale * (1 - discount.value.permyriad / 10000)
-                                        }
-                                    }
-                                }
-                            })
-
-                            variant.prices.sale = currency(sale).format()
-                            return variant
-                        })
-                    }
-                })
-            }
-            else {
-                return products
-            }
-        }
-    }
-}
-
-import { findInMegaMenu } from '../common'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
-import qs from 'qs'
+import { Attribute, CommerceToolsCodecConfiguration, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
+let rest: OAuthRestClientInterface
+
+// caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
+let categories: CTCategory[]
+
+const api: any = {
+    getProduct: async (args: GetCommerceObjectArgs): Promise<CTProduct> => {
+        if (args.id) {
+            return _.first((await rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results)
+        }
+        throw new Error(`getProduct(): id must be specified`)
+    },
+    getProducts: async (args: GetProductsArgs): Promise<CTProduct[]> => {
+        if (args.productIds) {
+            let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',')
+            return (await rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results
+        }
+        else if (args.keyword) {
+            return (await rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results
+        }
+        throw new Error(`getProducts(): productIds or keyword must be specified`)
+    },
+    getCategories: async function (): Promise<CTCategory[]> {
+        if (!categories) {
+            categories = (await rest.get({ url: `/categories?limit=500` })).results
+        }
+        return categories
+    },
+    getCategory: async (args: GetCommerceObjectArgs): Promise<CTCategory> => {
+        return (await api.getCategories()).find(cat => cat.slug.en === args.slug)
+    },
+    getProductsForCategory: async (category: Category): Promise<CTProduct[]> => {
+        return (await rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results
+    }
+}
+
+const getMapper = (args: GetCommerceObjectArgs): any => {
+    args = {
+        language: args.language || 'en',
+        country: args.country || 'US',
+        currency: args.currency || 'USD'
+    }
+
+    return {
+        findPrice: (variant: CTVariant): string => {
+            let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
+                variant.prices.find(price => price.value.currencyCode === args.currency) ||
+                _.first(variant.prices)
+
+            return formatMoneyString((price.value.centAmount / Math.pow(10, price.value.fractionDigits)), args)
+        },
+
+        mapCategory: (category: CTCategory): Category => ({
+            id: category.id,
+            name: getMapper(args).localize(category.name),
+            slug: getMapper(args).localize(category.slug),
+            children: categories.filter(cat => cat.parent?.id === category.id).map(getMapper(args).mapCategory),
+            products: []
+        }),
+
+        localize: (localizable: Localizable): string => {
+            return localizable[args.language] || localizable.en
+        },
+
+        getAttributeValue: (attribute: Attribute): string => {
+            if (typeof attribute.value === 'string') {
+                return attribute.value
+            }
+            else if (typeof attribute.value.label === 'string') {
+                return attribute.value.label
+            }
+            else if (attribute.value.label) {
+                return getMapper(args).localize(attribute.value.label)
+            }
+            else {
+                return getMapper(args).localize(attribute.value)
+            }
+        },
+
+        mapProduct: (product: CTProduct): Product => ({
+            ...product,
+            name: getMapper(args).localize(product.name),
+            slug: getMapper(args).localize(product.slug),
+            variants: product.variants.map((variant: CTVariant): Variant => ({
+                ...variant,
+                listPrice: getMapper(args).findPrice(variant),
+
+                // todo: get discounted price
+                salePrice: getMapper(args).findPrice(variant),
+                attributes: _.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getMapper(args).getAttributeValue))
+            })),
+            categories: []
+        })
+    }
+}
+
 const commerceToolsCodec: Codec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: async function (config: CommerceToolsCodecConfiguration): Promise<CommerceAPI> {
-        const rest: OAuthRestClientInterface = OAuthRestClient({
-            ...config,
-            api_url: `${config.api_url}/${config.project}`
-        })
+        if (!rest) {
+            rest = OAuthRestClient({
+                ...config,
+                api_url: `${config.api_url}/${config.project}`
+            })
 
-        await rest.authenticate({
-            grant_type: 'client_credentials'
-        }, {
-            auth: {
-                username: config.client_id,
-                password: config.client_secret
-            }
-        })
-
-        const api: any = {
-            getTopLevelCategories: async (): Promise<Category[]> => {
-                return await Promise.all(cats.map(async (cat) => {
-                    return (await rest.get({ url: `/categories/key=${cat}` }))
-                }))
-            },
-            populateChildren: async (category: Category): Promise<Category> => {
-                let query = qs.stringify({ where: `parent(id="${category.id}")` })
-                return {
-                    ...category,
-                    children: (await rest.get({ url: `/categories?${query}` })).results
+            await rest.authenticate({
+                grant_type: 'client_credentials'
+            }, {
+                auth: {
+                    username: config.client_id,
+                    password: config.client_secret
                 }
-            }
+            })
         }
-        const mappers: any = {}
 
         return {
-            getProduct: async function (query: QueryContext): Promise<Product> {
-                let product = api.getProduct(query)
-                if (product) {
-                    return mappers.mapProduct(product, query)
+            getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
+                return getMapper(args).mapProduct(await api.getProduct(args))
+            },
+            getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
+                return (await api.getProducts(args)).map(getMapper(args).mapProduct)
+            },
+            getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
+                let category = getMapper(args).mapCategory(await api.getCategory(args))
+
+                // hydrate products into the category
+                return {
+                    ...category,
+                    products: (await api.getProductsForCategory(category)).map(getMapper(args).mapProduct)
                 }
             },
-            getProducts: async function (query: QueryContext): Promise<Product[]> {
-                let filtered: Product[] = api.getProducts(query)
-                if (!filtered) {
-                    throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`)
-                }
-                return filtered.map(prod => mappers.mapProduct(prod, query))
+            getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
+                // for the megaMenu, only get categories that have their slugs in 'cats'
+                let categories = (await api.getCategories()).filter(cat => cats.includes(cat.slug.en))
+                return categories.map(getMapper(args).mapCategory)
             },
-            getCategory: async function (query: QueryContext): Promise<Category> {
-                let category = api.getCategory(query)
-                if (!category) {
-                    throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`)
-                }
-                return mappers.mapCategory(api.populateCategory(category, query))
-            },
-            getMegaMenu: async function (): Promise<Category[]> {
-                let categories = await api.getTopLevelCategories()
-                return await Promise.all(categories.map(async (category) => {
-                    return await api.populateChildren(category)
-                }))
-            },
-            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
+            getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => {
                 return []
             }
         }

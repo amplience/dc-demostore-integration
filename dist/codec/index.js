@@ -12,15 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCodec = exports.registerCodec = exports.Codec = void 0;
+exports.getCodec = exports.registerCodec = void 0;
 const lodash_1 = __importDefault(require("lodash"));
-class Codec {
-    getAPI(config) {
-        return __awaiter(this, void 0, void 0, function* () { });
-    }
-    canUseConfiguration(config) { return false; }
-}
-exports.Codec = Codec;
 const codecs = {};
 const registerCodec = (codec) => {
     console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`);
@@ -33,7 +26,14 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    return yield codec.getAPI(config);
+    let api = yield codec.getAPI(config);
+    lodash_1.default.each(Object.keys(api), key => {
+        let method = api[key];
+        api[key] = (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield method(Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
+        });
+    });
+    return api;
 });
 exports.getCodec = getCodec;
 require("./codecs/bigcommerce");

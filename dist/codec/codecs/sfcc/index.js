@@ -65,7 +65,7 @@ const sfccCodec = {
             }
         };
         return {
-            getProduct: function (query) {
+            getProduct: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     // if (query.args.id) {
                     //     return mapProduct(await api.getProductById(query.args.id))
@@ -73,7 +73,7 @@ const sfccCodec = {
                     throw new Error(`getProduct(): must specify id`);
                 });
             },
-            getProducts: function (query) {
+            getProducts: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     // if (query.args.productIds) {
                     //     return await Promise.all(query.args.productIds.split(',').map(async id => mapProduct(await api.getProductById(id))))
@@ -84,12 +84,12 @@ const sfccCodec = {
                     throw new Error(`getProducts(): must specify either productIds or keyword`);
                 });
             },
-            getCategory: function (query) {
+            getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (!query.args.slug) {
+                    if (!args.slug) {
                         throw new Error(`getCategory(): must specify slug`);
                     }
-                    let category = yield api.getCategory(query.args.slug);
+                    let category = yield api.getCategory(args.slug);
                     return Object.assign(Object.assign({}, category), { products: yield api.getProductsForCategory(category) });
                 });
             },

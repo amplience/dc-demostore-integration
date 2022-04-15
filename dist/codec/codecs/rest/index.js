@@ -27,53 +27,52 @@ const restCodec = {
             categories = yield (yield fetch(config.categoryURL)).json();
             translations = yield (yield fetch(config.translationsURL)).json();
             const api = {
-                getProductsForCategory: (category) => lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id)),
-                getProduct: (query) => {
-                    return query.args.id && lodash_1.default.find(products, prod => query.args.id === prod.id) ||
-                        query.args.key && lodash_1.default.find(products, prod => query.args.key === prod.slug) ||
-                        query.args.sku && lodash_1.default.find(products, prod => lodash_1.default.map(prod.variants, 'sku').includes(query.args.sku));
+                getProductsForCategory: (category) => {
+                    return lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
                 },
-                getProducts: (query) => {
+                getProduct: (args) => {
+                    return args.id && lodash_1.default.find(products, prod => args.id === prod.id) ||
+                        args.slug && lodash_1.default.find(products, prod => args.slug === prod.slug);
+                },
+                getProducts: (args) => {
                     var _a;
-                    let productIds = (_a = query.args.productIds) === null || _a === void 0 ? void 0 : _a.split(',');
+                    let productIds = (_a = args.productIds) === null || _a === void 0 ? void 0 : _a.split(',');
                     return productIds && lodash_1.default.filter(products, prod => productIds.includes(prod.id)) ||
-                        query.args.keyword && lodash_1.default.filter(products, prod => prod.name.toLowerCase().indexOf(query.args.keyword) > -1) ||
-                        query.args.categoryId && lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), query.args.categoryId));
+                        args.keyword && lodash_1.default.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1);
                 },
-                getCategory: (query) => {
-                    var _a;
-                    return (0, common_1.findInMegaMenu)(categories, (_a = query.args) === null || _a === void 0 ? void 0 : _a.slug);
+                getCategory: (args) => {
+                    return api.populateCategory((0, common_1.findInMegaMenu)(categories, args.slug));
                 },
-                populateCategory: (category, context) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(lodash_1.default.uniqBy([
+                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(lodash_1.default.uniqBy([
                         ...api.getProductsForCategory(category),
                         ...lodash_1.default.flatMap(category.children, api.getProductsForCategory)
                     ], 'slug'), 12) }))
             };
             return {
-                getProduct: function (query) {
+                getProduct: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let product = api.getProduct(query);
+                        let product = api.getProduct(args);
                         if (product) {
-                            return mappers_1.default.mapProduct(product, query);
+                            return mappers_1.default.mapProduct(product, args);
                         }
                     });
                 },
-                getProducts: function (query) {
+                getProducts: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let filtered = api.getProducts(query);
+                        let filtered = api.getProducts(args);
                         if (!filtered) {
-                            throw new Error(`Products not found for args: ${JSON.stringify(query.args)}`);
+                            throw new Error(`Products not found for args: ${JSON.stringify(args)}`);
                         }
-                        return filtered.map(prod => mappers_1.default.mapProduct(prod, query));
+                        return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
                     });
                 },
-                getCategory: function (query) {
+                getCategory: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let category = api.getCategory(query);
+                        let category = api.getCategory(args);
                         if (!category) {
-                            throw new Error(`Category not found for args: ${JSON.stringify(query.args)}`);
+                            throw new Error(`Category not found for args: ${JSON.stringify(args)}`);
                         }
-                        return mappers_1.default.mapCategory(api.populateCategory(category, query));
+                        return mappers_1.default.mapCategory(api.populateCategory(category));
                     });
                 },
                 getMegaMenu: function () {

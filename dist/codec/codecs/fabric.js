@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FabricCommerceCodec = void 0;
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("..");
 const axios_1 = __importDefault(require("axios"));
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const slugify_1 = __importDefault(require("slugify"));
@@ -57,7 +56,13 @@ const expandCategory = (category) => [category, ...lodash_1.default.flatMapDeep(
 const locateCategoryForKey = (key) => __awaiter(void 0, void 0, void 0, function* () {
     return lodash_1.default.find(lodash_1.default.flatMapDeep(megaMenu, expandCategory), c => c.key === key);
 });
-class FabricCommerceCodec extends __1.Codec {
+class FabricCommerceCodec {
+    getAPI(config) {
+        throw new Error('Method not implemented.');
+    }
+    canUseConfiguration(config) {
+        throw new Error('Method not implemented.');
+    }
     // constructor(config: FabricCommerceCodecConfig) {
     //     super(config)
     //     if (!rest) {
@@ -69,19 +74,19 @@ class FabricCommerceCodec extends __1.Codec {
     //     console.log(`authenticated to [ fabric ]`)
     // }
     // commerce codec api implementation
-    getProduct(context) {
+    getProduct(args) {
         return __awaiter(this, void 0, void 0, function* () {
             throw new Error(`product no!`);
         });
     }
-    getProducts(context) {
+    getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             throw new Error(`products no!`);
         });
     }
-    getCategory(context) {
+    getCategory(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            let category = yield locateCategoryForKey(context.args.key);
+            let category = yield locateCategoryForKey(args.slug);
             let x = yield rest.get({
                 url: `https://sandbox.copilot.fabric.inc/api-pim2/v1/item/search`,
                 method: dc_management_sdk_js_1.HttpMethod.POST,
@@ -119,7 +124,6 @@ class FabricCommerceCodec extends __1.Codec {
                     id: prod.itemId,
                     name: productName,
                     slug: (0, slugify_1.default)(productName, { lower: true }),
-                    productType: prod.type,
                     shortDescription: '',
                     longDescription: '',
                     categories: [],

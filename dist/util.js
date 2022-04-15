@@ -4,10 +4,6 @@ exports.formatMoneyString = exports.sleep = void 0;
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 exports.sleep = sleep;
 const formatMoneyString = (money, args) => {
-    args = args || {
-        currency: 'USD',
-        locale: 'en-US'
-    };
     return new Intl.NumberFormat(args.locale, {
         style: 'currency',
         currency: args.currency

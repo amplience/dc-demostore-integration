@@ -38,40 +38,40 @@ const bigCommerceCodec = {
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
         };
         return {
-            getProduct: function (query) {
+            getProduct: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (query.args.id) {
-                        return (0, mappers_1.mapProduct)(yield api.getProductById(query.args.id));
+                    if (args.id) {
+                        return (0, mappers_1.mapProduct)(yield api.getProductById(args.id));
                     }
                     throw new Error(`getProduct(): must specify id`);
                 });
             },
-            getProducts: function (query) {
+            getProducts: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (query.args.productIds) {
-                        return yield Promise.all(query.args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return (0, mappers_1.mapProduct)(yield api.getProductById(id)); })));
+                    if (args.productIds) {
+                        return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return (0, mappers_1.mapProduct)(yield api.getProductById(id)); })));
                     }
-                    else if (query.args.keyword) {
-                        return (yield api.searchProducts(query.args.keyword)).map(mappers_1.mapProduct);
+                    else if (args.keyword) {
+                        return (yield api.searchProducts(args.keyword)).map(mappers_1.mapProduct);
                     }
                     throw new Error(`getProducts(): must specify either productIds or keyword`);
                 });
             },
-            getCategory: function (query) {
+            getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (!query.args.slug) {
+                    if (!args.slug) {
                         throw new Error(`getCategory(): must specify slug`);
                     }
-                    let category = (0, common_1.findInMegaMenu)(yield this.getMegaMenu(), query.args.slug);
+                    let category = (0, common_1.findInMegaMenu)(yield this.getMegaMenu(), args.slug);
                     return Object.assign(Object.assign({}, category), { products: yield api.getProductsForCategory(category) });
                 });
             },
-            getMegaMenu: function () {
+            getMegaMenu: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     return (yield api.getCategoryTree()).map(mappers_1.mapCategory);
                 });
             },
-            getCustomerGroups: function () {
+            getCustomerGroups: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     return [];
                 });

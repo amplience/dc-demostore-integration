@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import { Product, Category, QueryContext, Image, CustomerGroup } from '../../types'
+import { Product, Category, QueryContext, Image, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../types'
 import { CodecConfiguration, Codec } from '..'
-import { CommerceAPI } from '../..'
+import { API, CommerceAPI } from '../..'
 import Moltin, { Catalog, Hierarchy, Price, File } from '@moltin/sdk'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../common/rest-client'
 import { formatMoneyString } from '../../util'
@@ -60,7 +60,14 @@ const locateCategoryForKey = async (key: string): Promise<Category> => {
     return _.find(_.flatMapDeep(megaMenu, expandCategory), c => c.key === key)
 }
 
-export class FabricCommerceCodec extends Codec implements CommerceAPI {
+export class FabricCommerceCodec implements Codec, CommerceAPI {
+    SchemaURI: string
+    getAPI(config: CodecConfiguration): Promise<API> {
+        throw new Error('Method not implemented.')
+    }
+    canUseConfiguration(config: CodecConfiguration): boolean {
+        throw new Error('Method not implemented.')
+    }
     // constructor(config: FabricCommerceCodecConfig) {
     //     super(config)
     //     if (!rest) {
@@ -74,16 +81,16 @@ export class FabricCommerceCodec extends Codec implements CommerceAPI {
     // }
 
     // commerce codec api implementation
-    async getProduct(context: QueryContext): Promise<Product> {
+    async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
         throw new Error(`product no!`)
     }
 
-    async getProducts(context: QueryContext): Promise<Product[]> {
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
         throw new Error(`products no!`)
     }
 
-    async getCategory(context: QueryContext): Promise<Category> {
-        let category = await locateCategoryForKey(context.args.key)
+    async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
+        let category = await locateCategoryForKey(args.slug)
 
         let x = await rest.get({
             url: `https://sandbox.copilot.fabric.inc/api-pim2/v1/item/search`,
@@ -123,7 +130,6 @@ export class FabricCommerceCodec extends Codec implements CommerceAPI {
                 id: prod.itemId,
                 name: productName,
                 slug: slugify(productName, { lower: true }),
-                productType: prod.type,
                 shortDescription: '',
                 longDescription: '',
                 categories: [],

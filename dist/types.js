@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DemoStoreConfiguration = exports.qc = exports.GetAttributeArgs = exports.GetProductArgs = exports.GetProductsArgs = exports.GetCategoryProductArgs = exports.GetCategoryArgs = exports.Promotion = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.CustomerGroup = exports.Identifiable = exports.Image = void 0;
+exports.DemoStoreConfiguration = exports.GetAttributeArgs = exports.Promotion = exports.Category = exports.Variant = exports.Product = exports.CommerceObject = exports.CustomerGroup = exports.Identifiable = exports.Image = void 0;
 class Image {
 }
 exports.Image = Image;
@@ -25,29 +25,9 @@ exports.Category = Category;
 class Promotion extends Identifiable {
 }
 exports.Promotion = Promotion;
-class GetCategoryArgs {
-}
-exports.GetCategoryArgs = GetCategoryArgs;
-class GetCategoryProductArgs {
-}
-exports.GetCategoryProductArgs = GetCategoryProductArgs;
-class GetProductsArgs {
-}
-exports.GetProductsArgs = GetProductsArgs;
-class GetProductArgs {
-}
-exports.GetProductArgs = GetProductArgs;
 class GetAttributeArgs {
 }
 exports.GetAttributeArgs = GetAttributeArgs;
-const qc = (args, locale = 'en-US', language = 'en', country = 'US', currency = 'USD', segment = '', appUrl = '', method = 'get') => (Object.assign(Object.assign({}, args), { locale,
-    language,
-    country,
-    currency,
-    segment,
-    appUrl,
-    method }));
-exports.qc = qc;
 class DemoStoreConfiguration {
 }
 exports.DemoStoreConfiguration = DemoStoreConfiguration;

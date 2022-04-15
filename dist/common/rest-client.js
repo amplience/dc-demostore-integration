@@ -32,7 +32,7 @@ const OAuthRestClient = ({ api_url, auth_url }) => {
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let response = yield authenticatedAxios(config);
+            let response = yield authenticatedAxios.get(config.url, config);
             return response.data;
         }
         catch (error) {

@@ -1,7 +1,7 @@
-import { QueryContext, Product, Category } from "../../../types";
+import { Product, Category, CommonArgs } from "../../../types";
 import _ from "lodash";
 declare const _default: {
-    mapProduct: (product: Product, context: QueryContext) => {
+    mapProduct: (product: Product, args: CommonArgs) => {
         imageSetId: string;
         variants: {
             listPrice: string;
@@ -14,7 +14,6 @@ declare const _default: {
         shortDescription?: string;
         longDescription?: string;
         categories: Category[];
-        productType?: string;
         slug: string;
         id: string;
         name: string;
