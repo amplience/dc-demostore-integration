@@ -23,14 +23,7 @@ export class AmplienceClient {
             ...(await response.json()).content,
             locator: this.toString()
         }
-
-        let keeper = CryptKeeper(content)
-        _.each(content, (value, key) => {
-            if (typeof value === 'string') {
-                content[key] = keeper.decrypt(value)
-            }
-        })
-        return content
+        return CryptKeeper(content).decryptAll()
     }
 
     async getConfig(): Promise<DemoStoreConfiguration> {

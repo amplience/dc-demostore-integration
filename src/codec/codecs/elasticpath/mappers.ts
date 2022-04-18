@@ -51,21 +51,6 @@ const mappers = (api: any) => {
             id: product.id
         }]
     
-        // .map(opt => {
-        //     return {
-        //         sku: product.attributes.sku,
-        //         prices: {
-        //             list: productPrice,
-        //         },
-        //         listPrice: productPrice,
-        //         salePrice: productPrice,
-        //         images,
-        //         attributes: _.concat(attributes, [{ name: v.name, value: opt.name }]),
-        //         key: product.attributes.slug,
-        //         id: product.id
-        //     }
-        // })
-    
         // variants
         if (!_.isEmpty((product.meta as any).variation_matrix)) {
             let variationMatrix: Dictionary<Dictionary<string>> = (product.meta as any).variation_matrix

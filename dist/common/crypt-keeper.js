@@ -15,12 +15,18 @@ const CryptKeeper = (config) => {
         const originalText = bytes.toString(crypto_js_1.default.enc.Utf8);
         return originalText;
     };
+    const encrypt = (text) => text.startsWith('===') && text.endsWith('===') ? text : `===${(0, rot47_1.default)(reverseString(encryptAES(text)))}===`;
+    const decrypt = (text) => text.startsWith('===') && text.endsWith('===') ? decryptAES(reverseString((0, rot47_1.default)(text.substring(3, text.length - 3)))) : text;
     return {
-        encrypt: (text) => {
-            return text.startsWith('===') && text.endsWith('===') ? text : `===${(0, rot47_1.default)(reverseString(encryptAES(text)))}===`;
-        },
-        decrypt: (text) => {
-            return text.startsWith('===') && text.endsWith('===') ? decryptAES(reverseString((0, rot47_1.default)(text.substring(3, text.length - 3)))) : text;
+        encrypt,
+        decrypt,
+        decryptAll: () => {
+            lodash_1.default.each(config, (value, key) => {
+                if (typeof value === 'string') {
+                    config[key] = decrypt(value);
+                }
+            });
+            return config;
         }
     };
 };

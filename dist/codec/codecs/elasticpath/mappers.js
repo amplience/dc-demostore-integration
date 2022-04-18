@@ -55,20 +55,6 @@ const mappers = (api) => {
                 key: product.attributes.slug,
                 id: product.id
             }];
-        // .map(opt => {
-        //     return {
-        //         sku: product.attributes.sku,
-        //         prices: {
-        //             list: productPrice,
-        //         },
-        //         listPrice: productPrice,
-        //         salePrice: productPrice,
-        //         images,
-        //         attributes: _.concat(attributes, [{ name: v.name, value: opt.name }]),
-        //         key: product.attributes.slug,
-        //         id: product.id
-        //     }
-        // })
         // variants
         if (!lodash_1.default.isEmpty(product.meta.variation_matrix)) {
             let variationMatrix = product.meta.variation_matrix;

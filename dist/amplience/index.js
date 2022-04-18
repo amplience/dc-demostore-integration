@@ -28,13 +28,7 @@ class AmplienceClient {
             let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
             let response = yield fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
             let content = Object.assign(Object.assign({}, (yield response.json()).content), { locator: this.toString() });
-            let keeper = (0, __1.CryptKeeper)(content);
-            lodash_1.default.each(content, (value, key) => {
-                if (typeof value === 'string') {
-                    content[key] = keeper.decrypt(value);
-                }
-            });
-            return content;
+            return (0, __1.CryptKeeper)(content).decryptAll();
         });
     }
     getConfig() {

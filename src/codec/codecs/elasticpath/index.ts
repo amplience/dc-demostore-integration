@@ -52,7 +52,7 @@ const epCodec: Codec = {
             getPricebooks: (): Promise<PriceBook[]> => fetch(`/pcm/pricebooks`),
             getPricebookById: (id: string): Promise<PriceBook> => fetch(`/pcm/pricebooks/${id}`),
             getHierarchyById: (id: string): Promise<Hierarchy> => fetch(`/pcm/hierarchies/${id}`),
-            getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first((await rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` })).data),
+            getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first(await fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)),
             getPriceForSku: async (sku: string): Promise<Price> => {
                 let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
                 let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === catalog.attributes.pricebook_id && !!price.attributes?.currencies) ||
@@ -66,26 +66,17 @@ const epCodec: Codec = {
                 ...await api.getPriceForSkuInPricebook(sku, pricebook),
                 pricebook
             }))),
-            getCatalog: async (name: string): Promise<Catalog> => {
-                let catalogs = (await rest.get({ url: '/catalogs' })).data
-                return _.find(catalogs, cat => cat.attributes?.name === name)
-            },
+            getCatalog: async (name: string): Promise<Catalog> => _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === name),
             getMegaMenu: async (name: string): Promise<Hierarchy[]> => {
                 return await Promise.all((await api.getCatalog(name)).attributes.hierarchy_ids.map(await api.getHierarchyById))
             },
-            getProductsByNodeId: async (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => {
-                return (await rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products` })).data
-            },
-            getChildrenByHierarchyId: async (id: string): Promise<Moltin.Node[]> => {
-                return (await rest.get({ url: `/pcm/hierarchies/${id}/children` })).data
-            },
-            getChildrenByNodeId: async (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => {
-                return (await rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children` })).data
-            }
+            getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
+            getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
+            getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
         }
 
-        let catalog = await api.getCatalog(config.catalog_name)
         let mapper = mappers(api)
+        let catalog = await api.getCatalog(config.catalog_name)
         let megaMenu = await Promise.all((await api.getMegaMenu(config.catalog_name)).map(await mapper.mapHierarchy))
 
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
@@ -104,18 +95,18 @@ const epCodec: Codec = {
             return await Promise.all(products.map(await mapper.mapProduct))
         }
 
+        const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
+            if (args.id) {
+                return mapper.mapProduct(await api.getProductById(args.id))
+            }
+            throw new Error(`getProduct(): must specify id`)
+        }
+
         return {
-            getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
-                if (args.id) {
-                    return mapper.mapProduct(await api.getProductById(args.id))
-                }
-                throw new Error(`getProduct(): must specify id`)
-            },
+            getProduct,
             getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
                 if (args.productIds) {
-                    return await Promise.all(args.productIds.split(',').map(async productId => {
-                        return await this.getProduct({ id: productId })
-                    }))
+                    return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
                 }
                 else if (args.keyword) {
                     // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search

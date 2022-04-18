@@ -35,7 +35,7 @@ const epCodec = {
                 getPricebooks: () => fetch(`/pcm/pricebooks`),
                 getPricebookById: (id) => fetch(`/pcm/pricebooks/${id}`),
                 getHierarchyById: (id) => fetch(`/pcm/hierarchies/${id}`),
-                getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.first((yield rest.get({ url: `/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})` })).data); }),
+                getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)); }),
                 getPriceForSku: (sku) => __awaiter(this, void 0, void 0, function* () {
                     let prices = yield api.getPricesForSku(sku);
                     let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === catalog.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
@@ -47,25 +47,16 @@ const epCodec = {
                         return (Object.assign(Object.assign({}, yield api.getPriceForSkuInPricebook(sku, pricebook)), { pricebook }));
                     })));
                 }),
-                getCatalog: (name) => __awaiter(this, void 0, void 0, function* () {
-                    let catalogs = (yield rest.get({ url: '/catalogs' })).data;
-                    return lodash_1.default.find(catalogs, cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === name; });
-                }),
+                getCatalog: (name) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === name; }); }),
                 getMegaMenu: (name) => __awaiter(this, void 0, void 0, function* () {
                     return yield Promise.all((yield api.getCatalog(name)).attributes.hierarchy_ids.map(yield api.getHierarchyById));
                 }),
-                getProductsByNodeId: (hierarchyId, nodeId) => __awaiter(this, void 0, void 0, function* () {
-                    return (yield rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products` })).data;
-                }),
-                getChildrenByHierarchyId: (id) => __awaiter(this, void 0, void 0, function* () {
-                    return (yield rest.get({ url: `/pcm/hierarchies/${id}/children` })).data;
-                }),
-                getChildrenByNodeId: (hierarchyId, nodeId) => __awaiter(this, void 0, void 0, function* () {
-                    return (yield rest.get({ url: `/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children` })).data;
-                })
+                getProductsByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
+                getChildrenByHierarchyId: (id) => fetch(`/pcm/hierarchies/${id}/children`),
+                getChildrenByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
             };
-            let catalog = yield api.getCatalog(config.catalog_name);
             let mapper = (0, mappers_1.default)(api);
+            let catalog = yield api.getCatalog(config.catalog_name);
             let megaMenu = yield Promise.all((yield api.getMegaMenu(config.catalog_name)).map(yield mapper.mapHierarchy));
             const populateCategory = (category) => __awaiter(this, void 0, void 0, function* () {
                 return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
@@ -80,21 +71,20 @@ const epCodec = {
                 }
                 return yield Promise.all(products.map(yield mapper.mapProduct));
             });
+            const getProduct = function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (args.id) {
+                        return mapper.mapProduct(yield api.getProductById(args.id));
+                    }
+                    throw new Error(`getProduct(): must specify id`);
+                });
+            };
             return {
-                getProduct: function (args) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        if (args.id) {
-                            return mapper.mapProduct(yield api.getProductById(args.id));
-                        }
-                        throw new Error(`getProduct(): must specify id`);
-                    });
-                },
+                getProduct,
                 getProducts: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
                         if (args.productIds) {
-                            return yield Promise.all(args.productIds.split(',').map((productId) => __awaiter(this, void 0, void 0, function* () {
-                                return yield this.getProduct({ id: productId });
-                            })));
+                            return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return yield getProduct({ id }); })));
                         }
                         else if (args.keyword) {
                             // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
