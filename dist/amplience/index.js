@@ -27,8 +27,8 @@ class AmplienceClient {
         return __awaiter(this, void 0, void 0, function* () {
             let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
             let response = yield fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
-            let content = Object.assign(Object.assign({}, (yield response.json()).content), { locator: this.toString() });
-            return (0, __1.CryptKeeper)(content).decryptAll();
+            let content = (yield response.json()).content;
+            return (0, __1.CryptKeeper)(content, this.toString()).decryptAll();
         });
     }
     getConfig() {

@@ -1,5 +1,5 @@
 import { Category } from '../../../types';
-import { CodecConfiguration, Codec } from '../..';
+import { CodecConfiguration, CommerceCodec } from '../..';
 import Moltin, { PriceBook, PriceBookPriceBase } from '@moltin/sdk';
 export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
     client_id: string;
@@ -23,5 +23,5 @@ export interface ElasticPathCategory extends Category {
 export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook;
 }
-declare const epCodec: Codec;
+declare const epCodec: CommerceCodec;
 export default epCodec;

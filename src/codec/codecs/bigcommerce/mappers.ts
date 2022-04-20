@@ -22,7 +22,7 @@ export const mapProduct = (product: BigCommerceProduct): Product => {
         slug: slugify(product.name, { lower: true }),
         name: product.name,
         categories: [],
-        variants: product.variants.map((variant: BigCommerceVariant): Variant => {
+        variants: product.variants?.map((variant: BigCommerceVariant): Variant => {
             return {
                 sku: `${variant.id}`,
                 listPrice: `${variant.calculated_price}`,

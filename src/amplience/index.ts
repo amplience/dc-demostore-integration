@@ -19,11 +19,8 @@ export class AmplienceClient {
     async getContentItem(args: any): Promise<ContentItem> {
         let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
         let response = await fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
-        let content = {
-            ...(await response.json()).content,
-            locator: this.toString()
-        }
-        return CryptKeeper(content).decryptAll()
+        let content = (await response.json()).content
+        return CryptKeeper(content, this.toString()).decryptAll()
     }
 
     async getConfig(): Promise<DemoStoreConfiguration> {

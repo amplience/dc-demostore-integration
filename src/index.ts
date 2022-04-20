@@ -1,9 +1,9 @@
 import { AmplienceClient } from './amplience'
-import { CodecConfiguration, getCodec } from './codec'
+import { getCodec } from './codec'
 import CryptKeeper from './common/crypt-keeper'
 import OAuthRestClient from './common/rest-client'
 import { flattenCategories } from './codec/codecs/common'
-import { DemoStoreConfiguration, Category, Product, QueryContext, CustomerGroup, CommonArgs, GetCommerceObjectArgs, GetProductsArgs } from './types'
+import { DemoStoreConfiguration, Category, Product, CustomerGroup, CommonArgs, GetCommerceObjectArgs, GetProductsArgs } from './types'
 
 export * from './types'
 export * from './codec'
@@ -30,16 +30,9 @@ export const getConfig = async (configLocator: string): Promise<DemoStoreConfigu
 
 export const getCommerceAPI = async (configLocator: string): Promise<CommerceAPI> => {
     let demostoreConfig = await getConfig(configLocator)
-    let config = await getCodec({ 
-        ...demostoreConfig.commerce, 
-        locator: demostoreConfig.locator
-    })
-    return config
+    return await getCommerceAPIFromConfig(demostoreConfig.commerce)
 }
 
 export const getCommerceAPIFromConfig = async (config: object): Promise<CommerceAPI> => {
-    let codec = await getCodec({ 
-        ...config
-    })
-    return codec
+    return await getCodec(config)
 }

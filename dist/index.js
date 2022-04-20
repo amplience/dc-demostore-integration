@@ -50,12 +50,10 @@ const getConfig = (configLocator) => __awaiter(void 0, void 0, void 0, function*
 exports.getConfig = getConfig;
 const getCommerceAPI = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
     let demostoreConfig = yield (0, exports.getConfig)(configLocator);
-    let config = yield (0, codec_1.getCodec)(Object.assign(Object.assign({}, demostoreConfig.commerce), { locator: demostoreConfig.locator }));
-    return config;
+    return yield (0, exports.getCommerceAPIFromConfig)(demostoreConfig.commerce);
 });
 exports.getCommerceAPI = getCommerceAPI;
 const getCommerceAPIFromConfig = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    let codec = yield (0, codec_1.getCodec)(Object.assign({}, config));
-    return codec;
+    return yield (0, codec_1.getCodec)(config);
 });
 exports.getCommerceAPIFromConfig = getCommerceAPIFromConfig;

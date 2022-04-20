@@ -17,9 +17,9 @@ const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../util");
 const qs_1 = __importDefault(require("qs"));
 const cache = {};
-const OAuthRestClient = ({ api_url, auth_url }) => {
+const OAuthRestClient = ({ api_url, auth_url }, payload, config = {}) => {
     let authenticatedAxios;
-    const authenticate = (payload, config = {}) => __awaiter(void 0, void 0, void 0, function* () {
+    const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         let response = yield axios_1.default.post(auth_url, qs_1.default.stringify(payload), config);
         const auth = response.data;
         authenticatedAxios = axios_1.default.create({
@@ -28,17 +28,17 @@ const OAuthRestClient = ({ api_url, auth_url }) => {
                 Authorization: `${auth.token_type} ${auth.access_token}`
             }
         });
-        setTimeout(() => { authenticate(payload, config); }, auth.expires_in * 999);
+        setTimeout(() => { authenticate(); }, auth.expires_in * 999);
+        return authenticatedAxios;
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            let response = yield authenticatedAxios.get(config.url, config);
-            return response.data;
+            authenticatedAxios = authenticatedAxios || (yield authenticate());
+            return yield (yield authenticatedAxios.get(config.url, config)).data;
         }
         catch (error) {
             if (error.response.status === 429) {
                 yield (0, util_1.sleep)(1000);
-                // console.log(`[ get ] ${apiUrl}${config.url} [ rate limited ]`)
                 return yield get(config);
             }
             else if (error.response.status === 404) {

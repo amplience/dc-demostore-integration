@@ -1,7 +1,7 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, CodecConfiguration, registerCodec } from '../../../codec'
+import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, QueryContext } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
 
@@ -14,9 +14,9 @@ export interface SFCCCodecConfiguration extends CodecConfiguration {
     client_secret: string
 }
 
-const sfccCodec: Codec = {
+const sfccCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
-    getAPI: async (config: SFCCCodecConfiguration): Promise<CommerceAPI> => {
+    getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
         const fetch = async (url: string): Promise<any> => (await axios.request({
             method: 'get',
             url,
@@ -27,8 +27,7 @@ const sfccCodec: Codec = {
         })).data
 
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
-        let rest = OAuthRestClient(config)
-        await rest.authenticate({
+        let rest = OAuthRestClient(config, {
             grant_type: 'client_credentials'
         }, {
             headers: {

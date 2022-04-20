@@ -1,4 +1,4 @@
-import { Codec, CodecConfiguration } from '../../../codec';
+import { CodecConfiguration, CommerceCodec } from '../../../codec';
 export interface SFCCCodecConfiguration extends CodecConfiguration {
     api_url: string;
     auth_url: string;
@@ -7,5 +7,5 @@ export interface SFCCCodecConfiguration extends CodecConfiguration {
     client_id: string;
     client_secret: string;
 }
-declare const sfccCodec: Codec;
+declare const sfccCodec: CommerceCodec;
 export default sfccCodec;

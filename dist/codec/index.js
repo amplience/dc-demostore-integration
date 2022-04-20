@@ -15,26 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCodec = exports.registerCodec = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const codecs = {};
-const registerCodec = (codec) => {
-    console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`);
-    codecs[codec.SchemaURI] = codec;
-};
+const registerCodec = (codec) => codecs[codec.SchemaURI] = codec;
 exports.registerCodec = registerCodec;
-const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
+const getCodec = (config) => {
     var _a;
     let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema] || lodash_1.default.find(Object.values(codecs), c => c.canUseConfiguration(config));
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    let api = yield codec.getAPI(config);
-    lodash_1.default.each(Object.keys(api), key => {
-        let method = api[key];
+    let api = codec.getAPI(config);
+    lodash_1.default.each(api, (method, key) => {
+        // apply default arguments for those not provided in the query
         api[key] = (args) => __awaiter(void 0, void 0, void 0, function* () {
             return yield method(Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
         });
     });
     return api;
-});
+};
 exports.getCodec = getCodec;
 require("./codecs/bigcommerce");
 require("./codecs/commercetools");

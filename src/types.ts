@@ -63,6 +63,7 @@ export interface QueryContext {
 }
 
 export interface CommonArgs {
+    [key: string]: any;
     locale?: string
     language?: string
     country?: string
@@ -85,5 +86,4 @@ export class DemoStoreConfiguration {
     url?: string
     cms?: any
     commerce?: CodecConfiguration
-    locator: string
 }

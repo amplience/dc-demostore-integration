@@ -11,25 +11,25 @@ export interface CodecConfiguration {
 
 export interface Codec {
     SchemaURI: string
-    getAPI(config: CodecConfiguration): Promise<API>
+    getAPI(config: CodecConfiguration): any
     canUseConfiguration(config: CodecConfiguration): boolean
 }
 
-const codecs: Dictionary<Codec> = {}
-export const registerCodec = (codec: Codec) => {
-    console.log(`[ aria ] register codec [ ${codec.SchemaURI} ]`)
-    codecs[codec.SchemaURI] = codec
+export interface CommerceCodec extends Codec {
+    getAPI(config: CodecConfiguration): CommerceAPI
 }
 
-export const getCodec = async (config: CodecConfiguration): Promise<any> => {
+const codecs: Dictionary<Codec> = {}
+export const registerCodec = (codec: Codec) => codecs[codec.SchemaURI] = codec
+export const getCodec = <T extends API>(config: CodecConfiguration): T => {
     let codec: Codec = codecs[config?._meta?.schema] || _.find(Object.values(codecs), c => c.canUseConfiguration(config))
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
-    let api = await codec.getAPI(config)
-
-    _.each(Object.keys(api), key => {
-        let method = api[key]
+    
+    let api = codec.getAPI(config)
+    _.each(api, (method: any, key: string) => {
+        // apply default arguments for those not provided in the query
         api[key] = async (args: CommonArgs): Promise<any> => await method({
             locale: 'en-US',
             language: 'en',
@@ -39,7 +39,6 @@ export const getCodec = async (config: CodecConfiguration): Promise<any> => {
             ...args
         })
     })
-
     return api
 }
 

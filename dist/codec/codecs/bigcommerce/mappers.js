@@ -16,6 +16,7 @@ const mapCategory = (category) => {
 };
 exports.mapCategory = mapCategory;
 const mapProduct = (product) => {
+    var _a;
     return {
         id: `${product.id}`,
         shortDescription: product.description,
@@ -23,7 +24,7 @@ const mapProduct = (product) => {
         slug: (0, slugify_1.default)(product.name, { lower: true }),
         name: product.name,
         categories: [],
-        variants: product.variants.map((variant) => {
+        variants: (_a = product.variants) === null || _a === void 0 ? void 0 : _a.map((variant) => {
             return {
                 sku: `${variant.id}`,
                 listPrice: `${variant.calculated_price}`,

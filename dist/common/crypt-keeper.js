@@ -7,8 +7,8 @@ const crypto_js_1 = __importDefault(require("crypto-js"));
 const rot47_1 = __importDefault(require("rot47"));
 const lodash_1 = __importDefault(require("lodash"));
 const reverseString = str => str.split("").reverse().join("");
-const CryptKeeper = (config) => {
-    const hash = `${reverseString(lodash_1.default.last(config._meta.deliveryId.split('-')))}${lodash_1.default.first(config.locator.split(':'))}${lodash_1.default.last(config._meta.schema.split('/'))}${reverseString(lodash_1.default.first(config._meta.deliveryId.split('-')))}`;
+const CryptKeeper = (config, hub) => {
+    const hash = `${reverseString(lodash_1.default.last(config._meta.deliveryId.split('-')))}${hub}${lodash_1.default.last(config._meta.schema.split('/'))}${reverseString(lodash_1.default.first(config._meta.deliveryId.split('-')))}`;
     const encryptAES = (text) => crypto_js_1.default.AES.encrypt(text, hash).toString();
     const decryptAES = (text) => {
         const bytes = crypto_js_1.default.AES.decrypt(text, hash);

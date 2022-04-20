@@ -1,6 +1,6 @@
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../types';
 import { CodecConfiguration, Codec } from '..';
-import { API, CommerceAPI } from '../..';
+import { CommerceAPI } from '../..';
 export interface FabricCommerceCodecConfig extends CodecConfiguration {
     username: string;
     password: string;
@@ -8,7 +8,7 @@ export interface FabricCommerceCodecConfig extends CodecConfiguration {
 }
 export declare class FabricCommerceCodec implements Codec, CommerceAPI {
     SchemaURI: string;
-    getAPI(config: CodecConfiguration): Promise<API>;
+    getAPI(config: CodecConfiguration): any;
     canUseConfiguration(config: CodecConfiguration): boolean;
     getProduct(args: GetCommerceObjectArgs): Promise<Product>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;

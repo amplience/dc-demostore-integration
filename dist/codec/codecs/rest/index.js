@@ -19,14 +19,17 @@ const common_1 = require("../common");
 let categories = [];
 let products = [];
 let translations = {};
+let api = null;
 const restCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config) {
-        return __awaiter(this, void 0, void 0, function* () {
-            products = yield (yield fetch(config.productURL)).json();
-            categories = yield (yield fetch(config.categoryURL)).json();
-            translations = yield (yield fetch(config.translationsURL)).json();
-            const api = {
+        const loadAPI = () => __awaiter(this, void 0, void 0, function* () {
+            if (lodash_1.default.isEmpty(products)) {
+                products = yield (yield fetch(config.productURL)).json();
+                categories = yield (yield fetch(config.categoryURL)).json();
+                translations = yield (yield fetch(config.translationsURL)).json();
+            }
+            api = {
                 getProductsForCategory: (category) => {
                     return lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
                 },
@@ -48,45 +51,49 @@ const restCodec = {
                         ...lodash_1.default.flatMap(category.children, api.getProductsForCategory)
                     ], 'slug'), 12) }))
             };
-            return {
-                getProduct: function (args) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let product = api.getProduct(args);
-                        if (product) {
-                            return mappers_1.default.mapProduct(product, args);
-                        }
-                    });
-                },
-                getProducts: function (args) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let filtered = api.getProducts(args);
-                        if (!filtered) {
-                            throw new Error(`Products not found for args: ${JSON.stringify(args)}`);
-                        }
-                        return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
-                    });
-                },
-                getCategory: function (args) {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        let category = api.getCategory(args);
-                        if (!category) {
-                            throw new Error(`Category not found for args: ${JSON.stringify(args)}`);
-                        }
-                        return mappers_1.default.mapCategory(api.populateCategory(category));
-                    });
-                },
-                getMegaMenu: function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        return categories.filter(cat => !cat.parent).map(mappers_1.default.mapCategory);
-                    });
-                },
-                getCustomerGroups: function () {
-                    return __awaiter(this, void 0, void 0, function* () {
-                        return [];
-                    });
-                }
-            };
         });
+        return {
+            getProduct: function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield loadAPI();
+                    let product = api.getProduct(args);
+                    if (product) {
+                        return mappers_1.default.mapProduct(product, args);
+                    }
+                });
+            },
+            getProducts: function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield loadAPI();
+                    let filtered = api.getProducts(args);
+                    if (!filtered) {
+                        throw new Error(`Products not found for args: ${JSON.stringify(args)}`);
+                    }
+                    return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
+                });
+            },
+            getCategory: function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield loadAPI();
+                    let category = api.getCategory(args);
+                    if (!category) {
+                        throw new Error(`Category not found for args: ${JSON.stringify(args)}`);
+                    }
+                    return mappers_1.default.mapCategory(api.populateCategory(category));
+                });
+            },
+            getMegaMenu: function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    yield loadAPI();
+                    return categories.filter(cat => !cat.parent).map(mappers_1.default.mapCategory);
+                });
+            },
+            getCustomerGroups: function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    return [];
+                });
+            }
+        };
     },
     canUseConfiguration: function (config) {
         return config.productURL && config.categoryURL && config.translationsURL;

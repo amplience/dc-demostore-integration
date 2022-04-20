@@ -1,15 +1,15 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, registerCodec } from '../../../codec'
+import { Codec, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
 import { BigCommerceCodecConfiguration } from './types'
 import { mapProduct, mapCategory } from './mappers'
 import { findInMegaMenu } from '../common'
 
-const bigCommerceCodec: Codec = {
+const bigCommerceCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
-    getAPI: async (config: BigCommerceCodecConfiguration): Promise<CommerceAPI> => {
+    getAPI: (config: BigCommerceCodecConfiguration): CommerceAPI => {
         const fetch = async (url: string): Promise<any> => (await axios.request({
             method: 'get',
             url,
@@ -26,6 +26,10 @@ const bigCommerceCodec: Codec = {
             searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
             getProductById: id => fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
+        }
+
+        const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
+            return (await api.getCategoryTree()).map(mapCategory)
         }
 
         return {
@@ -49,15 +53,13 @@ const bigCommerceCodec: Codec = {
                     throw new Error(`getCategory(): must specify slug`)
                 }
 
-                let category = findInMegaMenu(await this.getMegaMenu(), args.slug)
+                let category = findInMegaMenu(await getMegaMenu(args), args.slug)
                 return {
                     ...category,
-                    products: await api.getProductsForCategory(category)
+                    products: (await api.getProductsForCategory(category)).map(mapProduct)
                 }
             },
-            getMegaMenu: async function (args: CommonArgs): Promise<Category[]> {
-                return (await api.getCategoryTree()).map(mapCategory)
-            },
+            getMegaMenu,
             getCustomerGroups: async function (args: CommonArgs): Promise<CustomerGroup[]> {
                 return []
             }

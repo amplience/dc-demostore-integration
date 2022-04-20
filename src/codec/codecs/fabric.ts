@@ -62,7 +62,7 @@ const locateCategoryForKey = async (key: string): Promise<Category> => {
 
 export class FabricCommerceCodec implements Codec, CommerceAPI {
     SchemaURI: string
-    getAPI(config: CodecConfiguration): Promise<API> {
+    getAPI(config: CodecConfiguration): any {
         throw new Error('Method not implemented.')
     }
     canUseConfiguration(config: CodecConfiguration): boolean {

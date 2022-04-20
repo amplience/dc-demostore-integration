@@ -19,10 +19,10 @@ export interface OAuthRestClientInterface {
     get: (config: AxiosRequestConfig) => Promise<any>
 }
 
-export const OAuthRestClient = ({ api_url, auth_url }) => {
+export const OAuthRestClient = ({ api_url, auth_url }, payload: any, config: AxiosRequestConfig = {}) => {
     let authenticatedAxios: AxiosInstance
 
-    const authenticate = async (payload: any, config: AxiosRequestConfig = {}) => {
+    const authenticate = async () => {
         let response = await axios.post(auth_url, qs.stringify(payload), config)
         const auth = response.data
 
@@ -33,18 +33,17 @@ export const OAuthRestClient = ({ api_url, auth_url }) => {
             }
         })
 
-        setTimeout(() => { authenticate(payload, config) }, auth.expires_in * 999)
+        setTimeout(() => { authenticate() }, auth.expires_in * 999)
+        return authenticatedAxios
     }
 
     const get = async (config: AxiosRequestConfig): Promise<any> => {
         try {
-            let response = await authenticatedAxios.get(config.url, config)
-            return response.data
+            authenticatedAxios = authenticatedAxios || await authenticate()
+            return await (await authenticatedAxios.get(config.url, config)).data
         } catch (error: any) {
             if (error.response.status === 429) {
                 await sleep(1000)
-
-                // console.log(`[ get ] ${apiUrl}${config.url} [ rate limited ]`)
                 return await get(config)
             }
             else if (error.response.status === 404) {

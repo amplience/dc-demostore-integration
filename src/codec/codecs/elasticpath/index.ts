@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { CodecConfiguration, Codec, registerCodec } from '../..'
-import { CommerceAPI } from '../../..'
+import { CodecConfiguration, Codec, registerCodec, CommerceCodec } from '../..'
+import { API, CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
 import OAuthRestClient from '../../../common/rest-client'
 import mappers from './mappers'
@@ -34,15 +34,17 @@ export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook
 }
 
-const epCodec: Codec = {
+const epCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
-    getAPI: async function (config: ElasticPathCommerceCodecConfig): Promise<CommerceAPI> {
-        const rest = OAuthRestClient(config)
-        await rest.authenticate({
+    getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
+        const rest = OAuthRestClient(config, {
             grant_type: 'client_credentials',
             client_id: config.client_id,
             client_secret: config.client_secret
         })
+
+        let catalog = null
+        let megaMenu = null
 
         const fetch = async url => (await rest.get({ url })).data
         const api = {
@@ -66,19 +68,18 @@ const epCodec: Codec = {
                 ...await api.getPriceForSkuInPricebook(sku, pricebook),
                 pricebook
             }))),
-            getCatalog: async (name: string): Promise<Catalog> => _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === name),
-            getMegaMenu: async (name: string): Promise<Hierarchy[]> => {
-                return await Promise.all((await api.getCatalog(name)).attributes.hierarchy_ids.map(await api.getHierarchyById))
+            getCatalog: async (): Promise<Catalog> => {
+                return catalog = catalog || _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
+            },
+            getMegaMenu: async (): Promise<Hierarchy[]> => {
+                return await Promise.all((await api.getCatalog()).attributes.hierarchy_ids.map(await api.getHierarchyById))
             },
             getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
             getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
             getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
         }
 
-        let mapper = mappers(api)
-        let catalog = await api.getCatalog(config.catalog_name)
-        let megaMenu = await Promise.all((await api.getMegaMenu(config.catalog_name)).map(await mapper.mapHierarchy))
-
+        const mapper = mappers(api)
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
             ...category,
             products: await getProductsFromCategory(category)
@@ -121,7 +122,7 @@ const epCodec: Codec = {
                 return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
             },
             getMegaMenu: async function (): Promise<Category[]> {
-                return megaMenu
+                return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
             },
             getCustomerGroups: async function (): Promise<CustomerGroup[]> {
                 return []

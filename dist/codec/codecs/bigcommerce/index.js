@@ -18,7 +18,7 @@ const mappers_1 = require("./mappers");
 const common_1 = require("../common");
 const bigCommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
-    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
+    getAPI: (config) => {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
             return (yield axios_1.default.request({
                 method: 'get',
@@ -36,6 +36,11 @@ const bigCommerceCodec = {
             searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
             getProductById: id => fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
+        };
+        const getMegaMenu = function (args) {
+            return __awaiter(this, void 0, void 0, function* () {
+                return (yield api.getCategoryTree()).map(mappers_1.mapCategory);
+            });
         };
         return {
             getProduct: function (args) {
@@ -62,22 +67,18 @@ const bigCommerceCodec = {
                     if (!args.slug) {
                         throw new Error(`getCategory(): must specify slug`);
                     }
-                    let category = (0, common_1.findInMegaMenu)(yield this.getMegaMenu(), args.slug);
-                    return Object.assign(Object.assign({}, category), { products: yield api.getProductsForCategory(category) });
+                    let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug);
+                    return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(mappers_1.mapProduct) });
                 });
             },
-            getMegaMenu: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    return (yield api.getCategoryTree()).map(mappers_1.mapCategory);
-                });
-            },
+            getMegaMenu,
             getCustomerGroups: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     return [];
                 });
             }
         };
-    }),
+    },
     canUseConfiguration: function (config) {
         return config.api_url && config.api_token && config.store_hash;
     }

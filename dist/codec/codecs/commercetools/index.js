@@ -17,47 +17,15 @@ const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
-let rest;
 // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
 let categories;
-const api = {
-    getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        if (args.id) {
-            return lodash_1.default.first((yield rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results);
-        }
-        throw new Error(`getProduct(): id must be specified`);
-    }),
-    getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        if (args.productIds) {
-            let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',');
-            return (yield rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results;
-        }
-        else if (args.keyword) {
-            return (yield rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results;
-        }
-        throw new Error(`getProducts(): productIds or keyword must be specified`);
-    }),
-    getCategories: function () {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!categories) {
-                categories = (yield rest.get({ url: `/categories?limit=500` })).results;
-            }
-            return categories;
-        });
-    },
-    getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () {
-        return (yield api.getCategories()).find(cat => cat.slug.en === args.slug);
-    }),
-    getProductsForCategory: (category) => __awaiter(void 0, void 0, void 0, function* () {
-        return (yield rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results;
-    })
-};
 const getMapper = (args) => {
     args = {
         language: args.language || 'en',
         country: args.country || 'US',
         currency: args.currency || 'USD'
     };
+    const map = () => getMapper(args);
     return {
         findPrice: (variant) => {
             let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
@@ -67,9 +35,9 @@ const getMapper = (args) => {
         },
         mapCategory: (category) => ({
             id: category.id,
-            name: getMapper(args).localize(category.name),
-            slug: getMapper(args).localize(category.slug),
-            children: categories.filter(cat => { var _a; return ((_a = cat.parent) === null || _a === void 0 ? void 0 : _a.id) === category.id; }).map(getMapper(args).mapCategory),
+            name: map().localize(category.name),
+            slug: map().localize(category.slug),
+            children: categories.filter(cat => { var _a; return ((_a = cat.parent) === null || _a === void 0 ? void 0 : _a.id) === category.id; }).map(map().mapCategory),
             products: []
         }),
         localize: (localizable) => {
@@ -83,54 +51,82 @@ const getMapper = (args) => {
                 return attribute.value.label;
             }
             else if (attribute.value.label) {
-                return getMapper(args).localize(attribute.value.label);
+                return map().localize(attribute.value.label);
             }
             else {
-                return getMapper(args).localize(attribute.value);
+                return map().localize(attribute.value);
             }
         },
-        mapProduct: (product) => (Object.assign(Object.assign({}, product), { name: getMapper(args).localize(product.name), slug: getMapper(args).localize(product.slug), variants: product.variants.map((variant) => (Object.assign(Object.assign({}, variant), { listPrice: getMapper(args).findPrice(variant), 
-                // todo: get discounted price
-                salePrice: getMapper(args).findPrice(variant), attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getMapper(args).getAttributeValue)) }))), categories: [] }))
+        mapProduct: (product) => (Object.assign(Object.assign({}, product), { name: map().localize(product.name), slug: map().localize(product.slug), variants: lodash_1.default.isEmpty(product.variants) ? [product.masterVariant].map(map().mapVariant) : product.variants.map(map().mapVariant), categories: [] })),
+        mapVariant: (variant) => (Object.assign(Object.assign({}, variant), { listPrice: map().findPrice(variant), 
+            // todo: get discounted price
+            salePrice: map().findPrice(variant), attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(map().getAttributeValue)) }))
     };
 };
 const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!rest) {
-                rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }));
-                yield rest.authenticate({
-                    grant_type: 'client_credentials'
-                }, {
-                    auth: {
-                        username: config.client_id,
-                        password: config.client_secret
-                    }
-                });
+        let rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }), {
+            grant_type: 'client_credentials'
+        }, {
+            auth: {
+                username: config.client_id,
+                password: config.client_secret
             }
-            return {
-                getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return getMapper(args).mapProduct(yield api.getProduct(args));
-                }),
-                getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return (yield api.getProducts(args)).map(getMapper(args).mapProduct);
-                }),
-                getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
-                    let category = getMapper(args).mapCategory(yield api.getCategory(args));
-                    // hydrate products into the category
-                    return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(getMapper(args).mapProduct) });
-                }),
-                getMegaMenu: (args) => __awaiter(this, void 0, void 0, function* () {
-                    // for the megaMenu, only get categories that have their slugs in 'cats'
-                    let categories = (yield api.getCategories()).filter(cat => cats.includes(cat.slug.en));
-                    return categories.map(getMapper(args).mapCategory);
-                }),
-                getCustomerGroups: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return [];
-                })
-            };
         });
+        const api = {
+            getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
+                if (args.id) {
+                    return lodash_1.default.first((yield rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results);
+                }
+                throw new Error(`getProduct(): id must be specified`);
+            }),
+            getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
+                if (args.productIds) {
+                    let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',');
+                    return (yield rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results;
+                }
+                else if (args.keyword) {
+                    return (yield rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results;
+                }
+                throw new Error(`getProducts(): productIds or keyword must be specified`);
+            }),
+            getCategories: function () {
+                return __awaiter(this, void 0, void 0, function* () {
+                    if (!categories) {
+                        categories = (yield rest.get({ url: `/categories?limit=500` })).results;
+                    }
+                    return categories;
+                });
+            },
+            getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
+                return (yield api.getCategories()).find(cat => cat.slug.en === args.slug);
+            }),
+            getProductsForCategory: (category) => __awaiter(this, void 0, void 0, function* () {
+                return (yield rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results;
+            })
+        };
+        return {
+            getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
+                return getMapper(args).mapProduct(yield api.getProduct(args));
+            }),
+            getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
+                return (yield api.getProducts(args)).map(getMapper(args).mapProduct);
+            }),
+            getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
+                let category = getMapper(args).mapCategory(yield api.getCategory(args));
+                // hydrate products into the category
+                return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(getMapper(args).mapProduct) });
+            }),
+            getMegaMenu: (args) => __awaiter(this, void 0, void 0, function* () {
+                // for the megaMenu, only get categories that have their slugs in 'cats'
+                let categories = (yield api.getCategories()).filter(cat => cats.includes(cat.slug.en));
+                return categories.map(getMapper(args).mapCategory);
+            }),
+            getCustomerGroups: (args) => __awaiter(this, void 0, void 0, function* () {
+                return [];
+            })
+        };
     },
     canUseConfiguration: function (config) {
         return config.project && config.client_id && config.client_secret && config.auth_url && config.api_url && config.scope;

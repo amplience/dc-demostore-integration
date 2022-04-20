@@ -1,46 +1,14 @@
 import _ from 'lodash'
-import { Codec, registerCodec } from '../../../codec'
+import { Codec, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
 import { Attribute, CommerceToolsCodecConfiguration, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
-let rest: OAuthRestClientInterface
 
 // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
 let categories: CTCategory[]
-
-const api: any = {
-    getProduct: async (args: GetCommerceObjectArgs): Promise<CTProduct> => {
-        if (args.id) {
-            return _.first((await rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results)
-        }
-        throw new Error(`getProduct(): id must be specified`)
-    },
-    getProducts: async (args: GetProductsArgs): Promise<CTProduct[]> => {
-        if (args.productIds) {
-            let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',')
-            return (await rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results
-        }
-        else if (args.keyword) {
-            return (await rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results
-        }
-        throw new Error(`getProducts(): productIds or keyword must be specified`)
-    },
-    getCategories: async function (): Promise<CTCategory[]> {
-        if (!categories) {
-            categories = (await rest.get({ url: `/categories?limit=500` })).results
-        }
-        return categories
-    },
-    getCategory: async (args: GetCommerceObjectArgs): Promise<CTCategory> => {
-        return (await api.getCategories()).find(cat => cat.slug.en === args.slug)
-    },
-    getProductsForCategory: async (category: Category): Promise<CTProduct[]> => {
-        return (await rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results
-    }
-}
 
 const getMapper = (args: GetCommerceObjectArgs): any => {
     args = {
@@ -48,7 +16,8 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
         country: args.country || 'US',
         currency: args.currency || 'USD'
     }
-
+    
+    const map = () => getMapper(args)
     return {
         findPrice: (variant: CTVariant): string => {
             let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
@@ -60,9 +29,9 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
 
         mapCategory: (category: CTCategory): Category => ({
             id: category.id,
-            name: getMapper(args).localize(category.name),
-            slug: getMapper(args).localize(category.slug),
-            children: categories.filter(cat => cat.parent?.id === category.id).map(getMapper(args).mapCategory),
+            name: map().localize(category.name),
+            slug: map().localize(category.slug),
+            children: categories.filter(cat => cat.parent?.id === category.id).map(map().mapCategory),
             products: []
         }),
 
@@ -78,49 +47,78 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
                 return attribute.value.label
             }
             else if (attribute.value.label) {
-                return getMapper(args).localize(attribute.value.label)
+                return map().localize(attribute.value.label)
             }
             else {
-                return getMapper(args).localize(attribute.value)
+                return map().localize(attribute.value)
             }
         },
 
         mapProduct: (product: CTProduct): Product => ({
             ...product,
-            name: getMapper(args).localize(product.name),
-            slug: getMapper(args).localize(product.slug),
-            variants: product.variants.map((variant: CTVariant): Variant => ({
-                ...variant,
-                listPrice: getMapper(args).findPrice(variant),
-
-                // todo: get discounted price
-                salePrice: getMapper(args).findPrice(variant),
-                attributes: _.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getMapper(args).getAttributeValue))
-            })),
+            name: map().localize(product.name),
+            slug: map().localize(product.slug),
+            variants: _.isEmpty(product.variants) ? [product.masterVariant].map(map().mapVariant) : product.variants.map(map().mapVariant),
             categories: []
+        }),
+
+        mapVariant: (variant: CTVariant): Variant => ({
+            ...variant,
+            listPrice: map().findPrice(variant),
+
+            // todo: get discounted price
+            salePrice: map().findPrice(variant),
+            attributes: _.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(map().getAttributeValue))
         })
     }
 }
 
-const commerceToolsCodec: Codec = {
+const commerceToolsCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
-    getAPI: async function (config: CommerceToolsCodecConfiguration): Promise<CommerceAPI> {
-        if (!rest) {
-            rest = OAuthRestClient({
-                ...config,
-                api_url: `${config.api_url}/${config.project}`
-            })
+    getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
+        let rest = OAuthRestClient({
+            ...config,
+            api_url: `${config.api_url}/${config.project}`
+        }, {
+            grant_type: 'client_credentials'
+        }, {
+            auth: {
+                username: config.client_id,
+                password: config.client_secret
+            }
+        })
 
-            await rest.authenticate({
-                grant_type: 'client_credentials'
-            }, {
-                auth: {
-                    username: config.client_id,
-                    password: config.client_secret
+        const api: any = {
+            getProduct: async (args: GetCommerceObjectArgs): Promise<CTProduct> => {
+                if (args.id) {
+                    return _.first((await rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results)
                 }
-            })
+                throw new Error(`getProduct(): id must be specified`)
+            },
+            getProducts: async (args: GetProductsArgs): Promise<CTProduct[]> => {
+                if (args.productIds) {
+                    let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',')
+                    return (await rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results
+                }
+                else if (args.keyword) {
+                    return (await rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results
+                }
+                throw new Error(`getProducts(): productIds or keyword must be specified`)
+            },
+            getCategories: async function (): Promise<CTCategory[]> {
+                if (!categories) {
+                    categories = (await rest.get({ url: `/categories?limit=500` })).results
+                }
+                return categories
+            },
+            getCategory: async (args: GetCommerceObjectArgs): Promise<CTCategory> => {
+                return (await api.getCategories()).find(cat => cat.slug.en === args.slug)
+            },
+            getProductsForCategory: async (category: Category): Promise<CTProduct[]> => {
+                return (await rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results
+            }
         }
-
+        
         return {
             getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
                 return getMapper(args).mapProduct(await api.getProduct(args))
