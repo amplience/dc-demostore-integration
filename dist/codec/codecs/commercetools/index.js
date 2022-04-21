@@ -104,6 +104,9 @@ const commerceToolsCodec = {
             }),
             getProductsForCategory: (category) => __awaiter(this, void 0, void 0, function* () {
                 return (yield rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results;
+            }),
+            getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
+                return (yield rest.get({ url: `/customer-groups` })).results;
             })
         };
         return {
@@ -124,7 +127,7 @@ const commerceToolsCodec = {
                 return categories.map(getMapper(args).mapCategory);
             }),
             getCustomerGroups: (args) => __awaiter(this, void 0, void 0, function* () {
-                return [];
+                return yield api.getCustomerGroups();
             })
         };
     },

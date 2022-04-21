@@ -33,6 +33,7 @@ Takes its product catalog, category structure, and translation data from URLs sp
 {
     "productURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/products.json",
     "categoryURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/categories.json",
+    "customerGroupURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/customerGroups.json",
     "translationsURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json"
 }
 ```

@@ -55,7 +55,8 @@ const epCodec = {
             }),
             getProductsByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
             getChildrenByHierarchyId: (id) => fetch(`/pcm/hierarchies/${id}/children`),
-            getChildrenByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
+            getChildrenByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
+            getCustomerGroups: () => fetch(`/v2/flows/customer-group/entries`)
         };
         const mapper = (0, mappers_1.default)(api);
         const populateCategory = (category) => __awaiter(this, void 0, void 0, function* () {
@@ -108,7 +109,7 @@ const epCodec = {
             },
             getCustomerGroups: function () {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return [];
+                    return (yield api.getCustomerGroups()).map(mapper.mapCustomerGroup);
                 });
             }
         };

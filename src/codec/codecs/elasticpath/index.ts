@@ -6,6 +6,7 @@ import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase 
 import OAuthRestClient from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
+import { ElasticPathCustomerGroup } from './types'
 
 export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
     client_id: string
@@ -76,7 +77,8 @@ const epCodec: CommerceCodec = {
             },
             getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
             getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
-            getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
+            getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
+            getCustomerGroups: (): Promise<ElasticPathCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
         }
 
         const mapper = mappers(api)
@@ -125,7 +127,7 @@ const epCodec: CommerceCodec = {
                 return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
             },
             getCustomerGroups: async function (): Promise<CustomerGroup[]> {
-                return []
+                return (await api.getCustomerGroups()).map(mapper.mapCustomerGroup)
             }
         }
     },

@@ -8,11 +8,13 @@ import { findInMegaMenu } from '../common'
 export interface RestCommerceCodecConfig extends CodecConfiguration {
     productURL: string
     categoryURL: string
+    customerGroupURL: string
     translationsURL: string
 }
 
 let categories: Category[] = []
 let products: Product[] = []
+let customerGroups: CustomerGroup[] = []
 let translations: Dictionary<Dictionary<string>> = {}
 let api = null
 
@@ -23,6 +25,7 @@ const restCodec: CommerceCodec = {
             if (_.isEmpty(products)) {
                 products = await (await fetch(config.productURL)).json()
                 categories = await (await fetch(config.categoryURL)).json()
+                customerGroups = await (await fetch(config.customerGroupURL)).json()
                 translations = await (await fetch(config.translationsURL)).json()
             }
 
@@ -48,7 +51,10 @@ const restCodec: CommerceCodec = {
                         ...api.getProductsForCategory(category),
                         ..._.flatMap(category.children, api.getProductsForCategory)
                     ], 'slug'), 12)
-                })
+                }),
+                getCustomerGroups: (): CustomerGroup[] => {
+                    return customerGroups
+                }
             }
         }
 
@@ -81,12 +87,13 @@ const restCodec: CommerceCodec = {
                 return categories.filter(cat => !cat.parent).map(mappers.mapCategory)
             },
             getCustomerGroups: async function (): Promise<CustomerGroup[]> {
-                return []
+                await loadAPI()
+                return api.getCustomerGroups()
             }
         }
     },
     canUseConfiguration: function (config: any): boolean {
-        return config.productURL && config.categoryURL && config.translationsURL
+        return config.productURL && config.categoryURL && config.customerGroupURL && config.translationsURL
     }
 }
 

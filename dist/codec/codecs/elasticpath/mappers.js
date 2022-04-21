@@ -94,11 +94,13 @@ const mappers = (api) => {
             products: []
         });
     });
+    const mapCustomerGroup = (customerGroup) => (Object.assign(Object.assign({}, customerGroup), { name: customerGroup['group-name'] }));
     // end mappers    
     return {
         mapHierarchy,
         mapNode,
-        mapProduct
+        mapProduct,
+        mapCustomerGroup
     };
 };
 exports.default = mappers;

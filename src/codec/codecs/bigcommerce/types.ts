@@ -100,6 +100,15 @@ export interface BigCommerceProduct {
     images:                          any[];
 }
 
+export interface BigCommerceCustomerGroup {
+    id: number
+    name: string
+    category_access: any
+    discount_rules: any[]
+    is_group_for_guests: boolean
+    is_default: boolean
+}
+
 export interface CustomURL {
     url:           string;
     is_customized: boolean;
@@ -155,3 +164,4 @@ export interface BigCommerceAPI {
     getProductById: (id: string) => Promise<BigCommerceProduct>
     getProductsForCategory: (cat: Category) => Promise<BigCommerceProduct[]>
 }
+

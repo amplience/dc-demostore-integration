@@ -4,28 +4,37 @@ import axios from 'axios'
 import { Codec, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
 import { BigCommerceCodecConfiguration } from './types'
-import { mapProduct, mapCategory } from './mappers'
+import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
 import { findInMegaMenu } from '../common'
 
 const bigCommerceCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
     getAPI: (config: BigCommerceCodecConfiguration): CommerceAPI => {
-        const fetch = async (url: string): Promise<any> => (await axios.request({
-            method: 'get',
-            url,
-            baseURL: `${config.api_url}/stores/${config.store_hash}/v3/catalog`,
-            headers: {
-                'X-Auth-Token': config.api_token,
-                'Content-Type': `application/json`
+        const fetch = async (url: string): Promise<any> => {
+            let response = await axios.request({
+                method: 'get',
+                url,
+                baseURL: `${config.api_url}/stores/${config.store_hash}`,
+                headers: {
+                    'X-Auth-Token'  : config.api_token,
+                    'Accept'        : `application/json`,
+                    'Content-Type'  : `application/json`
+                }
+            })
+
+            if (url.indexOf('customer_groups') > -1) {
+                return response.data
             }
-        })).data.data
+            return response.data.data
+        }
 
         const api = {
-            getCategoryTree: () => fetch(`/categories/tree`),
-            getProducts: () => fetch(`/products`),
-            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
-            getProductById: id => fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
+            getCategoryTree: () => fetch(`/v3/catalog/categories/tree`),
+            getProducts: () => fetch(`/v3/catalog/products`),
+            searchProducts: keyword => fetch(`/v3/catalog/products?keyword=${keyword}`),
+            getProductById: id => fetch(`/v3/catalog/products/${id}?include=images,variants`),
+            getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
+            getCustomerGroups: () => fetch(`/v2/customer_groups`)
         }
 
         const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
@@ -61,7 +70,7 @@ const bigCommerceCodec: CommerceCodec = {
             },
             getMegaMenu,
             getCustomerGroups: async function (args: CommonArgs): Promise<CustomerGroup[]> {
-                return []
+                return (await api.getCustomerGroups()).map(mapCustomerGroup)
             }
         }
     },

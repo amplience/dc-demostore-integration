@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapProduct = exports.mapCategory = void 0;
+exports.mapCustomerGroup = exports.mapProduct = exports.mapCategory = void 0;
 const slugify_1 = __importDefault(require("slugify"));
 const mapCategory = (category) => {
     return {
@@ -45,3 +45,8 @@ const mapProduct = (product) => {
     };
 };
 exports.mapProduct = mapProduct;
+const mapCustomerGroup = (group) => ({
+    id: `${group.id}`,
+    name: group.name
+});
+exports.mapCustomerGroup = mapCustomerGroup;

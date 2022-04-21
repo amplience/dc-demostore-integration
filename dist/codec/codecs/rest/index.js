@@ -18,6 +18,7 @@ const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
 let categories = [];
 let products = [];
+let customerGroups = [];
 let translations = {};
 let api = null;
 const restCodec = {
@@ -27,6 +28,7 @@ const restCodec = {
             if (lodash_1.default.isEmpty(products)) {
                 products = yield (yield fetch(config.productURL)).json();
                 categories = yield (yield fetch(config.categoryURL)).json();
+                customerGroups = yield (yield fetch(config.customerGroupURL)).json();
                 translations = yield (yield fetch(config.translationsURL)).json();
             }
             api = {
@@ -49,7 +51,10 @@ const restCodec = {
                 populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(lodash_1.default.uniqBy([
                         ...api.getProductsForCategory(category),
                         ...lodash_1.default.flatMap(category.children, api.getProductsForCategory)
-                    ], 'slug'), 12) }))
+                    ], 'slug'), 12) })),
+                getCustomerGroups: () => {
+                    return customerGroups;
+                }
             };
         });
         return {
@@ -90,13 +95,14 @@ const restCodec = {
             },
             getCustomerGroups: function () {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return [];
+                    yield loadAPI();
+                    return api.getCustomerGroups();
                 });
             }
         };
     },
     canUseConfiguration: function (config) {
-        return config.productURL && config.categoryURL && config.translationsURL;
+        return config.productURL && config.categoryURL && config.customerGroupURL && config.translationsURL;
     }
 };
 exports.default = restCodec;

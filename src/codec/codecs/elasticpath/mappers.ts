@@ -1,8 +1,9 @@
-import { Product, Image } from "../../../types"
+import { Product, Image, CustomerGroup } from "../../../types"
 import { formatMoneyString } from "../../../util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
 import { AttributedProduct, ElasticPathCategory } from "."
+import { ElasticPathCustomerGroup } from "./types"
 
 const mappers = (api: any) => {
     const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> => {
@@ -92,12 +93,18 @@ const mappers = (api: any) => {
         children: await Promise.all((await api.getChildrenByHierarchyId(hierarchy.id)).map(await mapNode(hierarchy))),
         products: []
     })
+
+    const mapCustomerGroup = (customerGroup: ElasticPathCustomerGroup): CustomerGroup => ({
+        ...customerGroup,
+        name: customerGroup['group-name']
+    })
     // end mappers    
 
     return {
         mapHierarchy,
         mapNode,
-        mapProduct
+        mapProduct,
+        mapCustomerGroup
     }
 }
 

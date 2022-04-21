@@ -1,7 +1,7 @@
 import { formatMoneyString } from "../../../util"
 import slugify from "slugify"
-import { Category, Product, Variant } from "../../../types"
-import { BigCommerceCategory, BigCommerceProduct, BigCommerceVariant } from "./types"
+import { Category, CustomerGroup, Product, Variant } from "../../../types"
+import { BigCommerceCategory, BigCommerceCustomerGroup, BigCommerceProduct, BigCommerceVariant } from "./types"
 import _ from "lodash"
 
 export const mapCategory = (category: BigCommerceCategory): Category => {
@@ -42,3 +42,8 @@ export const mapProduct = (product: BigCommerceProduct): Product => {
         })
     }
 }
+
+export const mapCustomerGroup = (group: BigCommerceCustomerGroup): CustomerGroup => ({
+    id: `${group.id}`,
+    name: group.name
+})

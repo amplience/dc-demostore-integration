@@ -20,22 +20,28 @@ const bigCommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
     getAPI: (config) => {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
-            return (yield axios_1.default.request({
+            let response = yield axios_1.default.request({
                 method: 'get',
                 url,
-                baseURL: `${config.api_url}/stores/${config.store_hash}/v3/catalog`,
+                baseURL: `${config.api_url}/stores/${config.store_hash}`,
                 headers: {
                     'X-Auth-Token': config.api_token,
+                    'Accept': `application/json`,
                     'Content-Type': `application/json`
                 }
-            })).data.data;
+            });
+            if (url.indexOf('customer_groups') > -1) {
+                return response.data;
+            }
+            return response.data.data;
         });
         const api = {
-            getCategoryTree: () => fetch(`/categories/tree`),
-            getProducts: () => fetch(`/products`),
-            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
-            getProductById: id => fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`)
+            getCategoryTree: () => fetch(`/v3/catalog/categories/tree`),
+            getProducts: () => fetch(`/v3/catalog/products`),
+            searchProducts: keyword => fetch(`/v3/catalog/products?keyword=${keyword}`),
+            getProductById: id => fetch(`/v3/catalog/products/${id}?include=images,variants`),
+            getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
+            getCustomerGroups: () => fetch(`/v2/customer_groups`)
         };
         const getMegaMenu = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -74,7 +80,7 @@ const bigCommerceCodec = {
             getMegaMenu,
             getCustomerGroups: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return [];
+                    return (yield api.getCustomerGroups()).map(mappers_1.mapCustomerGroup);
                 });
             }
         };

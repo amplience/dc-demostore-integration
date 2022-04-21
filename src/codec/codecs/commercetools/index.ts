@@ -116,6 +116,9 @@ const commerceToolsCodec: CommerceCodec = {
             },
             getProductsForCategory: async (category: Category): Promise<CTProduct[]> => {
                 return (await rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results
+            },
+            getCustomerGroups: async (): Promise<CustomerGroup[]> => {
+                return (await rest.get({ url: `/customer-groups` })).results
             }
         }
         
@@ -141,7 +144,7 @@ const commerceToolsCodec: CommerceCodec = {
                 return categories.map(getMapper(args).mapCategory)
             },
             getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => {
-                return []
+                return await api.getCustomerGroups()
             }
         }
     },
