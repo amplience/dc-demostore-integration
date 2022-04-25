@@ -18,15 +18,17 @@ let customerGroups: CustomerGroup[] = []
 let translations: Dictionary<Dictionary<string>> = {}
 let api = null
 
+const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
+
 const restCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config: RestCommerceCodecConfig): CommerceAPI {
         const loadAPI = async () => {
-            if (_.isEmpty(products)) {
-                products = await (await fetch(config.productURL)).json()
-                categories = await (await fetch(config.categoryURL)).json()
-                customerGroups = await (await fetch(config.customerGroupURL)).json()
-                translations = await (await fetch(config.translationsURL)).json()
+            if (_.isEmpty(products)) { 
+                products = await fetchFromURL(config.productURL, [])
+                categories = await fetchFromURL(config.categoryURL, [])
+                customerGroups = await fetchFromURL(config.customerGroupURL, [])
+                translations = await fetchFromURL(config.translationsURL, {})
             }
 
             api = {

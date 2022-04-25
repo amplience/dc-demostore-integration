@@ -21,15 +21,16 @@ let products = [];
 let customerGroups = [];
 let translations = {};
 let api = null;
+const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 const restCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config) {
         const loadAPI = () => __awaiter(this, void 0, void 0, function* () {
             if (lodash_1.default.isEmpty(products)) {
-                products = yield (yield fetch(config.productURL)).json();
-                categories = yield (yield fetch(config.categoryURL)).json();
-                customerGroups = yield (yield fetch(config.customerGroupURL)).json();
-                translations = yield (yield fetch(config.translationsURL)).json();
+                products = yield fetchFromURL(config.productURL, []);
+                categories = yield fetchFromURL(config.categoryURL, []);
+                customerGroups = yield fetchFromURL(config.customerGroupURL, []);
+                translations = yield fetchFromURL(config.translationsURL, {});
             }
             api = {
                 getProductsForCategory: (category) => {
