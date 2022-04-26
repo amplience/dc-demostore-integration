@@ -1,11 +1,10 @@
 import { Category } from '../../../types';
-import { CodecConfiguration, CommerceCodec } from '../..';
+import { CommerceCodec } from '../..';
 import Moltin, { PriceBook, PriceBookPriceBase } from '@moltin/sdk';
-export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
+import { OAuthCodecConfiguration } from '../../../common/rest-client';
+export interface ElasticPathCommerceCodecConfig extends OAuthCodecConfiguration {
     client_id: string;
     client_secret: string;
-    api_url: string;
-    auth_url: string;
     pcm_url: string;
     catalog_name: string;
 }

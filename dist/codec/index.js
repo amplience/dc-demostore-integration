@@ -15,7 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCodec = exports.registerCodec = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const codecs = {};
-const registerCodec = (codec) => codecs[codec.SchemaURI] = codec;
+const registerCodec = (codec) => {
+    // console.log(`[ aria ] register codec ${codec.SchemaURI}`)
+    codecs[codec.SchemaURI] = codec;
+};
 exports.registerCodec = registerCodec;
 const getCodec = (config) => {
     var _a;
@@ -38,3 +41,4 @@ require("./codecs/commercetools");
 require("./codecs/sfcc");
 require("./codecs/elasticpath");
 require("./codecs/rest");
+require("./codecs/fabric");

@@ -1,7 +1,5 @@
-import { CodecConfiguration } from "../../../codec";
-export interface CommerceToolsCodecConfiguration extends CodecConfiguration {
-    auth_url: string;
-    api_url: string;
+import { OAuthCodecConfiguration } from "../../../common/rest-client";
+export interface CommerceToolsCodecConfiguration extends OAuthCodecConfiguration {
     client_id: string;
     client_secret: string;
     project: string;

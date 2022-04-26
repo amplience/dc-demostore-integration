@@ -14,11 +14,12 @@ export interface Codec {
 export interface CommerceCodec extends Codec {
     getAPI(config: CodecConfiguration): CommerceAPI;
 }
-export declare const registerCodec: (codec: Codec) => Codec;
+export declare const registerCodec: (codec: Codec) => void;
 export declare const getCodec: <T extends API>(config: CodecConfiguration) => T;
 import './codecs/bigcommerce';
 import './codecs/commercetools';
 import './codecs/sfcc';
 import './codecs/elasticpath';
 import './codecs/rest';
+import './codecs/fabric';
 import { API, CommerceAPI } from '..';

@@ -6,3 +6,7 @@ export const formatMoneyString = (money, args) => {
         currency: args.currency
     }).format(money);
 }
+
+export const isServer = (): boolean => {
+    return typeof window === 'undefined';
+}

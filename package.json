@@ -12,8 +12,7 @@
     ".": "./dist/index.js"
   },
   "dependencies": {
-    "@moltin/request": "^2.0.2",
-    "@moltin/sdk": "^11.8.4",
+    "@moltin/sdk": "^11.14.0",
     "axios": "^0.26.0",
     "crypto-js": "^4.1.1",
     "currency.js": "^2.0.4",

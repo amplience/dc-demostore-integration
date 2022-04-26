@@ -4,6 +4,7 @@ import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs
 import { formatMoneyString } from '../../../util'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
 import { Attribute, CommerceToolsCodecConfiguration, CTCategory, CTProduct, CTVariant, Localizable } from './types'
+import { findInMegaMenu } from '../common'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
@@ -76,76 +77,72 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
 const commerceToolsCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
-        let rest = OAuthRestClient({
-            ...config,
-            api_url: `${config.api_url}/${config.project}`
-        }, {
-            grant_type: 'client_credentials'
-        }, {
+        const rest = OAuthRestClient({
+            api_url: `${config.api_url}/${config.project}`,
+            auth_url: `${config.auth_url}?grant_type=client_credentials`
+        }, { }, 
+        {
             auth: {
                 username: config.client_id,
                 password: config.client_secret
             }
         })
+        const fetch = async url => (await rest.get({ url })).results
 
-        const api: any = {
-            getProduct: async (args: GetCommerceObjectArgs): Promise<CTProduct> => {
-                if (args.id) {
-                    return _.first((await rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results)
-                }
-                throw new Error(`getProduct(): id must be specified`)
-            },
-            getProducts: async (args: GetProductsArgs): Promise<CTProduct[]> => {
-                if (args.productIds) {
-                    let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',')
-                    return (await rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results
-                }
-                else if (args.keyword) {
-                    return (await rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results
-                }
-                throw new Error(`getProducts(): productIds or keyword must be specified`)
-            },
-            getCategories: async function (): Promise<CTCategory[]> {
-                if (!categories) {
-                    categories = (await rest.get({ url: `/categories?limit=500` })).results
-                }
-                return categories
-            },
-            getCategory: async (args: GetCommerceObjectArgs): Promise<CTCategory> => {
-                return (await api.getCategories()).find(cat => cat.slug.en === args.slug)
-            },
-            getProductsForCategory: async (category: Category): Promise<CTProduct[]> => {
-                return (await rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results
-            },
-            getCustomerGroups: async (): Promise<CustomerGroup[]> => {
-                return (await rest.get({ url: `/customer-groups` })).results
+        const getProductsForCategory = async (categoryId: string): Promise<CTProduct[]> => {
+            return await fetch(`/product-projections/search?filter=categories.id: subtree("${categoryId}")`)
+        }
+
+        // CommerceAPI implementation
+        const getProduct = async (args: GetCommerceObjectArgs): Promise<Product> => {
+            if (args.id) {
+                let product = _.first(await fetch(`/product-projections/search?filter=id:"${args.id}"`))
+                return getMapper(args).mapProduct(product)
+            }
+            throw new Error(`getProduct(): id must be specified`)
+        }
+
+        const getProducts = async (args: GetProductsArgs): Promise<Product[]> => {
+            let products: CTProduct[] = []
+            if (args.productIds) {
+                let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',')
+                products = await fetch(`/product-projections/search?filter=id:${queryIds}`)
+            }
+            else if (args.keyword) {
+                products = await fetch(`/product-projections/search?text.en="${args.keyword}"`)
+            }
+            return products.map(getMapper(args).mapProduct)
+        }
+
+        const getCategory = async (args: GetCommerceObjectArgs): Promise<Category> => {
+            let category = findInMegaMenu(await getMegaMenu(args), args.slug)
+
+            // hydrate products into the category
+            return {
+                ...category,
+                products: (await getProductsForCategory(category.id)).map(getMapper(args).mapProduct)
             }
         }
-        
-        return {
-            getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
-                return getMapper(args).mapProduct(await api.getProduct(args))
-            },
-            getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
-                return (await api.getProducts(args)).map(getMapper(args).mapProduct)
-            },
-            getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
-                let category = getMapper(args).mapCategory(await api.getCategory(args))
 
-                // hydrate products into the category
-                return {
-                    ...category,
-                    products: (await api.getProductsForCategory(category)).map(getMapper(args).mapProduct)
-                }
-            },
-            getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
-                // for the megaMenu, only get categories that have their slugs in 'cats'
-                let categories = (await api.getCategories()).filter(cat => cats.includes(cat.slug.en))
-                return categories.map(getMapper(args).mapCategory)
-            },
-            getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => {
-                return await api.getCustomerGroups()
+        const getMegaMenu = async (args: CommonArgs): Promise<Category[]> => {
+            // for the megaMenu, only get categories that have their slugs in 'cats'
+            if (!categories) {
+                categories = await fetch(`/categories?limit=500`)
             }
+            return categories.filter(cat => cats.includes(cat.slug.en)).map(getMapper(args).mapCategory)
+        }
+
+        const getCustomerGroups = async (): Promise<CustomerGroup[]> => {
+            return await fetch(`/customer-groups`)
+        }
+        // end CommerceAPI
+
+        return {
+            getProduct,
+            getProducts,
+            getMegaMenu,
+            getCategory,
+            getCustomerGroups
         }
     },
     canUseConfiguration: function (config: any): boolean {

@@ -1,14 +1,15 @@
+import { CodecConfiguration } from './codec';
 import CryptKeeper from './common/crypt-keeper';
 import OAuthRestClient from './common/rest-client';
 import { flattenCategories } from './codec/codecs/common';
-import { DemoStoreConfiguration, Category, Product, CustomerGroup, CommonArgs, GetCommerceObjectArgs, GetProductsArgs } from './types';
+import middleware, { getResponse } from './middleware/api';
+import { isServer } from './util';
 export * from './types';
 export * from './codec';
 export * from './common/paginator';
-export { CryptKeeper };
-export { OAuthRestClient };
-export { flattenCategories };
+export { isServer, middleware, getResponse, CryptKeeper, OAuthRestClient, flattenCategories };
 import { SFCCCodecConfiguration } from './codec/codecs/sfcc';
+import { GetCommerceObjectArgs, GetProductsArgs, CommonArgs, CustomerGroup, DemoStoreConfiguration, Product, Category } from './types';
 export { SFCCCodecConfiguration };
 export declare class API {
 }
@@ -20,5 +21,8 @@ export declare class CommerceAPI extends API {
     getCustomerGroups: (args: CommonArgs) => Promise<CustomerGroup[]>;
 }
 export declare const getConfig: (configLocator: string) => Promise<DemoStoreConfiguration>;
-export declare const getCommerceAPI: (configLocator: string) => Promise<CommerceAPI>;
+export declare type ConfigLocatorBlock = {
+    config_locator: string;
+};
+export declare const getCommerceAPI: (config: string | ConfigLocatorBlock | CodecConfiguration) => Promise<CommerceAPI>;
 export declare const getCommerceAPIFromConfig: (config: object) => Promise<CommerceAPI>;

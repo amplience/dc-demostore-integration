@@ -15,20 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OAuthRestClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../util");
-const qs_1 = __importDefault(require("qs"));
-const cache = {};
-const OAuthRestClient = ({ api_url, auth_url }, payload, config = {}) => {
+const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
-        let response = yield axios_1.default.post(auth_url, qs_1.default.stringify(payload), config);
-        const auth = response.data;
-        authenticatedAxios = axios_1.default.create({
-            baseURL: api_url,
-            headers: {
-                Authorization: `${auth.token_type} ${auth.access_token}`
+        if (!authenticatedAxios) {
+            console.log(`[ aria ] oauth authenticate: ${config.auth_url}`);
+            let response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
+            const auth = response.data;
+            if (!getHeaders) {
+                getHeaders = (auth) => ({
+                    Authorization: `${auth.token_type} ${auth.access_token}`
+                });
             }
-        });
-        setTimeout(() => { authenticate(); }, auth.expires_in * 999);
+            authenticatedAxios = axios_1.default.create({
+                baseURL: config.api_url,
+                headers: getHeaders(auth)
+            });
+            setTimeout(() => { authenticate(); }, auth.expires_in * 999);
+        }
         return authenticatedAxios;
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {

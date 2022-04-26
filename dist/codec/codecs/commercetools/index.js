@@ -16,6 +16,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
+const common_1 = require("../common");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
 let categories;
@@ -66,69 +67,60 @@ const getMapper = (args) => {
 const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config) {
-        let rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { api_url: `${config.api_url}/${config.project}` }), {
-            grant_type: 'client_credentials'
-        }, {
+        const rest = (0, rest_client_1.default)({
+            api_url: `${config.api_url}/${config.project}`,
+            auth_url: `${config.auth_url}?grant_type=client_credentials`
+        }, {}, {
             auth: {
                 username: config.client_id,
                 password: config.client_secret
             }
         });
-        const api = {
-            getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
-                if (args.id) {
-                    return lodash_1.default.first((yield rest.get({ url: `/product-projections/search?filter=id:"${args.id}"` })).results);
-                }
-                throw new Error(`getProduct(): id must be specified`);
-            }),
-            getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
-                if (args.productIds) {
-                    let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',');
-                    return (yield rest.get({ url: `/product-projections/search?filter=id:${queryIds}` })).results;
-                }
-                else if (args.keyword) {
-                    return (yield rest.get({ url: `/product-projections/search?text.en="${args.keyword}"` })).results;
-                }
-                throw new Error(`getProducts(): productIds or keyword must be specified`);
-            }),
-            getCategories: function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (!categories) {
-                        categories = (yield rest.get({ url: `/categories?limit=500` })).results;
-                    }
-                    return categories;
-                });
-            },
-            getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
-                return (yield api.getCategories()).find(cat => cat.slug.en === args.slug);
-            }),
-            getProductsForCategory: (category) => __awaiter(this, void 0, void 0, function* () {
-                return (yield rest.get({ url: `/product-projections/search?filter=categories.id: subtree("${category.id}")` })).results;
-            }),
-            getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
-                return (yield rest.get({ url: `/customer-groups` })).results;
-            })
-        };
+        const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return (yield rest.get({ url })).results; });
+        const getProductsForCategory = (categoryId) => __awaiter(this, void 0, void 0, function* () {
+            return yield fetch(`/product-projections/search?filter=categories.id: subtree("${categoryId}")`);
+        });
+        // CommerceAPI implementation
+        const getProduct = (args) => __awaiter(this, void 0, void 0, function* () {
+            if (args.id) {
+                let product = lodash_1.default.first(yield fetch(`/product-projections/search?filter=id:"${args.id}"`));
+                return getMapper(args).mapProduct(product);
+            }
+            throw new Error(`getProduct(): id must be specified`);
+        });
+        const getProducts = (args) => __awaiter(this, void 0, void 0, function* () {
+            let products = [];
+            if (args.productIds) {
+                let queryIds = args.productIds.split(',').map(id => `"${id}"`).join(',');
+                products = yield fetch(`/product-projections/search?filter=id:${queryIds}`);
+            }
+            else if (args.keyword) {
+                products = yield fetch(`/product-projections/search?text.en="${args.keyword}"`);
+            }
+            return products.map(getMapper(args).mapProduct);
+        });
+        const getCategory = (args) => __awaiter(this, void 0, void 0, function* () {
+            let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug);
+            // hydrate products into the category
+            return Object.assign(Object.assign({}, category), { products: (yield getProductsForCategory(category.id)).map(getMapper(args).mapProduct) });
+        });
+        const getMegaMenu = (args) => __awaiter(this, void 0, void 0, function* () {
+            // for the megaMenu, only get categories that have their slugs in 'cats'
+            if (!categories) {
+                categories = yield fetch(`/categories?limit=500`);
+            }
+            return categories.filter(cat => cats.includes(cat.slug.en)).map(getMapper(args).mapCategory);
+        });
+        const getCustomerGroups = () => __awaiter(this, void 0, void 0, function* () {
+            return yield fetch(`/customer-groups`);
+        });
+        // end CommerceAPI
         return {
-            getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
-                return getMapper(args).mapProduct(yield api.getProduct(args));
-            }),
-            getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
-                return (yield api.getProducts(args)).map(getMapper(args).mapProduct);
-            }),
-            getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
-                let category = getMapper(args).mapCategory(yield api.getCategory(args));
-                // hydrate products into the category
-                return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(getMapper(args).mapProduct) });
-            }),
-            getMegaMenu: (args) => __awaiter(this, void 0, void 0, function* () {
-                // for the megaMenu, only get categories that have their slugs in 'cats'
-                let categories = (yield api.getCategories()).filter(cat => cats.includes(cat.slug.en));
-                return categories.map(getMapper(args).mapCategory);
-            }),
-            getCustomerGroups: (args) => __awaiter(this, void 0, void 0, function* () {
-                return yield api.getCustomerGroups();
-            })
+            getProduct,
+            getProducts,
+            getMegaMenu,
+            getCategory,
+            getCustomerGroups
         };
     },
     canUseConfiguration: function (config) {

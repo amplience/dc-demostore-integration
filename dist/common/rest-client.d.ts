@@ -1,12 +1,14 @@
 import { AxiosInstance, AxiosRequestConfig } from 'axios';
+import { CodecConfiguration } from '..';
 export interface OAuthRestClientInterface {
     authenticate: (payload: any, config: AxiosRequestConfig) => Promise<void>;
     get: (config: AxiosRequestConfig) => Promise<any>;
 }
-export declare const OAuthRestClient: ({ api_url, auth_url }: {
-    api_url: any;
-    auth_url: any;
-}, payload: any, config?: AxiosRequestConfig) => {
+export interface OAuthCodecConfiguration extends CodecConfiguration {
+    auth_url: string;
+    api_url: string;
+}
+export declare const OAuthRestClient: (config: OAuthCodecConfiguration, payload: any, requestConfig?: AxiosRequestConfig, getHeaders?: (auth: any) => any) => {
     authenticate: () => Promise<AxiosInstance>;
     get: (config: AxiosRequestConfig) => Promise<any>;
 };

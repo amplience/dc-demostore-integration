@@ -17,14 +17,15 @@ const __1 = require("../..");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
+const qs_1 = __importDefault(require("qs"));
 const epCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getAPI: function (config) {
-        const rest = (0, rest_client_1.default)(config, {
+        const rest = (0, rest_client_1.default)(config, qs_1.default.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
             client_secret: config.client_secret
-        });
+        }));
         let catalog = null;
         let megaMenu = null;
         const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
@@ -72,6 +73,7 @@ const epCodec = {
             }
             return yield Promise.all(products.map(yield mapper.mapProduct));
         });
+        // CommerceAPI
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
                 if (args.id) {
@@ -80,38 +82,43 @@ const epCodec = {
                 throw new Error(`getProduct(): must specify id`);
             });
         };
+        const getProducts = function (args) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (args.productIds) {
+                    return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return yield getProduct({ id }); })));
+                }
+                else if (args.keyword) {
+                    // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
+                    return [yield mapper.mapProduct(yield api.getProductBySku(args.keyword))];
+                }
+                throw new Error(`getProducts(): must specify either productIds or keyword`);
+            });
+        };
+        const getCategory = function (args) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!args.slug) {
+                    throw new Error(`getCategory(): must specify slug`);
+                }
+                return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
+            });
+        };
+        const getMegaMenu = function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                return megaMenu = megaMenu || (yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy)));
+            });
+        };
+        const getCustomerGroups = function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                return (yield api.getCustomerGroups()).map(mapper.mapCustomerGroup);
+            });
+        };
+        // end CommerceAPI
         return {
             getProduct,
-            getProducts: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (args.productIds) {
-                        return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return yield getProduct({ id }); })));
-                    }
-                    else if (args.keyword) {
-                        // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
-                        return [yield mapper.mapProduct(yield api.getProductBySku(args.keyword))];
-                    }
-                    throw new Error(`getProducts(): must specify either productIds or keyword`);
-                });
-            },
-            getCategory: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (!args.slug) {
-                        throw new Error(`getCategory(): must specify slug`);
-                    }
-                    return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
-                });
-            },
-            getMegaMenu: function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    return megaMenu = megaMenu || (yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy)));
-                });
-            },
-            getCustomerGroups: function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    return (yield api.getCustomerGroups()).map(mapper.mapCustomerGroup);
-                });
-            }
+            getProducts,
+            getCategory,
+            getMegaMenu,
+            getCustomerGroups
         };
     },
     canUseConfiguration: function (config) {

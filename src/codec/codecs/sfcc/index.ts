@@ -4,10 +4,9 @@ import axios from 'axios'
 import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, QueryContext } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
+import { OAuthCodecConfiguration } from '../../../common/rest-client'
 
-export interface SFCCCodecConfiguration extends CodecConfiguration {
-    api_url: string
-    auth_url: string
+export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     api_token: string
     site_id: string
     client_id: string
@@ -17,24 +16,28 @@ export interface SFCCCodecConfiguration extends CodecConfiguration {
 const sfccCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
-        const fetch = async (url: string): Promise<any> => (await axios.request({
-            method: 'get',
-            url,
-            baseURL: config.api_url,
-            params: {
-                client_id: config.client_id
-            }
-        })).data
+        const fetch = async (url: string): Promise<any> => {
+            console.log(`fetch ${config.api_url}${url}&client_id=${config.client_id}`)
+            return (await axios.get(url, {
+                baseURL: config.api_url,
+                params: {
+                    client_id: config.client_id
+                }
+            })).data
+        }
 
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
-        let rest = OAuthRestClient(config, {
-            grant_type: 'client_credentials'
-        }, {
-            headers: {
-                Authorization: 'Basic ' + config.api_token,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
+        let rest = OAuthRestClient({
+            ...config,
+            auth_url: `${config.auth_url}?grant_type=client_credentials`
+        },
+            {},
+            {
+                headers: {
+                    Authorization: 'Basic ' + config.api_token,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
         const authenticatedFetch = async url => (await rest.get({ url })).data
         // end authenticated fetch
 

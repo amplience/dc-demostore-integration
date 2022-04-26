@@ -1,7 +1,6 @@
-import { CodecConfiguration, CommerceCodec } from '../../../codec';
-export interface SFCCCodecConfiguration extends CodecConfiguration {
-    api_url: string;
-    auth_url: string;
+import { CommerceCodec } from '../../../codec';
+import { OAuthCodecConfiguration } from '../../../common/rest-client';
+export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     api_token: string;
     site_id: string;
     client_id: string;

@@ -1,4 +1,4 @@
-export interface ElasticPathCustomerGroup {
+export interface EPCustomerGroup {
     id: string;
     type: string;
     "group-name": string;

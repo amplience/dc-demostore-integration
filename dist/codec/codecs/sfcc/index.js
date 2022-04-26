@@ -19,9 +19,8 @@ const sfccCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config) => {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
-            return (yield axios_1.default.request({
-                method: 'get',
-                url,
+            console.log(`fetch ${config.api_url}${url}&client_id=${config.client_id}`);
+            return (yield axios_1.default.get(url, {
                 baseURL: config.api_url,
                 params: {
                     client_id: config.client_id
@@ -29,9 +28,7 @@ const sfccCodec = {
             })).data;
         });
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
-        let rest = (0, index_1.OAuthRestClient)(config, {
-            grant_type: 'client_credentials'
-        }, {
+        let rest = (0, index_1.OAuthRestClient)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
             headers: {
                 Authorization: 'Basic ' + config.api_token,
                 'Content-Type': 'application/x-www-form-urlencoded'

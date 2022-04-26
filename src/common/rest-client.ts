@@ -1,39 +1,42 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import { sleep } from '../util'
 import { Dictionary } from 'lodash'
-import qs from 'qs'
 import _ from 'lodash'
-
-interface OAuthAuthorization {
-    access_token: string
-    expires: number
-    token_type: string
-    identifier: string
-    expires_in: number
-}
-
-const cache: Dictionary<AxiosResponse> = {}
+import { CodecConfiguration } from '..'
 
 export interface OAuthRestClientInterface {
     authenticate: (payload: any, config: AxiosRequestConfig) => Promise<void>
     get: (config: AxiosRequestConfig) => Promise<any>
 }
 
-export const OAuthRestClient = ({ api_url, auth_url }, payload: any, config: AxiosRequestConfig = {}) => {
+export interface OAuthCodecConfiguration extends CodecConfiguration {
+    auth_url: string
+    api_url: string
+}
+
+export const OAuthRestClient = (config: OAuthCodecConfiguration, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any) => {
     let authenticatedAxios: AxiosInstance
 
     const authenticate = async () => {
-        let response = await axios.post(auth_url, qs.stringify(payload), config)
-        const auth = response.data
+        if (!authenticatedAxios) {
+            console.log(`[ aria ] oauth authenticate: ${config.auth_url}`)
 
-        authenticatedAxios = axios.create({
-            baseURL: api_url,
-            headers: {
-                Authorization: `${auth.token_type} ${auth.access_token}`
+            let response = await axios.post(config.auth_url, payload, requestConfig)
+            const auth = response.data
+
+            if (!getHeaders) {
+                getHeaders = (auth: any) => ({
+                    Authorization: `${auth.token_type} ${auth.access_token}`
+                })
             }
-        })
 
-        setTimeout(() => { authenticate() }, auth.expires_in * 999)
+            authenticatedAxios = axios.create({
+                baseURL: config.api_url,
+                headers: getHeaders(auth)
+            })
+
+            setTimeout(() => { authenticate() }, auth.expires_in * 999)
+        }
         return authenticatedAxios
     }
 

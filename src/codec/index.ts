@@ -20,7 +20,11 @@ export interface CommerceCodec extends Codec {
 }
 
 const codecs: Dictionary<Codec> = {}
-export const registerCodec = (codec: Codec) => codecs[codec.SchemaURI] = codec
+export const registerCodec = (codec: Codec) => {
+    // console.log(`[ aria ] register codec ${codec.SchemaURI}`)
+    codecs[codec.SchemaURI] = codec
+}
+
 export const getCodec = <T extends API>(config: CodecConfiguration): T => {
     let codec: Codec = codecs[config?._meta?.schema] || _.find(Object.values(codecs), c => c.canUseConfiguration(config))
     if (!codec) {
@@ -47,4 +51,5 @@ import './codecs/commercetools'
 import './codecs/sfcc'
 import './codecs/elasticpath'
 import './codecs/rest'
+import './codecs/fabric'
 import { API, CommerceAPI, CommonArgs } from '..'

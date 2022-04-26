@@ -3,16 +3,15 @@ import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArg
 import { CodecConfiguration, Codec, registerCodec, CommerceCodec } from '../..'
 import { API, CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient from '../../../common/rest-client'
+import OAuthRestClient, { OAuthCodecConfiguration } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
-import { ElasticPathCustomerGroup } from './types'
+import qs from 'qs'
+import { EPCustomerGroup } from './types'
 
-export interface ElasticPathCommerceCodecConfig extends CodecConfiguration {
+export interface ElasticPathCommerceCodecConfig extends OAuthCodecConfiguration {
     client_id: string
     client_secret: string
-    api_url: string
-    auth_url: string
     pcm_url: string
     catalog_name: string
 }
@@ -38,11 +37,11 @@ export interface PriceBookPrice extends PriceBookPriceBase {
 const epCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
-        const rest = OAuthRestClient(config, {
+        const rest = OAuthRestClient(config, qs.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
             client_secret: config.client_secret
-        })
+        }))
 
         let catalog = null
         let megaMenu = null
@@ -78,7 +77,7 @@ const epCodec: CommerceCodec = {
             getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
             getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
             getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
-            getCustomerGroups: (): Promise<ElasticPathCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
+            getCustomerGroups: (): Promise<EPCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
         }
 
         const mapper = mappers(api)
@@ -98,6 +97,7 @@ const epCodec: CommerceCodec = {
             return await Promise.all(products.map(await mapper.mapProduct))
         }
 
+        // CommerceAPI
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
             if (args.id) {
                 return mapper.mapProduct(await api.getProductById(args.id))
@@ -105,30 +105,39 @@ const epCodec: CommerceCodec = {
             throw new Error(`getProduct(): must specify id`)
         }
 
+        const getProducts = async function (args: GetProductsArgs): Promise<Product[]> {
+            if (args.productIds) {
+                return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
+            }
+            else if (args.keyword) {
+                // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
+                return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
+            }
+            throw new Error(`getProducts(): must specify either productIds or keyword`)
+        }
+
+        const getCategory = async function (args: GetCommerceObjectArgs): Promise<Category> {
+            if (!args.slug) {
+                throw new Error(`getCategory(): must specify slug`)
+            }
+            return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
+        }
+
+        const getMegaMenu = async function (): Promise<Category[]> {
+            return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+        }
+
+        const getCustomerGroups = async function (): Promise<CustomerGroup[]> {
+            return (await api.getCustomerGroups()).map(mapper.mapCustomerGroup)
+        }
+        // end CommerceAPI
+
         return {
             getProduct,
-            getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
-                if (args.productIds) {
-                    return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
-                }
-                else if (args.keyword) {
-                    // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
-                    return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
-                }
-                throw new Error(`getProducts(): must specify either productIds or keyword`)
-            },
-            getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
-                if (!args.slug) {
-                    throw new Error(`getCategory(): must specify slug`)
-                }
-                return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
-            },
-            getMegaMenu: async function (): Promise<Category[]> {
-                return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
-            },
-            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
-                return (await api.getCustomerGroups()).map(mapper.mapCustomerGroup)
-            }
+            getProducts,
+            getCategory,
+            getMegaMenu,
+            getCustomerGroups
         }
     },
     canUseConfiguration: function (config: any): boolean {

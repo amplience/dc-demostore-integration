@@ -3,7 +3,7 @@ import { formatMoneyString } from "../../../util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
 import { AttributedProduct, ElasticPathCategory } from "."
-import { ElasticPathCustomerGroup } from "./types"
+import { EPCustomerGroup } from "./types"
 
 const mappers = (api: any) => {
     const mapProduct = async (skeletonProduct: AttributedProduct): Promise<Product> => {
@@ -94,7 +94,7 @@ const mappers = (api: any) => {
         products: []
     })
 
-    const mapCustomerGroup = (customerGroup: ElasticPathCustomerGroup): CustomerGroup => ({
+    const mapCustomerGroup = (customerGroup: EPCustomerGroup): CustomerGroup => ({
         ...customerGroup,
         name: customerGroup['group-name']
     })
