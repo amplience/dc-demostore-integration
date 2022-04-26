@@ -22,4 +22,5 @@ import './codecs/sfcc';
 import './codecs/elasticpath';
 import './codecs/rest';
 import './codecs/fabric';
+import './codecs/hybris';
 import { API, CommerceAPI } from '..';

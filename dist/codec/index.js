@@ -42,3 +42,4 @@ require("./codecs/sfcc");
 require("./codecs/elasticpath");
 require("./codecs/rest");
 require("./codecs/fabric");
+require("./codecs/hybris");
