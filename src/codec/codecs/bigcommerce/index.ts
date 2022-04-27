@@ -1,15 +1,24 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, CommerceCodec, registerCodec } from '../../../codec'
+import { Codec, CommerceCodec, registerCodec, CodecConfiguration } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
-import { BigCommerceCodecConfiguration } from './types'
 import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
 import { findInMegaMenu } from '../common'
+
+export interface BigCommerceCodecConfiguration extends CodecConfiguration {
+    api_url: string
+    api_token: string
+    store_hash: string
+}
 
 const bigCommerceCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
     getAPI: (config: BigCommerceCodecConfiguration): CommerceAPI => {
+        if (!config.store_hash) {
+            return null
+        }
+
         const fetch = async (url: string): Promise<any> => {
             let response = await axios.request({
                 method: 'get',
@@ -73,9 +82,6 @@ const bigCommerceCodec: CommerceCodec = {
                 return (await api.getCustomerGroups()).map(mapCustomerGroup)
             }
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.api_url && config.api_token && config.store_hash
     }
 }
 

@@ -1,21 +1,21 @@
-export interface CodecConfiguration {
+export declare type CodecConfiguration = {
     _meta?: {
         deliveryKey?: string;
         deliveryId: string;
         schema: string;
     };
     locator?: string;
-}
+};
 export interface Codec {
     SchemaURI: string;
     getAPI(config: CodecConfiguration): any;
-    canUseConfiguration(config: CodecConfiguration): boolean;
 }
 export interface CommerceCodec extends Codec {
     getAPI(config: CodecConfiguration): CommerceAPI;
 }
+export declare const getCodecs: () => Codec[];
 export declare const registerCodec: (codec: Codec) => void;
-export declare const getCodec: <T extends API>(config: CodecConfiguration) => T;
+export declare const getCodec: (config: CodecConfiguration) => API;
 import './codecs/bigcommerce';
 import './codecs/commercetools';
 import './codecs/sfcc';

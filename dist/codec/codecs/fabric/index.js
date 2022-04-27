@@ -21,6 +21,9 @@ let megaMenu;
 const fabricCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
     getAPI: function (config) {
+        if (!config.username) {
+            return null;
+        }
         const rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `https://sandbox.copilot.fabric.inc/api-identity/auth/local/login` }), {
             username: config.username,
             password: config.password,
@@ -49,8 +52,8 @@ const fabricCodec = {
         };
         const getProductsForCategory = function (category) {
             return __awaiter(this, void 0, void 0, function* () {
-                let skus = lodash_1.default.take(lodash_1.default.get(yield fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 12);
-                return yield getProducts({ productIds: skus.join(',') });
+                let skus = lodash_1.default.take(lodash_1.default.get(yield fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 20);
+                return lodash_1.default.isEmpty(skus) ? [] : yield getProducts({ productIds: skus.join(',') });
             });
         };
         const mapCategory = (category) => ({
@@ -72,8 +75,8 @@ const fabricCodec = {
                 categories: [],
                 variants: [{
                         sku: product.sku,
-                        listPrice: '$0.00',
-                        salePrice: '$0.00',
+                        listPrice: '--',
+                        salePrice: '--',
                         images: [
                             { url: getAttributeValue('Image 1') },
                             ...JSON.parse(getAttributeValue('ImageArray'))
@@ -128,9 +131,6 @@ const fabricCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.username && config.password && config.accountId;
     }
 };
 exports.default = fabricCodec;

@@ -14,6 +14,36 @@ export const mapCategory = (category: BigCommerceCategory): Category => {
     }
 }
 
+export const mapVariant = (variant: BigCommerceVariant, product: BigCommerceProduct): Variant => {
+    return {
+        sku: `${variant.sku}`,
+        listPrice: formatMoneyString(variant.calculated_price, { currency: 'USD' }),
+        salePrice: formatMoneyString(variant.sale_price, { currency: 'USD' }),
+        // attributesx: variant.option_values.map(opt => ({
+        //     name: opt.option_display_name.toLowerCase(),
+        //     value: opt.label
+        // })),
+        // attributes: _.keyBy(variant.option_values, ''),
+        attributes: {},
+        images: variant.image_url ? [{ url: variant.image_url }] : product.images?.map(i => ({ url: i.url_standard }))
+    }
+}
+
+export const mapVariantProduct = (product: BigCommerceProduct): Variant => {
+    return {
+        sku: `${product.sku}`,
+        listPrice: formatMoneyString(product.calculated_price, { currency: 'USD' }),
+        salePrice: formatMoneyString(product.sale_price, { currency: 'USD' }),
+        // attributesx: variant.option_values.map(opt => ({
+        //     name: opt.option_display_name.toLowerCase(),
+        //     value: opt.label
+        // })),
+        // attributes: _.keyBy(variant.option_values, ''),
+        attributes: {},
+        images: product.images?.map(i => ({ url: i.url_standard }))
+    }
+}
+
 export const mapProduct = (product: BigCommerceProduct): Product => {
     return {
         id: `${product.id}`,
@@ -22,24 +52,7 @@ export const mapProduct = (product: BigCommerceProduct): Product => {
         slug: slugify(product.name, { lower: true }),
         name: product.name,
         categories: [],
-        variants: product.variants?.map((variant: BigCommerceVariant): Variant => {
-            return {
-                sku: `${variant.id}`,
-                listPrice: `${variant.calculated_price}`,
-                salePrice: `${variant.sale_price}`,
-                // prices: {
-                //     list: formatMoneyString(variant.price || product.price),
-                //     sale: formatMoneyString(variant.sale_price || product.price)
-                // },
-                // attributesx: variant.option_values.map(opt => ({
-                //     name: opt.option_display_name.toLowerCase(),
-                //     value: opt.label
-                // })),
-                // attributes: _.keyBy(variant.option_values, ''),
-                attributes: {},
-                images: variant.image_url ? [{ url: variant.image_url }] : product.images.map(i => ({ url: i.url_standard }))
-            }
-        })
+        variants: product.variants?.map(variant => mapVariant(variant, product)) || [mapVariantProduct(product)]
     }
 }
 

@@ -12,26 +12,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCodec = exports.registerCodec = void 0;
+exports.getCodec = exports.registerCodec = exports.getCodecs = void 0;
 const lodash_1 = __importDefault(require("lodash"));
-const codecs = {};
+const codecs = [];
+const getCodecs = () => {
+    return codecs;
+};
+exports.getCodecs = getCodecs;
 const registerCodec = (codec) => {
     // console.log(`[ aria ] register codec ${codec.SchemaURI}`)
-    codecs[codec.SchemaURI] = codec;
+    if (!codecs.includes(codec)) {
+        codecs.push(codec);
+    }
 };
 exports.registerCodec = registerCodec;
 const getCodec = (config) => {
-    var _a;
-    let codec = codecs[(_a = config === null || config === void 0 ? void 0 : config._meta) === null || _a === void 0 ? void 0 : _a.schema] || lodash_1.default.find(Object.values(codecs), c => c.canUseConfiguration(config));
+    // let codec: Codec = codecs[config?._meta?.schema] || _.find(Object.values(codecs), c => c.canUseConfiguration(config))
+    let codec = lodash_1.default.find(codecs, c => !!c.getAPI(config));
     if (!codec) {
         throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
     let api = codec.getAPI(config);
     lodash_1.default.each(api, (method, key) => {
-        // apply default arguments for those not provided in the query
-        api[key] = (args) => __awaiter(void 0, void 0, void 0, function* () {
-            return yield method(Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
-        });
+        if (typeof api[key] === 'function') {
+            // apply default arguments for those not provided in the query
+            api[key] = (args) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield method(Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
+            });
+        }
     });
     return api;
 };

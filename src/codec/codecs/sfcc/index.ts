@@ -16,6 +16,10 @@ export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
 const sfccCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
+        if (!config.api_token) {
+            return null
+        }
+
         const fetch = async (url: string): Promise<any> => {
             console.log(`fetch ${config.api_url}${url}&client_id=${config.client_id}`)
             return (await axios.get(url, {
@@ -100,9 +104,6 @@ const sfccCodec: CommerceCodec = {
                 return await api.getCustomerGroups()
             }
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.client_id && config.client_secret && config.site_id && config.auth_url && config.api_url && config.api_token
     }
 }
 

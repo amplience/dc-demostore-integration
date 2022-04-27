@@ -29,6 +29,9 @@ let megaMenu;
 const hybrisCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/hybris',
     getAPI: function (config) {
+        if (!config.catalog_id) {
+            return null;
+        }
         const rest = axios_1.default.create({
             baseURL: `${config.api_url}/occ/v2/${config.catalog_id}`
         });
@@ -81,9 +84,6 @@ const hybrisCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.api_url && config.catalog_id;
     }
 };
 exports.default = hybrisCodec;

@@ -42,6 +42,7 @@ export const OAuthRestClient = (config: OAuthCodecConfiguration, payload: any, r
 
     const get = async (config: AxiosRequestConfig): Promise<any> => {
         try {
+            // console.log(`[ rest ] get ${config.url}`)
             authenticatedAxios = authenticatedAxios || await authenticate()
             return await (await authenticatedAxios.get(config.url, config)).data
         } catch (error: any) {

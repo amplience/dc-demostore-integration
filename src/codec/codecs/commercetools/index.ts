@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Codec, CommerceCodec, registerCodec } from '../../../codec'
+import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
 import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
@@ -17,76 +17,92 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
         country: args.country || 'US',
         currency: args.currency || 'USD'
     }
-    
-    const map = () => getMapper(args)
-    return {
-        findPrice: (variant: CTVariant): string => {
-            let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
-                variant.prices.find(price => price.value.currencyCode === args.currency) ||
-                _.first(variant.prices)
 
+    const findPrice = (variant: CTVariant): string => {
+        let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
+            variant.prices.find(price => price.value.currencyCode === args.currency) ||
+            _.first(variant.prices)
+
+        if (!price) {
+            return '--'
+        }
+        else {
             return formatMoneyString((price.value.centAmount / Math.pow(10, price.value.fractionDigits)), args)
-        },
+        }
+    }
 
-        mapCategory: (category: CTCategory): Category => ({
-            id: category.id,
-            name: map().localize(category.name),
-            slug: map().localize(category.slug),
-            children: categories.filter(cat => cat.parent?.id === category.id).map(map().mapCategory),
-            products: []
-        }),
+    const mapCategory = (category: CTCategory): Category => ({
+        id: category.id,
+        name: localize(category.name),
+        slug: localize(category.slug),
+        children: categories.filter(cat => cat.parent?.id === category.id).map(mapCategory),
+        products: []
+    })
 
-        localize: (localizable: Localizable): string => {
-            return localizable[args.language] || localizable.en
-        },
+    const localize = (localizable: Localizable): string => {
+        return localizable[args.language] || localizable.en
+    }
 
-        getAttributeValue: (attribute: Attribute): string => {
-            if (typeof attribute.value === 'string') {
-                return attribute.value
-            }
-            else if (typeof attribute.value.label === 'string') {
-                return attribute.value.label
-            }
-            else if (attribute.value.label) {
-                return map().localize(attribute.value.label)
-            }
-            else {
-                return map().localize(attribute.value)
-            }
-        },
+    const getAttributeValue = (attribute: Attribute): string => {
+        if (typeof attribute.value === 'string') {
+            return attribute.value
+        }
+        else if (typeof attribute.value.label === 'string') {
+            return attribute.value.label
+        }
+        else if (attribute.value.label) {
+            return localize(attribute.value.label)
+        }
+        else {
+            return localize(attribute.value)
+        }
+    }
 
-        mapProduct: (product: CTProduct): Product => ({
-            ...product,
-            name: map().localize(product.name),
-            slug: map().localize(product.slug),
-            variants: _.isEmpty(product.variants) ? [product.masterVariant].map(map().mapVariant) : product.variants.map(map().mapVariant),
-            categories: []
-        }),
+    const mapProduct = (product: CTProduct): Product => ({
+        id: product.id,
+        name: localize(product.name),
+        slug: localize(product.slug),
+        variants: _.isEmpty(product.variants) ? [product.masterVariant].map(mapVariant) : product.variants.map(mapVariant),
+        categories: []
+    })
 
-        mapVariant: (variant: CTVariant): Variant => ({
-            ...variant,
-            listPrice: map().findPrice(variant),
+    const mapVariant = (variant: CTVariant): Variant => ({
+        sku: variant.sku,
+        images: variant.images,
+        listPrice: findPrice(variant),
 
-            // todo: get discounted price
-            salePrice: map().findPrice(variant),
-            attributes: _.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(map().getAttributeValue))
-        })
+        // todo: get discounted price
+        salePrice: findPrice(variant),
+        attributes: _.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getAttributeValue))
+    })
+
+    return {
+        findPrice,
+        mapCategory,
+        localize,
+        getAttributeValue,
+        mapProduct,
+        mapVariant
     }
 }
 
 const commerceToolsCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
+        if (!config.scope) {
+            return null
+        }
+
         const rest = OAuthRestClient({
             api_url: `${config.api_url}/${config.project}`,
             auth_url: `${config.auth_url}?grant_type=client_credentials`
-        }, { }, 
-        {
-            auth: {
-                username: config.client_id,
-                password: config.client_secret
-            }
-        })
+        }, {},
+            {
+                auth: {
+                    username: config.client_id,
+                    password: config.client_secret
+                }
+            })
         const fetch = async url => (await rest.get({ url })).results
 
         const getProductsForCategory = async (categoryId: string): Promise<CTProduct[]> => {
@@ -144,9 +160,6 @@ const commerceToolsCodec: CommerceCodec = {
             getCategory,
             getCustomerGroups
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.project && config.client_id && config.client_secret && config.auth_url && config.api_url && config.scope
     }
 }
 

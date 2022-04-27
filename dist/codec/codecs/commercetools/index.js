@@ -26,47 +26,71 @@ const getMapper = (args) => {
         country: args.country || 'US',
         currency: args.currency || 'USD'
     };
-    const map = () => getMapper(args);
-    return {
-        findPrice: (variant) => {
-            let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
-                variant.prices.find(price => price.value.currencyCode === args.currency) ||
-                lodash_1.default.first(variant.prices);
+    const findPrice = (variant) => {
+        let price = variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
+            variant.prices.find(price => price.value.currencyCode === args.currency) ||
+            lodash_1.default.first(variant.prices);
+        if (!price) {
+            return '--';
+        }
+        else {
             return (0, util_1.formatMoneyString)((price.value.centAmount / Math.pow(10, price.value.fractionDigits)), args);
-        },
-        mapCategory: (category) => ({
-            id: category.id,
-            name: map().localize(category.name),
-            slug: map().localize(category.slug),
-            children: categories.filter(cat => { var _a; return ((_a = cat.parent) === null || _a === void 0 ? void 0 : _a.id) === category.id; }).map(map().mapCategory),
-            products: []
-        }),
-        localize: (localizable) => {
-            return localizable[args.language] || localizable.en;
-        },
-        getAttributeValue: (attribute) => {
-            if (typeof attribute.value === 'string') {
-                return attribute.value;
-            }
-            else if (typeof attribute.value.label === 'string') {
-                return attribute.value.label;
-            }
-            else if (attribute.value.label) {
-                return map().localize(attribute.value.label);
-            }
-            else {
-                return map().localize(attribute.value);
-            }
-        },
-        mapProduct: (product) => (Object.assign(Object.assign({}, product), { name: map().localize(product.name), slug: map().localize(product.slug), variants: lodash_1.default.isEmpty(product.variants) ? [product.masterVariant].map(map().mapVariant) : product.variants.map(map().mapVariant), categories: [] })),
-        mapVariant: (variant) => (Object.assign(Object.assign({}, variant), { listPrice: map().findPrice(variant), 
-            // todo: get discounted price
-            salePrice: map().findPrice(variant), attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(map().getAttributeValue)) }))
+        }
+    };
+    const mapCategory = (category) => ({
+        id: category.id,
+        name: localize(category.name),
+        slug: localize(category.slug),
+        children: categories.filter(cat => { var _a; return ((_a = cat.parent) === null || _a === void 0 ? void 0 : _a.id) === category.id; }).map(mapCategory),
+        products: []
+    });
+    const localize = (localizable) => {
+        return localizable[args.language] || localizable.en;
+    };
+    const getAttributeValue = (attribute) => {
+        if (typeof attribute.value === 'string') {
+            return attribute.value;
+        }
+        else if (typeof attribute.value.label === 'string') {
+            return attribute.value.label;
+        }
+        else if (attribute.value.label) {
+            return localize(attribute.value.label);
+        }
+        else {
+            return localize(attribute.value);
+        }
+    };
+    const mapProduct = (product) => ({
+        id: product.id,
+        name: localize(product.name),
+        slug: localize(product.slug),
+        variants: lodash_1.default.isEmpty(product.variants) ? [product.masterVariant].map(mapVariant) : product.variants.map(mapVariant),
+        categories: []
+    });
+    const mapVariant = (variant) => ({
+        sku: variant.sku,
+        images: variant.images,
+        listPrice: findPrice(variant),
+        // todo: get discounted price
+        salePrice: findPrice(variant),
+        attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getAttributeValue))
+    });
+    return {
+        findPrice,
+        mapCategory,
+        localize,
+        getAttributeValue,
+        mapProduct,
+        mapVariant
     };
 };
 const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config) {
+        if (!config.scope) {
+            return null;
+        }
         const rest = (0, rest_client_1.default)({
             api_url: `${config.api_url}/${config.project}`,
             auth_url: `${config.auth_url}?grant_type=client_credentials`
@@ -122,9 +146,6 @@ const commerceToolsCodec = {
             getCategory,
             getCustomerGroups
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.project && config.client_id && config.client_secret && config.auth_url && config.api_url && config.scope;
     }
 };
 exports.default = commerceToolsCodec;

@@ -21,6 +21,9 @@ const qs_1 = __importDefault(require("qs"));
 const epCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getAPI: function (config) {
+        if (!config.pcm_url) {
+            return null;
+        }
         const rest = (0, rest_client_1.default)(config, qs_1.default.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
@@ -120,9 +123,6 @@ const epCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.client_id && config.client_secret && config.pcm_url && config.auth_url && config.api_url && config.catalog_name;
     }
 };
 exports.default = epCodec;

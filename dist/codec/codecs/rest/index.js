@@ -25,6 +25,9 @@ const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, fu
 const restCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config) {
+        if (!config.productURL) {
+            return null;
+        }
         const loadAPI = () => __awaiter(this, void 0, void 0, function* () {
             if (lodash_1.default.isEmpty(products)) {
                 products = yield fetchFromURL(config.productURL, []);
@@ -101,9 +104,6 @@ const restCodec = {
                 });
             }
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.productURL && config.categoryURL && config.customerGroupURL && config.translationsURL;
     }
 };
 exports.default = restCodec;

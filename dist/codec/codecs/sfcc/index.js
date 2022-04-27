@@ -18,6 +18,9 @@ const index_1 = require("../../../index");
 const sfccCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config) => {
+        if (!config.api_token) {
+            return null;
+        }
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
             console.log(`fetch ${config.api_url}${url}&client_id=${config.client_id}`);
             return (yield axios_1.default.get(url, {
@@ -100,9 +103,6 @@ const sfccCodec = {
                 });
             }
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.client_id && config.client_secret && config.site_id && config.auth_url && config.api_url && config.api_token;
     }
 };
 exports.default = sfccCodec;

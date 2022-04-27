@@ -38,6 +38,10 @@ let megaMenu: Category[]
 const hybrisCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/hybris',
     getAPI: function (config: HybrisCommerceCodecConfig): CommerceAPI {
+        if (!config.catalog_id) {
+            return null
+        }
+
         const rest = axios.create({
             baseURL: `${config.api_url}/occ/v2/${config.catalog_id}`
         })
@@ -88,9 +92,6 @@ const hybrisCodec: CommerceCodec = {
             getMegaMenu,
             getCustomerGroups
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.api_url && config.catalog_id
     }
 }
 

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { CommerceCodec, registerCodec } from '../..'
+import { CodecConfiguration, CommerceCodec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration } from '../../../common/rest-client'
 import slugify from 'slugify'
@@ -18,6 +18,10 @@ let megaMenu: Category[]
 const fabricCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
     getAPI: function (config: FabricCommerceCodecConfig): CommerceAPI {
+        if (!config.username) {
+            return null
+        }
+
         const rest = OAuthRestClient({
             ...config,
             auth_url: `https://sandbox.copilot.fabric.inc/api-identity/auth/local/login`
@@ -49,8 +53,8 @@ const fabricCodec: CommerceCodec = {
         }
 
         const getProductsForCategory = async function (category: Category): Promise<Product[]> {
-            let skus = _.take(_.get(await fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 12)
-            return await getProducts({ productIds: skus.join(',') })
+            let skus = _.take(_.get(await fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 20)
+            return _.isEmpty(skus) ? [] : await getProducts({ productIds: skus.join(',') })
         }
 
         const mapCategory = (category: FabricCategory): Category => ({
@@ -74,8 +78,8 @@ const fabricCodec: CommerceCodec = {
                 categories: [],
                 variants: [{
                     sku: product.sku,
-                    listPrice: '$0.00',
-                    salePrice: '$0.00',
+                    listPrice: '--',
+                    salePrice: '--',
                     images: [
                         { url: getAttributeValue('Image 1') },
                         ...JSON.parse(getAttributeValue('ImageArray'))
@@ -131,9 +135,6 @@ const fabricCodec: CommerceCodec = {
             getMegaMenu,
             getCustomerGroups
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.username && config.password && config.accountId
     }
 }
 

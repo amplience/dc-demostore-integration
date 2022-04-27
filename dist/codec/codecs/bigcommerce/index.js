@@ -19,6 +19,9 @@ const common_1 = require("../common");
 const bigCommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
     getAPI: (config) => {
+        if (!config.store_hash) {
+            return null;
+        }
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
             let response = yield axios_1.default.request({
                 method: 'get',
@@ -84,9 +87,6 @@ const bigCommerceCodec = {
                 });
             }
         };
-    },
-    canUseConfiguration: function (config) {
-        return config.api_url && config.api_token && config.store_hash;
     }
 };
 exports.default = bigCommerceCodec;

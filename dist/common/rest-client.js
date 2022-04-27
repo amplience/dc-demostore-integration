@@ -37,6 +37,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     });
     const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            // console.log(`[ rest ] get ${config.url}`)
             authenticatedAxios = authenticatedAxios || (yield authenticate());
             return yield (yield authenticatedAxios.get(config.url, config)).data;
         }

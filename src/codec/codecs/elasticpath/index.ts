@@ -37,6 +37,10 @@ export interface PriceBookPrice extends PriceBookPriceBase {
 const epCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
+        if (!config.pcm_url) {
+            return null
+        }
+
         const rest = OAuthRestClient(config, qs.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
@@ -139,9 +143,6 @@ const epCodec: CommerceCodec = {
             getMegaMenu,
             getCustomerGroups
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.client_id && config.client_secret && config.pcm_url && config.auth_url && config.api_url && config.catalog_name
     }
 }
 

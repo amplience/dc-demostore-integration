@@ -1,5 +1,3 @@
-import { CodecConfiguration } from "../../../codec";
-import { Category } from "../../../types";
 export interface BigCommerceCategory {
     id: number;
     parent_id: number;
@@ -22,45 +20,47 @@ export interface CustomURL {
     url: string;
     is_customized: boolean;
 }
-export interface BigCommerceProduct {
+export interface BigCommerceRetail {
     id: number;
-    name: string;
-    type: string;
-    sku: string;
-    description: string;
-    weight: number;
-    width: number;
-    depth: number;
-    height: number;
+    calculated_price: number;
+    sale_price: number;
     price: number;
     cost_price: number;
     retail_price: number;
-    sale_price: number;
     map_price: number;
+    sku: string;
+    weight: number;
+    width: number;
+    height: number;
+    depth: number;
+    fixed_cost_shipping_price: number;
+    is_free_shipping: boolean;
+    upc: string;
+    mpn: string;
+    gtin: string;
+    inventory_level: number;
+    inventory_warning_level: number;
+    bin_picking_number: string;
+}
+export interface BigCommerceProduct extends BigCommerceRetail {
+    name: string;
+    type: string;
+    description: string;
     tax_class_id: number;
     product_tax_code: string;
-    calculated_price: number;
     categories: number[];
     brand_id: number;
     option_set_id: number;
     option_set_display: string;
-    inventory_level: number;
-    inventory_warning_level: number;
     inventory_tracking: string;
     reviews_rating_sum: number;
     reviews_count: number;
     total_sold: number;
-    fixed_cost_shipping_price: number;
-    is_free_shipping: boolean;
     is_visible: boolean;
     is_featured: boolean;
     related_products: number[];
     warranty: string;
-    bin_picking_number: string;
     layout_file: string;
-    upc: string;
-    mpn: string;
-    gtin: string;
     search_keywords: string;
     availability: string;
     availability_description: string;
@@ -93,6 +93,16 @@ export interface BigCommerceProduct {
     variants: BigCommerceVariant[];
     images: any[];
 }
+export interface BigCommerceVariant extends BigCommerceRetail {
+    product_id: number;
+    sku_id: number;
+    calculated_weight: number;
+    purchasing_disabled: boolean;
+    purchasing_disabled_message: string;
+    image_url: string;
+    cost_price: number;
+    option_values: OptionValue[];
+}
 export interface BigCommerceCustomerGroup {
     id: number;
     name: string;
@@ -101,54 +111,9 @@ export interface BigCommerceCustomerGroup {
     is_group_for_guests: boolean;
     is_default: boolean;
 }
-export interface CustomURL {
-    url: string;
-    is_customized: boolean;
-}
-export interface BigCommerceVariant {
-    id: number;
-    product_id: number;
-    sku: string;
-    sku_id: number;
-    price: null;
-    calculated_price: number;
-    sale_price: null;
-    retail_price: null;
-    map_price: null;
-    weight: null;
-    calculated_weight: number;
-    width: null;
-    height: null;
-    depth: null;
-    is_free_shipping: boolean;
-    fixed_cost_shipping_price: null;
-    purchasing_disabled: boolean;
-    purchasing_disabled_message: string;
-    image_url: string;
-    cost_price: number;
-    upc: string;
-    mpn: string;
-    gtin: string;
-    inventory_level: number;
-    inventory_warning_level: number;
-    bin_picking_number: string;
-    option_values: OptionValue[];
-}
 export interface OptionValue {
     id: number;
     label: string;
     option_id: number;
     option_display_name: string;
-}
-export interface BigCommerceCodecConfiguration extends CodecConfiguration {
-    api_url: string;
-    api_token: string;
-    store_hash: string;
-}
-export interface BigCommerceAPI {
-    getCategoryTree: () => Promise<BigCommerceCategory[]>;
-    getProducts: () => Promise<BigCommerceProduct[]>;
-    searchProducts: (keyword: string) => Promise<BigCommerceProduct[]>;
-    getProductById: (id: string) => Promise<BigCommerceProduct>;
-    getProductsForCategory: (cat: Category) => Promise<BigCommerceProduct[]>;
 }

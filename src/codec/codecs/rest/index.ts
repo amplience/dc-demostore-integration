@@ -23,6 +23,10 @@ const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? 
 const restCodec: CommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config: RestCommerceCodecConfig): CommerceAPI {
+        if (!config.productURL) {
+            return null
+        }
+
         const loadAPI = async () => {
             if (_.isEmpty(products)) { 
                 products = await fetchFromURL(config.productURL, [])
@@ -93,9 +97,6 @@ const restCodec: CommerceCodec = {
                 return api.getCustomerGroups()
             }
         }
-    },
-    canUseConfiguration: function (config: any): boolean {
-        return config.productURL && config.categoryURL && config.customerGroupURL && config.translationsURL
     }
 }
 
