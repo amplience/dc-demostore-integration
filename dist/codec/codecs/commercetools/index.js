@@ -88,7 +88,6 @@ const getMapper = (args) => {
 const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config) {
-        console.log(Object.keys(config).join(', '));
         if (!config.scope) {
             return null;
         }
