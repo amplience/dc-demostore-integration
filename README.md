@@ -115,7 +115,23 @@ Connects to a SalesForce Commerce Cloud instance.
 }
 ```
 
-### `fabricCodec` (in progress)
+### `hybrisCodec`
+Location: `src/codec/codecs/hybris`
+
+Schema: `https://demostore.amplience.com/site/integration/hybris`
+
+Connects to an SAP/Hybris instance.
+
+#### Configuration
+
+```
+{
+    "api_url": "<api base URL>",
+    "catalog_id": "<catalog id>"
+}
+```
+
+### `fabricCodec`
 Location: `src/codec/codecs/fabric`
 
 Schema: `https://demostore.amplience.com/site/integration/fabric`
