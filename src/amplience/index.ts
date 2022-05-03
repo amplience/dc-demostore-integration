@@ -3,38 +3,32 @@ import { DemoStoreConfiguration } from '../types'
 import { ContentItem } from 'dc-management-sdk-js'
 import { CryptKeeper } from '..'
 
-export class AmplienceClient {
-    hub: string
-    environment: string
+const getContentItem = async (hub: string, args: any): Promise<ContentItem> => {
+    let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
+    let response = await fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
+    return response.status === 200 ? CryptKeeper((await response.json()).content, hub).decryptAll() : null
+}
 
-    constructor(key: string) {
-        this.hub = key.split(':')[0]
-        this.environment = key.split(':')[1]
+const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> => {
+    let [hub, lookup] = key.split(':')
+
+    // look up aria/env as a fallback to demostore/config for backward compatibility
+    let obj: any = await getContentItem(hub, { key: `demostore/config/${lookup}` }) ||
+        await getContentItem(hub, { key: `aria/env/${lookup}` })
+
+    if (!obj) {
+        throw `[ demostore ] Couldn't find config with key '${key}'`
     }
 
-    toString(): string {
-        return [this.hub, this.environment].join(':')
-    }
+    obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
+    obj.cms.hubs = _.keyBy(obj.cms.hubs, 'key')
+    obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
+    obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
+    obj.locator = key
 
-    async getContentItem(args: any): Promise<ContentItem> {
-        let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
-        let response = await fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
-        let content = (await response.json()).content
-        return CryptKeeper(content, this.toString()).decryptAll()
-    }
+    return obj as DemoStoreConfiguration
+}
 
-    async getConfig(): Promise<DemoStoreConfiguration> {
-        let obj: any = await this.getContentItem({ key: `aria/env/${this.environment}` })
-        if (!obj) {
-            throw `[ aria ] Couldn't find config with key '${this.toString()}'`
-        }
-
-        obj.commerce = obj.commerce && await this.getContentItem({ id: obj.commerce.id })
-        obj.cms.hubs = _.keyBy(obj.cms.hubs, 'key')
-        obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
-        obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
-        obj.locator = this.toString()
-
-        return obj as DemoStoreConfiguration
-    }
+export {
+    getDemoStoreConfig
 }

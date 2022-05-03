@@ -1,8 +1,7 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
-import { Category, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, QueryContext } from '../../../index'
+import { Category, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
 import { OAuthCodecConfiguration } from '../../../common/rest-client'
 
@@ -13,7 +12,7 @@ export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     client_secret: string
 }
 
-const sfccCodec: CommerceCodec = {
+const sfccCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
     getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
         if (!config.api_token) {
@@ -106,6 +105,4 @@ const sfccCodec: CommerceCodec = {
         }
     }
 }
-
 export default sfccCodec
-registerCodec(sfccCodec)

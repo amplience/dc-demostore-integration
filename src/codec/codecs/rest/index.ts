@@ -1,16 +1,56 @@
 import _, { Dictionary } from 'lodash'
-import { Product, Category, QueryContext, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
 import { CodecConfiguration, Codec, registerCodec, CommerceCodec } from '../..'
-import { CommerceAPI } from '../../..'
+import { CommerceAPI, Config } from '../../..'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 
-export interface RestCommerceCodecConfig extends CodecConfiguration {
-    productURL: string
-    categoryURL: string
-    customerGroupURL: string
-    translationsURL: string
+type ConfigObject = {
+    type: string
+    title: string
+    description: string
 }
+
+type RestCommerceCodecConfigObject = {
+    productURL: ConfigObject
+    categoryURL: ConfigObject
+    customerGroupURL: ConfigObject
+    translationsURL: ConfigObject
+}
+
+type RestCommerceCodecConfig = {
+    [Key in keyof RestCommerceCodecConfigObject]: string
+}
+
+// let x: RestCommerceCodecConfig = {
+//     "productURL": {
+//         "type": "string",
+//         "title": "Product URL",
+//         "description": "URL to a product JSON file"
+//     },
+//     "categoryURL": {
+//         "type": "string",
+//         "title": "Category URL",
+//         "description": "URL to a category JSON file"
+//     },
+//     "customerGroupURL": {
+//         "type": "string",
+//         "title": "Customer Group URL",
+//         "description": "URL to a customer group JSON file"
+//     },
+//     "translationsURL": {
+//         "type": "string",
+//         "title": "Translations URL",
+//         "description": "URL to a translations JSON file"
+//     }
+// }
+
+// export interface RestCommerceCodecConfig extends CodecConfiguration {
+//     productURL: string
+//     categoryURL: string
+//     customerGroupURL: string
+//     translationsURL: string
+// }
 
 let categories: Category[] = []
 let products: Product[] = []
@@ -20,7 +60,7 @@ let api = null
 
 const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
 
-const restCodec: CommerceCodec = {
+const restCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
     getAPI: function (config: RestCommerceCodecConfig): CommerceAPI {
         if (!config.productURL) {
@@ -28,7 +68,7 @@ const restCodec: CommerceCodec = {
         }
 
         const loadAPI = async () => {
-            if (_.isEmpty(products)) { 
+            if (_.isEmpty(products)) {
                 products = await fetchFromURL(config.productURL, [])
                 categories = await fetchFromURL(config.categoryURL, [])
                 customerGroups = await fetchFromURL(config.customerGroupURL, [])
@@ -99,6 +139,4 @@ const restCodec: CommerceCodec = {
         }
     }
 }
-
 export default restCodec
-registerCodec(restCodec)

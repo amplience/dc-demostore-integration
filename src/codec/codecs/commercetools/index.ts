@@ -86,7 +86,7 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
     }
 }
 
-const commerceToolsCodec: CommerceCodec = {
+const commerceToolsCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
     getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
         if (!config.scope) {
@@ -96,7 +96,8 @@ const commerceToolsCodec: CommerceCodec = {
         const rest = OAuthRestClient({
             api_url: `${config.api_url}/${config.project}`,
             auth_url: `${config.auth_url}?grant_type=client_credentials`
-        }, {},
+        },
+            {},
             {
                 auth: {
                     username: config.client_id,
@@ -162,6 +163,4 @@ const commerceToolsCodec: CommerceCodec = {
         }
     }
 }
-
 export default commerceToolsCodec
-registerCodec(commerceToolsCodec)

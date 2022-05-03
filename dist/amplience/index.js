@@ -12,38 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AmplienceClient = void 0;
+exports.getDemoStoreConfig = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("..");
-class AmplienceClient {
-    constructor(key) {
-        this.hub = key.split(':')[0];
-        this.environment = key.split(':')[1];
+const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
+    let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
+    let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
+    return response.status === 200 ? (0, __1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
+});
+const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
+    let [hub, lookup] = key.split(':');
+    // look up aria/env as a fallback to demostore/config for backward compatibility
+    let obj = (yield getContentItem(hub, { key: `demostore/config/${lookup}` })) ||
+        (yield getContentItem(hub, { key: `aria/env/${lookup}` }));
+    if (!obj) {
+        throw `[ demostore ] Couldn't find config with key '${key}'`;
     }
-    toString() {
-        return [this.hub, this.environment].join(':');
-    }
-    getContentItem(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
-            let response = yield fetch(`https://${this.hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
-            let content = (yield response.json()).content;
-            return (0, __1.CryptKeeper)(content, this.toString()).decryptAll();
-        });
-    }
-    getConfig() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let obj = yield this.getContentItem({ key: `aria/env/${this.environment}` });
-            if (!obj) {
-                throw `[ aria ] Couldn't find config with key '${this.toString()}'`;
-            }
-            obj.commerce = obj.commerce && (yield this.getContentItem({ id: obj.commerce.id }));
-            obj.cms.hubs = lodash_1.default.keyBy(obj.cms.hubs, 'key');
-            obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
-            obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
-            obj.locator = this.toString();
-            return obj;
-        });
-    }
-}
-exports.AmplienceClient = AmplienceClient;
+    obj.commerce = obj.commerce && (yield getContentItem(hub, { id: obj.commerce.id }));
+    obj.cms.hubs = lodash_1.default.keyBy(obj.cms.hubs, 'key');
+    obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
+    obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
+    obj.locator = key;
+    return obj;
+});
+exports.getDemoStoreConfig = getDemoStoreConfig;

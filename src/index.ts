@@ -2,8 +2,9 @@ import { CodecConfiguration } from './codec'
 import CryptKeeper from './common/crypt-keeper'
 import OAuthRestClient from './common/rest-client'
 import { flattenCategories } from './codec/codecs/common'
-import middleware, { getCommerceAPI, getConfig } from './middleware/api'
-import { isServer } from './util'
+import middleware, { getCommerceAPI } from './middleware/api'
+import { getDemoStoreConfig } from './amplience'
+import { isServer, sleep } from './util'
 
 export * from './types'
 export * from './codec'
@@ -12,10 +13,15 @@ export {
     isServer,
     middleware,
     getCommerceAPI,
-    getConfig,
+    getDemoStoreConfig,
+
+    // backwards compatibility
+    getDemoStoreConfig as getConfig,
+
     CryptKeeper,
     OAuthRestClient,
-    flattenCategories
+    flattenCategories,
+    sleep
 }
 
 import { GetCommerceObjectArgs, GetProductsArgs, CommonArgs, CustomerGroup, Product, Category } from './types'

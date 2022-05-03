@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const codec_1 = require("../../../codec");
 const util_1 = require("../../../util");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const common_1 = require("../common");
@@ -149,4 +148,3 @@ const commerceToolsCodec = {
     }
 };
 exports.default = commerceToolsCodec;
-(0, codec_1.registerCodec)(commerceToolsCodec);

@@ -1,24 +1,23 @@
-import { Method } from 'axios'
 import _, { Dictionary } from 'lodash'
 import { CodecConfiguration } from './codec'
 
-export class Image {
+export interface Image {
     url: string
     thumb?: string
 }
 
-export class Identifiable {
+export interface Identifiable {
     id: string
     name: string
 }
 
-export class CustomerGroup extends Identifiable {}
+export interface CustomerGroup extends Identifiable {}
 
-export class CommerceObject extends Identifiable {
+export interface CommerceObject extends Identifiable {
     slug: string
 }
 
-export class Product extends CommerceObject {
+export interface Product extends CommerceObject {
     shortDescription?: string
     longDescription?: string
     imageSetId?: string
@@ -26,7 +25,7 @@ export class Product extends CommerceObject {
     variants: Variant[]
 }
 
-export class Variant {
+export interface Variant {
     sku: string
     listPrice: string
     salePrice: string
@@ -35,31 +34,22 @@ export class Variant {
     attributes: Dictionary<string>
 }
 
-export class Category extends CommerceObject {
+export interface Category extends CommerceObject {
     parent?: Category
     image?: Image
     children: Category[]
     products: Product[]
 }
 
-export class Promotion extends Identifiable {
+export interface Promotion extends Identifiable {
     description: string
     promoCode?: string
     isActive: boolean
     image?: Image
 }
 
-export class GetAttributeArgs {
+export interface GetAttributeArgs {
     name: string
-}
-
-export interface QueryContext {
-    args: any
-    locale: string
-    language: string
-    country: string
-    currency: string
-    segment: string
 }
 
 export interface CommonArgs {
@@ -81,7 +71,7 @@ export interface GetProductsArgs extends CommonArgs {
     productIds?: string
 }
 
-export class DemoStoreConfiguration {
+export interface DemoStoreConfiguration {
     algolia?: any
     url?: string
     cms?: any

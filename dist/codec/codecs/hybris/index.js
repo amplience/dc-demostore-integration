@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("../..");
 const common_1 = require("../common");
 const axios_1 = __importDefault(require("axios"));
 const slugify_1 = __importDefault(require("slugify"));
@@ -87,4 +86,3 @@ const hybrisCodec = {
     }
 };
 exports.default = hybrisCodec;
-(0, __1.registerCodec)(hybrisCodec);
