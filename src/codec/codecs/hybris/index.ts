@@ -35,7 +35,7 @@ const mapProduct = (product: HybrisProduct): Product => ({
 })
 
 let megaMenu: Category[]
-const hybrisCodec: CommerceCodec = {
+const hybrisCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/hybris',
     getAPI: function (config: HybrisCommerceCodecConfig): CommerceAPI {
         if (!config.catalog_id) {
@@ -94,6 +94,4 @@ const hybrisCodec: CommerceCodec = {
         }
     }
 }
-
 export default hybrisCodec
-registerCodec(hybrisCodec)

@@ -1,26 +1,26 @@
 import { Dictionary } from 'lodash';
 import { CodecConfiguration } from './codec';
-export declare class Image {
+export interface Image {
     url: string;
     thumb?: string;
 }
-export declare class Identifiable {
+export interface Identifiable {
     id: string;
     name: string;
 }
-export declare class CustomerGroup extends Identifiable {
+export interface CustomerGroup extends Identifiable {
 }
-export declare class CommerceObject extends Identifiable {
+export interface CommerceObject extends Identifiable {
     slug: string;
 }
-export declare class Product extends CommerceObject {
+export interface Product extends CommerceObject {
     shortDescription?: string;
     longDescription?: string;
     imageSetId?: string;
     categories: Category[];
     variants: Variant[];
 }
-export declare class Variant {
+export interface Variant {
     sku: string;
     listPrice: string;
     salePrice: string;
@@ -28,28 +28,20 @@ export declare class Variant {
     images: Image[];
     attributes: Dictionary<string>;
 }
-export declare class Category extends CommerceObject {
+export interface Category extends CommerceObject {
     parent?: Category;
     image?: Image;
     children: Category[];
     products: Product[];
 }
-export declare class Promotion extends Identifiable {
+export interface Promotion extends Identifiable {
     description: string;
     promoCode?: string;
     isActive: boolean;
     image?: Image;
 }
-export declare class GetAttributeArgs {
+export interface GetAttributeArgs {
     name: string;
-}
-export interface QueryContext {
-    args: any;
-    locale: string;
-    language: string;
-    country: string;
-    currency: string;
-    segment: string;
 }
 export interface CommonArgs {
     [key: string]: any;
@@ -67,7 +59,7 @@ export interface GetProductsArgs extends CommonArgs {
     keyword?: string;
     productIds?: string;
 }
-export declare class DemoStoreConfiguration {
+export interface DemoStoreConfiguration {
     algolia?: any;
     url?: string;
     cms?: any;

@@ -12,7 +12,7 @@ export interface BigCommerceCodecConfiguration extends CodecConfiguration {
     store_hash: string
 }
 
-const bigCommerceCodec: CommerceCodec = {
+const bigCommerceCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
     getAPI: (config: BigCommerceCodecConfiguration): CommerceAPI => {
         if (!config.store_hash) {
@@ -84,6 +84,4 @@ const bigCommerceCodec: CommerceCodec = {
         }
     }
 }
-
 export default bigCommerceCodec
-registerCodec(bigCommerceCodec)

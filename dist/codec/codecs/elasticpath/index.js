@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("../..");
 const rest_client_1 = __importDefault(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
@@ -126,4 +125,3 @@ const epCodec = {
     }
 };
 exports.default = epCodec;
-(0, __1.registerCodec)(epCodec);

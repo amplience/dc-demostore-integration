@@ -15,7 +15,7 @@ export interface FabricCommerceCodecConfig extends OAuthCodecConfiguration {
 
 let megaMenu: Category[]
 
-const fabricCodec: CommerceCodec = {
+const fabricCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
     getAPI: function (config: FabricCommerceCodecConfig): CommerceAPI {
         if (!config.username) {
@@ -137,6 +137,4 @@ const fabricCodec: CommerceCodec = {
         }
     }
 }
-
 export default fabricCodec
-registerCodec(fabricCodec)

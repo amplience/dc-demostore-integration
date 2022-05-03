@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-const codec_1 = require("../../../codec");
 const index_1 = require("../../../index");
 const sfccCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
@@ -106,4 +105,3 @@ const sfccCodec = {
     }
 };
 exports.default = sfccCodec;
-(0, codec_1.registerCodec)(sfccCodec);

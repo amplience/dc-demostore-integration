@@ -29,7 +29,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommerceAPI = exports.API = exports.flattenCategories = exports.OAuthRestClient = exports.CryptKeeper = exports.getConfig = exports.getCommerceAPI = exports.middleware = exports.isServer = void 0;
+exports.CommerceAPI = exports.API = exports.sleep = exports.flattenCategories = exports.OAuthRestClient = exports.CryptKeeper = exports.getConfig = exports.getDemoStoreConfig = exports.getCommerceAPI = exports.middleware = exports.isServer = void 0;
 const crypt_keeper_1 = __importDefault(require("./common/crypt-keeper"));
 exports.CryptKeeper = crypt_keeper_1.default;
 const rest_client_1 = __importDefault(require("./common/rest-client"));
@@ -39,9 +39,12 @@ Object.defineProperty(exports, "flattenCategories", { enumerable: true, get: fun
 const api_1 = __importStar(require("./middleware/api"));
 exports.middleware = api_1.default;
 Object.defineProperty(exports, "getCommerceAPI", { enumerable: true, get: function () { return api_1.getCommerceAPI; } });
-Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return api_1.getConfig; } });
+const amplience_1 = require("./amplience");
+Object.defineProperty(exports, "getDemoStoreConfig", { enumerable: true, get: function () { return amplience_1.getDemoStoreConfig; } });
+Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return amplience_1.getDemoStoreConfig; } });
 const util_1 = require("./util");
 Object.defineProperty(exports, "isServer", { enumerable: true, get: function () { return util_1.isServer; } });
+Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return util_1.sleep; } });
 __exportStar(require("./types"), exports);
 __exportStar(require("./codec"), exports);
 __exportStar(require("./common/paginator"), exports);

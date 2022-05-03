@@ -1,4 +1,4 @@
-import { CommerceCodec } from '../../../codec';
+import { CommerceAPI } from '../../../index';
 import { OAuthCodecConfiguration } from '../../../common/rest-client';
 export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     api_token: string;
@@ -6,5 +6,8 @@ export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     client_id: string;
     client_secret: string;
 }
-declare const sfccCodec: CommerceCodec;
+declare const sfccCodec: {
+    SchemaURI: string;
+    getAPI: (config: SFCCCodecConfiguration) => CommerceAPI;
+};
 export default sfccCodec;

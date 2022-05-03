@@ -34,7 +34,7 @@ export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook
 }
 
-const epCodec: CommerceCodec = {
+const epCodec = {
     SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
     getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
         if (!config.pcm_url) {
@@ -145,6 +145,4 @@ const epCodec: CommerceCodec = {
         }
     }
 }
-
 export default epCodec
-registerCodec(epCodec)

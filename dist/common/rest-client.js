@@ -15,16 +15,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OAuthRestClient = void 0;
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../util");
+const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
+    let status = 'NOT_LOGGED_IN';
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!authenticatedAxios) {
-            console.log(`[ aria ] oauth authenticate: ${config.auth_url}`);
             let response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
             const auth = response.data;
             if (!getHeaders) {
                 getHeaders = (auth) => ({
-                    Authorization: `${auth.token_type} ${auth.access_token}`
+                    Authorization: `${auth.token_type || 'Bearer'} ${auth.access_token}`
                 });
             }
             authenticatedAxios = axios_1.default.create({
@@ -35,20 +36,37 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
         }
         return authenticatedAxios;
     });
-    const get = (config) => __awaiter(void 0, void 0, void 0, function* () {
+    const request = (method) => (config) => __awaiter(void 0, void 0, void 0, function* () {
+        if (typeof config === 'string') {
+            config = { url: config };
+        }
+        // authentication
+        switch (status) {
+            case 'LOGGING_IN':
+                yield (0, util_1.sleep)(100);
+                return yield request(method)(config);
+            case 'NOT_LOGGED_IN':
+                status = 'LOGGING_IN';
+                break;
+            case 'LOGGED_IN':
+                break;
+        }
+        authenticatedAxios = yield authenticate();
+        if (status === 'LOGGING_IN') {
+            status = 'LOGGED_IN';
+        }
         try {
             // console.log(`[ rest ] get ${config.url}`)
-            authenticatedAxios = authenticatedAxios || (yield authenticate());
-            return yield (yield authenticatedAxios.get(config.url, config)).data;
+            return yield (yield authenticatedAxios.request(Object.assign({ method }, config))).data;
         }
         catch (error) {
             if (error.response.status === 429) {
                 yield (0, util_1.sleep)(1000);
-                return yield get(config);
+                return yield request(method)(config);
             }
             else if (error.response.status === 404) {
                 // don't throw on a 404 just return an empty result set
-                return { data: undefined };
+                return null;
             }
             if (error.stack) {
                 console.log(error.stack);
@@ -57,8 +75,10 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
         }
     });
     return {
-        authenticate,
-        get
+        get: request(dc_management_sdk_js_1.HttpMethod.GET),
+        delete: request(dc_management_sdk_js_1.HttpMethod.DELETE),
+        post: request(dc_management_sdk_js_1.HttpMethod.POST),
+        patch: request(dc_management_sdk_js_1.HttpMethod.PATCH)
     };
 };
 exports.OAuthRestClient = OAuthRestClient;

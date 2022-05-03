@@ -1,4 +1,5 @@
-import _, { Dictionary } from 'lodash'
+import _ from 'lodash'
+import { API, CommerceAPI, CommonArgs } from '..'
 
 export type CodecConfiguration = {
     _meta?: {
@@ -24,17 +25,16 @@ export const getCodecs = (): Codec[] => {
 }
 
 export const registerCodec = (codec: Codec) => {
-    // console.log(`[ aria ] register codec ${codec.SchemaURI}`)
+    // console.log(`[ demostore ] register codec ${codec.SchemaURI}`)
     if (!codecs.includes(codec)) {
         codecs.push(codec)
     }
 }
 
 export const getCodec = (config: CodecConfiguration): API => {
-    // let codec: Codec = codecs[config?._meta?.schema] || _.find(Object.values(codecs), c => c.canUseConfiguration(config))
-    let codec: Codec = _.find(codecs, c => !!c.getAPI(config))
+    let codec: Codec = codecs.find(c => !!c.getAPI(config))
     if (!codec) {
-        throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
+        throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
 
     let api = codec.getAPI(config)
@@ -54,11 +54,10 @@ export const getCodec = (config: CodecConfiguration): API => {
     return api
 }
 
-import './codecs/bigcommerce'
-import './codecs/commercetools'
-import './codecs/sfcc'
-import './codecs/elasticpath'
-import './codecs/rest'
-import './codecs/fabric'
-import './codecs/hybris'
-import { API, CommerceAPI, CommonArgs } from '..'
+registerCodec(require('./codecs/bigcommerce').default)
+registerCodec(require('./codecs/commercetools').default)
+registerCodec(require('./codecs/sfcc').default)
+registerCodec(require('./codecs/elasticpath').default)
+registerCodec(require('./codecs/rest').default)
+registerCodec(require('./codecs/fabric').default)
+registerCodec(require('./codecs/hybris').default)

@@ -1,16 +1,15 @@
-import { AmplienceClient } from "../amplience";
+import { getDemoStoreConfig } from "../amplience";
 import axios from "axios";
 import { Category, CodecConfiguration, CommerceAPI, CommonArgs, Config, CustomerGroup, DemoStoreConfiguration, getCodec, GetCommerceObjectArgs, GetProductsArgs, Product } from "../index";
 import { isServer } from "../index";
 
-export const getConfig = async (configLocator: string): Promise<DemoStoreConfiguration> => await new AmplienceClient(configLocator).getConfig()
 const getAPI = async (config: Config): Promise<CommerceAPI> => {
     let configLocator: string
     if ('config_locator' in config && config.config_locator) {
         configLocator = config.config_locator
     }
     return configLocator ?
-        await getCodec((await getConfig(configLocator)).commerce) as CommerceAPI :
+        await getCodec((await getDemoStoreConfig(configLocator)).commerce) as CommerceAPI :
         await getCodec(config as CodecConfiguration) as CommerceAPI
 }
 
@@ -36,7 +35,5 @@ export const getCommerceAPI = (params: Config): CommerceAPI => ({
     getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => await getResponse({ params, args, operation: 'getCustomerGroups' })
 })
 
-const handler = async (req, res) => {
-    return res.status(200).json(await getResponse(req.body))
-}
+const handler = async (req, res) => res.status(200).json(await getResponse(req.body))
 export default handler

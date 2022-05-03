@@ -20,17 +20,16 @@ const getCodecs = () => {
 };
 exports.getCodecs = getCodecs;
 const registerCodec = (codec) => {
-    // console.log(`[ aria ] register codec ${codec.SchemaURI}`)
+    // console.log(`[ demostore ] register codec ${codec.SchemaURI}`)
     if (!codecs.includes(codec)) {
         codecs.push(codec);
     }
 };
 exports.registerCodec = registerCodec;
 const getCodec = (config) => {
-    // let codec: Codec = codecs[config?._meta?.schema] || _.find(Object.values(codecs), c => c.canUseConfiguration(config))
-    let codec = lodash_1.default.find(codecs, c => !!c.getAPI(config));
+    let codec = codecs.find(c => !!c.getAPI(config));
     if (!codec) {
-        throw `[ aria ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
+        throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
     let api = codec.getAPI(config);
     lodash_1.default.each(api, (method, key) => {
@@ -44,10 +43,10 @@ const getCodec = (config) => {
     return api;
 };
 exports.getCodec = getCodec;
-require("./codecs/bigcommerce");
-require("./codecs/commercetools");
-require("./codecs/sfcc");
-require("./codecs/elasticpath");
-require("./codecs/rest");
-require("./codecs/fabric");
-require("./codecs/hybris");
+(0, exports.registerCodec)(require('./codecs/bigcommerce').default);
+(0, exports.registerCodec)(require('./codecs/commercetools').default);
+(0, exports.registerCodec)(require('./codecs/sfcc').default);
+(0, exports.registerCodec)(require('./codecs/elasticpath').default);
+(0, exports.registerCodec)(require('./codecs/rest').default);
+(0, exports.registerCodec)(require('./codecs/fabric').default);
+(0, exports.registerCodec)(require('./codecs/hybris').default);

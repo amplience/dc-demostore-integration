@@ -13,9 +13,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("../..");
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
+// let x: RestCommerceCodecConfig = {
+//     "productURL": {
+//         "type": "string",
+//         "title": "Product URL",
+//         "description": "URL to a product JSON file"
+//     },
+//     "categoryURL": {
+//         "type": "string",
+//         "title": "Category URL",
+//         "description": "URL to a category JSON file"
+//     },
+//     "customerGroupURL": {
+//         "type": "string",
+//         "title": "Customer Group URL",
+//         "description": "URL to a customer group JSON file"
+//     },
+//     "translationsURL": {
+//         "type": "string",
+//         "title": "Translations URL",
+//         "description": "URL to a translations JSON file"
+//     }
+// }
+// export interface RestCommerceCodecConfig extends CodecConfiguration {
+//     productURL: string
+//     categoryURL: string
+//     customerGroupURL: string
+//     translationsURL: string
+// }
 let categories = [];
 let products = [];
 let customerGroups = [];
@@ -107,4 +134,3 @@ const restCodec = {
     }
 };
 exports.default = restCodec;
-(0, __1.registerCodec)(restCodec);
