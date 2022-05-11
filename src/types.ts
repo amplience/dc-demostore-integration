@@ -83,8 +83,8 @@ export interface AmplienceConfig {
 }
 
 export interface DemoStoreConfiguration {
-    algolia?: AlgoliaConfig
+    algolia: AlgoliaConfig
     url?: string
-    cms?: AmplienceConfig
+    cms: AmplienceConfig
     commerce?: CodecConfiguration
 }

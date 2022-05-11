@@ -69,8 +69,8 @@ export interface AmplienceConfig {
     imageHub?: string;
 }
 export interface DemoStoreConfiguration {
-    algolia?: AlgoliaConfig;
+    algolia: AlgoliaConfig;
     url?: string;
-    cms?: AmplienceConfig;
+    cms: AmplienceConfig;
     commerce?: CodecConfiguration;
 }
