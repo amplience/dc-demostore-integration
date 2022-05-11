@@ -15,11 +15,10 @@ const translatePrice = (price: string, args: CommonArgs) =>
 export default {
     mapProduct: (product: Product, args: CommonArgs) => ({
         ...product,
-        imageSetId: product.variants[0].attributes['articleNumberMax'] || '',
         variants: product.variants.map(variant => ({
             ...variant,
-            listPrice: (variant as any).prices.list && translatePrice((variant as any).prices.list, args) || '',
-            salePrice: (variant as any).prices.sale && translatePrice((variant as any).prices.sale, args) || ''
+            listPrice: translatePrice(variant.listPrice, args) || '',
+            salePrice: translatePrice(variant.salePrice, args) || ''
         }))
     }),
 

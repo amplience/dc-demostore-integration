@@ -2,7 +2,6 @@ import { Product, Category, CommonArgs } from "../../../types";
 import _ from "lodash";
 declare const _default: {
     mapProduct: (product: Product, args: CommonArgs) => {
-        imageSetId: string;
         variants: {
             listPrice: string;
             salePrice: string;
@@ -13,6 +12,7 @@ declare const _default: {
         }[];
         shortDescription?: string;
         longDescription?: string;
+        imageSetId?: string;
         categories: Category[];
         slug: string;
         id: string;
