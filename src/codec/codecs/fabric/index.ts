@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { CodecConfiguration, CommerceCodec, registerCodec } from '../..'
+import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration } from '../../../common/rest-client'
 import slugify from 'slugify'
@@ -15,8 +15,31 @@ export interface FabricCommerceCodecConfig extends OAuthCodecConfiguration {
 
 let megaMenu: Category[]
 
-const fabricCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
+const fabricCodec: Codec = {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/fabric',
+        icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
+        properties: {
+            "username": {
+                "title": "Username",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "password": {
+                "title": "Password",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 200
+            },
+            "accountId": {
+                "title": "Account ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            }
+        }
+    },
     getAPI: function (config: FabricCommerceCodecConfig): CommerceAPI {
         if (!config.username) {
             return null

@@ -18,7 +18,30 @@ const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
 let megaMenu;
 const fabricCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/fabric',
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/fabric',
+        icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
+        properties: {
+            "username": {
+                "title": "Username",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "password": {
+                "title": "Password",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 200
+            },
+            "accountId": {
+                "title": "Account ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            }
+        }
+    },
     getAPI: function (config) {
         if (!config.username) {
             return null;

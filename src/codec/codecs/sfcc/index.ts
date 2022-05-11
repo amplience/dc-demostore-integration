@@ -1,7 +1,7 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product } from '../../../index'
+import { Category, Codec, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
 import { OAuthCodecConfiguration } from '../../../common/rest-client'
 
@@ -12,8 +12,49 @@ export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
     client_secret: string
 }
 
-const sfccCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
+const sfccCodec: Codec = {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/sfcc',
+        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+        properties: {
+            "api_url": {
+                "title": "Base API URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "auth_url": {
+                "title": "Oauth URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "api_token": {
+                "title": "Shopper API token",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "site_id": {
+                "title": "Site ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_id": {
+                "title": "Client ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_secret": {
+                "title": "Client secret",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            }
+        }
+    },
     getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
         if (!config.api_token) {
             return null

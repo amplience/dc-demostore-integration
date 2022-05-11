@@ -11,7 +11,11 @@ export type CodecConfiguration = {
 }
 
 export interface Codec {
-    SchemaURI: string
+    schema: {
+        uri: string
+        properties: any
+        icon: string
+    }
     getAPI(config: CodecConfiguration): any
 }
 

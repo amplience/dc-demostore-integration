@@ -15,7 +15,48 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../../../index");
 const sfccCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/sfcc',
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/sfcc',
+        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+        properties: {
+            "api_url": {
+                "title": "Base API URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "auth_url": {
+                "title": "Oauth URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "api_token": {
+                "title": "Shopper API token",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "site_id": {
+                "title": "Site ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_id": {
+                "title": "Client ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_secret": {
+                "title": "Client secret",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            }
+        }
+    },
     getAPI: (config) => {
         if (!config.api_token) {
             return null;

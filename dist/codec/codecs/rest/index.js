@@ -50,7 +50,32 @@ let translations = {};
 let api = null;
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 const restCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/rest',
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/rest',
+        icon: 'https://cdn-icons-png.flaticon.com/512/180/180954.png',
+        properties: {
+            "productURL": {
+                "type": "string",
+                "title": "Product URL",
+                "description": "URL to a product JSON file"
+            },
+            "categoryURL": {
+                "type": "string",
+                "title": "Category URL",
+                "description": "URL to a category JSON file"
+            },
+            "customerGroupURL": {
+                "type": "string",
+                "title": "Customer Group URL",
+                "description": "URL to a customer group JSON file"
+            },
+            "translationsURL": {
+                "type": "string",
+                "title": "Translations URL",
+                "description": "URL to a translations JSON file"
+            }
+        }
+    },
     getAPI: function (config) {
         if (!config.productURL) {
             return null;

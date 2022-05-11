@@ -16,7 +16,30 @@ const axios_1 = __importDefault(require("axios"));
 const mappers_1 = require("./mappers");
 const common_1 = require("../common");
 const bigCommerceCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/bigcommerce',
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
+        icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
+        properties: {
+            api_url: {
+                title: "Base API URL",
+                type: "string",
+                minLength: 0,
+                maxLength: 50
+            },
+            api_token: {
+                title: "API Token",
+                type: "string",
+                minLength: 0,
+                maxLength: 50
+            },
+            store_hash: {
+                title: "Store hash",
+                type: "string",
+                minLength: 0,
+                maxLength: 50
+            }
+        }
+    },
     getAPI: (config) => {
         if (!config.store_hash) {
             return null;

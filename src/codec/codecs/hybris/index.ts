@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { CodecConfiguration, registerCodec, CommerceCodec } from '../..'
+import { CodecConfiguration, registerCodec, CommerceCodec, Codec } from '../..'
 import { CommerceAPI } from '../../..'
 import { findInMegaMenu } from '../common'
 import axios from 'axios'
@@ -35,8 +35,25 @@ const mapProduct = (product: HybrisProduct): Product => ({
 })
 
 let megaMenu: Category[]
-const hybrisCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/hybris',
+const hybrisCodec: Codec = {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/hybris',
+        icon: 'https://images.squarespace-cdn.com/content/v1/54dd763ce4b01f6b05bab7db/1511645929126-9BGFQ3VFVOQX75PHZ7JS/logos-014__2_.png',
+        properties: {
+            "api_url": {
+                "title": "API Base URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "catalog_id": {
+                "title": "Catalog ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            }
+        }
+    },
     getAPI: function (config: HybrisCommerceCodecConfig): CommerceAPI {
         if (!config.catalog_id) {
             return null

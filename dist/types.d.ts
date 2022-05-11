@@ -59,9 +59,18 @@ export interface GetProductsArgs extends CommonArgs {
     keyword?: string;
     productIds?: string;
 }
+export interface AlgoliaConfig {
+    appId: string;
+    apiKey: string;
+}
+export interface AmplienceConfig {
+    name: string;
+    stagingApi: string;
+    imageHub?: string;
+}
 export interface DemoStoreConfiguration {
-    algolia?: any;
+    algolia?: AlgoliaConfig;
     url?: string;
-    cms?: any;
+    cms?: AmplienceConfig;
     commerce?: CodecConfiguration;
 }

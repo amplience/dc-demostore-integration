@@ -1,12 +1,8 @@
-import { CodecConfiguration } from '../../../codec';
-import { CommerceAPI } from '../../../index';
+import { Codec, CodecConfiguration } from '../../../codec';
 export interface BigCommerceCodecConfiguration extends CodecConfiguration {
     api_url: string;
     api_token: string;
     store_hash: string;
 }
-declare const bigCommerceCodec: {
-    SchemaURI: string;
-    getAPI: (config: BigCommerceCodecConfiguration) => CommerceAPI;
-};
+declare const bigCommerceCodec: Codec;
 export default bigCommerceCodec;

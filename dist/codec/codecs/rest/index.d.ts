@@ -14,7 +14,32 @@ declare type RestCommerceCodecConfig = {
     [Key in keyof RestCommerceCodecConfigObject]: string;
 };
 declare const restCodec: {
-    SchemaURI: string;
+    schema: {
+        uri: string;
+        icon: string;
+        properties: {
+            productURL: {
+                type: string;
+                title: string;
+                description: string;
+            };
+            categoryURL: {
+                type: string;
+                title: string;
+                description: string;
+            };
+            customerGroupURL: {
+                type: string;
+                title: string;
+                description: string;
+            };
+            translationsURL: {
+                type: string;
+                title: string;
+                description: string;
+            };
+        };
+    };
     getAPI: (config: RestCommerceCodecConfig) => CommerceAPI;
 };
 export default restCodec;

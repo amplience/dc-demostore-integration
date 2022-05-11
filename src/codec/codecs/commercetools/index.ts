@@ -86,8 +86,49 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
     }
 }
 
-const commerceToolsCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/commercetools',
+const commerceToolsCodec: Codec = {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/commercetools',
+        icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
+        properties: {
+            "client_id": {
+                "title": "Client ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_secret": {
+                "title": "Client secret",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "auth_url": {
+                "title": "OAuth URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "api_url": {
+                "title": "API URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+            },
+            "project": {
+                "title": "Project key",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "scope": {
+                "title": "Scope",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 1000
+            }    
+        }
+    },
     getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
         if (!config.scope) {
             return null

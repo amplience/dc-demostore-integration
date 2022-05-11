@@ -34,8 +34,49 @@ export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook
 }
 
-const epCodec = {
-    SchemaURI: 'https://demostore.amplience.com/site/integration/elasticpath',
+const epCodec: Codec = {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/elasticpath',
+        icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
+        properties: {
+            "client_id": {
+                "title": "Client ID",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "client_secret": {
+                "title": "Client secret",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 200
+            },
+            "auth_url": {
+                "title": "OAuth URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "api_url": {
+                "title": "API Base URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "pcm_url": {
+                "title": "PCM URL",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "catalog_name": {
+                "title": "Catalog name",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            }
+        }
+    },
     getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
         if (!config.pcm_url) {
             return null

@@ -1,7 +1,7 @@
 import { CodecConfiguration } from './codec'
 import CryptKeeper from './common/crypt-keeper'
 import OAuthRestClient from './common/rest-client'
-import { flattenCategories } from './codec/codecs/common'
+import { flattenCategories, getContentType, getContentTypeSchema } from './codec/codecs/common'
 import middleware, { getCommerceAPI } from './middleware/api'
 import { getDemoStoreConfig } from './amplience'
 import { isServer, sleep } from './util'
@@ -21,6 +21,8 @@ export {
     CryptKeeper,
     OAuthRestClient,
     flattenCategories,
+    getContentType,
+    getContentTypeSchema,
     sleep
 }
 

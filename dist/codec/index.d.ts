@@ -8,7 +8,11 @@ export declare type CodecConfiguration = {
     locator?: string;
 };
 export interface Codec {
-    SchemaURI: string;
+    schema: {
+        uri: string;
+        properties: any;
+        icon: string;
+    };
     getAPI(config: CodecConfiguration): any;
 }
 export interface CommerceCodec extends Codec {
