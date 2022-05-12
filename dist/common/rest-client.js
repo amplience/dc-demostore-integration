@@ -37,6 +37,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
         return authenticatedAxios;
     });
     const request = (method) => (config) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a, _b;
         if (typeof config === 'string') {
             config = { url: config };
         }
@@ -60,11 +61,11 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
             return yield (yield authenticatedAxios.request(Object.assign({ method }, config))).data;
         }
         catch (error) {
-            if (error.response.status === 429) {
+            if (((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) === 429) {
                 yield (0, util_1.sleep)(1000);
                 return yield request(method)(config);
             }
-            else if (error.response.status === 404) {
+            else if (((_b = error.response) === null || _b === void 0 ? void 0 : _b.status) === 404) {
                 // don't throw on a 404 just return an empty result set
                 return null;
             }

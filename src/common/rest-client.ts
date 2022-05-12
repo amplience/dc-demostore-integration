@@ -78,11 +78,11 @@ export const OAuthRestClient = (config: OAuthCodecConfiguration, payload: any, r
             // console.log(`[ rest ] get ${config.url}`)
             return await (await authenticatedAxios.request({ method, ...config })).data
         } catch (error: any) {
-            if (error.response.status === 429) {
+            if (error.response?.status === 429) {
                 await sleep(1000)
                 return await request(method)(config)
             }
-            else if (error.response.status === 404) {
+            else if (error.response?.status === 404) {
                 // don't throw on a 404 just return an empty result set
                 return null
             }
