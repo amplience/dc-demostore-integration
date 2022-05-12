@@ -3,11 +3,16 @@ import axios from "axios";
 import { Category, CodecConfiguration, CommerceAPI, CommonArgs, Config, CustomerGroup, DemoStoreConfiguration, getCodec, GetCommerceObjectArgs, GetProductsArgs, Product } from "../index";
 import { isServer } from "../index";
 
+export const baseConfigLocator = process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default`
 const getAPI = async (config: Config): Promise<CommerceAPI> => {
     let configLocator: string
-    if ('config_locator' in config && config.config_locator) {
+    if (!config) {
+        configLocator = baseConfigLocator
+    }
+    else if ('config_locator' in config && config.config_locator) {
         configLocator = config.config_locator
     }
+
     return configLocator ?
         await getCodec((await getDemoStoreConfig(configLocator)).commerce) as CommerceAPI :
         await getCodec(config as CodecConfiguration) as CommerceAPI

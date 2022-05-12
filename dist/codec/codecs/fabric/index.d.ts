@@ -4,6 +4,8 @@ export interface FabricCommerceCodecConfig extends OAuthCodecConfiguration {
     username: string;
     password: string;
     accountId: string;
+    accountKey: string;
+    stage: string;
 }
 declare const fabricCodec: Codec;
 export default fabricCodec;

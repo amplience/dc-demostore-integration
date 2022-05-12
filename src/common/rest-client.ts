@@ -16,6 +16,36 @@ export interface OAuthCodecConfiguration extends CodecConfiguration {
     api_url: string
 }
 
+export const OAuthProperties = {
+    "api_url": {
+        "title": "Base API URL",
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 100
+    },
+    "auth_url": {
+        "title": "Oauth URL",
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 100
+    }
+}
+
+export const ClientCredentialProperties = {
+    client_id: {
+        "title": "Client ID",
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 50
+    },
+    client_secret: {
+        "title": "Client secret",
+        "type": "string",
+        "minLength": 0,
+        "maxLength": 100
+    }
+}
+
 // enum AuthenticationStatus {
 //     NOT_LOGGED_IN,
 //     LOGGING_IN,

@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const rest_client_1 = __importDefault(require("../../../common/rest-client"));
+const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
 const qs_1 = __importDefault(require("qs"));
@@ -21,44 +44,17 @@ const epCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
-        properties: {
-            "client_id": {
-                "title": "Client ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "client_secret": {
-                "title": "Client secret",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 200
-            },
-            "auth_url": {
-                "title": "OAuth URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "api_url": {
-                "title": "API Base URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "pcm_url": {
+        properties: Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { "pcm_url": {
                 "title": "PCM URL",
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 50
-            },
-            "catalog_name": {
+            }, "catalog_name": {
                 "title": "Catalog name",
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 50
-            }
-        }
+            } })
     },
     getAPI: function (config) {
         if (!config.pcm_url) {

@@ -144,6 +144,8 @@ Connects to a fabric instance.
 {
     "username": "<fabric username>",
     "password": "<fabric password>",
-    "accountId": "<fabric account id>"
+    "accountId": "<fabric account id>",
+    "auth_url": "<fabric auth url>",
+    "api_url": "<fabric base url>"
 }
 ```

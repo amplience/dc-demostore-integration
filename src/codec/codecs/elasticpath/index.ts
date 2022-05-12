@@ -3,7 +3,7 @@ import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArg
 import { CodecConfiguration, Codec, registerCodec, CommerceCodec } from '../..'
 import { API, CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient, { OAuthCodecConfiguration } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
@@ -39,30 +39,8 @@ const epCodec: Codec = {
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
         properties: {
-            "client_id": {
-                "title": "Client ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "client_secret": {
-                "title": "Client secret",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 200
-            },
-            "auth_url": {
-                "title": "OAuth URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "api_url": {
-                "title": "API Base URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
+            ...OAuthProperties,
+            ...ClientCredentialProperties,
             "pcm_url": {
                 "title": "PCM URL",
                 "type": "string",

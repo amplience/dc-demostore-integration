@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
-import OAuthRestClient, { OAuthRestClientInterface } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, OAuthProperties, OAuthRestClientInterface } from '../../../common/rest-client'
 import { Attribute, CommerceToolsCodecConfiguration, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { findInMegaMenu } from '../common'
 
@@ -91,30 +91,8 @@ const commerceToolsCodec: Codec = {
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
         icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
         properties: {
-            "client_id": {
-                "title": "Client ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "client_secret": {
-                "title": "Client secret",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "auth_url": {
-                "title": "OAuth URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            },
-            "api_url": {
-                "title": "API URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            },
+            ...OAuthProperties,
+            ...ClientCredentialProperties,
             "project": {
                 "title": "Project key",
                 "type": "string",

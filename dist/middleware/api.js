@@ -12,14 +12,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommerceAPI = void 0;
+exports.getCommerceAPI = exports.baseConfigLocator = void 0;
 const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const index_2 = require("../index");
+exports.baseConfigLocator = process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default`;
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     let configLocator;
-    if ('config_locator' in config && config.config_locator) {
+    if (!config) {
+        configLocator = exports.baseConfigLocator;
+    }
+    else if ('config_locator' in config && config.config_locator) {
         configLocator = config.config_locator;
     }
     return configLocator ?

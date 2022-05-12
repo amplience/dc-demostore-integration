@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
-const rest_client_1 = __importDefault(require("../../../common/rest-client"));
+const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
 let megaMenu;
@@ -21,32 +44,38 @@ const fabricCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/fabric',
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
-        properties: {
-            "username": {
+        properties: Object.assign(Object.assign({}, rest_client_1.OAuthProperties), { "username": {
                 "title": "Username",
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 50
-            },
-            "password": {
+            }, "password": {
                 "title": "Password",
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 200
-            },
-            "accountId": {
+            }, "accountId": {
                 "title": "Account ID",
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 50
-            }
-        }
+            }, "accountKey": {
+                "title": "Account Key",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            }, "stage": {
+                "title": "Stage",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            } })
     },
     getAPI: function (config) {
         if (!config.username) {
             return null;
         }
-        const rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `https://sandbox.copilot.fabric.inc/api-identity/auth/local/login` }), {
+        const rest = (0, rest_client_1.default)(config, {
             username: config.username,
             password: config.password,
             accountId: config.accountId
@@ -58,11 +87,12 @@ const fabricCodec = {
             return {
                 Authorization: auth.accessToken,
                 // todo: what comprises site-context?
+                // todo: what do we need to remove (abstract) from here?  account?  stage?
                 'x-site-context': JSON.stringify({
-                    "stage": "sandbox",
-                    "account": "62095c9437d1c60011d8c3cf",
-                    "date": "2021-07-19T23:41:54.179Z",
-                    "channel": 12
+                    stage: config.stage,
+                    account: config.accountKey,
+                    date: new Date().toISOString(),
+                    channel: 12
                 })
             };
         });
@@ -110,6 +140,7 @@ const fabricCodec = {
         // CommerceAPI implementation
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
+                console.log(`fabric getProduct ${args}`);
                 return lodash_1.default.first(yield getProducts({ productIds: args.id }));
             });
         };

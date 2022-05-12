@@ -14,55 +14,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../../../index");
+const rest_client_1 = require("../../../common/rest-client");
+const schema = {
+    uri: 'https://demostore.amplience.com/site/integration/sfcc',
+    icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+    properties: Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { api_token: {
+            "title": "Shopper API token",
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 100
+        }, site_id: {
+            "title": "Site ID",
+            "type": "string",
+            "minLength": 0,
+            "maxLength": 50
+        } })
+};
 const sfccCodec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/sfcc',
-        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
-        properties: {
-            "api_url": {
-                "title": "Base API URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            },
-            "auth_url": {
-                "title": "Oauth URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            },
-            "api_token": {
-                "title": "Shopper API token",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            },
-            "site_id": {
-                "title": "Site ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "client_id": {
-                "title": "Client ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "client_secret": {
-                "title": "Client secret",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 100
-            }
-        }
-    },
+    schema,
     getAPI: (config) => {
         if (!config.api_token) {
             return null;
         }
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
-            console.log(`fetch ${config.api_url}${url}&client_id=${config.client_id}`);
             return (yield axios_1.default.get(url, {
                 baseURL: config.api_url,
                 params: {

@@ -2,7 +2,7 @@ import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
 import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../..'
 import { CommerceAPI } from '../../..'
-import OAuthRestClient, { OAuthCodecConfiguration } from '../../../common/rest-client'
+import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import slugify from 'slugify'
 import { findInMegaMenu } from '../common'
 import { Attribute, FabricCategory, FabricProduct } from './types'
@@ -11,6 +11,8 @@ export interface FabricCommerceCodecConfig extends OAuthCodecConfiguration {
     username: string
     password: string
     accountId: string
+    accountKey: string
+    stage: string
 }
 
 let megaMenu: Category[]
@@ -20,6 +22,7 @@ const fabricCodec: Codec = {
         uri: 'https://demostore.amplience.com/site/integration/fabric',
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
         properties: {
+            ...OAuthProperties,
             "username": {
                 "title": "Username",
                 "type": "string",
@@ -37,6 +40,18 @@ const fabricCodec: Codec = {
                 "type": "string",
                 "minLength": 0,
                 "maxLength": 50
+            },
+            "accountKey": {
+                "title": "Account Key",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
+            },
+            "stage": {
+                "title": "Stage",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 50
             }
         }
     },
@@ -45,10 +60,7 @@ const fabricCodec: Codec = {
             return null
         }
 
-        const rest = OAuthRestClient({
-            ...config,
-            auth_url: `https://sandbox.copilot.fabric.inc/api-identity/auth/local/login`
-        }, {
+        const rest = OAuthRestClient(config, {
             username: config.username,
             password: config.password,
             accountId: config.accountId
@@ -61,11 +73,12 @@ const fabricCodec: Codec = {
                 Authorization: auth.accessToken,
 
                 // todo: what comprises site-context?
+                // todo: what do we need to remove (abstract) from here?  account?  stage?
                 'x-site-context': JSON.stringify({
-                    "stage": "sandbox",
-                    "account": "62095c9437d1c60011d8c3cf",
-                    "date": "2021-07-19T23:41:54.179Z",
-                    "channel": 12
+                    stage: config.stage,
+                    account: config.accountKey,
+                    date: new Date().toISOString(),
+                    channel: 12
                 })
             }
         })
@@ -114,6 +127,7 @@ const fabricCodec: Codec = {
 
         // CommerceAPI implementation
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
+            console.log(`fabric getProduct ${args}`)
             return _.first(await getProducts({ productIds: args.id }))
         }
 
