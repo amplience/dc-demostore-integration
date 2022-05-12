@@ -140,7 +140,6 @@ const fabricCodec = {
         // CommerceAPI implementation
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
-                console.log(`fabric getProduct ${args}`);
                 return lodash_1.default.first(yield getProducts({ productIds: args.id }));
             });
         };

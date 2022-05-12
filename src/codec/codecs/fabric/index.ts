@@ -127,7 +127,6 @@ const fabricCodec: Codec = {
 
         // CommerceAPI implementation
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
-            console.log(`fabric getProduct ${args}`)
             return _.first(await getProducts({ productIds: args.id }))
         }
 
