@@ -26,15 +26,20 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, index_1.getCodec)((yield (0, amplience_1.getDemoStoreConfig)(configLocator)).commerce) :
         yield (0, index_1.getCodec)(config);
 });
-const getResponse = (query) => __awaiter(void 0, void 0, void 0, function* () {
-    const commerceAPI = yield getAPI(query.params);
+const getResponse = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const commerceAPI = yield getAPI(req.params);
     if (!commerceAPI) {
-        throw new Error(`commerceAPI not found for ${JSON.stringify(query.params)}`);
+        throw new Error(`commerceAPI not found for ${JSON.stringify(req.params)}`);
     }
-    if (!commerceAPI[query.operation]) {
-        throw new Error(`invalid operation: ${query.operation}`);
+    const operation = commerceAPI[req.operation];
+    if (!operation) {
+        throw new Error(`invalid operation: ${req.operation}`);
     }
-    return (0, index_2.isServer)() ? yield commerceAPI[query.operation](query.args) : yield (yield axios_1.default.post(`/api`, query)).data;
+    let apiUrl = `/api`;
+    if (typeof window !== 'undefined' && window.isStorybook) {
+        apiUrl = `https://core.dc-demostore.com/api`;
+    }
+    return (0, index_2.isServer)() ? yield operation(req.args) : yield (yield axios_1.default.post(apiUrl, req)).data;
 });
 const getCommerceAPI = (params) => ({
     getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getProduct' }); }),
@@ -44,5 +49,18 @@ const getCommerceAPI = (params) => ({
     getCustomerGroups: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getCustomerGroups' }); })
 });
 exports.getCommerceAPI = getCommerceAPI;
-const handler = (req, res) => __awaiter(void 0, void 0, void 0, function* () { return res.status(200).json(yield getResponse(req.body)); });
+const handler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // CORS support
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    switch (req.method.toLowerCase()) {
+        case 'post':
+            return res.status(200).json(yield getResponse(req.body));
+        case 'options':
+            return res.status(200).send();
+        default:
+            break;
+    }
+});
 exports.default = handler;
