@@ -77,7 +77,7 @@ export interface AlgoliaConfig {
 }
 
 export interface AmplienceConfig {
-    name: string
+    hub: string
     stagingApi: string
     imageHub?: string
 }

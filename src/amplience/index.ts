@@ -21,7 +21,6 @@ const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> 
     }
 
     obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
-    obj.cms.hubs = _.keyBy(obj.cms.hubs, 'key')
     obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
     obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
     obj.locator = key

@@ -29,7 +29,6 @@ const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* 
         throw `[ demostore ] Couldn't find config with key '${key}'`;
     }
     obj.commerce = obj.commerce && (yield getContentItem(hub, { id: obj.commerce.id }));
-    obj.cms.hubs = lodash_1.default.keyBy(obj.cms.hubs, 'key');
     obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
     obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
     obj.locator = key;

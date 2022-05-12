@@ -22,7 +22,7 @@ const getContentTypeSchema = (codec: Codec): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
     schema.schemaId = codec.schema.uri
     schema.body = JSON.stringify({
-        id: codec.schema,
+        id: codec.schema.uri,
         title: `${_.last(codec.schema.uri.split('/'))} integration`,
         description: `${_.last(codec.schema.uri.split('/'))} integration`,
         allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
