@@ -15,23 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../../../index");
 const rest_client_1 = require("../../../common/rest-client");
-const schema = {
-    uri: 'https://demostore.amplience.com/site/integration/sfcc',
-    icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
-    properties: Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { api_token: {
-            "title": "Shopper API token",
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 100
-        }, site_id: {
-            "title": "Site ID",
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 50
-        } })
-};
+const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { api_token: {
+        title: "Shopper API Token",
+        type: "string",
+        maxLength: 100
+    }, site_id: {
+        title: "Site ID",
+        type: "string"
+    } });
 const sfccCodec = {
-    schema,
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/sfcc',
+        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+        properties
+    },
     getAPI: (config) => {
         if (!config.api_token) {
             return null;

@@ -12,36 +12,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = void 0;
+exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = exports.APIProperties = void 0;
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../util");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
-exports.OAuthProperties = {
-    "api_url": {
-        "title": "Base API URL",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
-    },
-    "auth_url": {
-        "title": "Oauth URL",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
+exports.APIProperties = {
+    api_url: {
+        title: "Base API URL",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
     }
 };
+exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties), { auth_url: {
+        title: "Oauth URL",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
+    } });
 exports.ClientCredentialProperties = {
     client_id: {
-        "title": "Client ID",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 50
+        title: "Client ID",
+        type: "string",
+        minLength: 0,
+        maxLength: 50
     },
     client_secret: {
-        "title": "Client secret",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
+        title: "Client secret",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
     }
 };
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
@@ -100,7 +100,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
             if (error.stack) {
                 console.log(error.stack);
             }
-            console.log(`Error while getting URL [ ${config.url} ]: ${error.message} ${error.code}`);
+            console.log(`Error while ${method}ing URL [ ${config.url} ]: ${error.message} ${error.code}`);
         }
     });
     return {

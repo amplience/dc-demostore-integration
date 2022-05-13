@@ -40,36 +40,27 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
 let megaMenu;
+const properties = Object.assign(Object.assign({}, rest_client_1.OAuthProperties), { username: {
+        title: "Username",
+        type: "string"
+    }, password: {
+        title: "Password",
+        type: "string"
+    }, accountId: {
+        title: "Account ID",
+        type: "string"
+    }, accountKey: {
+        title: "Account Key",
+        type: "string"
+    }, stage: {
+        title: "Stage",
+        type: "string"
+    } });
 const fabricCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/fabric',
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
-        properties: Object.assign(Object.assign({}, rest_client_1.OAuthProperties), { "username": {
-                "title": "Username",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }, "password": {
-                "title": "Password",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 200
-            }, "accountId": {
-                "title": "Account ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }, "accountKey": {
-                "title": "Account Key",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }, "stage": {
-                "title": "Stage",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            } })
+        properties
     },
     getAPI: function (config) {
         if (!config.username) {

@@ -40,21 +40,18 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
 const qs_1 = __importDefault(require("qs"));
+const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { pcm_url: {
+        title: "PCM URL",
+        type: "string"
+    }, catalog_name: {
+        title: "Catalog name",
+        type: "string"
+    } });
 const epCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
-        properties: Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { "pcm_url": {
-                "title": "PCM URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }, "catalog_name": {
-                "title": "Catalog name",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            } })
+        properties
     },
     getAPI: function (config) {
         if (!config.pcm_url) {

@@ -1,48 +1,64 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { sleep } from '../util'
 import _ from 'lodash'
-import { CodecConfiguration } from '..'
+import { AnyProperty, StringProperty } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
 
 export interface OAuthRestClientInterface {
-    get: (config: AxiosRequestConfig | string) => Promise<any>
-    patch: (config: AxiosRequestConfig | string) => Promise<any>
+    get:    (config: AxiosRequestConfig | string) => Promise<any>
+    patch:  (config: AxiosRequestConfig | string) => Promise<any>
     delete: (config: AxiosRequestConfig | string) => Promise<any>
-    post: (config: AxiosRequestConfig | string) => Promise<any>
+    post:   (config: AxiosRequestConfig | string) => Promise<any>
 }
 
-export interface OAuthCodecConfiguration extends CodecConfiguration {
-    auth_url: string
-    api_url: string
+export type APIConfiguration = {
+    api_url: StringProperty
 }
 
-export const OAuthProperties = {
-    "api_url": {
-        "title": "Base API URL",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
-    },
-    "auth_url": {
-        "title": "Oauth URL",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
+export type OAuthCodecConfiguration = APIConfiguration & {
+    auth_url: StringProperty
+}
+
+export type OAuthCodecStringConfiguration = {
+    [Key in keyof OAuthCodecConfiguration]: string
+}
+
+export type ClientCredentialsConfiguration = {
+    client_id:      StringProperty
+    client_secret:  StringProperty
+}
+
+export const APIProperties: APIConfiguration = {
+    api_url: {
+        title: "Base API URL",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
     }
 }
 
-export const ClientCredentialProperties = {
+export const OAuthProperties: OAuthCodecConfiguration = {
+    ...APIProperties,
+    auth_url: {
+        title: "Oauth URL",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
+    }
+}
+
+export const ClientCredentialProperties: ClientCredentialsConfiguration = {
     client_id: {
-        "title": "Client ID",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 50
+        title: "Client ID",
+        type: "string",
+        minLength: 0,
+        maxLength: 50
     },
     client_secret: {
-        "title": "Client secret",
-        "type": "string",
-        "minLength": 0,
-        "maxLength": 100
+        title: "Client secret",
+        type: "string",
+        minLength: 0,
+        maxLength: 100
     }
 }
 
@@ -54,7 +70,7 @@ export const ClientCredentialProperties = {
 
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
 
-export const OAuthRestClient = (config: OAuthCodecConfiguration, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any) => {
+export const OAuthRestClient = (config: OAuthCodecStringConfiguration, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any) => {
     let authenticatedAxios: AxiosInstance
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
@@ -120,7 +136,7 @@ export const OAuthRestClient = (config: OAuthCodecConfiguration, payload: any, r
             if (error.stack) {
                 console.log(error.stack)
             }
-            console.log(`Error while getting URL [ ${config.url} ]: ${error.message} ${error.code}`)
+            console.log(`Error while ${method}ing URL [ ${config.url} ]: ${error.message} ${error.code}`)
         }
     }
 

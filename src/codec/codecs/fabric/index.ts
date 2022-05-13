@@ -1,61 +1,53 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../..'
+import { Codec, CodecStringConfig, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import slugify from 'slugify'
 import { findInMegaMenu } from '../common'
 import { Attribute, FabricCategory, FabricProduct } from './types'
 
-export interface FabricCommerceCodecConfig extends OAuthCodecConfiguration {
-    username: string
-    password: string
-    accountId: string
-    accountKey: string
-    stage: string
+let megaMenu: Category[]
+
+type CodecConfig = OAuthCodecConfiguration & {
+    username:   StringProperty
+    password:   StringProperty
+    accountId:  StringProperty
+    accountKey: StringProperty
+    stage:      StringProperty
 }
 
-let megaMenu: Category[]
+const properties: CodecConfig = {
+    ...OAuthProperties,
+    username: {
+        title: "Username",
+        type: "string"
+    },
+    password: {
+        title: "Password",
+        type: "string"
+    },
+    accountId: {
+        title: "Account ID",
+        type: "string"
+    },
+    accountKey: {
+        title: "Account Key",
+        type: "string"
+    },
+    stage: {
+        title: "Stage",
+        type: "string"
+    }
+}
 
 const fabricCodec: Codec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/fabric',
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
-        properties: {
-            ...OAuthProperties,
-            "username": {
-                "title": "Username",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "password": {
-                "title": "Password",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 200
-            },
-            "accountId": {
-                "title": "Account ID",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "accountKey": {
-                "title": "Account Key",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "stage": {
-                "title": "Stage",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }
-        }
+        properties
     },
-    getAPI: function (config: FabricCommerceCodecConfig): CommerceAPI {
+    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
         if (!config.username) {
             return null
         }

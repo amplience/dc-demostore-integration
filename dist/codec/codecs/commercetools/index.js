@@ -42,6 +42,14 @@ const common_1 = require("../common");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
 let categories;
+const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { project: {
+        title: "project key",
+        type: "string"
+    }, scope: {
+        title: "scope",
+        type: "string",
+        maxLength: 1000
+    } });
 const getMapper = (args) => {
     args = {
         language: args.language || 'en',
@@ -111,17 +119,7 @@ const commerceToolsCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
         icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
-        properties: Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { "project": {
-                "title": "Project key",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }, "scope": {
-                "title": "Scope",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 1000
-            } })
+        properties
     },
     getAPI: function (config) {
         if (!config.scope) {

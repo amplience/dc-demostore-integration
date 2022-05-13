@@ -1,41 +1,36 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, Codec, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product } from '../../../index'
+import { Category, Codec, CodecStringConfig, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
-import { ClientCredentialProperties, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 
-export interface SFCCCodecConfiguration extends OAuthCodecConfiguration {
-    api_token: string
-    site_id: string
-    client_id: string
-    client_secret: string
+type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+    api_token:  StringProperty
+    site_id:    StringProperty
 }
 
-const schema = {
-    uri: 'https://demostore.amplience.com/site/integration/sfcc',
-    icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
-    properties: {
-        ...OAuthProperties,
-        ...ClientCredentialProperties,
-        api_token: {
-            "title": "Shopper API token",
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 100
-        },
-        site_id: {
-            "title": "Site ID",
-            "type": "string",
-            "minLength": 0,
-            "maxLength": 50
-        }
+const properties: CodecConfig = {
+    ...OAuthProperties,
+    ...ClientCredentialProperties,
+    api_token: {
+        title: "Shopper API Token",
+        type: "string",
+        maxLength: 100
+    },
+    site_id: {
+        title: "Site ID",
+        type: "string"
     }
 }
 
 const sfccCodec: Codec = {
-    schema,
-    getAPI: (config: SFCCCodecConfiguration): CommerceAPI => {
+    schema: {
+        uri: 'https://demostore.amplience.com/site/integration/sfcc',
+        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+        properties
+    },
+    getAPI: (config: CodecStringConfig<CodecConfig>): CommerceAPI => {
         if (!config.api_token) {
             return null
         }

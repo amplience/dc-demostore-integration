@@ -1,15 +1,34 @@
 import _ from 'lodash'
-import { Codec, CodecConfiguration, CommerceCodec, registerCodec } from '../../../codec'
+import { Codec, CodecStringConfig, StringProperty } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
-import OAuthRestClient, { ClientCredentialProperties, OAuthProperties, OAuthRestClientInterface } from '../../../common/rest-client'
-import { Attribute, CommerceToolsCodecConfiguration, CTCategory, CTProduct, CTVariant, Localizable } from './types'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { findInMegaMenu } from '../common'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
 // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
 let categories: CTCategory[]
+
+type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+    project:    StringProperty
+    scope:      StringProperty
+}
+
+const properties: CodecConfig = {
+    ...OAuthProperties,
+    ...ClientCredentialProperties,
+    project: {
+        title: "project key",
+        type: "string"
+    },
+    scope: {
+        title: "scope",
+        type: "string",
+        maxLength: 1000
+    }
+}
 
 const getMapper = (args: GetCommerceObjectArgs): any => {
     args = {
@@ -90,24 +109,9 @@ const commerceToolsCodec: Codec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
         icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
-        properties: {
-            ...OAuthProperties,
-            ...ClientCredentialProperties,
-            "project": {
-                "title": "Project key",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "scope": {
-                "title": "Scope",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 1000
-            }    
-        }
+        properties
     },
-    getAPI: function (config: CommerceToolsCodecConfiguration): CommerceAPI {
+    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
         if (!config.scope) {
             return null
         }

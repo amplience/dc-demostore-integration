@@ -1,43 +1,35 @@
-// 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, CommerceCodec, registerCodec, CodecConfiguration } from '../../../codec'
+import { Codec, CodecStringConfig, StringProperty } from '../../../codec'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
 import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
 import { findInMegaMenu } from '../common'
+import { APIConfiguration, APIProperties } from '../../../common/rest-client'
 
-export interface BigCommerceCodecConfiguration extends CodecConfiguration {
-    api_url: string
-    api_token: string
-    store_hash: string
+type CodecConfig = APIConfiguration & {
+    api_token:  StringProperty
+    store_hash: StringProperty
+}
+
+const properties: CodecConfig = {
+    ...APIProperties,
+    api_token: {
+        title: "API Token",
+        type: "string"
+    },
+    store_hash: {
+        title: "Store hash",
+        type: "string"
+    }
 }
 
 const bigCommerceCodec: Codec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
         icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
-        properties: {
-            api_url: {
-                title: "Base API URL",
-                type: "string",
-                minLength: 0,
-                maxLength: 50
-            },
-            api_token: {
-                title: "API Token",
-                type: "string",
-                minLength: 0,
-                maxLength: 50
-            },
-            store_hash: {
-                title: "Store hash",
-                type: "string",
-                minLength: 0,
-                maxLength: 50
-            }    
-        }
+        properties
     },
-    getAPI: (config: BigCommerceCodecConfiguration): CommerceAPI => {
+    getAPI: (config: CodecStringConfig<CodecConfig>): CommerceAPI => {
         if (!config.store_hash) {
             return null
         }
@@ -48,9 +40,9 @@ const bigCommerceCodec: Codec = {
                 url,
                 baseURL: `${config.api_url}/stores/${config.store_hash}`,
                 headers: {
-                    'X-Auth-Token'  : config.api_token,
-                    'Accept'        : `application/json`,
-                    'Content-Type'  : `application/json`
+                    'X-Auth-Token': config.api_token,
+                    'Accept': `application/json`,
+                    'Content-Type': `application/json`
                 }
             })
 

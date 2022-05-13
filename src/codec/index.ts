@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI, CommonArgs } from '..'
 
 export type CodecConfiguration = {
@@ -10,17 +10,56 @@ export type CodecConfiguration = {
     locator?: string
 }
 
+export type Property = {
+    title:          string
+}
+
+export type StringProperty = Property & {
+    type:       'string'
+    minLength?: number
+    maxLength?: number
+    pattern?:   string
+}
+
+export type NumberProperty = Property & {
+    type:               'number'
+    multipleOf?:        number
+    minimum?:           number
+    maximum?:           number
+    exclusiveMinimum?:  number
+    exclusiveMaximum?:  number
+}
+
+export type IntegerProperty = NumberProperty & {
+    type:           'integer'
+}
+
+export type ArrayProperty = Property & {
+    type:           'array'
+    items?:         number
+    minItems?:      number
+    maxItems?:      number
+    required?:      boolean
+    uniqueItems?:   boolean
+}
+
+export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
+
 export interface Codec {
     schema: {
-        uri: string
-        properties: any
-        icon: string
+        uri:        string
+        properties: Dictionary<AnyProperty>
+        icon:       string
     }
-    getAPI(config: CodecConfiguration): any
+    getAPI(config: any): any
 }
 
 export interface CommerceCodec extends Codec {
-    getAPI(config: CodecConfiguration): CommerceAPI
+    getAPI(config: any): CommerceAPI
+}
+
+export type CodecStringConfig<T> = {
+    [Key in keyof T]: string
 }
 
 const codecs: Codec[] = []

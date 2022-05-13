@@ -1,19 +1,30 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { CodecConfiguration, Codec, registerCodec, CommerceCodec } from '../..'
-import { API, CommerceAPI } from '../../..'
+import { Codec, CodecStringConfig, StringProperty } from '../..'
+import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient, { ClientCredentialProperties, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
 import { EPCustomerGroup } from './types'
 
-export interface ElasticPathCommerceCodecConfig extends OAuthCodecConfiguration {
-    client_id: string
-    client_secret: string
-    pcm_url: string
-    catalog_name: string
+type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+    pcm_url:        StringProperty
+    catalog_name:   StringProperty
+}
+
+const properties: CodecConfig = {
+    ...OAuthProperties,
+    ...ClientCredentialProperties,
+    pcm_url: {
+        title: "PCM URL",
+        type: "string"
+    },
+    catalog_name: {
+        title: "Catalog name",
+        type: "string"
+    }
 }
 
 export interface AttributedProduct extends Moltin.Product {
@@ -38,24 +49,9 @@ const epCodec: Codec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
-        properties: {
-            ...OAuthProperties,
-            ...ClientCredentialProperties,
-            "pcm_url": {
-                "title": "PCM URL",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            },
-            "catalog_name": {
-                "title": "Catalog name",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 50
-            }
-        }
+        properties
     },
-    getAPI: function (config: ElasticPathCommerceCodecConfig): CommerceAPI {
+    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
         if (!config.pcm_url) {
             return null
         }

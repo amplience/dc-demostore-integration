@@ -14,72 +14,40 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
 const mappers_1 = __importDefault(require("./mappers"));
-const common_1 = require("../common");
-// let x: RestCommerceCodecConfig = {
-//     "productURL": {
-//         "type": "string",
-//         "title": "Product URL",
-//         "description": "URL to a product JSON file"
-//     },
-//     "categoryURL": {
-//         "type": "string",
-//         "title": "Category URL",
-//         "description": "URL to a category JSON file"
-//     },
-//     "customerGroupURL": {
-//         "type": "string",
-//         "title": "Customer Group URL",
-//         "description": "URL to a customer group JSON file"
-//     },
-//     "translationsURL": {
-//         "type": "string",
-//         "title": "Translations URL",
-//         "description": "URL to a translations JSON file"
-//     }
-// }
-// export interface RestCommerceCodecConfig extends CodecConfiguration {
-//     productURL: string
-//     categoryURL: string
-//     customerGroupURL: string
-//     translationsURL: string
-// }
-let categories = [];
-let products = [];
-let customerGroups = [];
-let translations = {};
-let api = null;
+const properties = {
+    productURL: {
+        title: "Product file URL",
+        type: "string"
+    },
+    categoryURL: {
+        title: "Category file URL",
+        type: "string"
+    },
+    customerGroupURL: {
+        title: "Customer group file URL",
+        type: "string"
+    },
+    translationsURL: {
+        title: "Translations file URL",
+        type: "string"
+    }
+};
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 const restCodec = {
     schema: {
         uri: 'https://demostore.amplience.com/site/integration/rest',
         icon: 'https://cdn-icons-png.flaticon.com/512/180/180954.png',
-        properties: {
-            "productURL": {
-                "type": "string",
-                "title": "Product URL",
-                "description": "URL to a product JSON file"
-            },
-            "categoryURL": {
-                "type": "string",
-                "title": "Category URL",
-                "description": "URL to a category JSON file"
-            },
-            "customerGroupURL": {
-                "type": "string",
-                "title": "Customer Group URL",
-                "description": "URL to a customer group JSON file"
-            },
-            "translationsURL": {
-                "type": "string",
-                "title": "Translations URL",
-                "description": "URL to a translations JSON file"
-            }
-        }
+        properties
     },
     getAPI: function (config) {
         if (!config.productURL) {
             return null;
         }
+        let categories = [];
+        let products = [];
+        let customerGroups = [];
+        let translations = {};
+        let api = null;
         const loadAPI = () => __awaiter(this, void 0, void 0, function* () {
             if (lodash_1.default.isEmpty(products)) {
                 products = yield fetchFromURL(config.productURL, []);
@@ -89,7 +57,11 @@ const restCodec = {
             }
             api = {
                 getProductsForCategory: (category) => {
-                    return lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
+                    let categoryProducts = lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
+                    if (lodash_1.default.isEmpty(categoryProducts)) {
+                        categoryProducts = lodash_1.default.flatMap(category.children.map(api.getProductsForCategory));
+                    }
+                    return categoryProducts;
                 },
                 getProduct: (args) => {
                     return args.id && lodash_1.default.find(products, prod => args.id === prod.id) ||
@@ -102,12 +74,13 @@ const restCodec = {
                         args.keyword && lodash_1.default.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1);
                 },
                 getCategory: (args) => {
-                    return api.populateCategory((0, common_1.findInMegaMenu)(categories, args.slug));
+                    let category = categories.find(cat => cat.slug === args.slug);
+                    if (category) {
+                        return api.populateCategory(category);
+                    }
+                    return null;
                 },
-                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(lodash_1.default.uniqBy([
-                        ...api.getProductsForCategory(category),
-                        ...lodash_1.default.flatMap(category.children, api.getProductsForCategory)
-                    ], 'slug'), 12) })),
+                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 20) })),
                 getCustomerGroups: () => {
                     return customerGroups;
                 }
@@ -127,20 +100,20 @@ const restCodec = {
                 return __awaiter(this, void 0, void 0, function* () {
                     yield loadAPI();
                     let filtered = api.getProducts(args);
-                    if (!filtered) {
-                        throw new Error(`Products not found for args: ${JSON.stringify(args)}`);
+                    if (filtered) {
+                        return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
                     }
-                    return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
+                    return null;
                 });
             },
             getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     yield loadAPI();
                     let category = api.getCategory(args);
-                    if (!category) {
-                        throw new Error(`Category not found for args: ${JSON.stringify(args)}`);
+                    if (category) {
+                        return mappers_1.default.mapCategory(api.populateCategory(category));
                     }
-                    return mappers_1.default.mapCategory(api.populateCategory(category));
+                    return null;
                 });
             },
             getMegaMenu: function () {
