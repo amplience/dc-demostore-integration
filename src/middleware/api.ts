@@ -1,6 +1,6 @@
 import { getDemoStoreConfig } from "../amplience";
 import axios from "axios";
-import { Category, CodecConfiguration, CommerceAPI, CommonArgs, Config, CustomerGroup, DemoStoreConfiguration, getCodec, GetCommerceObjectArgs, GetProductsArgs, Product } from "../index";
+import { Category, CommerceAPI, CommonArgs, Config, CustomerGroup, getCommerceCodec, GetCommerceObjectArgs, GetProductsArgs, Product } from "../index";
 import { isServer } from "../index";
 
 export const baseConfigLocator = process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default`
@@ -14,34 +14,31 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
     }
 
     return configLocator ?
-        await getCodec((await getDemoStoreConfig(configLocator)).commerce) as CommerceAPI :
-        await getCodec(config as CodecConfiguration) as CommerceAPI
+        await getCommerceCodec((await getDemoStoreConfig(configLocator)).commerce) :
+        await getCommerceCodec(config)
 }
 
-const getResponse = async (req: any): Promise<any> => {
-    const commerceAPI = await getAPI(req.params)
+const getResponse = (operation: string) => (params: any) => async (args: any): Promise<any> => {
+    const commerceAPI = await getAPI(params)
     if (!commerceAPI) {
-        throw new Error(`commerceAPI not found for ${JSON.stringify(req.params)}`)
+        throw new Error(`commerceAPI not found for ${JSON.stringify(params)}`)
     }
 
-    const operation = commerceAPI[req.operation]
-    if (!operation) {
-        throw new Error(`invalid operation: ${req.operation}`)
+    const method = commerceAPI[operation]
+    if (!method) {
+        throw new Error(`invalid operation: ${operation}`)
     }
 
-    let apiUrl = `/api`
-    if (typeof window !== 'undefined' && (window as any).isStorybook) {
-        apiUrl = `https://core.dc-demostore.com/api`
-    }
-    return isServer() ? await operation(req.args) : await (await axios.post(apiUrl, req)).data
+    const apiUrl = typeof window !== 'undefined' && (window as any).isStorybook ? `https://core.dc-demostore.com/api` : `/api`
+    return isServer() ? await method(args) : await (await axios.post(apiUrl, { ...args, ...params })).data
 }
 
 export const getCommerceAPI = (params: Config): CommerceAPI => ({
-    getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => await getResponse({ params, args, operation: 'getProduct' }),
-    getProducts: async (args: GetProductsArgs): Promise<Product[]> => await getResponse({ params, args, operation: 'getProducts' }),
-    getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => await getResponse({ params, args, operation: 'getCategory' }),
-    getMegaMenu: async (args: CommonArgs): Promise<Category[]> => await getResponse({ params, args, operation: 'getMegaMenu' }),
-    getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => await getResponse({ params, args, operation: 'getCustomerGroups' })
+    getProduct:         getResponse('getProduct')(params),
+    getProducts:        getResponse('getProducts')(params),
+    getCategory:        getResponse('getCategory')(params),
+    getMegaMenu:        getResponse('getMegaMenu')(params),
+    getCustomerGroups:  getResponse('getCustomerGroups')(params)
 })
 
 const handler = async (req, res) => { 

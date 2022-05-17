@@ -1,23 +1,19 @@
 import _ from 'lodash'
-import { Codec, CodecStringConfig, StringProperty } from '../../../codec'
+import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
 import { formatMoneyString } from '../../../util'
-import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
 import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { findInMegaMenu } from '../common'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
-// caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
-let categories: CTCategory[]
-
-type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+type CodecConfig = ClientCredentialsConfiguration & {
     project:    StringProperty
     scope:      StringProperty
 }
 
 const properties: CodecConfig = {
-    ...OAuthProperties,
     ...ClientCredentialProperties,
     project: {
         title: "project key",
@@ -30,7 +26,7 @@ const properties: CodecConfig = {
     }
 }
 
-const getMapper = (args: GetCommerceObjectArgs): any => {
+const getMapper = (args: GetCommerceObjectArgs, megaMenu: CTCategory[] = []): any => {
     args = {
         language: args.language || 'en',
         country: args.country || 'US',
@@ -54,7 +50,7 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
         id: category.id,
         name: localize(category.name),
         slug: localize(category.slug),
-        children: categories.filter(cat => cat.parent?.id === category.id).map(mapCategory),
+        children: megaMenu.filter(cat => cat.parent?.id === category.id).map(mapCategory),
         products: []
     })
 
@@ -105,17 +101,14 @@ const getMapper = (args: GetCommerceObjectArgs): any => {
     }
 }
 
-const commerceToolsCodec: Codec = {
+const commerceToolsCodec: CommerceCodec = {
     schema: {
+        type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
         icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
         properties
     },
-    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
-        if (!config.scope) {
-            return null
-        }
-
+    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient({
             api_url: `${config.api_url}/${config.project}`,
             auth_url: `${config.auth_url}?grant_type=client_credentials`
@@ -129,6 +122,9 @@ const commerceToolsCodec: Codec = {
             })
         const fetch = async url => (await rest.get({ url })).results
 
+        // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
+        const categories: CTCategory[] = await fetch(`/categories?limit=500`)
+
         const getProductsForCategory = async (categoryId: string): Promise<CTProduct[]> => {
             return await fetch(`/product-projections/search?filter=categories.id: subtree("${categoryId}")`)
         }
@@ -137,7 +133,7 @@ const commerceToolsCodec: Codec = {
         const getProduct = async (args: GetCommerceObjectArgs): Promise<Product> => {
             if (args.id) {
                 let product = _.first(await fetch(`/product-projections/search?filter=id:"${args.id}"`))
-                return getMapper(args).mapProduct(product)
+                return getMapper(args, categories).mapProduct(product)
             }
             throw new Error(`getProduct(): id must be specified`)
         }
@@ -151,7 +147,7 @@ const commerceToolsCodec: Codec = {
             else if (args.keyword) {
                 products = await fetch(`/product-projections/search?text.en="${args.keyword}"`)
             }
-            return products.map(getMapper(args).mapProduct)
+            return products.map(getMapper(args, categories).mapProduct)
         }
 
         const getCategory = async (args: GetCommerceObjectArgs): Promise<Category> => {
@@ -160,16 +156,12 @@ const commerceToolsCodec: Codec = {
             // hydrate products into the category
             return {
                 ...category,
-                products: (await getProductsForCategory(category.id)).map(getMapper(args).mapProduct)
+                products: (await getProductsForCategory(category.id)).map(getMapper(args, categories).mapProduct)
             }
         }
 
         const getMegaMenu = async (args: CommonArgs): Promise<Category[]> => {
-            // for the megaMenu, only get categories that have their slugs in 'cats'
-            if (!categories) {
-                categories = await fetch(`/categories?limit=500`)
-            }
-            return categories.filter(cat => cats.includes(cat.slug.en)).map(getMapper(args).mapCategory)
+            return categories.filter(cat => cats.includes(cat.slug.en)).map(getMapper(args, categories).mapCategory)
         }
 
         const getCustomerGroups = async (): Promise<CustomerGroup[]> => {

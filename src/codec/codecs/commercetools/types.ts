@@ -1,5 +1,4 @@
 import { OAuthCodecConfiguration } from "../../../common/rest-client"
-import { CodecConfiguration } from "../../../codec"
 
 export interface CommerceToolsCodecConfiguration extends OAuthCodecConfiguration {
     client_id: string

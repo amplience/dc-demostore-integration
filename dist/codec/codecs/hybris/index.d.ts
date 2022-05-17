@@ -1,3 +1,3 @@
-import { Codec } from '../..';
-declare const hybrisCodec: Codec;
+import { CommerceCodec } from '../..';
+declare const hybrisCodec: CommerceCodec;
 export default hybrisCodec;

@@ -27,30 +27,27 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         configLocator = config.config_locator;
     }
     return configLocator ?
-        yield (0, index_1.getCodec)((yield (0, amplience_1.getDemoStoreConfig)(configLocator)).commerce) :
-        yield (0, index_1.getCodec)(config);
+        yield (0, index_1.getCommerceCodec)((yield (0, amplience_1.getDemoStoreConfig)(configLocator)).commerce) :
+        yield (0, index_1.getCommerceCodec)(config);
 });
-const getResponse = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const commerceAPI = yield getAPI(req.params);
+const getResponse = (operation) => (params) => (args) => __awaiter(void 0, void 0, void 0, function* () {
+    const commerceAPI = yield getAPI(params);
     if (!commerceAPI) {
-        throw new Error(`commerceAPI not found for ${JSON.stringify(req.params)}`);
+        throw new Error(`commerceAPI not found for ${JSON.stringify(params)}`);
     }
-    const operation = commerceAPI[req.operation];
-    if (!operation) {
-        throw new Error(`invalid operation: ${req.operation}`);
+    const method = commerceAPI[operation];
+    if (!method) {
+        throw new Error(`invalid operation: ${operation}`);
     }
-    let apiUrl = `/api`;
-    if (typeof window !== 'undefined' && window.isStorybook) {
-        apiUrl = `https://core.dc-demostore.com/api`;
-    }
-    return (0, index_2.isServer)() ? yield operation(req.args) : yield (yield axios_1.default.post(apiUrl, req)).data;
+    const apiUrl = typeof window !== 'undefined' && window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+    return (0, index_2.isServer)() ? yield method(args) : yield (yield axios_1.default.post(apiUrl, Object.assign(Object.assign({}, args), params))).data;
 });
 const getCommerceAPI = (params) => ({
-    getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getProduct' }); }),
-    getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getProducts' }); }),
-    getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getCategory' }); }),
-    getMegaMenu: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getMegaMenu' }); }),
-    getCustomerGroups: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getCustomerGroups' }); })
+    getProduct: getResponse('getProduct')(params),
+    getProducts: getResponse('getProducts')(params),
+    getCategory: getResponse('getCategory')(params),
+    getMegaMenu: getResponse('getMegaMenu')(params),
+    getCustomerGroups: getResponse('getCustomerGroups')(params)
 });
 exports.getCommerceAPI = getCommerceAPI;
 const handler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

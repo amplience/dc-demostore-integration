@@ -19,31 +19,20 @@ const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 exports.APIProperties = {
     api_url: {
         title: "Base API URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     }
 };
 exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties), { auth_url: {
         title: "Oauth URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     } });
-exports.ClientCredentialProperties = {
-    client_id: {
+exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAuthProperties), { client_id: {
         title: "Client ID",
-        type: "string",
-        minLength: 0,
-        maxLength: 50
-    },
-    client_secret: {
+        type: "string"
+    }, client_secret: {
         title: "Client secret",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
-    }
-};
+        type: "string"
+    } });
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
@@ -106,6 +95,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     return {
         get: request(dc_management_sdk_js_1.HttpMethod.GET),
         delete: request(dc_management_sdk_js_1.HttpMethod.DELETE),
+        put: request(dc_management_sdk_js_1.HttpMethod.PUT),
         post: request(dc_management_sdk_js_1.HttpMethod.POST),
         patch: request(dc_management_sdk_js_1.HttpMethod.PATCH)
     };

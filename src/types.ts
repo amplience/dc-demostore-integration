@@ -1,5 +1,4 @@
 import _, { Dictionary } from 'lodash'
-import { CodecConfiguration } from './codec'
 
 export interface Image {
     url: string
@@ -86,5 +85,5 @@ export interface DemoStoreConfiguration {
     algolia: AlgoliaConfig
     url?: string
     cms: AmplienceConfig
-    commerce?: CodecConfiguration
+    commerce?: any
 }

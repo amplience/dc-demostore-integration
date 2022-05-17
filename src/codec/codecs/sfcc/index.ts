@@ -1,17 +1,17 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, Codec, CodecStringConfig, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
+import { Category, CodecStringConfig, CommerceAPI, CommerceCodec, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
-import { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
+import { CodecType } from '../../index'
 
-type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+type CodecConfig = ClientCredentialsConfiguration & {
     api_token:  StringProperty
     site_id:    StringProperty
 }
 
 const properties: CodecConfig = {
-    ...OAuthProperties,
     ...ClientCredentialProperties,
     api_token: {
         title: "Shopper API Token",
@@ -24,17 +24,14 @@ const properties: CodecConfig = {
     }
 }
 
-const sfccCodec: Codec = {
+const sfccCodec: CommerceCodec = {
     schema: {
+        type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/sfcc',
         icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
         properties
     },
-    getAPI: (config: CodecStringConfig<CodecConfig>): CommerceAPI => {
-        if (!config.api_token) {
-            return null
-        }
-
+    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
             return (await axios.get(url, {
                 baseURL: config.api_url,
@@ -84,6 +81,7 @@ const sfccCodec: Codec = {
             })
         }
 
+        const megaMenu = await (await api.getCategory()).children
         return {
             getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
                 // if (query.args.id) {
@@ -112,7 +110,7 @@ const sfccCodec: Codec = {
                 }
             },
             getMegaMenu: async function (): Promise<Category[]> {
-                return await (await api.getCategory()).children
+                return megaMenu
             },
             getCustomerGroups: async function (): Promise<CustomerGroup[]> {
                 return await api.getCustomerGroups()

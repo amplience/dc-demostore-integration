@@ -1,4 +1,3 @@
-import { CodecConfiguration } from './codec';
 import CryptKeeper from './common/crypt-keeper';
 import OAuthRestClient from './common/rest-client';
 import { flattenCategories, getContentType, getContentTypeSchema } from './codec/codecs/common';
@@ -19,7 +18,7 @@ export declare class CommerceAPI extends API {
     getMegaMenu: (args: CommonArgs) => Promise<Category[]>;
     getCustomerGroups: (args: CommonArgs) => Promise<CustomerGroup[]>;
 }
-export declare type Config = ConfigLocatorBlock | CodecConfiguration;
+export declare type Config = ConfigLocatorBlock | any;
 export declare type ConfigLocatorBlock = {
     config_locator: string;
 };

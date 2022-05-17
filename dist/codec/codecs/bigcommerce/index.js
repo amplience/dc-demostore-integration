@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
+const __1 = require("../..");
 const mappers_1 = require("./mappers");
 const common_1 = require("../common");
 const rest_client_1 = require("../../../common/rest-client");
@@ -25,14 +26,12 @@ const properties = Object.assign(Object.assign({}, rest_client_1.APIProperties),
     } });
 const bigCommerceCodec = {
     schema: {
+        type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
         icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
         properties
     },
-    getAPI: (config) => {
-        if (!config.store_hash) {
-            return null;
-        }
+    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
             let response = yield axios_1.default.request({
                 method: 'get',
@@ -57,11 +56,7 @@ const bigCommerceCodec = {
             getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
             getCustomerGroups: () => fetch(`/v2/customer_groups`)
         };
-        const getMegaMenu = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return (yield api.getCategoryTree()).map(mappers_1.mapCategory);
-            });
-        };
+        const megaMenu = (yield api.getCategoryTree()).map(mappers_1.mapCategory);
         return {
             getProduct: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -87,17 +82,21 @@ const bigCommerceCodec = {
                     if (!args.slug) {
                         throw new Error(`getCategory(): must specify slug`);
                     }
-                    let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug);
+                    let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
                     return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(mappers_1.mapProduct) });
                 });
             },
-            getMegaMenu,
+            getMegaMenu: function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    return megaMenu;
+                });
+            },
             getCustomerGroups: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     return (yield api.getCustomerGroups()).map(mappers_1.mapCustomerGroup);
                 });
             }
         };
-    }
+    })
 };
 exports.default = bigCommerceCodec;

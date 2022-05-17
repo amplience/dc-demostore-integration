@@ -15,7 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../../../index");
 const rest_client_1 = require("../../../common/rest-client");
-const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { api_token: {
+const index_2 = require("../../index");
+const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { api_token: {
         title: "Shopper API Token",
         type: "string",
         maxLength: 100
@@ -25,14 +26,12 @@ const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.O
     } });
 const sfccCodec = {
     schema: {
+        type: index_2.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/sfcc',
         icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
         properties
     },
-    getAPI: (config) => {
-        if (!config.api_token) {
-            return null;
-        }
+    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
             return (yield axios_1.default.get(url, {
                 baseURL: config.api_url,
@@ -74,6 +73,7 @@ const sfccCodec = {
                 });
             }
         };
+        const megaMenu = yield (yield api.getCategory()).children;
         return {
             getProduct: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -105,7 +105,7 @@ const sfccCodec = {
             },
             getMegaMenu: function () {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return yield (yield api.getCategory()).children;
+                    return megaMenu;
                 });
             },
             getCustomerGroups: function () {
@@ -114,6 +114,6 @@ const sfccCodec = {
                 });
             }
         };
-    }
+    })
 };
 exports.default = sfccCodec;

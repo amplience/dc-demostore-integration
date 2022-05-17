@@ -1,3 +1,3 @@
-import { Codec } from '../../../index';
-declare const sfccCodec: Codec;
+import { CommerceCodec } from '../../../index';
+declare const sfccCodec: CommerceCodec;
 export default sfccCodec;

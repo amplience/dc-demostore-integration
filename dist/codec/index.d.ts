@@ -1,13 +1,5 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
-export declare type CodecConfiguration = {
-    _meta?: {
-        deliveryKey?: string;
-        deliveryId: string;
-        schema: string;
-    };
-    locator?: string;
-};
 export declare type Property = {
     title: string;
 };
@@ -37,20 +29,24 @@ export declare type ArrayProperty = Property & {
     uniqueItems?: boolean;
 };
 export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
-export interface Codec {
+export declare enum CodecType {
+    commerce = 0
+}
+export declare type Codec<T> = {
     schema: {
+        type: CodecType;
         uri: string;
         properties: Dictionary<AnyProperty>;
         icon: string;
     };
-    getAPI(config: any): any;
-}
-export interface CommerceCodec extends Codec {
-    getAPI(config: any): CommerceAPI;
-}
+    getAPI(config: any): Promise<T>;
+};
+export declare type GenericCodec = Codec<API>;
+export declare type CommerceCodec = Codec<CommerceAPI>;
 export declare type CodecStringConfig<T> = {
     [Key in keyof T]: string;
 };
-export declare const getCodecs: () => Codec[];
-export declare const registerCodec: (codec: Codec) => void;
-export declare const getCodec: (config: CodecConfiguration) => API;
+export declare const getCodecs: (type: CodecType) => Codec<any>[];
+export declare const registerCodec: (codec: Codec<any>) => void;
+export declare const getCodec: (config: any, type: CodecType) => Promise<API>;
+export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;

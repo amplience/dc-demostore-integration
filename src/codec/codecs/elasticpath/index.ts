@@ -1,21 +1,20 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { Codec, CodecStringConfig, StringProperty } from '../..'
+import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
 import { EPCustomerGroup } from './types'
 
-type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+type CodecConfig = ClientCredentialsConfiguration & {
     pcm_url:        StringProperty
     catalog_name:   StringProperty
 }
 
 const properties: CodecConfig = {
-    ...OAuthProperties,
     ...ClientCredentialProperties,
     pcm_url: {
         title: "PCM URL",
@@ -45,25 +44,19 @@ export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook
 }
 
-const epCodec: Codec = {
+const epCodec: CommerceCodec = {
     schema: {
+        type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
         properties
     },
-    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
-        if (!config.pcm_url) {
-            return null
-        }
-
+    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient(config, qs.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
             client_secret: config.client_secret
         }))
-
-        let catalog = null
-        let megaMenu = null
 
         const fetch = async url => (await rest.get({ url })).data
         const api = {
@@ -88,7 +81,7 @@ const epCodec: Codec = {
                 pricebook
             }))),
             getCatalog: async (): Promise<Catalog> => {
-                return catalog = catalog || _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
+                return catalog
             },
             getMegaMenu: async (): Promise<Hierarchy[]> => {
                 return await Promise.all((await api.getCatalog()).attributes.hierarchy_ids.map(await api.getHierarchyById))
@@ -115,6 +108,9 @@ const epCodec: Codec = {
             }
             return await Promise.all(products.map(await mapper.mapProduct))
         }
+
+        const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+        const catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
 
         // CommerceAPI
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
@@ -143,7 +139,7 @@ const epCodec: Codec = {
         }
 
         const getMegaMenu = async function (): Promise<Category[]> {
-            return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+            return megaMenu
         }
 
         const getCustomerGroups = async function (): Promise<CustomerGroup[]> {

@@ -36,10 +36,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("../..");
 const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
-let megaMenu;
 const properties = Object.assign(Object.assign({}, rest_client_1.OAuthProperties), { username: {
         title: "Username",
         type: "string"
@@ -58,19 +58,13 @@ const properties = Object.assign(Object.assign({}, rest_client_1.OAuthProperties
     } });
 const fabricCodec = {
     schema: {
+        type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/fabric',
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
         properties
     },
-    getAPI: function (config) {
-        if (!config.username) {
-            return null;
-        }
-        const rest = (0, rest_client_1.default)(config, {
-            username: config.username,
-            password: config.password,
-            accountId: config.accountId
-        }, {
+    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
+        const rest = (0, rest_client_1.default)(config, config, {
             headers: {
                 'content-type': 'application/json'
             }
@@ -87,7 +81,7 @@ const fabricCodec = {
                 })
             };
         });
-        const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return yield rest.get({ url }); });
+        const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return yield rest.get({ url }); });
         const getProductAttributes = function (sku) {
             return __awaiter(this, void 0, void 0, function* () {
                 return lodash_1.default.get(yield fetch(`/api-product/v1/product/attribute?sku=${sku}`), 'attributes');
@@ -106,7 +100,7 @@ const fabricCodec = {
             children: category.children.map(mapCategory),
             products: []
         });
-        const mapProduct = (product) => __awaiter(this, void 0, void 0, function* () {
+        const mapProduct = (product) => __awaiter(void 0, void 0, void 0, function* () {
             let attributes = yield getProductAttributes(product.sku);
             const getAttributeValue = name => attributes.find(att => att.name === name).value;
             let name = getAttributeValue('title');
@@ -128,6 +122,12 @@ const fabricCodec = {
                     }]
             };
         });
+        // the 'categories[0].children' of the node returned from this URL are the top level categories
+        let categories = lodash_1.default.get(yield fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children');
+        if (!categories) {
+            throw new Error('megaMenu node not found');
+        }
+        const megaMenu = categories.map(mapCategory);
         // CommerceAPI implementation
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -149,15 +149,7 @@ const fabricCodec = {
         };
         const getMegaMenu = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (megaMenu) {
-                    return megaMenu;
-                }
-                // the 'categories[0].children' of the node returned from this URL are the top level categories
-                let categories = lodash_1.default.get(yield fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children');
-                if (categories) {
-                    return megaMenu = categories.map(mapCategory);
-                }
-                throw new Error('megaMenu node not found');
+                return megaMenu;
             });
         };
         const getCustomerGroups = function (args) {
@@ -174,6 +166,6 @@ const fabricCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    }
+    })
 };
 exports.default = fabricCodec;

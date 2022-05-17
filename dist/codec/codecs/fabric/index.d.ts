@@ -1,3 +1,3 @@
-import { Codec } from '../..';
-declare const fabricCodec: Codec;
+import { CommerceCodec } from '../..';
+declare const fabricCodec: CommerceCodec;
 export default fabricCodec;

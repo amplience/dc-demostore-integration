@@ -1,4 +1,3 @@
-import { CodecConfiguration } from './codec'
 import CryptKeeper from './common/crypt-keeper'
 import OAuthRestClient from './common/rest-client'
 import { flattenCategories, getContentType, getContentTypeSchema } from './codec/codecs/common'
@@ -37,7 +36,7 @@ export class CommerceAPI extends API {
     getCustomerGroups:  (args: CommonArgs)              => Promise<CustomerGroup[]>
 }
 
-export type Config = ConfigLocatorBlock | CodecConfiguration
+export type Config = ConfigLocatorBlock | any
 export type ConfigLocatorBlock = {
     config_locator: string
 }

@@ -1,3 +1,3 @@
-import { Codec } from '../../../codec';
-declare const commerceToolsCodec: Codec;
+import { CommerceCodec } from '../..';
+declare const commerceToolsCodec: CommerceCodec;
 export default commerceToolsCodec;
