@@ -1,14 +1,13 @@
 import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
 import _ from "lodash";
-import { Codec, GenericCodec } from "..";
-import { Category } from "../../types";
+import { GenericCodec } from "..";
+import { Category } from "../../common/types";
 
-const findInMegaMenu = (categories: Category[], slug: string) => {
-    let allCategories = flattenCategories(categories)
-    return allCategories.find(category => category.slug.toLowerCase() === slug.toLowerCase())
+export const findInMegaMenu = (categories: Category[], slug: string) => {
+    return flattenCategories(categories).find(category => category.slug.toLowerCase() === slug.toLowerCase())
 }
 
-const flattenCategories = (categories: Category[]) => {
+export const flattenCategories = (categories: Category[]) => {
     const allCategories: Category[] = []
     const bulldozeCategories = cat => {
         allCategories.push(cat)
@@ -18,7 +17,7 @@ const flattenCategories = (categories: Category[]) => {
     return allCategories
 }
 
-const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
+export const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
     schema.schemaId = codec.schema.uri
     schema.body = JSON.stringify({
@@ -33,7 +32,7 @@ const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
     return schema
 }
 
-const getContentType = (codec: GenericCodec): ContentType => {
+export const getContentType = (codec: GenericCodec): ContentType => {
     let contentType = new ContentType()
     contentType.contentTypeUri = codec.schema.uri
     contentType.settings = {
@@ -45,5 +44,3 @@ const getContentType = (codec: GenericCodec): ContentType => {
     }
     return contentType
 }
-
-export { findInMegaMenu, flattenCategories, getContentType, getContentTypeSchema }

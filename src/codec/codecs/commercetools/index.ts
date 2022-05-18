@@ -1,7 +1,7 @@
 import _ from 'lodash'
-import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product, Variant } from '../../../index'
-import { formatMoneyString } from '../../../util'
+import { formatMoneyString } from '../../../common/util'
 import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
 import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { findInMegaMenu } from '../common'
@@ -11,19 +11,6 @@ const cats = ['women', 'men', 'new', 'sale', 'accessories']
 type CodecConfig = ClientCredentialsConfiguration & {
     project:    StringProperty
     scope:      StringProperty
-}
-
-const properties: CodecConfig = {
-    ...ClientCredentialProperties,
-    project: {
-        title: "project key",
-        type: "string"
-    },
-    scope: {
-        title: "scope",
-        type: "string",
-        maxLength: 1000
-    }
 }
 
 const getMapper = (args: GetCommerceObjectArgs, megaMenu: CTCategory[] = []): any => {
@@ -103,12 +90,23 @@ const getMapper = (args: GetCommerceObjectArgs, megaMenu: CTCategory[] = []): an
 
 const commerceToolsCodec: CommerceCodec = {
     schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/commercetools',
-        icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
-        properties
+        type:               CodecType.commerce,
+        uri:                'https://demostore.amplience.com/site/integration/commercetools',
+        icon:               'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
+        properties: {
+            ...ClientCredentialProperties,
+            project: {
+                title:      "project key",
+                type:       "string"
+            },
+            scope: {
+                title:      "scope",
+                type:       "string",
+                maxLength:  1000
+            }
+        }
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient({
             api_url: `${config.api_url}/${config.project}`,
             auth_url: `${config.auth_url}?grant_type=client_credentials`
@@ -178,4 +176,4 @@ const commerceToolsCodec: CommerceCodec = {
         }
     }
 }
-export default commerceToolsCodec
+registerCodec(commerceToolsCodec)

@@ -28,4 +28,4 @@ const CryptKeeper = (config: any, hub?: string) => {
         }
     }
 }
-export default CryptKeeper
+export { CryptKeeper }

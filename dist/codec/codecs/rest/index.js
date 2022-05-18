@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("../..");
 const mappers_1 = __importDefault(require("./mappers"));
 const index_1 = require("../../index");
 const properties = {
@@ -118,4 +119,4 @@ const restCodec = {
         });
     }
 };
-exports.default = restCodec;
+(0, __1.registerCodec)(restCodec);

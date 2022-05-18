@@ -157,4 +157,4 @@ const epCodec = {
         };
     })
 };
-exports.default = epCodec;
+(0, __1.registerCodec)(epCodec);

@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import { findInMegaMenu } from '../common'
 import axios from 'axios'
@@ -49,7 +49,7 @@ const hybrisCodec: CommerceCodec = {
         icon: 'https://images.squarespace-cdn.com/content/v1/54dd763ce4b01f6b05bab7db/1511645929126-9BGFQ3VFVOQX75PHZ7JS/logos-014__2_.png',
         properties
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = axios.create({ baseURL: `${config.api_url}/occ/v2/${config.catalog_id}` })
         const fetch = async (url: string) => await (await rest.get(url)).data
 
@@ -99,4 +99,4 @@ const hybrisCodec: CommerceCodec = {
         }
     }
 }
-export default hybrisCodec
+registerCodec(hybrisCodec)

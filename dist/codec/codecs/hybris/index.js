@@ -88,4 +88,4 @@ const hybrisCodec = {
         };
     })
 };
-exports.default = hybrisCodec;
+(0, __1.registerCodec)(hybrisCodec);

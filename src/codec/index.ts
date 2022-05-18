@@ -1,71 +1,71 @@
+import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI, CommonArgs } from '..'
 
 export type Property = {
-    title:          string
+    title: string
 }
 
 export type StringProperty = Property & {
-    type:       'string'
+    type: 'string'
     minLength?: number
     maxLength?: number
-    pattern?:   string
+    pattern?: string
 }
 
 export type NumberProperty = Property & {
-    type:               'number'
-    multipleOf?:        number
-    minimum?:           number
-    maximum?:           number
-    exclusiveMinimum?:  number
-    exclusiveMaximum?:  number
+    type: 'number'
+    multipleOf?: number
+    minimum?: number
+    maximum?: number
+    exclusiveMinimum?: number
+    exclusiveMaximum?: number
 }
 
 export type IntegerProperty = NumberProperty & {
-    type:           'integer'
+    type: 'integer'
 }
 
 export type ArrayProperty = Property & {
-    type:           'array'
-    items?:         number
-    minItems?:      number
-    maxItems?:      number
-    required?:      boolean
-    uniqueItems?:   boolean
+    type: 'array'
+    items?: number
+    minItems?: number
+    maxItems?: number
+    required?: boolean
+    uniqueItems?: boolean
 }
-
-export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
 export enum CodecType {
     commerce
 }
 
+export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 export type Codec<T> = {
     schema: {
-        type:       CodecType
-        uri:        string
+        type: CodecType
+        uri: string
         properties: Dictionary<AnyProperty>
-        icon:       string
+        icon: string
     }
-    getAPI(config: any): Promise<T>
+    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>
 }
 
 export type GenericCodec = Codec<API>
 export type CommerceCodec = Codec<CommerceAPI>
 
-export type CodecStringConfig<T> = {
-    [Key in keyof T]: string
+export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
+    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[]
 }
 
-const codecs = new Map<CodecType, Codec<any>>()
+const codecs = new Map<CodecType, GenericCodec>()
 codecs[CodecType.commerce] = []
 
-export const getCodecs = (type: CodecType): Codec<any>[] => {
+// public interface
+export const getCodecs = (type: CodecType): GenericCodec[] => {
     return codecs[type]
 }
 
-export const registerCodec = (codec: Codec<any>) => {
-    // console.log(`[ demostore ] register [ ${codec.schema.type} ] codec ${codec.schema.uri}`)
+export const registerCodec = (codec: GenericCodec) => {
     if (!codecs[codec.schema.type].includes(codec)) {
         codecs[codec.schema.type].push(codec)
     }
@@ -75,7 +75,7 @@ export const registerCodec = (codec: Codec<any>) => {
 const apis = new Map<any, API>()
 
 export const getCodec = async (config: any, type: CodecType): Promise<API> => {
-    let codecsMatchingConfig: Codec<any>[] = getCodecs(type).filter(c => _.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0)
+    let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0)
 
     if (codecsMatchingConfig.length === 0) {
         throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
@@ -85,34 +85,35 @@ export const getCodec = async (config: any, type: CodecType): Promise<API> => {
     }
 
     if (!apis[config]) {
-        let codec = _.first(codecsMatchingConfig)
-        let api = await codec.getAPI(config)
-        _.each(api, (method: any, key: string) => {
-            if (typeof api[key] === 'function') {
-                // apply default arguments for those not provided in the query
-                api[key] = async (args: CommonArgs): Promise<any> => await method({
-                    locale: 'en-US',
-                    language: 'en',
-                    country: 'US',
-                    currency: 'USD',
-                    segment: '',
-                    ...args
-                })
-            }
-        })
-        apis[config] = api
+        let api = await _.first(codecsMatchingConfig).getAPI(config)
+        apis[config] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
+            // apply default arguments for those not provided in the query
+            return async (args: CommonArgs): Promise<any> => await api[key]({
+                locale:     'en-US',
+                language:   'en',
+                country:    'US',
+                currency:   'USD',
+                segment:    '',
+                ...args
+            })
+        }))
     }
     return apis[config]
 }
 
-export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => {
-    return await getCodec(config, CodecType.commerce) as CommerceAPI
+export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecType.commerce) as CommerceAPI
+// end public interface
+
+// register codecs
+if (isServer()) {
+    import('./codecs/bigcommerce')
+    import('./codecs/commercetools')
+    import('./codecs/elasticpath')
+    import('./codecs/fabric')
+    import('./codecs/hybris')
+    import('./codecs/rest')
+    import('./codecs/sfcc')
 }
 
-registerCodec(require('./codecs/bigcommerce').default)
-registerCodec(require('./codecs/commercetools').default)
-registerCodec(require('./codecs/sfcc').default)
-registerCodec(require('./codecs/elasticpath').default)
-registerCodec(require('./codecs/rest').default)
-registerCodec(require('./codecs/fabric').default)
-registerCodec(require('./codecs/hybris').default)
+// reexport codec common functions
+export * from './codecs/common'

@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import axios from 'axios'
-import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
+import { CodecPropertyConfig, CodecType, CommerceCodec, NumberProperty, registerCodec, StringProperty } from '../..'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
 import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
 import { findInMegaMenu } from '../common'
@@ -11,26 +11,24 @@ type CodecConfig = APIConfiguration & {
     store_hash: StringProperty
 }
 
-const properties: CodecConfig = {
-    ...APIProperties,
-    api_token: {
-        title: "API Token",
-        type: "string"
-    },
-    store_hash: {
-        title: "Store hash",
-        type: "string"
-    }
-}
-
 const bigCommerceCodec: CommerceCodec = {
     schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
-        icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
-        properties
+        type:       CodecType.commerce,
+        uri:        'https://demostore.amplience.com/site/integration/bigcommerce',
+        icon:       'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
+        properties: {
+            ...APIProperties,
+            api_token: {
+                title: "API Token",
+                type: "string"
+            },
+            store_hash: {
+                title: "Store hash",
+                type: "string"
+            }
+        }
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
             let response = await axios.request({
                 method: 'get',
@@ -95,4 +93,4 @@ const bigCommerceCodec: CommerceCodec = {
         }
     }
 }
-export default bigCommerceCodec
+registerCodec(bigCommerceCodec)

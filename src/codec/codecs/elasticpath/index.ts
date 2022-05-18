@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
 import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
@@ -51,7 +51,7 @@ const epCodec: CommerceCodec = {
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
         properties
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient(config, qs.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
@@ -156,4 +156,4 @@ const epCodec: CommerceCodec = {
         }
     }
 }
-export default epCodec
+registerCodec(epCodec)

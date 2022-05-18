@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mapCustomerGroup = exports.mapProduct = exports.mapVariantProduct = exports.mapVariant = exports.mapCategory = void 0;
-const util_1 = require("../../../util");
+const util_1 = require("../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
 const mapCategory = (category) => {
     return {

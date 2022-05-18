@@ -1,15 +1,15 @@
 import _, { Dictionary } from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { CodecStringConfig, CommerceCodec, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../common/types'
+import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import mappers from './mappers'
 import { CodecType } from '../../index'
 
 type CodecConfig = {
-    productURL: StringProperty
-    categoryURL: StringProperty
-    customerGroupURL: StringProperty
-    translationsURL: StringProperty
+    productURL:         StringProperty
+    categoryURL:        StringProperty
+    customerGroupURL:   StringProperty
+    translationsURL:    StringProperty
 }
 
 const properties: CodecConfig = {
@@ -40,7 +40,7 @@ const restCodec: CommerceCodec = {
         icon: 'https://cdn-icons-png.flaticon.com/512/180/180954.png',
         properties
     },
-    getAPI: async function (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> {
+    getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
         const categories: Category[] = await fetchFromURL(config.categoryURL, [])
         const products: Product[] = await fetchFromURL(config.productURL, [])
         const customerGroups: CustomerGroup[] = await fetchFromURL(config.customerGroupURL, [])
@@ -109,4 +109,4 @@ const restCodec: CommerceCodec = {
         }
     }
 }
-export default restCodec
+registerCodec(restCodec)

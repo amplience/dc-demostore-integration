@@ -1,75 +1,73 @@
 import { Dictionary } from 'lodash';
-export interface Image {
+export declare type Image = {
     url: string;
     thumb?: string;
-}
-export interface Identifiable {
+};
+export declare type Identifiable = {
     id: string;
     name: string;
-}
-export interface CustomerGroup extends Identifiable {
-}
-export interface CommerceObject extends Identifiable {
+};
+export declare type CustomerGroup = Identifiable & {};
+export declare type CommerceObject = Identifiable & {
     slug: string;
-}
-export interface Product extends CommerceObject {
+};
+export declare type Product = CommerceObject & {
     shortDescription?: string;
     longDescription?: string;
     imageSetId?: string;
     categories: Category[];
     variants: Variant[];
-}
-export interface Variant {
+};
+export declare type Variant = {
     sku: string;
     listPrice: string;
     salePrice: string;
     defaultImage?: Image;
     images: Image[];
     attributes: Dictionary<string>;
-}
-export interface Category extends CommerceObject {
+};
+export declare type Category = CommerceObject & {
     parent?: Category;
     image?: Image;
     children: Category[];
     products: Product[];
-}
-export interface Promotion extends Identifiable {
+};
+export declare type Promotion = Identifiable & {
     description: string;
     promoCode?: string;
     isActive: boolean;
     image?: Image;
-}
-export interface GetAttributeArgs {
+};
+export declare type GetAttributeArgs = {
     name: string;
-}
-export interface CommonArgs {
-    [key: string]: any;
+};
+export declare type CommonArgs = {
     locale?: string;
     language?: string;
     country?: string;
     currency?: string;
     segment?: string;
-}
-export interface GetCommerceObjectArgs extends CommonArgs {
+};
+export declare type GetCommerceObjectArgs = CommonArgs & {
     id?: string;
     slug?: string;
-}
-export interface GetProductsArgs extends CommonArgs {
+};
+export declare type GetProductsArgs = CommonArgs & {
     keyword?: string;
     productIds?: string;
-}
-export interface AlgoliaConfig {
+};
+export declare type AlgoliaConfig = {
     appId: string;
     apiKey: string;
-}
-export interface AmplienceConfig {
+};
+export declare type AmplienceConfig = {
     hub: string;
     stagingApi: string;
     imageHub?: string;
-}
-export interface DemoStoreConfiguration {
+};
+export declare type DemoStoreConfiguration = {
     algolia: AlgoliaConfig;
     url?: string;
     cms: AmplienceConfig;
     commerce?: any;
-}
+};

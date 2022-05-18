@@ -1,5 +1,5 @@
-import { Product, Image, CustomerGroup } from "../../../types"
-import { formatMoneyString } from "../../../util"
+import { Product, Image, CustomerGroup } from "../../../common/types"
+import { formatMoneyString } from "../../../common/util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
 import { AttributedProduct, ElasticPathCategory } from "."

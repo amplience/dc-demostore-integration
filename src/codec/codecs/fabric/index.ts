@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { CodecStringConfig, CodecType, CommerceCodec, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import slugify from 'slugify'
@@ -46,7 +46,7 @@ const fabricCodec: CommerceCodec = {
         icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
         properties
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient(config, config, {
             headers: {
                 'content-type': 'application/json'
@@ -154,4 +154,4 @@ const fabricCodec: CommerceCodec = {
         }
     }
 }
-export default fabricCodec
+registerCodec(fabricCodec)

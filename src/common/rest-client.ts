@@ -1,19 +1,15 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { sleep } from '../util'
+import { sleep } from '../common/util'
 import _ from 'lodash'
-import { AnyProperty, CodecStringConfig, StringProperty } from '..'
+import { CodecPropertyConfig, StringProperty } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
 
-export type OAuthRestClientInterface = {
-    [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
-}
-
 export type APIConfiguration = {
-    api_url: StringProperty
+    api_url:        StringProperty
 }
 
 export type OAuthCodecConfiguration = APIConfiguration & {
-    auth_url: StringProperty
+    auth_url:       StringProperty
 }
 
 export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
@@ -48,8 +44,12 @@ export const ClientCredentialProperties: ClientCredentialsConfiguration = {
     }
 }
 
+export type OAuthRestClientInterface = {
+    [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
+}
+
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
-export const OAuthRestClient = (config: CodecStringConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any) => {
+export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any): OAuthRestClientInterface => {
     let authenticatedAxios: AxiosInstance
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 

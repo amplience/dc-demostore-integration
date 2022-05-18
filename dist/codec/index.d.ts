@@ -28,10 +28,10 @@ export declare type ArrayProperty = Property & {
     required?: boolean;
     uniqueItems?: boolean;
 };
-export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
 export declare enum CodecType {
     commerce = 0
 }
+export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
 export declare type Codec<T> = {
     schema: {
         type: CodecType;
@@ -39,14 +39,15 @@ export declare type Codec<T> = {
         properties: Dictionary<AnyProperty>;
         icon: string;
     };
-    getAPI(config: any): Promise<T>;
+    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>;
 };
 export declare type GenericCodec = Codec<API>;
 export declare type CommerceCodec = Codec<CommerceAPI>;
-export declare type CodecStringConfig<T> = {
-    [Key in keyof T]: string;
+export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
+    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
-export declare const getCodecs: (type: CodecType) => Codec<any>[];
-export declare const registerCodec: (codec: Codec<any>) => void;
+export declare const getCodecs: (type: CodecType) => GenericCodec[];
+export declare const registerCodec: (codec: GenericCodec) => void;
 export declare const getCodec: (config: any, type: CodecType) => Promise<API>;
 export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;
+export * from './codecs/common';

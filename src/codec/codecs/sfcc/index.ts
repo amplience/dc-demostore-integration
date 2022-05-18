@@ -1,10 +1,10 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, CodecStringConfig, CommerceAPI, CommerceCodec, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
+import { Category, CodecPropertyConfig, CommerceAPI, CommerceCodec, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
 import { SFCCCategory, SFCCCustomerGroup } from './types'
 import { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
-import { CodecType } from '../../index'
+import { CodecType, registerCodec } from '../../index'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     api_token:  StringProperty
@@ -31,7 +31,7 @@ const sfccCodec: CommerceCodec = {
         icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
         properties
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
             return (await axios.get(url, {
                 baseURL: config.api_url,
@@ -118,4 +118,4 @@ const sfccCodec: CommerceCodec = {
         }
     }
 }
-export default sfccCodec
+registerCodec(sfccCodec)

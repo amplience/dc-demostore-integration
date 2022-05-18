@@ -37,18 +37,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../..");
-const util_1 = require("../../../util");
+const util_1 = require("../../../common/util");
 const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const common_1 = require("../common");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
-const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { project: {
-        title: "project key",
-        type: "string"
-    }, scope: {
-        title: "scope",
-        type: "string",
-        maxLength: 1000
-    } });
 const getMapper = (args, megaMenu = []) => {
     args = {
         language: args.language || 'en',
@@ -119,7 +111,14 @@ const commerceToolsCodec = {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
         icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
-        properties
+        properties: Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { project: {
+                title: "project key",
+                type: "string"
+            }, scope: {
+                title: "scope",
+                type: "string",
+                maxLength: 1000
+            } })
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         const rest = (0, rest_client_1.default)({
@@ -177,4 +176,4 @@ const commerceToolsCodec = {
         };
     })
 };
-exports.default = commerceToolsCodec;
+(0, __1.registerCodec)(commerceToolsCodec);

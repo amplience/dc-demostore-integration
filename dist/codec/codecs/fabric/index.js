@@ -168,4 +168,4 @@ const fabricCodec = {
         };
     })
 };
-exports.default = fabricCodec;
+(0, __1.registerCodec)(fabricCodec);

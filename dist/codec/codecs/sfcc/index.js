@@ -116,4 +116,4 @@ const sfccCodec = {
         };
     })
 };
-exports.default = sfccCodec;
+(0, index_2.registerCodec)(sfccCodec);

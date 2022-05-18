@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = exports.APIProperties = void 0;
 const axios_1 = __importDefault(require("axios"));
-const util_1 = require("../util");
+const util_1 = require("../common/util");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 exports.APIProperties = {
     api_url: {

@@ -1,4 +1,4 @@
-import { Product, Category, CommonArgs } from "../../../types";
+import { Product, Category, CommonArgs } from "../../../common/types";
 import _ from "lodash";
 declare const _default: {
     mapProduct: (product: Product, args: CommonArgs) => {
@@ -7,26 +7,26 @@ declare const _default: {
             listPrice: string;
             salePrice: string;
             sku: string;
-            defaultImage?: import("../../../types").Image;
-            images: import("../../../types").Image[];
+            defaultImage?: import("../../../common/types").Image;
+            images: import("../../../common/types").Image[];
             attributes: _.Dictionary<string>;
         }[];
+        id: string;
+        name: string;
+        slug: string;
         shortDescription?: string;
         longDescription?: string;
         categories: Category[];
-        slug: string;
-        id: string;
-        name: string;
     };
     mapCategory: (category: Category) => {
         key: string;
-        parent?: Category;
-        image?: import("../../../types").Image;
-        children: Category[];
-        products: Product[];
-        slug: string;
         id: string;
         name: string;
+        slug: string;
+        parent?: Category;
+        image?: import("../../../common/types").Image;
+        children: Category[];
+        products: Product[];
     };
 };
 export default _default;

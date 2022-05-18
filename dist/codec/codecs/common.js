@@ -3,12 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentTypeSchema = exports.getContentType = exports.flattenCategories = exports.findInMegaMenu = void 0;
+exports.getContentType = exports.getContentTypeSchema = exports.flattenCategories = exports.findInMegaMenu = void 0;
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const lodash_1 = __importDefault(require("lodash"));
 const findInMegaMenu = (categories, slug) => {
-    let allCategories = flattenCategories(categories);
-    return allCategories.find(category => category.slug.toLowerCase() === slug.toLowerCase());
+    return (0, exports.flattenCategories)(categories).find(category => category.slug.toLowerCase() === slug.toLowerCase());
 };
 exports.findInMegaMenu = findInMegaMenu;
 const flattenCategories = (categories) => {

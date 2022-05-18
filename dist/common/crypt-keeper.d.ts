@@ -3,4 +3,4 @@ declare const CryptKeeper: (config: any, hub?: string) => {
     decrypt: (text: string) => string;
     decryptAll: () => any;
 };
-export default CryptKeeper;
+export { CryptKeeper };
