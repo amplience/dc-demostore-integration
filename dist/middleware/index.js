@@ -19,10 +19,7 @@ const index_1 = require("../index");
 const util_1 = require("../common/util");
 exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    if (!config) {
-        // if undefined is passed then the config locator is specified by baseConfigLocator
-        config = exports.baseConfigLocator;
-    }
+    config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
     if ('config_locator' in config) {
         // either we were passed in a config_locator or undefined, so let's get the credential block
         config = yield (yield (0, amplience_1.getDemoStoreConfig)(config.config_locator)).commerce;

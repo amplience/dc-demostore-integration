@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,9 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = __importDefault(require("axios"));
-const index_1 = require("../../../index");
-const rest_client_1 = require("../../../common/rest-client");
-const index_2 = require("../../index");
+const rest_client_1 = __importStar(require("../../../common/rest-client"));
+const index_1 = require("../../index");
+const slugify_1 = __importDefault(require("slugify"));
 const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { api_token: {
         title: "Shopper API Token",
         type: "string",
@@ -26,7 +49,7 @@ const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentia
     } });
 const sfccCodec = {
     schema: {
-        type: index_2.CodecType.commerce,
+        type: index_1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/sfcc',
         icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
         properties
@@ -41,7 +64,7 @@ const sfccCodec = {
             })).data;
         });
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
-        let rest = (0, index_1.OAuthRestClient)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
+        let rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
             headers: {
                 Authorization: 'Basic ' + config.api_token,
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -51,15 +74,29 @@ const sfccCodec = {
         // end authenticated fetch
         const api = {
             getCategory: (slug = 'root') => __awaiter(void 0, void 0, void 0, function* () {
-                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`));
+                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v22_4/categories/${slug}?levels=4`));
             }),
             getCustomerGroups: () => __awaiter(void 0, void 0, void 0, function* () {
                 return (yield authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup);
             }),
-            getProducts: () => fetch(`/products`),
-            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
+            getProducts: (id) => __awaiter(void 0, void 0, void 0, function* () {
+            }),
+            searchProducts: (keyword) => __awaiter(void 0, void 0, void 0, function* () {
+                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v22_4/product_search?q=${keyword}`));
+            }),
             getProductById: id => fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
+            mapProduct: (product) => {
+                return Object.assign(Object.assign({}, product), { slug: (0, slugify_1.default)(product.name, { lower: true }), shortDescription: product.short_description, longDescription: product.long_description, categories: [], variants: product.variants.map(variant => {
+                        return {
+                            sku: variant.product_id,
+                            listPrice: `${variant.price}`,
+                            salePrice: `${variant.price}`,
+                            images: [],
+                            attributes: {}
+                        };
+                    }) });
+            },
             mapCustomerGroup: (group) => (Object.assign(Object.assign({}, group), { name: group.id })),
             mapCategory: (cat) => {
                 var _a;
@@ -116,4 +153,4 @@ const sfccCodec = {
         };
     })
 };
-(0, index_2.registerCodec)(sfccCodec);
+(0, index_1.registerCodec)(sfccCodec);

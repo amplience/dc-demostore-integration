@@ -48,11 +48,10 @@ const restCodec: CommerceCodec = {
 
         const api = {
             getProductsForCategory: (category: Category): Product[] => {
-                let categoryProducts = _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
-                if (_.isEmpty(categoryProducts)) {
-                    categoryProducts = _.flatMap(category.children.map(api.getProductsForCategory))
-                }
-                return categoryProducts
+                return [
+                    ..._.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id)),
+                    ..._.flatMap(category.children.map(api.getProductsForCategory))
+                ]
             },
             getProduct: (args: GetCommerceObjectArgs) => {
                 return args.id && _.find(products, prod => args.id === prod.id) ||
@@ -72,7 +71,7 @@ const restCodec: CommerceCodec = {
             },
             populateCategory: (category: Category): Category => ({
                 ...category,
-                products: _.take(api.getProductsForCategory(category), 20)
+                products: _.take(api.getProductsForCategory(category), 12)
             }),
             getCustomerGroups: (): CustomerGroup[] => {
                 return customerGroups

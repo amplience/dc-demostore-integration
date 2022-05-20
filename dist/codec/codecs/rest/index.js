@@ -50,11 +50,10 @@ const restCodec = {
             const translations = yield fetchFromURL(config.translationsURL, {});
             const api = {
                 getProductsForCategory: (category) => {
-                    let categoryProducts = lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id));
-                    if (lodash_1.default.isEmpty(categoryProducts)) {
-                        categoryProducts = lodash_1.default.flatMap(category.children.map(api.getProductsForCategory));
-                    }
-                    return categoryProducts;
+                    return [
+                        ...lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id)),
+                        ...lodash_1.default.flatMap(category.children.map(api.getProductsForCategory))
+                    ];
                 },
                 getProduct: (args) => {
                     return args.id && lodash_1.default.find(products, prod => args.id === prod.id) ||
@@ -73,7 +72,7 @@ const restCodec = {
                     }
                     return null;
                 },
-                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 20) })),
+                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 12) })),
                 getCustomerGroups: () => {
                     return customerGroups;
                 }
