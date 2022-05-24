@@ -10,9 +10,9 @@ export type ConfigLocatorBlock = {
 
 export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
 const getAPI = async (config: Config): Promise<CommerceAPI> => {
-    if (!config) {
-        // if undefined is passed then the config locator is specified by baseConfigLocator
-        config = baseConfigLocator
+    config = {
+        ...baseConfigLocator,
+        ...config
     }
 
     if ('config_locator' in config) {

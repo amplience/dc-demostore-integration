@@ -37,16 +37,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../..");
+const __2 = require("../../..");
 const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
-const properties = Object.assign(Object.assign({}, rest_client_1.OAuthProperties), { username: {
-        title: "Username",
-        type: "string"
-    }, password: {
-        title: "Password",
-        type: "string"
-    }, accountId: {
+const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), __2.UsernamePasswordProperties), { accountId: {
         title: "Account ID",
         type: "string"
     }, accountKey: {

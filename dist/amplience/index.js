@@ -17,6 +17,7 @@ const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
+    // console.log(`[ amp ] https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
     return response.status === 200 ? (0, crypt_keeper_1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });

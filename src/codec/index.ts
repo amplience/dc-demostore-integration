@@ -7,32 +7,32 @@ export type Property = {
 }
 
 export type StringProperty = Property & {
-    type: 'string'
+    type:       'string'
     minLength?: number
     maxLength?: number
-    pattern?: string
+    pattern?:   string
 }
 
 export type NumberProperty = Property & {
-    type: 'number'
-    multipleOf?: number
-    minimum?: number
-    maximum?: number
-    exclusiveMinimum?: number
-    exclusiveMaximum?: number
+    type:               'number'
+    multipleOf?:        number
+    minimum?:           number
+    maximum?:           number
+    exclusiveMinimum?:  number
+    exclusiveMaximum?:  number
 }
 
 export type IntegerProperty = NumberProperty & {
-    type: 'integer'
+    type:   'integer'
 }
 
 export type ArrayProperty = Property & {
-    type: 'array'
-    items?: number
-    minItems?: number
-    maxItems?: number
-    required?: boolean
-    uniqueItems?: boolean
+    type:           'array'
+    items?:         number
+    minItems?:      number
+    maxItems?:      number
+    required?:      boolean
+    uniqueItems?:   boolean
 }
 
 export enum CodecType {
@@ -42,10 +42,10 @@ export enum CodecType {
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 export type Codec<T> = {
     schema: {
-        type: CodecType
-        uri: string
+        type:       CodecType
+        uri:        string
         properties: Dictionary<AnyProperty>
-        icon: string
+        icon:       string
     }
     getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>
 }
@@ -106,8 +106,10 @@ export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => awa
 
 // register codecs
 if (isServer()) {
+    import('./codecs/akeneo')
     import('./codecs/bigcommerce')
     import('./codecs/commercetools')
+    import('./codecs/constructor.io')
     import('./codecs/elasticpath')
     import('./codecs/fabric')
     import('./codecs/hybris')

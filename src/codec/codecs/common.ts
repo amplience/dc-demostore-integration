@@ -1,4 +1,4 @@
-import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
+import { ContentType, ContentTypeSchema, ValidationLevel } from "dc-management-sdk-js";
 import _ from "lodash";
 import { GenericCodec } from "..";
 import { Category } from "../../common/types";
@@ -20,6 +20,7 @@ export const flattenCategories = (categories: Category[]) => {
 export const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
     schema.schemaId = codec.schema.uri
+    schema.validationLevel = ValidationLevel.CONTENT_TYPE
     schema.body = JSON.stringify({
         id: codec.schema.uri,
         title: `${_.last(codec.schema.uri.split('/'))} integration`,

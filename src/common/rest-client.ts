@@ -17,6 +17,22 @@ export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
     client_secret:  StringProperty
 }
 
+export type UsernamePasswordConfiguration = {
+    username:   StringProperty
+    password:   StringProperty
+}
+
+export const UsernamePasswordProperties: UsernamePasswordConfiguration = {
+    username: {
+        title: "Username",
+        type: "string"
+    },
+    password: {
+        title: "Password",
+        type: "string"
+    }
+}
+
 export const APIProperties: APIConfiguration = {
     api_url: {
         title: "Base API URL",
@@ -54,6 +70,8 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
     const authenticate = async (): Promise<AxiosInstance> => {
+        // console.log(`authenticating to ${config.auth_url}`)
+
         if (!authenticatedAxios) {
             let response = await axios.post(config.auth_url, payload, requestConfig)
             const auth = response.data

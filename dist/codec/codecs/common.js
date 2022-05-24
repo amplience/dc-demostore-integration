@@ -23,6 +23,7 @@ exports.flattenCategories = flattenCategories;
 const getContentTypeSchema = (codec) => {
     let schema = new dc_management_sdk_js_1.ContentTypeSchema();
     schema.schemaId = codec.schema.uri;
+    schema.validationLevel = dc_management_sdk_js_1.ValidationLevel.CONTENT_TYPE;
     schema.body = JSON.stringify({
         id: codec.schema.uri,
         title: `${lodash_1.default.last(codec.schema.uri.split('/'))} integration`,

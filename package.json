@@ -12,11 +12,15 @@
     ".": "./dist/index.js"
   },
   "dependencies": {
+    "@babel/runtime": "^7.17.9",
+    "@constructor-io/constructorio-node": "^3.8.6",
     "@moltin/sdk": "^11.14.0",
+    "async": "^3.2.3",
     "axios": "^0.26.0",
+    "btoa": "^1.2.1",
     "crypto-js": "^4.1.1",
     "currency.js": "^2.0.4",
-    "dc-management-sdk-js": "^1.16.2",
+    "dc-management-sdk-js": "^1.17.0",
     "fs-extra": "^10.1.0",
     "http": "^0.0.1-security",
     "https": "^1.0.0",

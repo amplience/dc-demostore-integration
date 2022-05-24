@@ -1,15 +1,13 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
 import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { CommerceAPI } from '../../..'
+import { CommerceAPI, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import slugify from 'slugify'
 import { findInMegaMenu } from '../common'
 import { Attribute, FabricCategory, FabricProduct } from './types'
 
-type CodecConfig = OAuthCodecConfiguration & {
-    username:   StringProperty
-    password:   StringProperty
+type CodecConfig = OAuthCodecConfiguration & UsernamePasswordConfiguration & {
     accountId:  StringProperty
     accountKey: StringProperty
     stage:      StringProperty
@@ -17,14 +15,7 @@ type CodecConfig = OAuthCodecConfiguration & {
 
 const properties: CodecConfig = {
     ...OAuthProperties,
-    username: {
-        title: "Username",
-        type: "string"
-    },
-    password: {
-        title: "Password",
-        type: "string"
-    },
+    ...UsernamePasswordProperties,
     accountId: {
         title: "Account ID",
         type: "string"

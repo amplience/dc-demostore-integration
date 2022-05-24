@@ -5,6 +5,7 @@ import { CryptKeeper } from '../common/crypt-keeper'
 
 export const getContentItem = async (hub: string, args: any): Promise<ContentItem> => {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
+    // console.log(`[ amp ] https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     let response = await fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     return response.status === 200 ? CryptKeeper((await response.json()).content, hub).decryptAll() : null
 }

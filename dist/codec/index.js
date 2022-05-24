@@ -85,8 +85,10 @@ exports.getCommerceCodec = getCommerceCodec;
 // end public interface
 // register codecs
 if ((0, util_1.isServer)()) {
+    Promise.resolve().then(() => __importStar(require('./codecs/akeneo')));
     Promise.resolve().then(() => __importStar(require('./codecs/bigcommerce')));
     Promise.resolve().then(() => __importStar(require('./codecs/commercetools')));
+    Promise.resolve().then(() => __importStar(require('./codecs/constructor.io')));
     Promise.resolve().then(() => __importStar(require('./codecs/elasticpath')));
     Promise.resolve().then(() => __importStar(require('./codecs/fabric')));
     Promise.resolve().then(() => __importStar(require('./codecs/hybris')));

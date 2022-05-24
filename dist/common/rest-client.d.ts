@@ -11,6 +11,11 @@ export declare type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
     client_id: StringProperty;
     client_secret: StringProperty;
 };
+export declare type UsernamePasswordConfiguration = {
+    username: StringProperty;
+    password: StringProperty;
+};
+export declare const UsernamePasswordProperties: UsernamePasswordConfiguration;
 export declare const APIProperties: APIConfiguration;
 export declare const OAuthProperties: OAuthCodecConfiguration;
 export declare const ClientCredentialProperties: ClientCredentialsConfiguration;

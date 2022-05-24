@@ -110,7 +110,7 @@ const commerceToolsCodec = {
     schema: {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/commercetools',
-        icon: 'https://pbs.twimg.com/profile_images/1448061457086640132/zm8zxo8N.jpg',
+        icon: 'https://yt3.ggpht.com/ytc/AKedOLSk_VDaYTmm7BX6NK0m3RC_m41YYHdi6jjT5Nk3=s900-c-k-c0x00ffffff-no-rj',
         properties: Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { project: {
                 title: "project key",
                 type: "string"

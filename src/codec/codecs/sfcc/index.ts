@@ -1,10 +1,11 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, CodecPropertyConfig, CommerceAPI, CommerceCodec, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
-import { SFCCCategory, SFCCCustomerGroup } from './types'
-import { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
-import { CodecType, registerCodec } from '../../index'
+import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from './types'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../../index'
+import { CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Category, Product } from '../../../common'
+import slugify from 'slugify'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     api_token:  StringProperty
@@ -58,15 +59,37 @@ const sfccCodec: CommerceCodec = {
 
         const api = {
             getCategory: async (slug: string = 'root'): Promise<Category> => {
-                return api.mapCategory(await fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`))
+                return api.mapCategory(await fetch(`/s/${config.site_id}/dw/shop/v22_4/categories/${slug}?levels=4`))
             },
             getCustomerGroups: async (): Promise<CustomerGroup[]> => {
                 return (await authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup)
             },
-            getProducts: () => fetch(`/products`),
-            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
+            getProducts: async id => {
+
+            },
+            searchProducts: async keyword => {
+                return api.mapCategory(await fetch(`/s/${config.site_id}/dw/shop/v22_4/product_search?q=${keyword}`))
+            },
             getProductById: id => fetch(`/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
+            mapProduct: (product: SFCCProduct): Product => {
+                return {
+                    ...product,
+                    slug: slugify(product.name, { lower: true }),
+                    shortDescription: product.short_description,
+                    longDescription: product.long_description,
+                    categories: [],
+                    variants: product.variants.map(variant => {
+                        return {
+                            sku: variant.product_id,
+                            listPrice: `${variant.price}`,
+                            salePrice: `${variant.price}`,
+                            images: [],
+                            attributes: {}
+                        }
+                    })
+                }
+            },
             mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => ({
                 ...group,
                 name: group.id
