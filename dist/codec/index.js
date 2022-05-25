@@ -68,16 +68,17 @@ const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* (
     else if (codecsMatchingConfig.length > 1) {
         throw `[ demostore ] multiple codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    if (!apis[config]) {
+    let configHash = lodash_1.default.values(config).join('');
+    if (!apis[configHash]) {
         let api = yield lodash_1.default.first(codecsMatchingConfig).getAPI(config);
-        apis[config] = lodash_1.default.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key) => {
+        apis[configHash] = lodash_1.default.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key) => {
             // apply default arguments for those not provided in the query
             return (args) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield api[key](Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
             });
         }));
     }
-    return apis[config];
+    return apis[configHash];
 });
 exports.getCodec = getCodec;
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecType.commerce); });

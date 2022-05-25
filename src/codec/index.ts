@@ -57,7 +57,7 @@ export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[]
 }
 
-const codecs = new Map<CodecType, GenericCodec>()
+const codecs = new Map<CodecType, GenericCodec[]>()
 codecs[CodecType.commerce] = []
 
 // public interface
@@ -84,9 +84,10 @@ export const getCodec = async (config: any, type: CodecType): Promise<API> => {
         throw `[ demostore ] multiple codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
 
-    if (!apis[config]) {
+    let configHash = _.values(config).join('')
+    if (!apis[configHash]) {
         let api = await _.first(codecsMatchingConfig).getAPI(config)
-        apis[config] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
+        apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
             // apply default arguments for those not provided in the query
             return async (args: CommonArgs): Promise<any> => await api[key]({
                 locale:     'en-US',
@@ -98,7 +99,7 @@ export const getCodec = async (config: any, type: CodecType): Promise<API> => {
             })
         }))
     }
-    return apis[config]
+    return apis[configHash]
 }
 
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecType.commerce) as CommerceAPI
