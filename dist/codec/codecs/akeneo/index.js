@@ -19,10 +19,8 @@ const index_1 = require("../../index");
 const common_1 = require("../common");
 const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
-const properties = Object.assign(Object.assign(Object.assign({}, __2.UsernamePasswordProperties), __2.ClientCredentialProperties), { rootCategory: {
-        title: "Root category ID",
-        type: "string"
-    } });
+const util_1 = require("../../../common/util");
+const properties = Object.assign(Object.assign({}, __2.UsernamePasswordProperties), __2.ClientCredentialProperties);
 const akeneoCodec = {
     schema: {
         type: index_1.CodecType.commerce,
@@ -47,10 +45,17 @@ const akeneoCodec = {
                 Authorization: `Bearer ${auth.access_token}`
             }));
             const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
-                let result = yield rest.get({ url });
-                return result._embedded ? result._embedded.items : result;
+                try {
+                    let result = yield rest.get({ url });
+                    return result._embedded ? result._embedded.items : result;
+                }
+                catch (error) {
+                    console.log(`error url [ ${url} ]`);
+                }
             });
-            let categories = yield fetch('/categories');
+            let categories = yield fetch('/categories?limit=100');
+            categories = lodash_1.default.concat(categories, yield fetch('/categories?limit=100&page=2'));
+            categories = lodash_1.default.concat(categories, yield fetch('/categories?limit=100&page=3'));
             const mapCategory = (category) => ({
                 id: category.code,
                 name: category.labels['en_US'],
@@ -58,22 +63,32 @@ const akeneoCodec = {
                 children: [],
                 products: []
             });
-            const findValue = (values) => values && values.find(value => !value.locale || value.locale === 'en_US').data;
-            const mapProduct = (product) => ({
-                id: product.identifier,
-                name: findValue(product.values.name),
-                slug: product.values.name && (0, slugify_1.default)(findValue(product.values.name), { lower: true }),
-                shortDescription: findValue(product.values.description),
-                longDescription: findValue(product.values.description),
-                categories: [],
-                variants: [{
-                        sku: product.identifier,
-                        listPrice: '0.00',
-                        salePrice: '0.00',
-                        images: [],
-                        attributes: lodash_1.default.mapValues(product.values, findValue)
-                    }]
-            });
+            const findValue = (values) => { var _a; return values && ((_a = values.find(value => !value.locale || value.locale === 'en_US')) === null || _a === void 0 ? void 0 : _a.data); };
+            const mapProduct = (args) => (product) => {
+                const prices = findValue(product.values.price);
+                let price = '--';
+                if (prices) {
+                    let locationPrice = prices.find(p => p.currency === args.currency);
+                    if (locationPrice) {
+                        price = (0, util_1.formatMoneyString)(locationPrice.amount, args);
+                    }
+                }
+                return {
+                    id: product.identifier,
+                    name: findValue(product.values.name),
+                    slug: product.values.name && (0, slugify_1.default)(findValue(product.values.name), { lower: true }),
+                    shortDescription: findValue(product.values.description),
+                    longDescription: findValue(product.values.description),
+                    categories: [],
+                    variants: [{
+                            sku: product.identifier,
+                            listPrice: price,
+                            salePrice: price,
+                            images: [],
+                            attributes: lodash_1.default.mapValues(product.values, findValue)
+                        }]
+                };
+            };
             // 'master' is the catalog root node, so top-level categories its children
             let megaMenu = [];
             categories.forEach(cat => {
@@ -89,17 +104,17 @@ const akeneoCodec = {
                     }
                 }
             });
-            megaMenu = (0, common_1.findInMegaMenu)(megaMenu, config.rootCategory === '' ? 'master' : config.rootCategory).children;
+            megaMenu = (0, common_1.findInMegaMenu)(megaMenu, 'master').children;
             const api = {
-                getProductById: (id) => __awaiter(this, void 0, void 0, function* () {
-                    return mapProduct(yield fetch(`/products/${id}`));
+                getProductById: (args) => (id) => __awaiter(this, void 0, void 0, function* () {
+                    return mapProduct(args)(yield fetch(`/products/${id}`));
                 }),
                 getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield api.getProductById(args.id);
+                    return yield api.getProductById(args)(args.id);
                 }),
                 getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
                     if (args.productIds) {
-                        return yield Promise.all(args.productIds.split(',').map(api.getProductById));
+                        return yield Promise.all(args.productIds.split(',').map(api.getProductById(args)));
                     }
                     else if (args.keyword) {
                         let searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
@@ -107,11 +122,11 @@ const akeneoCodec = {
                     }
                 }),
                 getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield api.populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
+                    return yield api.populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug), args);
                 }),
-                populateCategory: (category) => __awaiter(this, void 0, void 0, function* () {
+                populateCategory: (category, args) => __awaiter(this, void 0, void 0, function* () {
                     let products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${category.id}"]}]}`);
-                    category.products = products.map(mapProduct);
+                    category.products = products.map(mapProduct(args));
                     return category;
                 }),
                 getMegaMenu: () => __awaiter(this, void 0, void 0, function* () {

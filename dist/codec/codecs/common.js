@@ -7,7 +7,7 @@ exports.getContentType = exports.getContentTypeSchema = exports.flattenCategorie
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const lodash_1 = __importDefault(require("lodash"));
 const findInMegaMenu = (categories, slug) => {
-    return (0, exports.flattenCategories)(categories).find(category => category.slug.toLowerCase() === slug.toLowerCase());
+    return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
 exports.findInMegaMenu = findInMegaMenu;
 const flattenCategories = (categories) => {

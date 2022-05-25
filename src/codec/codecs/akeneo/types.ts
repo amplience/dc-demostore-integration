@@ -65,23 +65,7 @@ export interface QuantifiedAssociations {
 }
 
 export interface Values {
-    fit:           AkeneoProperty[];
-    color:         AkeneoProperty[];
-    gender:        AkeneoProperty[];
-    season:        AkeneoProperty[];
-    washing:       AkeneoProperty[];
-    material:      AkeneoProperty[];
-    occasion:      AkeneoProperty[];
-    rise_type:     AkeneoProperty[];
-    waist_size:    AkeneoProperty[];
-    inseam_size:   AkeneoProperty[];
-    generic_color: AkeneoProperty[];
-    image_1:       AkeneoProperty[];
-    image_2:       AkeneoProperty[];
-    name:          AkeneoProperty[];
-    erp_name:      AkeneoProperty[];
-    fit_info:      AkeneoProperty[];
-    description:   AkeneoProperty[];
+    [key: string]: AkeneoProperty[]
 }
 
 export interface AkeneoProperty {

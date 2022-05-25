@@ -4,7 +4,7 @@ import { GenericCodec } from "..";
 import { Category } from "../../common/types";
 
 export const findInMegaMenu = (categories: Category[], slug: string) => {
-    return flattenCategories(categories).find(category => category.slug.toLowerCase() === slug.toLowerCase())
+    return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 
 export const flattenCategories = (categories: Category[]) => {

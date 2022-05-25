@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../common/types'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, OAuthRestClient, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
 import { CodecType } from '../../index'
@@ -7,18 +7,13 @@ import { findInMegaMenu } from '../common'
 import slugify from 'slugify'
 import btoa from 'btoa'
 import { AkeneoCategory, AkeneoProduct, AkeneoProperty } from './types'
+import { formatMoneyString } from '../../../common/util'
 
-type CodecConfig = UsernamePasswordConfiguration & ClientCredentialsConfiguration & {
-    rootCategory: StringProperty
-}
+type CodecConfig = UsernamePasswordConfiguration & ClientCredentialsConfiguration
 
 const properties: CodecConfig = {
     ...UsernamePasswordProperties,
-    ...ClientCredentialProperties,
-    rootCategory: {
-        title: "Root category ID",
-        type: "string"
-    }
+    ...ClientCredentialProperties
 }
 
 const akeneoCodec: CommerceCodec = {
@@ -44,11 +39,17 @@ const akeneoCodec: CommerceCodec = {
             Authorization: `Bearer ${auth.access_token}`
         }))
         const fetch = async url => {
-            let result = await rest.get({ url })
-            return result._embedded ? result._embedded.items : result 
+            try {
+                let result = await rest.get({ url })
+                return result._embedded ? result._embedded.items : result
+            } catch (error) {
+                console.log(`error url [ ${url} ]`)                
+            }
         }
 
-        let categories: AkeneoCategory[] = await fetch('/categories')
+        let categories: AkeneoCategory[] = await fetch('/categories?limit=100')
+        categories = _.concat(categories, await fetch('/categories?limit=100&page=2'))
+        categories = _.concat(categories, await fetch('/categories?limit=100&page=3'))
 
         const mapCategory = (category: AkeneoCategory): Category => ({
             id: category.code,
@@ -57,25 +58,37 @@ const akeneoCodec: CommerceCodec = {
             children: [],
             products: []
         })
-        
-        const findValue = (values: AkeneoProperty[]) => values && values.find(value => !value.locale || value.locale === 'en_US').data
 
-        const mapProduct = (product: AkeneoProduct): Product => ({
-            id: product.identifier,
-            name: findValue(product.values.name),
-            slug: product.values.name && slugify(findValue(product.values.name), { lower: true }),
-            shortDescription: findValue(product.values.description),
-            longDescription: findValue(product.values.description),
-            categories: [],
-            variants: [{
-                sku: product.identifier,
-                listPrice: '0.00',
-                salePrice: '0.00',
-                images: [],
-                attributes: _.mapValues(product.values, findValue)
-            }]
-        })
-        
+        const findValue = (values: AkeneoProperty[]) => values && values.find(value => !value.locale || value.locale === 'en_US')?.data
+
+        const mapProduct = (args: CommonArgs) => (product: AkeneoProduct): Product => {
+            const prices = findValue(product.values.price)
+            let price = '--'
+
+            if (prices) {
+                let locationPrice = prices.find(p => p.currency === args.currency)
+                if (locationPrice) {
+                    price = formatMoneyString(locationPrice.amount, args)
+                }
+            }
+
+            return {
+                id: product.identifier,
+                name: findValue(product.values.name),
+                slug: product.values.name && slugify(findValue(product.values.name), { lower: true }),
+                shortDescription: findValue(product.values.description),
+                longDescription: findValue(product.values.description),
+                categories: [],
+                variants: [{
+                    sku: product.identifier,
+                    listPrice: price,
+                    salePrice: price,
+                    images: [],
+                    attributes: _.mapValues(product.values, findValue)
+                }]
+            }
+        }
+
         // 'master' is the catalog root node, so top-level categories its children
         let megaMenu: Category[] = []
         categories.forEach(cat => {
@@ -92,18 +105,18 @@ const akeneoCodec: CommerceCodec = {
             }
         })
 
-        megaMenu = findInMegaMenu(megaMenu, config.rootCategory === '' ? 'master' : config.rootCategory).children
+        megaMenu = findInMegaMenu(megaMenu, 'master').children
 
         const api = {
-            getProductById: async (id: string): Promise<Product> => {
-                return mapProduct(await fetch(`/products/${id}`))
+            getProductById: (args: CommonArgs) => async (id: string): Promise<Product> => {
+                return mapProduct(args)(await fetch(`/products/${id}`))
             },
             getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
-                return await api.getProductById(args.id)
+                return await api.getProductById(args)(args.id)
             },
             getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
                 if (args.productIds) {
-                    return await Promise.all(args.productIds.split(',').map(api.getProductById))
+                    return await Promise.all(args.productIds.split(',').map(api.getProductById(args)))
                 }
                 else if (args.keyword) {
                     let searchResults = await fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`)
@@ -111,11 +124,11 @@ const akeneoCodec: CommerceCodec = {
                 }
             },
             getCategory: async (args: GetCommerceObjectArgs) => {
-                return await api.populateCategory(findInMegaMenu(megaMenu, args.slug))
+                return await api.populateCategory(findInMegaMenu(megaMenu, args.slug), args)
             },
-            populateCategory: async (category: Category): Promise<Category> => {
+            populateCategory: async (category: Category, args: CommonArgs): Promise<Category> => {
                 let products = await fetch(`/products?search={"categories":[{"operator":"IN","value":["${category.id}"]}]}`)
-                category.products = products.map(mapProduct)
+                category.products = products.map(mapProduct(args))
                 return category
             },
             getMegaMenu: async (): Promise<Category[]> => {
