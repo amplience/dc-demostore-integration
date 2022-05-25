@@ -74,8 +74,7 @@ export interface Variant {
     variation_values: VariationValues;
 }
 export interface VariationValues {
-    color: string;
-    size: string;
+    [key: string]: string;
 }
 export interface VariationAttribute {
     _type: string;

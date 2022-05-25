@@ -55,7 +55,7 @@ const fabricCodec = {
     schema: {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/fabric',
-        icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/fabric.png',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

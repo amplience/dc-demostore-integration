@@ -52,7 +52,7 @@ const epCodec = {
     schema: {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/elasticpath.png',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

@@ -48,7 +48,7 @@ const epCodec: CommerceCodec = {
     schema: {
         type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/elasticpath.png',
         properties
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {

@@ -39,6 +39,7 @@ const axios_1 = __importDefault(require("axios"));
 const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const index_1 = require("../../index");
 const slugify_1 = __importDefault(require("slugify"));
+const util_1 = require("../../../common/util");
 const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { api_token: {
         title: "Shopper API Token",
         type: "string",
@@ -51,7 +52,7 @@ const sfccCodec = {
     schema: {
         type: index_1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/sfcc',
-        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/salesforce.png',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
@@ -72,30 +73,56 @@ const sfccCodec = {
         });
         const authenticatedFetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
         // end authenticated fetch
-        const api = {
+        const shopApi = `/s/${config.site_id}/dw/shop/v22_4`;
+        const sitesApi = `/s/-/dw/data/v22_4/sites/${config.site_id}`;
+        const api = (args) => ({
             getCategory: (slug = 'root') => __awaiter(void 0, void 0, void 0, function* () {
-                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v22_4/categories/${slug}?levels=4`));
+                return api(args).mapCategory(yield fetch(`${shopApi}/categories/${slug}?levels=4`));
             }),
             getCustomerGroups: () => __awaiter(void 0, void 0, void 0, function* () {
-                return (yield authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup);
+                return (yield authenticatedFetch(`${sitesApi}/customer_groups`)).map(api(args).mapCustomerGroup);
             }),
-            getProducts: (id) => __awaiter(void 0, void 0, void 0, function* () {
+            getProducts: (productIds) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield Promise.all(productIds.map(api(args).getProductById));
+            }),
+            search: (query) => __awaiter(void 0, void 0, void 0, function* () {
+                let searchResults = (yield fetch(`${shopApi}/product_search?${query}`)).hits;
+                return yield api(args).getProducts(searchResults.map(sr => sr.product_id));
             }),
             searchProducts: (keyword) => __awaiter(void 0, void 0, void 0, function* () {
-                return api.mapCategory(yield fetch(`/s/${config.site_id}/dw/shop/v22_4/product_search?q=${keyword}`));
+                return yield api(args).search(`q=${keyword}`);
             }),
-            getProductById: id => fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
+            getProductsForCategory: (cat) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield api(args).search(`refine_1=cgid=${cat.id}`);
+            }),
+            getProductById: (id) => __awaiter(void 0, void 0, void 0, function* () {
+                return api(args).mapProduct(yield fetch(`${shopApi}/products/${id}?expand=prices,options,images,variations`));
+            }),
             mapProduct: (product) => {
-                return Object.assign(Object.assign({}, product), { slug: (0, slugify_1.default)(product.name, { lower: true }), shortDescription: product.short_description, longDescription: product.long_description, categories: [], variants: product.variants.map(variant => {
-                        return {
-                            sku: variant.product_id,
-                            listPrice: `${variant.price}`,
-                            salePrice: `${variant.price}`,
-                            images: [],
+                var _a;
+                const largeImages = product.image_groups.find(group => group.view_type === 'large');
+                const images = largeImages.images.map(image => ({ url: image.link }));
+                return {
+                    id: product.id,
+                    name: product.name,
+                    slug: (0, slugify_1.default)(product.name, { lower: true }),
+                    shortDescription: product.short_description,
+                    longDescription: product.long_description,
+                    categories: [],
+                    variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => ({
+                        sku: variant.product_id,
+                        listPrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency, locale: args.locale }),
+                        salePrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency, locale: args.locale }),
+                        images,
+                        attributes: variant.variation_values
+                    }))) || [{
+                            sku: product.id,
+                            listPrice: (0, util_1.formatMoneyString)(product.price, { currency: product.currency, locale: args.locale }),
+                            salePrice: (0, util_1.formatMoneyString)(product.price, { currency: product.currency, locale: args.locale }),
+                            images,
                             attributes: {}
-                        };
-                    }) });
+                        }]
+                };
             },
             mapCustomerGroup: (group) => (Object.assign(Object.assign({}, group), { name: group.id })),
             mapCategory: (cat) => {
@@ -104,40 +131,32 @@ const sfccCodec = {
                     id: cat.id,
                     slug: cat.id,
                     name: cat.name,
-                    image: { url: cat.image },
-                    children: ((_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api.mapCategory)) || [],
+                    children: ((_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api(args).mapCategory)) || [],
                     products: []
                 });
             }
-        };
-        const megaMenu = yield (yield api.getCategory()).children;
+        });
+        const megaMenu = yield (yield api({}).getCategory()).children;
         return {
             getProduct: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    // if (query.args.id) {
-                    //     return mapProduct(await api.getProductById(query.args.id))
-                    // }
-                    throw new Error(`getProduct(): must specify id`);
+                    return yield api(args).getProductById(args.id);
                 });
             },
             getProducts: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    // if (query.args.productIds) {
-                    //     return await Promise.all(query.args.productIds.split(',').map(async id => mapProduct(await api.getProductById(id))))
-                    // }
-                    // else if (query.args.keyword) {
-                    //     return (await api.searchProducts(query.args.keyword)).map(mapProduct)
-                    // }
-                    throw new Error(`getProducts(): must specify either productIds or keyword`);
+                    if (args.productIds) {
+                        return yield api(args).getProducts(args.productIds.split(','));
+                    }
+                    else if (args.keyword) {
+                        return yield api(args).searchProducts(args.keyword);
+                    }
                 });
             },
             getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    if (!args.slug) {
-                        throw new Error(`getCategory(): must specify slug`);
-                    }
-                    let category = yield api.getCategory(args.slug);
-                    return Object.assign(Object.assign({}, category), { products: yield api.getProductsForCategory(category) });
+                    let category = yield api(args).getCategory(args.slug);
+                    return Object.assign(Object.assign({}, category), { products: yield api(args).getProductsForCategory(category) });
                 });
             },
             getMegaMenu: function () {
@@ -147,7 +166,7 @@ const sfccCodec = {
             },
             getCustomerGroups: function () {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return yield api.getCustomerGroups();
+                    return yield api({}).getCustomerGroups();
                 });
             }
         };

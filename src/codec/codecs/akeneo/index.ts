@@ -20,7 +20,7 @@ const akeneoCodec: CommerceCodec = {
     schema: {
         type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/akeneo',
-        icon: 'https://static.crozdesk.com/web_app_library/providers/logos/000/006/691/original/akeneo-pim-1559230789-logo.png?1559230789',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/akeneo.png',
         properties
     },
     getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {

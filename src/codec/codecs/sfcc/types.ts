@@ -89,8 +89,7 @@ export interface Variant {
 }
 
 export interface VariationValues {
-    color: string;
-    size:  string;
+    [key: string]: string
 }
 
 export interface VariationAttribute {

@@ -37,7 +37,7 @@ const restCodec: CommerceCodec = {
     schema: {
         type: CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/rest',
-        icon: 'https://cdn-icons-png.flaticon.com/512/180/180954.png',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/rest.png',
         properties
     },
     getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {

@@ -34,7 +34,7 @@ const hybrisCodec = {
     schema: {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/hybris',
-        icon: 'https://images.squarespace-cdn.com/content/v1/54dd763ce4b01f6b05bab7db/1511645929126-9BGFQ3VFVOQX75PHZ7JS/logos-014__2_.png',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/hybris.png',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

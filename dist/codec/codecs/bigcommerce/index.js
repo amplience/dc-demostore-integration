@@ -21,7 +21,7 @@ const bigCommerceCodec = {
     schema: {
         type: __1.CodecType.commerce,
         uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
-        icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
+        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/bigcommerce.png',
         properties: Object.assign(Object.assign({}, rest_client_1.APIProperties), { api_token: {
                 title: "API Token",
                 type: "string"
