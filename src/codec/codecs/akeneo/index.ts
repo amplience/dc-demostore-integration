@@ -120,7 +120,7 @@ const akeneoCodec: CommerceCodec = {
                 }
                 else if (args.keyword) {
                     let searchResults = await fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`)
-                    return searchResults.map(mapProduct)
+                    return searchResults.map(mapProduct(args))
                 }
             },
             getCategory: async (args: GetCommerceObjectArgs) => {

@@ -118,7 +118,7 @@ const akeneoCodec = {
                     }
                     else if (args.keyword) {
                         let searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
-                        return searchResults.map(mapProduct);
+                        return searchResults.map(mapProduct(args));
                     }
                 }),
                 getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
