@@ -17,6 +17,9 @@ const __1 = require("../..");
 const index_1 = require("../../index");
 const common_1 = require("../common");
 const slugify_1 = __importDefault(require("slugify"));
+const axios_1 = __importDefault(require("axios"));
+const btoa_1 = __importDefault(require("btoa"));
+const util_1 = require("../../../common/util");
 const properties = {
     api_key: {
         title: "API Key",
@@ -36,11 +39,46 @@ const constructorIOCodec = {
     },
     getAPI: function (config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ConstructorIOClient = require('@constructor-io/constructorio-node');
-            const constructorio = new ConstructorIOClient({
-                apiKey: config.api_key,
-                apiToken: config.api_token
+            const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    return (yield axios_1.default.get(url, {
+                        baseURL: `https://ac.cnstrc.com`,
+                        headers: {
+                            Authorization: `Basic ${(0, btoa_1.default)(`${config.api_token}:`)}`
+                        },
+                        params: {
+                            key: config.api_key
+                        }
+                    })).data;
+                }
+                catch (error) {
+                    if (error.message.indexOf('429') > -1 || error.status === 429) { // rate limited, wait 10 seconds and try again
+                        yield (0, util_1.sleep)(10000);
+                        return yield fetch(url);
+                    }
+                }
             });
+            const constructorio = {
+                catalog: {
+                    getItem: ({ id, section }, networkParameters) => __awaiter(this, void 0, void 0, function* () {
+                        var _a;
+                        return lodash_1.default.first((_a = (yield fetch(`/v1/item?section=${section}&id=${id}`))) === null || _a === void 0 ? void 0 : _a.items);
+                    }),
+                    getItemGroups: (networkParameters) => __awaiter(this, void 0, void 0, function* () {
+                        return yield fetch(`/v1/item_groups`);
+                    })
+                },
+                search: {
+                    getSearchResults: (query, parameters, userParameters, networkParameters) => __awaiter(this, void 0, void 0, function* () {
+                        return yield fetch(`/search/${query}`);
+                    })
+                },
+                browse: {
+                    getBrowseResults: (filterName, filterValue, parameters, userParameters, networkParameters) => __awaiter(this, void 0, void 0, function* () {
+                        return yield fetch(`/browse/${filterName}/${filterValue}`);
+                    })
+                }
+            };
             const mapCategory = (category) => ({
                 id: category.id,
                 slug: category.id,
@@ -50,7 +88,7 @@ const constructorIOCodec = {
             });
             const mapProduct = (product) => {
                 var _a, _b;
-                return ({
+                return {
                     id: product.id,
                     name: product.name,
                     slug: (0, slugify_1.default)(product.name, { lower: true }),
@@ -75,7 +113,7 @@ const constructorIOCodec = {
                             attributes
                         };
                     })
-                });
+                };
             };
             let categories = yield constructorio.catalog.getItemGroups();
             let megaMenu = categories.item_groups.map(mapCategory);

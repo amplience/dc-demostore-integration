@@ -1,12 +1,7 @@
 export declare type ConstructorIO = {
-    autocomplete: any;
     browse: Browse;
     catalog: Catalog;
-    options: any;
-    recommendations: any;
     search: Search;
-    tasks: any;
-    tracker: any;
 };
 export declare type Browse = {
     getBrowseResults: (filterName: any, filterValue: any, parameters?: any, userParameters?: any, networkParameters?: any) => Promise<any>;

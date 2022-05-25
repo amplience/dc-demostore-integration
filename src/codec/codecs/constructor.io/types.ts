@@ -1,12 +1,7 @@
 export type ConstructorIO = {
-    autocomplete: any
-    browse: Browse
-    catalog: Catalog
-    options: any
-    recommendations: any
-    search: Search
-    tasks: any
-    tracker: any
+    browse:     Browse
+    catalog:    Catalog
+    search:     Search
 }
 
 export type Browse = {

@@ -3,9 +3,12 @@ import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArg
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import { CodecType } from '../../index'
-import { ConstructorIO, ConstructorIOCategory, ConstructorIOProduct } from './types'
+import { ConstructorIO, ConstructorIOCategory, ConstructorIOProduct, Browse, Catalog, Search } from './types'
 import { findInMegaMenu } from '../common'
 import slugify from 'slugify'
+import axios from 'axios'
+import btoa from 'btoa'
+import { sleep } from '../../../common/util'
 
 type CodecConfig = {
     api_key: StringProperty
@@ -31,11 +34,45 @@ const constructorIOCodec: CommerceCodec = {
         properties
     },
     getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        const ConstructorIOClient = require('@constructor-io/constructorio-node');
-        const constructorio: ConstructorIO = new ConstructorIOClient({
-            apiKey: config.api_key,
-            apiToken: config.api_token
-        });
+        const fetch = async (url: string): Promise<any> => {
+            try {
+                return (await axios.get(url, {
+                    baseURL: `https://ac.cnstrc.com`,
+                    headers: {
+                        Authorization: `Basic ${btoa(`${config.api_token}:`)}`
+                    },
+                    params: {
+                        key: config.api_key
+                    }
+                })).data
+            } catch (error) {
+                if (error.message.indexOf('429') > -1 || error.status === 429) { // rate limited, wait 10 seconds and try again
+                    await sleep(10000)
+                    return await fetch(url)
+                }
+            }
+        }
+
+        const constructorio: ConstructorIO = { 
+            catalog: {
+                getItem: async ({ id, section }: { id: any; section: any }, networkParameters?: any): Promise<any> => {
+                    return _.first((await fetch(`/v1/item?section=${section}&id=${id}`))?.items)
+                },
+                getItemGroups: async (networkParameters?: any): Promise<any> => {
+                    return await fetch(`/v1/item_groups`)
+                }
+            },
+            search: {
+                getSearchResults: async (query: any, parameters?: any, userParameters?: any, networkParameters?: any): Promise<any> => {
+                    return await fetch(`/search/${query}`)
+                }
+            }, 
+            browse: {
+                getBrowseResults: async (filterName: any, filterValue: any, parameters?: any, userParameters?: any, networkParameters?: any): Promise<any> => {
+                    return await fetch(`/browse/${filterName}/${filterValue}`)
+                }
+            }
+        }
 
         const mapCategory = (category: ConstructorIOCategory): Category => ({
             id: category.id,
@@ -45,34 +82,36 @@ const constructorIOCodec: CommerceCodec = {
             products: []
         })
 
-        const mapProduct = (product: ConstructorIOProduct): Product => ({
-            id: product.id,
-            name: product.name,
-            slug: slugify(product.name, { lower: true }),
-            categories: product.group_ids.map(gid => findInMegaMenu(megaMenu, gid)),
-            imageSetId: product.variations[0]?.metadata['attribute-articleNumberMax']?.padStart(6, '0'),
-            variants: product.variations.map(variation => {
-                let attributes: Dictionary<string> = {}
-                let images: Image[] = []
+        const mapProduct = (product: ConstructorIOProduct): Product => {
+            return {
+                id: product.id,
+                name: product.name,
+                slug: slugify(product.name, { lower: true }),
+                categories: product.group_ids.map(gid => findInMegaMenu(megaMenu, gid)),
+                imageSetId: product.variations[0]?.metadata['attribute-articleNumberMax']?.padStart(6, '0'),
+                variants: product.variations.map(variation => {
+                    let attributes: Dictionary<string> = {}
+                    let images: Image[] = []
 
-                _.each(variation.metadata, (value, key) => {
-                    if (key.startsWith('attribute-')) {
-                        attributes[key.replace('attribute-', '')] = value
-                    }
-                    else if (key.startsWith('image-')) {
-                        images.push({ url: variation.metadata[key] })
+                    _.each(variation.metadata, (value, key) => {
+                        if (key.startsWith('attribute-')) {
+                            attributes[key.replace('attribute-', '')] = value
+                        }
+                        else if (key.startsWith('image-')) {
+                            images.push({ url: variation.metadata[key] })
+                        }
+                    })
+
+                    return {
+                        sku: variation.id,
+                        listPrice: variation.metadata.listPrice,
+                        salePrice: variation.metadata.salePrice,
+                        images,
+                        attributes
                     }
                 })
-
-                return {
-                    sku: variation.id,
-                    listPrice: variation.metadata.listPrice,
-                    salePrice: variation.metadata.salePrice,
-                    images,
-                    attributes
-                }
-            })
-        })
+            }
+        }
 
         let categories = await constructorio.catalog.getItemGroups()
         let megaMenu: Category[] = categories.item_groups.map(mapCategory)

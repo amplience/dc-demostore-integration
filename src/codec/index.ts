@@ -110,7 +110,7 @@ if (isServer()) {
     import('./codecs/akeneo')
     import('./codecs/bigcommerce')
     import('./codecs/commercetools')
-    // import('./codecs/constructor.io')
+    import('./codecs/constructor.io')
     import('./codecs/elasticpath')
     import('./codecs/fabric')
     import('./codecs/hybris')

@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
-    "@constructor-io/constructorio-node": "^3.8.6",
     "@moltin/sdk": "^11.14.0",
     "async": "^3.2.3",
     "axios": "^0.26.0",
