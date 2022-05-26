@@ -84,7 +84,8 @@ const akeneoCodec = {
                             sku: product.identifier,
                             listPrice: price,
                             salePrice: price,
-                            images: [],
+                            // images: [],
+                            images: [{ url: `https://assets.ellosgroup.com/s/ellos/ell_${product.identifier}_MS` }],
                             attributes: lodash_1.default.mapValues(product.values, findValue)
                         }]
                 };

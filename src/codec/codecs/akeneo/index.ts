@@ -83,7 +83,8 @@ const akeneoCodec: CommerceCodec = {
                     sku: product.identifier,
                     listPrice: price,
                     salePrice: price,
-                    images: [],
+                    // images: [],
+                    images: [{ url: `https://assets.ellosgroup.com/s/ellos/ell_${product.identifier}_MS` }],
                     attributes: _.mapValues(product.values, findValue)
                 }]
             }
