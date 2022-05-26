@@ -40,6 +40,7 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const index_1 = require("../../index");
 const slugify_1 = __importDefault(require("slugify"));
 const util_1 = require("../../../common/util");
+const common_1 = require("../common");
 const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { api_token: {
         title: "Shopper API Token",
         type: "string",
@@ -57,12 +58,24 @@ const sfccCodec = {
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
-            return (yield axios_1.default.get(url, {
-                baseURL: config.api_url,
-                params: {
-                    client_id: config.client_id
+            var _a, _b;
+            try {
+                return (yield axios_1.default.get(url, {
+                    baseURL: config.api_url,
+                    params: {
+                        client_id: config.client_id
+                    }
+                })).data;
+            }
+            catch (error) {
+                console.log(`url ${url} status ${(_a = error.response) === null || _a === void 0 ? void 0 : _a.status}`);
+                if (((_b = error.response) === null || _b === void 0 ? void 0 : _b.status) === 404) {
+                    return null;
                 }
-            })).data;
+                else {
+                    throw error;
+                }
+            }
         });
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
         let rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
@@ -87,7 +100,10 @@ const sfccCodec = {
             }),
             search: (query) => __awaiter(void 0, void 0, void 0, function* () {
                 let searchResults = (yield fetch(`${shopApi}/product_search?${query}`)).hits;
-                return yield api(args).getProducts(searchResults.map(sr => sr.product_id));
+                if (searchResults) {
+                    return yield api(args).getProducts(searchResults.map(sr => sr.product_id));
+                }
+                return [];
             }),
             searchProducts: (keyword) => __awaiter(void 0, void 0, void 0, function* () {
                 return yield api(args).search(`q=${keyword}`);
@@ -100,6 +116,9 @@ const sfccCodec = {
             }),
             mapProduct: (product) => {
                 var _a;
+                if (!product) {
+                    return null;
+                }
                 const largeImages = product.image_groups.find(group => group.view_type === 'large');
                 const images = largeImages.images.map(image => ({ url: image.link }));
                 return {
@@ -124,16 +143,19 @@ const sfccCodec = {
                         }]
                 };
             },
-            mapCustomerGroup: (group) => (Object.assign(Object.assign({}, group), { name: group.id })),
+            mapCustomerGroup: (group) => group && (Object.assign(Object.assign({}, group), { name: group.id })),
             mapCategory: (cat) => {
                 var _a;
-                return ({
+                if (!cat) {
+                    return null;
+                }
+                return {
                     id: cat.id,
                     slug: cat.id,
                     name: cat.name,
                     children: ((_a = cat.categories) === null || _a === void 0 ? void 0 : _a.map(api(args).mapCategory)) || [],
                     products: []
-                });
+                };
             }
         });
         const megaMenu = yield (yield api({}).getCategory()).children;
@@ -155,8 +177,12 @@ const sfccCodec = {
             },
             getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    let category = yield api(args).getCategory(args.slug);
-                    return Object.assign(Object.assign({}, category), { products: yield api(args).getProductsForCategory(category) });
+                    // let category = await api(args).getCategory(args.slug)
+                    let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
+                    if (category) {
+                        return Object.assign(Object.assign({}, category), { products: yield api(args).getProductsForCategory(category) });
+                    }
+                    return null;
                 });
             },
             getMegaMenu: function () {

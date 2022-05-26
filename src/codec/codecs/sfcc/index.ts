@@ -7,6 +7,7 @@ import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringPro
 import { CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Category, Product, CommonArgs } from '../../../common'
 import slugify from 'slugify'
 import { formatMoneyString } from '../../../common/util'
+import { findInMegaMenu } from '../common'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     api_token: StringProperty
@@ -35,12 +36,22 @@ const sfccCodec: CommerceCodec = {
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
-            return (await axios.get(url, {
-                baseURL: config.api_url,
-                params: {
-                    client_id: config.client_id
+            try {
+                return (await axios.get(url, {
+                    baseURL: config.api_url,
+                    params: {
+                        client_id: config.client_id
+                    }
+                })).data
+            } catch (error) {
+                console.log(`url ${url} status ${error.response?.status}`)
+                if (error.response?.status === 404) {
+                    return null
                 }
-            })).data
+                else {
+                    throw error
+                }
+            }
         }
 
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
@@ -72,7 +83,10 @@ const sfccCodec: CommerceCodec = {
             },
             search: async (query: string): Promise<Product[]> => {
                 let searchResults = (await fetch(`${shopApi}/product_search?${query}`)).hits
-                return await api(args).getProducts(searchResults.map(sr => sr.product_id))
+                if (searchResults) {
+                    return await api(args).getProducts(searchResults.map(sr => sr.product_id))
+                }
+                return []
             },
             searchProducts: async (keyword: string): Promise<Product[]> => {
                 return await api(args).search(`q=${keyword}`)
@@ -84,6 +98,7 @@ const sfccCodec: CommerceCodec = {
                 return api(args).mapProduct(await fetch(`${shopApi}/products/${id}?expand=prices,options,images,variations`))
             },
             mapProduct: (product: SFCCProduct): Product => {
+                if (!product) { return null }
                 const largeImages = product.image_groups.find(group => group.view_type === 'large')
                 const images = largeImages.images.map(image => ({ url: image.link }))
                 return {
@@ -108,17 +123,20 @@ const sfccCodec: CommerceCodec = {
                     }]
                 }
             },
-            mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => ({
+            mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => group && ({
                 ...group,
                 name: group.id
             }),
-            mapCategory: (cat: SFCCCategory): Category => ({
-                id: cat.id,
-                slug: cat.id,
-                name: cat.name,
-                children: cat.categories?.map(api(args).mapCategory) || [],
-                products: []
-            })
+            mapCategory: (cat: SFCCCategory): Category => {
+                if (!cat) { return null }
+                return {
+                    id: cat.id,
+                    slug: cat.id,
+                    name: cat.name,
+                    children: cat.categories?.map(api(args).mapCategory) || [],
+                    products: []
+                }
+            }
         })
 
         const megaMenu = await (await api({}).getCategory()).children
@@ -135,11 +153,15 @@ const sfccCodec: CommerceCodec = {
                 }
             },
             getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
-                let category = await api(args).getCategory(args.slug)
-                return {
-                    ...category,
-                    products: await api(args).getProductsForCategory(category)
+                // let category = await api(args).getCategory(args.slug)
+                let category = findInMegaMenu(megaMenu, args.slug)
+                if (category) {
+                    return {
+                        ...category,
+                        products: await api(args).getProductsForCategory(category)
+                    }    
                 }
+                return null
             },
             getMegaMenu: async function (): Promise<Category[]> {
                 return megaMenu

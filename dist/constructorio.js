@@ -17,8 +17,8 @@ const async_1 = __importDefault(require("async"));
 const lodash_1 = __importDefault(require("lodash"));
 const ConstructorIOClient = require('@constructor-io/constructorio-node');
 const constructorio = new ConstructorIOClient({
-    apiKey: 'key_qFJeU4DThqOqEtQt',
-    apiToken: 'tok_VaDeRb47Me3tL6WA'
+    apiKey: '********',
+    apiToken: '********'
 });
 const run = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`reading item groups...`);
