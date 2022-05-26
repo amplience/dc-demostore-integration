@@ -34,7 +34,7 @@ const getCommerceAPI = (params) => __awaiter(void 0, void 0, void 0, function* (
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
             const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
-            return yield (yield axios_1.default.post(apiUrl, Object.assign(Object.assign(Object.assign({}, args), params), { operation }))).data;
+            return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {
             getProduct: getResponse('getProduct'),
@@ -52,8 +52,10 @@ const apiRouteHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
-    let commerceAPI = yield (0, exports.getCommerceAPI)(req.body);
+    let commerceAPI = yield (0, exports.getCommerceAPI)(req.body || req.query);
     switch (req.method.toLowerCase()) {
+        case 'get':
+            return res.status(200).json(yield commerceAPI[req.query.operation](req.query));
         case 'post':
             return res.status(200).json(yield commerceAPI[req.body.operation](req.body));
         case 'options':

@@ -32,7 +32,7 @@ export const getCommerceAPI = async (params: Config): Promise<CommerceAPI> => {
     else {
         const getResponse = (operation: CommerceOperation) => async (args: any): Promise<any> => {
             const apiUrl = (window as any).isStorybook ? `https://core.dc-demostore.com/api` : `/api`
-            return await (await axios.post(apiUrl, { ...args, ...params, operation })).data
+            return await (await axios.get(apiUrl, { params: { ...args, ...params, operation } })).data
         }
 
         return {
@@ -52,8 +52,11 @@ export const apiRouteHandler = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', '*')
     res.setHeader('Access-Control-Allow-Methods', '*')
 
-    let commerceAPI = await getCommerceAPI(req.body)
+    let commerceAPI = await getCommerceAPI(req.body || req.query)
     switch (req.method.toLowerCase()) {
+        case 'get':
+            return res.status(200).json(await commerceAPI[req.query.operation](req.query))
+
         case 'post':
             return res.status(200).json(await commerceAPI[req.body.operation](req.body))
 
