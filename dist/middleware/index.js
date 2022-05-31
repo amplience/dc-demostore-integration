@@ -17,17 +17,22 @@ const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
-exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
+exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
     if ('config_locator' in config) {
-        // either we were passed in a config_locator or undefined, so let's get the credential block
-        config = yield (yield (0, amplience_1.getDemoStoreConfig)(config.config_locator)).commerce;
+        let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
+        if (configItem._meta.schema === 'https://demostore.amplience.com/site/demostoreconfig') {
+            config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
+        }
+        else {
+            config = configItem;
+        }
     }
     return yield (0, index_1.getCommerceCodec)(config);
 });
 // getCommerceAPI is the main client interaction point with the integration layer
-const getCommerceAPI = (params) => __awaiter(void 0, void 0, void 0, function* () {
+const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {
     if ((0, util_1.isServer)()) {
         return yield getAPI(params);
     }

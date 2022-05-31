@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDemoStoreConfig = exports.getContentItem = void 0;
+exports.getDemoStoreConfig = exports.getContentItemFromConfigLocator = exports.getContentItem = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
@@ -22,18 +22,22 @@ const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function
     return response.status === 200 ? (0, crypt_keeper_1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });
 exports.getContentItem = getContentItem;
+const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
+    let [hub, lookup] = configLocator.split(':');
+    if (lookup.indexOf('/') === -1) {
+        lookup = `config/${lookup}`;
+    }
+    return yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
+});
+exports.getContentItemFromConfigLocator = getContentItemFromConfigLocator;
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
-    let [hub, lookup] = key.split(':');
-    // look up aria/env as a fallback to demostore/config for backward compatibility
-    let obj = (yield (0, exports.getContentItem)(hub, { key: `demostore/config/${lookup}` })) ||
-        (yield (0, exports.getContentItem)(hub, { key: `aria/env/${lookup}` }));
+    let obj = yield (0, exports.getContentItemFromConfigLocator)(key);
     if (!obj) {
         throw `[ demostore ] Couldn't find config with key '${key}'`;
     }
-    obj.commerce = obj.commerce && (yield (0, exports.getContentItem)(hub, { id: obj.commerce.id }));
+    // obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
     obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
     obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
-    obj.locator = key;
     return obj;
 });
 exports.getDemoStoreConfig = getDemoStoreConfig;

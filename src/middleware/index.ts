@@ -1,4 +1,4 @@
-import { getDemoStoreConfig } from "../amplience";
+import { getContentItem, getContentItemFromConfigLocator } from "../amplience";
 import axios from "axios";
 import { CommerceAPI, getCommerceCodec } from "../index";
 import { isServer } from "../common/util";
@@ -8,7 +8,7 @@ export type ConfigLocatorBlock = {
     config_locator: string
 }
 
-export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
+export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
 const getAPI = async (config: Config): Promise<CommerceAPI> => {
     config = {
         ...baseConfigLocator,
@@ -16,8 +16,13 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
     }
 
     if ('config_locator' in config) {
-        // either we were passed in a config_locator or undefined, so let's get the credential block
-        config = await (await getDemoStoreConfig(config.config_locator)).commerce
+        let configItem: any = await getContentItemFromConfigLocator(config.config_locator)
+        if (configItem._meta.schema === 'https://demostore.amplience.com/site/demostoreconfig') {
+            config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
+        }
+        else {
+            config = configItem
+        }
     }
     return await getCommerceCodec(config)
 }
@@ -25,7 +30,7 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
 export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups'
 
 // getCommerceAPI is the main client interaction point with the integration layer
-export const getCommerceAPI = async (params: Config): Promise<CommerceAPI> => {
+export const getCommerceAPI = async (params: Config = undefined): Promise<CommerceAPI> => {
     if (isServer()) {
         return await getAPI(params)
     }

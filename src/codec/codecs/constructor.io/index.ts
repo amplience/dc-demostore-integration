@@ -3,7 +3,7 @@ import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArg
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import { CodecType } from '../../index'
-import { ConstructorIO, ConstructorIOCategory, ConstructorIOProduct, Browse, Catalog, Search } from './types'
+import { ConstructorIO, ConstructorIOCategory, ConstructorIOProduct } from './types'
 import { findInMegaMenu } from '../common'
 import slugify from 'slugify'
 import axios from 'axios'
