@@ -62,8 +62,8 @@ const epCodec: Codec = {
             client_secret: config.client_secret
         }))
 
-        let catalog = null
         let megaMenu = null
+        let catalog = null
 
         const fetch = async url => (await rest.get({ url })).data
         const api = {
@@ -75,8 +75,9 @@ const epCodec: Codec = {
             getHierarchyById: (id: string): Promise<Hierarchy> => fetch(`/pcm/hierarchies/${id}`),
             getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first(await fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)),
             getPriceForSku: async (sku: string): Promise<Price> => {
+                let cat = await api.getCatalog()
                 let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
-                let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === catalog.attributes.pricebook_id && !!price.attributes?.currencies) ||
+                let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === cat.attributes.pricebook_id && !!price.attributes?.currencies) ||
                     _.find(prices, price => !!price.attributes?.currencies)
                 return {
                     ...priceBookPrice?.attributes.currencies['USD'],

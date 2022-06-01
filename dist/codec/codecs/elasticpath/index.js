@@ -62,8 +62,8 @@ const epCodec = {
             client_id: config.client_id,
             client_secret: config.client_secret
         }));
-        let catalog = null;
         let megaMenu = null;
+        let catalog = null;
         const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
         const api = {
             getProductById: (id) => fetch(`/pcm/products/${id}`),
@@ -74,8 +74,9 @@ const epCodec = {
             getHierarchyById: (id) => fetch(`/pcm/hierarchies/${id}`),
             getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)); }),
             getPriceForSku: (sku) => __awaiter(this, void 0, void 0, function* () {
+                let cat = yield api.getCatalog();
                 let prices = yield api.getPricesForSku(sku);
-                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === catalog.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
+                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === cat.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
                     lodash_1.default.find(prices, price => { var _a; return !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); });
                 return Object.assign(Object.assign({}, priceBookPrice === null || priceBookPrice === void 0 ? void 0 : priceBookPrice.attributes.currencies['USD']), { currency: 'USD' });
             }),
