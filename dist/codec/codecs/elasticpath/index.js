@@ -102,7 +102,7 @@ const epCodec = {
         const getProductsFromCategory = (category) => __awaiter(this, void 0, void 0, function* () {
             let products = [];
             if (category.id === category.hierarchyId) {
-                products = lodash_1.default.flatten(yield Promise.all(category.children.map((child) => __awaiter(this, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))));
+                products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(this, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))), 1)), x => x.id);
             }
             else if (category.hierarchyId) {
                 products = yield api.getProductsByNodeId(category.hierarchyId, category.id);
@@ -135,12 +135,15 @@ const epCodec = {
                 if (!args.slug) {
                     throw new Error(`getCategory(): must specify slug`);
                 }
-                return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
+                let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(), args.slug);
+                let populated = yield populateCategory(category);
+                return populated;
             });
         };
         const getMegaMenu = function () {
             return __awaiter(this, void 0, void 0, function* () {
-                return megaMenu = megaMenu || (yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy)));
+                megaMenu = megaMenu || (yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy)));
+                return megaMenu;
             });
         };
         const getCustomerGroups = function () {

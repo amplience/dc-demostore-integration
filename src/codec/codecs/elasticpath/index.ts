@@ -108,7 +108,7 @@ const epCodec: Codec = {
         const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
             let products: Moltin.Product[] = []
             if (category.id === category.hierarchyId) {
-                products = _.flatten(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))))
+                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
             }
             else if (category.hierarchyId) {
                 products = await api.getProductsByNodeId(category.hierarchyId, category.id)
@@ -139,11 +139,14 @@ const epCodec: Codec = {
             if (!args.slug) {
                 throw new Error(`getCategory(): must specify slug`)
             }
-            return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
+            let category = findInMegaMenu(await getMegaMenu(), args.slug) as ElasticPathCategory
+            let populated = await populateCategory(category)
+            return populated
         }
 
         const getMegaMenu = async function (): Promise<Category[]> {
-            return megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+            megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+            return megaMenu
         }
 
         const getCustomerGroups = async function (): Promise<CustomerGroup[]> {
