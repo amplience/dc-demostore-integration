@@ -26,22 +26,28 @@ const registerCodec = (codec) => {
     }
 };
 exports.registerCodec = registerCodec;
-const getCodec = (config) => {
-    let codec = codecs.find(c => !!c.getAPI(config));
-    if (!codec) {
+const apis = new Map();
+const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
+    let codecsMatchingConfig = (0, exports.getCodecs)().filter(c => lodash_1.default.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0);
+    if (codecsMatchingConfig.length === 0) {
         throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
-    let api = codec.getAPI(config);
-    lodash_1.default.each(api, (method, key) => {
-        if (typeof api[key] === 'function') {
+    else if (codecsMatchingConfig.length > 1) {
+        throw `[ demostore ] multiple codecs found matching schema [ ${JSON.stringify(config)} ]`;
+    }
+    let configHash = lodash_1.default.values(config).join('');
+    if (!apis[configHash]) {
+        console.log(`[ demostore ] creating codec...`);
+        let api = yield lodash_1.default.first(codecsMatchingConfig).getAPI(config);
+        apis[configHash] = lodash_1.default.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key) => {
             // apply default arguments for those not provided in the query
-            api[key] = (args) => __awaiter(void 0, void 0, void 0, function* () {
-                return yield method(Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
+            return (args) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield api[key](Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
             });
-        }
-    });
-    return api;
-};
+        }));
+    }
+    return apis[configHash];
+});
 exports.getCodec = getCodec;
 (0, exports.registerCodec)(require('./codecs/bigcommerce').default);
 (0, exports.registerCodec)(require('./codecs/commercetools').default);

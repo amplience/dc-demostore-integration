@@ -11,45 +11,45 @@ export type CodecConfiguration = {
 }
 
 export type Property = {
-    title:          string
+    title: string
 }
 
 export type StringProperty = Property & {
-    type:       'string'
+    type: 'string'
     minLength?: number
     maxLength?: number
-    pattern?:   string
+    pattern?: string
 }
 
 export type NumberProperty = Property & {
-    type:               'number'
-    multipleOf?:        number
-    minimum?:           number
-    maximum?:           number
-    exclusiveMinimum?:  number
-    exclusiveMaximum?:  number
+    type: 'number'
+    multipleOf?: number
+    minimum?: number
+    maximum?: number
+    exclusiveMinimum?: number
+    exclusiveMaximum?: number
 }
 
 export type IntegerProperty = NumberProperty & {
-    type:           'integer'
+    type: 'integer'
 }
 
 export type ArrayProperty = Property & {
-    type:           'array'
-    items?:         number
-    minItems?:      number
-    maxItems?:      number
-    required?:      boolean
-    uniqueItems?:   boolean
+    type: 'array'
+    items?: number
+    minItems?: number
+    maxItems?: number
+    required?: boolean
+    uniqueItems?: boolean
 }
 
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
 export interface Codec {
     schema: {
-        uri:        string
+        uri: string
         properties: Dictionary<AnyProperty>
-        icon:       string
+        icon: string
     }
     getAPI(config: any): any
 }
@@ -74,27 +74,34 @@ export const registerCodec = (codec: Codec) => {
     }
 }
 
-export const getCodec = (config: CodecConfiguration): API => {
-    let codec: Codec = codecs.find(c => !!c.getAPI(config))
-    if (!codec) {
+const apis = new Map<any, API>()
+
+export const getCodec = async (config: any): Promise<API> => {
+    let codecsMatchingConfig: Codec[] = getCodecs().filter(c => _.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0)
+    if (codecsMatchingConfig.length === 0) {
         throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
     }
+    else if (codecsMatchingConfig.length > 1) {
+        throw `[ demostore ] multiple codecs found matching schema [ ${JSON.stringify(config)} ]`
+    }
 
-    let api = codec.getAPI(config)
-    _.each(api, (method: any, key: string) => {
-        if (typeof api[key] === 'function') {
+    let configHash = _.values(config).join('')
+    if (!apis[configHash]) {
+        console.log(`[ demostore ] creating codec...`)
+        let api = await _.first(codecsMatchingConfig).getAPI(config)
+        apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
             // apply default arguments for those not provided in the query
-            api[key] = async (args: CommonArgs): Promise<any> => await method({
-                locale: 'en-US',
-                language: 'en',
-                country: 'US',
-                currency: 'USD',
-                segment: '',
+            return async (args: CommonArgs): Promise<any> => await api[key]({
+                locale:     'en-US',
+                language:   'en',
+                country:    'US',
+                currency:   'USD',
+                segment:    '',
                 ...args
             })
-        }
-    })
-    return api
+        }))
+    }
+    return apis[configHash]
 }
 
 registerCodec(require('./codecs/bigcommerce').default)

@@ -51,7 +51,7 @@ const epCodec: Codec = {
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
         properties
     },
-    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
+    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
         if (!config.pcm_url) {
             return null
         }
@@ -62,10 +62,9 @@ const epCodec: Codec = {
             client_secret: config.client_secret
         }))
 
-        let megaMenu = null
-        let catalog = null
-
         const fetch = async url => (await rest.get({ url })).data
+        
+        let catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
         const api = {
             getProductById: (id: string): Promise<AttributedProduct> => fetch(`/pcm/products/${id}`),
             getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first(await fetch(`/pcm/products/?filter=like(sku,string:${sku})`)),
@@ -78,7 +77,7 @@ const epCodec: Codec = {
                 let cat = await api.getCatalog()
                 let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
                 let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === cat.attributes.pricebook_id && !!price.attributes?.currencies) ||
-                    _.find(prices, price => !!price.attributes?.currencies)
+                _.find(prices, price => !!price.attributes?.currencies)
                 return {
                     ...priceBookPrice?.attributes.currencies['USD'],
                     currency: 'USD'
@@ -89,7 +88,7 @@ const epCodec: Codec = {
                 pricebook
             }))),
             getCatalog: async (): Promise<Catalog> => {
-                return catalog = catalog || _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
+                return catalog
             },
             getMegaMenu: async (): Promise<Hierarchy[]> => {
                 return await Promise.all((await api.getCatalog()).attributes.hierarchy_ids.map(await api.getHierarchyById))
@@ -99,13 +98,24 @@ const epCodec: Codec = {
             getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
             getCustomerGroups: (): Promise<EPCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
         }
-
+        
+        // _.each(Object.keys(api), key => {
+        //     let method = api[key]
+        //     api[key] = async (...args) => {
+        //         let start = new Date().valueOf()
+        //         let result = await method(...args)
+        //         console.log(`${key}: ${new Date().valueOf() - start}ms`)
+        //         return result
+        //     }
+        // })
+        
         const mapper = mappers(api)
+        let megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
             ...category,
             products: await getProductsFromCategory(category)
         })
-
+        
         const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
             let products: Moltin.Product[] = []
             if (category.id === category.hierarchyId) {
@@ -146,7 +156,6 @@ const epCodec: Codec = {
         }
 
         const getMegaMenu = async function (): Promise<Category[]> {
-            megaMenu = megaMenu || await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
             return megaMenu
         }
 
