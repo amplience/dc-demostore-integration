@@ -2,6 +2,7 @@ import _ from 'lodash'
 import { DemoStoreConfiguration } from '../types'
 import { ContentItem } from 'dc-management-sdk-js'
 import { CryptKeeper } from '..'
+import fetch from 'isomorphic-unfetch'
 
 const getContentItem = async (hub: string, args: any): Promise<ContentItem> => {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`

@@ -18,41 +18,43 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
         await getCodec(config as CodecConfiguration) as CommerceAPI
 }
 
-const getResponse = async (req: any): Promise<any> => {
-    const commerceAPI = await getAPI(req.params)
-    if (!commerceAPI) {
-        throw new Error(`commerceAPI not found for ${JSON.stringify(req.params)}`)
-    }
+export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups'
 
-    const operation = commerceAPI[req.operation]
-    if (!operation) {
-        throw new Error(`invalid operation: ${req.operation}`)
+// getCommerceAPI is the main client interaction point with the integration layer
+export const getCommerceAPI = async (params: Config = undefined): Promise<CommerceAPI> => {
+    if (isServer()) {
+        return await getAPI(params)
     }
+    else {
+        const getResponse = (operation: CommerceOperation) => async (args: any): Promise<any> => {
+            const apiUrl = (window as any).isStorybook ? `https://core.dc-demostore.com/api` : `/api`
+            return await (await axios.get(apiUrl, { params: { ...args, ...params, operation } })).data
+        }
 
-    let apiUrl = `/api`
-    if (typeof window !== 'undefined' && (window as any).isStorybook) {
-        apiUrl = `https://core.dc-demostore.com/api`
+        return {
+            getProduct:         getResponse('getProduct'),
+            getProducts:        getResponse('getProducts'),
+            getCategory:        getResponse('getCategory'),
+            getMegaMenu:        getResponse('getMegaMenu'),
+            getCustomerGroups:  getResponse('getCustomerGroups')
+        }
     }
-    return isServer() ? await operation(req.args) : await (await axios.post(apiUrl, req)).data
 }
 
-export const getCommerceAPI = (params: Config): CommerceAPI => ({
-    getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => await getResponse({ params, args, operation: 'getProduct' }),
-    getProducts: async (args: GetProductsArgs): Promise<Product[]> => await getResponse({ params, args, operation: 'getProducts' }),
-    getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => await getResponse({ params, args, operation: 'getCategory' }),
-    getMegaMenu: async (args: CommonArgs): Promise<Category[]> => await getResponse({ params, args, operation: 'getMegaMenu' }),
-    getCustomerGroups: async (args: CommonArgs): Promise<CustomerGroup[]> => await getResponse({ params, args, operation: 'getCustomerGroups' })
-})
-
-const handler = async (req, res) => { 
+// handler for /api route
+const handler = async (req, res) => {
     // CORS support
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', '*')
     res.setHeader('Access-Control-Allow-Methods', '*')
-    
+
+    let commerceAPI = await getCommerceAPI(req.body || req.query)
     switch (req.method.toLowerCase()) {
+        case 'get':
+            return res.status(200).json(await commerceAPI[req.query.operation](req.query))
+
         case 'post':
-            return res.status(200).json(await getResponse(req.body))             
+            return res.status(200).json(await commerceAPI[req.body.operation](req.body))
 
         case 'options':
             return res.status(200).send()

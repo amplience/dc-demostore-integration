@@ -15,9 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDemoStoreConfig = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("..");
+const isomorphic_unfetch_1 = __importDefault(require("isomorphic-unfetch"));
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
-    let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
+    let response = yield (0, isomorphic_unfetch_1.default)(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
     return response.status === 200 ? (0, __1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
