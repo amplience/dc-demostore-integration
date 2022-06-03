@@ -6,7 +6,8 @@
   "scripts": {
     "clean": "rimraf dist",
     "lint": "eslint",
-    "build": "eslint && npm run clean && tsc"
+    "build": "eslint && npm run clean && tsc",
+    "server": "ts-node src/server.ts"
   },
   "exports": {
     ".": "./dist/index.js"
