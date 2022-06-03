@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { middleware } from '.';
+import { apiRouteHandler } from './middleware';
 import 'isomorphic-unfetch'
 
 const app = express();
@@ -7,7 +7,7 @@ const port = 8080; // default port to listen
 
 const wrappedMiddleware = async (req: Request, res: Response, next: any) => {
     try {
-        await middleware(req, res)
+        await apiRouteHandler(req, res)
     } catch (e) {
         next(e)
     }

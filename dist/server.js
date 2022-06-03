@@ -13,13 +13,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const _1 = require(".");
+const middleware_1 = require("./middleware");
 require("isomorphic-unfetch");
 const app = (0, express_1.default)();
 const port = 8080; // default port to listen
 const wrappedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, _1.middleware)(req, res);
+        yield (0, middleware_1.apiRouteHandler)(req, res);
     }
     catch (e) {
         next(e);
