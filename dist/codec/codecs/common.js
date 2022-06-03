@@ -14,7 +14,7 @@ const flattenCategories = (categories) => {
     const allCategories = [];
     const bulldozeCategories = cat => {
         allCategories.push(cat);
-        cat.children.forEach(bulldozeCategories);
+        cat.children && cat.children.forEach(bulldozeCategories);
     };
     categories.forEach(bulldozeCategories);
     return allCategories;

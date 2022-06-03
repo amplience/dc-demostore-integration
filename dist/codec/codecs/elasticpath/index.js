@@ -41,7 +41,7 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
 const qs_1 = __importDefault(require("qs"));
-const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { pcm_url: {
+const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { pcm_url: {
         title: "PCM URL",
         type: "string"
     }, catalog_name: {
@@ -71,8 +71,9 @@ const epCodec = {
             getHierarchyById: (id) => fetch(`/pcm/hierarchies/${id}`),
             getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)); }),
             getPriceForSku: (sku) => __awaiter(void 0, void 0, void 0, function* () {
+                let cat = yield api.getCatalog();
                 let prices = yield api.getPricesForSku(sku);
-                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === catalog.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
+                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === cat.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
                     lodash_1.default.find(prices, price => { var _a; return !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); });
                 return Object.assign(Object.assign({}, priceBookPrice === null || priceBookPrice === void 0 ? void 0 : priceBookPrice.attributes.currencies['USD']), { currency: 'USD' });
             }),
@@ -92,6 +93,15 @@ const epCodec = {
             getChildrenByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
             getCustomerGroups: () => fetch(`/v2/flows/customer-group/entries`)
         };
+        // _.each(Object.keys(api), key => {
+        //     let method = api[key]
+        //     api[key] = async (...args) => {
+        //         let start = new Date().valueOf()
+        //         let result = await method(...args)
+        //         console.log(`${key}: ${new Date().valueOf() - start}ms`)
+        //         return result
+        //     }
+        // })
         const mapper = (0, mappers_1.default)(api);
         const populateCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
@@ -99,7 +109,7 @@ const epCodec = {
         const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             if (category.id === category.hierarchyId) {
-                products = lodash_1.default.flatten(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))));
+                products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))), 1)), x => x.id);
             }
             else if (category.hierarchyId) {
                 products = yield api.getProductsByNodeId(category.hierarchyId, category.id);
@@ -134,7 +144,9 @@ const epCodec = {
                 if (!args.slug) {
                     throw new Error(`getCategory(): must specify slug`);
                 }
-                return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
+                let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(), args.slug);
+                let populated = yield populateCategory(category);
+                return populated;
             });
         };
         const getMegaMenu = function () {

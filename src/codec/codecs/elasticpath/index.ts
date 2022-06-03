@@ -3,7 +3,7 @@ import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArg
 import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthProperties } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
@@ -15,6 +15,7 @@ type CodecConfig = ClientCredentialsConfiguration & {
 }
 
 const properties: CodecConfig = {
+    ...OAuthProperties,
     ...ClientCredentialProperties,
     pcm_url: {
         title: "PCM URL",
@@ -59,6 +60,7 @@ const epCodec: CommerceCodec = {
         }))
 
         const fetch = async url => (await rest.get({ url })).data
+        
         const api = {
             getProductById: (id: string): Promise<AttributedProduct> => fetch(`/pcm/products/${id}`),
             getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first(await fetch(`/pcm/products/?filter=like(sku,string:${sku})`)),
@@ -68,9 +70,10 @@ const epCodec: CommerceCodec = {
             getHierarchyById: (id: string): Promise<Hierarchy> => fetch(`/pcm/hierarchies/${id}`),
             getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first(await fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)),
             getPriceForSku: async (sku: string): Promise<Price> => {
+                let cat = await api.getCatalog()
                 let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
-                let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === catalog.attributes.pricebook_id && !!price.attributes?.currencies) ||
-                    _.find(prices, price => !!price.attributes?.currencies)
+                let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === cat.attributes.pricebook_id && !!price.attributes?.currencies) ||
+                _.find(prices, price => !!price.attributes?.currencies)
                 return {
                     ...priceBookPrice?.attributes.currencies['USD'],
                     currency: 'USD'
@@ -91,17 +94,27 @@ const epCodec: CommerceCodec = {
             getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
             getCustomerGroups: (): Promise<EPCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
         }
-
+        
+        // _.each(Object.keys(api), key => {
+        //     let method = api[key]
+        //     api[key] = async (...args) => {
+        //         let start = new Date().valueOf()
+        //         let result = await method(...args)
+        //         console.log(`${key}: ${new Date().valueOf() - start}ms`)
+        //         return result
+        //     }
+        // })
+        
         const mapper = mappers(api)
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
             ...category,
             products: await getProductsFromCategory(category)
         })
-
+        
         const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
             let products: Moltin.Product[] = []
             if (category.id === category.hierarchyId) {
-                products = _.flatten(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))))
+                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
             }
             else if (category.hierarchyId) {
                 products = await api.getProductsByNodeId(category.hierarchyId, category.id)
@@ -135,7 +148,9 @@ const epCodec: CommerceCodec = {
             if (!args.slug) {
                 throw new Error(`getCategory(): must specify slug`)
             }
-            return await populateCategory(findInMegaMenu(megaMenu, args.slug) as ElasticPathCategory)
+            let category = findInMegaMenu(await getMegaMenu(), args.slug) as ElasticPathCategory
+            let populated = await populateCategory(category)
+            return populated
         }
 
         const getMegaMenu = async function (): Promise<Category[]> {

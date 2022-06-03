@@ -1,25 +1,26 @@
 import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
-import { API, CommerceAPI, CommonArgs } from '..'
+import { API, CommerceAPI } from '..'
+import { CommonArgs } from '../common/types'
 
 export type Property = {
     title: string
 }
 
 export type StringProperty = Property & {
-    type:       'string'
+    type: 'string'
     minLength?: number
     maxLength?: number
-    pattern?:   string
+    pattern?: string
 }
 
 export type NumberProperty = Property & {
-    type:               'number'
-    multipleOf?:        number
-    minimum?:           number
-    maximum?:           number
-    exclusiveMinimum?:  number
-    exclusiveMaximum?:  number
+    type: 'number'
+    multipleOf?: number
+    minimum?: number
+    maximum?: number
+    exclusiveMinimum?: number
+    exclusiveMaximum?: number
 }
 
 export type IntegerProperty = NumberProperty & {
@@ -27,12 +28,12 @@ export type IntegerProperty = NumberProperty & {
 }
 
 export type ArrayProperty = Property & {
-    type:           'array'
-    items?:         number
-    minItems?:      number
-    maxItems?:      number
-    required?:      boolean
-    uniqueItems?:   boolean
+    type: 'array'
+    items?: number
+    minItems?: number
+    maxItems?: number
+    required?: boolean
+    uniqueItems?: boolean
 }
 
 export enum CodecType {
@@ -45,7 +46,7 @@ export type Codec<T> = {
         type:       CodecType
         uri:        string
         properties: Dictionary<AnyProperty>
-        icon:       string
+        icon: string
     }
     getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>
 }
