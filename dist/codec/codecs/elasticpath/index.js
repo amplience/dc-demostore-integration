@@ -53,7 +53,7 @@ const epCodec = {
         icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
         properties
     },
-    getAPI: function (config) {
+    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         if (!config.pcm_url) {
             return null;
         }
@@ -62,32 +62,32 @@ const epCodec = {
             client_id: config.client_id,
             client_secret: config.client_secret
         }));
-        let catalog = null;
-        let megaMenu = null;
-        const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
+        const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
+        let catalog = lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === config.catalog_name; });
         const api = {
             getProductById: (id) => fetch(`/pcm/products/${id}`),
-            getProductBySku: (sku) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/products/?filter=like(sku,string:${sku})`)); }),
+            getProductBySku: (sku) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/products/?filter=like(sku,string:${sku})`)); }),
             getFileById: (id) => fetch(`/v2/files/${id}`),
             getPricebooks: () => fetch(`/pcm/pricebooks`),
             getPricebookById: (id) => fetch(`/pcm/pricebooks/${id}`),
             getHierarchyById: (id) => fetch(`/pcm/hierarchies/${id}`),
-            getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(this, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)); }),
-            getPriceForSku: (sku) => __awaiter(this, void 0, void 0, function* () {
+            getPriceForSkuInPricebook: (sku, pricebook) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)); }),
+            getPriceForSku: (sku) => __awaiter(void 0, void 0, void 0, function* () {
+                let cat = yield api.getCatalog();
                 let prices = yield api.getPricesForSku(sku);
-                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === catalog.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
+                let priceBookPrice = lodash_1.default.find(prices, (price) => { var _a; return price.pricebook.id === cat.attributes.pricebook_id && !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); }) ||
                     lodash_1.default.find(prices, price => { var _a; return !!((_a = price.attributes) === null || _a === void 0 ? void 0 : _a.currencies); });
                 return Object.assign(Object.assign({}, priceBookPrice === null || priceBookPrice === void 0 ? void 0 : priceBookPrice.attributes.currencies['USD']), { currency: 'USD' });
             }),
-            getPricesForSku: (sku) => __awaiter(this, void 0, void 0, function* () {
-                return yield Promise.all((yield api.getPricebooks()).map((pricebook) => __awaiter(this, void 0, void 0, function* () {
+            getPricesForSku: (sku) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield Promise.all((yield api.getPricebooks()).map((pricebook) => __awaiter(void 0, void 0, void 0, function* () {
                     return (Object.assign(Object.assign({}, yield api.getPriceForSkuInPricebook(sku, pricebook)), { pricebook }));
                 })));
             }),
-            getCatalog: () => __awaiter(this, void 0, void 0, function* () {
-                return catalog = catalog || lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === config.catalog_name; });
+            getCatalog: () => __awaiter(void 0, void 0, void 0, function* () {
+                return catalog;
             }),
-            getMegaMenu: () => __awaiter(this, void 0, void 0, function* () {
+            getMegaMenu: () => __awaiter(void 0, void 0, void 0, function* () {
                 return yield Promise.all((yield api.getCatalog()).attributes.hierarchy_ids.map(yield api.getHierarchyById));
             }),
             getProductsByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
@@ -95,14 +95,24 @@ const epCodec = {
             getChildrenByNodeId: (hierarchyId, nodeId) => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
             getCustomerGroups: () => fetch(`/v2/flows/customer-group/entries`)
         };
+        // _.each(Object.keys(api), key => {
+        //     let method = api[key]
+        //     api[key] = async (...args) => {
+        //         let start = new Date().valueOf()
+        //         let result = await method(...args)
+        //         console.log(`${key}: ${new Date().valueOf() - start}ms`)
+        //         return result
+        //     }
+        // })
         const mapper = (0, mappers_1.default)(api);
-        const populateCategory = (category) => __awaiter(this, void 0, void 0, function* () {
+        let megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
+        const populateCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
         });
-        const getProductsFromCategory = (category) => __awaiter(this, void 0, void 0, function* () {
+        const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             if (category.id === category.hierarchyId) {
-                products = lodash_1.default.flatten(yield Promise.all(category.children.map((child) => __awaiter(this, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))));
+                products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))), 1)), x => x.id);
             }
             else if (category.hierarchyId) {
                 products = yield api.getProductsByNodeId(category.hierarchyId, category.id);
@@ -135,12 +145,14 @@ const epCodec = {
                 if (!args.slug) {
                     throw new Error(`getCategory(): must specify slug`);
                 }
-                return yield populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug));
+                let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(), args.slug);
+                let populated = yield populateCategory(category);
+                return populated;
             });
         };
         const getMegaMenu = function () {
             return __awaiter(this, void 0, void 0, function* () {
-                return megaMenu = megaMenu || (yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy)));
+                return megaMenu;
             });
         };
         const getCustomerGroups = function () {
@@ -156,6 +168,6 @@ const epCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    }
+    })
 };
 exports.default = epCodec;

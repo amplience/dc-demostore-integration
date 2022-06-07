@@ -60,11 +60,10 @@ const restCodec = {
 
             api = {
                 getProductsForCategory: (category: Category): Product[] => {
-                    let categoryProducts = _.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id))
-                    if (_.isEmpty(categoryProducts)) {
-                        categoryProducts = _.flatMap(category.children.map(api.getProductsForCategory))
-                    }
-                    return categoryProducts
+                    return [
+                        ..._.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id)),
+                        ..._.flatMap(category.children.map<Product[]>(api.getProductsForCategory))
+                    ]
                 },
                 getProduct: (args: GetCommerceObjectArgs) => {
                     return args.id && _.find(products, prod => args.id === prod.id) ||

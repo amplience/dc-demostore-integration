@@ -53,4 +53,4 @@ export declare type CodecStringConfig<T> = {
 };
 export declare const getCodecs: () => Codec[];
 export declare const registerCodec: (codec: Codec) => void;
-export declare const getCodec: (config: CodecConfiguration) => API;
+export declare const getCodec: (config: any) => Promise<API>;

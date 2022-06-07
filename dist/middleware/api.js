@@ -30,37 +30,38 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         yield (0, index_1.getCodec)((yield (0, amplience_1.getDemoStoreConfig)(configLocator)).commerce) :
         yield (0, index_1.getCodec)(config);
 });
-const getResponse = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const commerceAPI = yield getAPI(req.params);
-    if (!commerceAPI) {
-        throw new Error(`commerceAPI not found for ${JSON.stringify(req.params)}`);
+// getCommerceAPI is the main client interaction point with the integration layer
+const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {
+    if ((0, index_2.isServer)()) {
+        return yield getAPI(params);
     }
-    const operation = commerceAPI[req.operation];
-    if (!operation) {
-        throw new Error(`invalid operation: ${req.operation}`);
+    else {
+        const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
+            const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+            return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
+        });
+        return {
+            getProduct: getResponse('getProduct'),
+            getProducts: getResponse('getProducts'),
+            getCategory: getResponse('getCategory'),
+            getMegaMenu: getResponse('getMegaMenu'),
+            getCustomerGroups: getResponse('getCustomerGroups')
+        };
     }
-    let apiUrl = `/api`;
-    if (typeof window !== 'undefined' && window.isStorybook) {
-        apiUrl = `https://core.dc-demostore.com/api`;
-    }
-    return (0, index_2.isServer)() ? yield operation(req.args) : yield (yield axios_1.default.post(apiUrl, req)).data;
-});
-const getCommerceAPI = (params) => ({
-    getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getProduct' }); }),
-    getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getProducts' }); }),
-    getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getCategory' }); }),
-    getMegaMenu: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getMegaMenu' }); }),
-    getCustomerGroups: (args) => __awaiter(void 0, void 0, void 0, function* () { return yield getResponse({ params, args, operation: 'getCustomerGroups' }); })
 });
 exports.getCommerceAPI = getCommerceAPI;
+// handler for /api route
 const handler = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // CORS support
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
+    let commerceAPI = yield (0, exports.getCommerceAPI)(req.body || req.query);
     switch (req.method.toLowerCase()) {
+        case 'get':
+            return res.status(200).json(yield commerceAPI[req.query.operation](req.query));
         case 'post':
-            return res.status(200).json(yield getResponse(req.body));
+            return res.status(200).json(yield commerceAPI[req.body.operation](req.body));
         case 'options':
             return res.status(200).send();
         default:
