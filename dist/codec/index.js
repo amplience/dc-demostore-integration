@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCodec = exports.registerCodec = exports.getCodecs = void 0;
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("..");
 const codecs = [];
 const getCodecs = () => {
     return codecs;
@@ -49,10 +50,12 @@ const getCodec = (config) => __awaiter(void 0, void 0, void 0, function* () {
     return apis[configHash];
 });
 exports.getCodec = getCodec;
-(0, exports.registerCodec)(require('./codecs/bigcommerce').default);
-(0, exports.registerCodec)(require('./codecs/commercetools').default);
-(0, exports.registerCodec)(require('./codecs/sfcc').default);
-(0, exports.registerCodec)(require('./codecs/elasticpath').default);
-(0, exports.registerCodec)(require('./codecs/rest').default);
-(0, exports.registerCodec)(require('./codecs/fabric').default);
-(0, exports.registerCodec)(require('./codecs/hybris').default);
+if ((0, __1.isServer)()) {
+    (0, exports.registerCodec)(require('./codecs/bigcommerce').default);
+    (0, exports.registerCodec)(require('./codecs/commercetools').default);
+    (0, exports.registerCodec)(require('./codecs/sfcc').default);
+    (0, exports.registerCodec)(require('./codecs/elasticpath').default);
+    (0, exports.registerCodec)(require('./codecs/rest').default);
+    (0, exports.registerCodec)(require('./codecs/fabric').default);
+    (0, exports.registerCodec)(require('./codecs/hybris').default);
+}

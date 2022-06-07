@@ -1,5 +1,5 @@
 import _, { Dictionary } from 'lodash'
-import { API, CommerceAPI, CommonArgs } from '..'
+import { API, CommerceAPI, CommonArgs, isServer } from '..'
 
 export type CodecConfiguration = {
     _meta?: {
@@ -104,10 +104,12 @@ export const getCodec = async (config: any): Promise<API> => {
     return apis[configHash]
 }
 
-registerCodec(require('./codecs/bigcommerce').default)
-registerCodec(require('./codecs/commercetools').default)
-registerCodec(require('./codecs/sfcc').default)
-registerCodec(require('./codecs/elasticpath').default)
-registerCodec(require('./codecs/rest').default)
-registerCodec(require('./codecs/fabric').default)
-registerCodec(require('./codecs/hybris').default)
+if (isServer()) {
+    registerCodec(require('./codecs/bigcommerce').default)
+    registerCodec(require('./codecs/commercetools').default)
+    registerCodec(require('./codecs/sfcc').default)
+    registerCodec(require('./codecs/elasticpath').default)
+    registerCodec(require('./codecs/rest').default)
+    registerCodec(require('./codecs/fabric').default)
+    registerCodec(require('./codecs/hybris').default)
+}

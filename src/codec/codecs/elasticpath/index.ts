@@ -9,6 +9,11 @@ import { findInMegaMenu } from '../common'
 import qs from 'qs'
 import { EPCustomerGroup } from './types'
 
+import fs from 'fs-extra'
+import path from 'path'
+
+const MEGAMENU_CACHE_PATH = path.resolve('.megamenu')
+
 type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
     pcm_url:        StringProperty
     catalog_name:   StringProperty
@@ -110,7 +115,20 @@ const epCodec: Codec = {
         // })
         
         const mapper = mappers(api)
-        let megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+
+        // megamenu cache logic
+        let megaMenu
+        if (fs.existsSync(MEGAMENU_CACHE_PATH)) {
+            console.log(`using cached megamenu`)
+            megaMenu = fs.readJsonSync(MEGAMENU_CACHE_PATH)
+        }
+        else {
+            console.log(`caching megamenu`)
+            megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+            fs.writeJsonSync(MEGAMENU_CACHE_PATH, megaMenu)
+        }
+        // end megamenu cache logic
+
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
             ...category,
             products: await getProductsFromCategory(category)
