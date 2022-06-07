@@ -40,9 +40,6 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
 const qs_1 = __importDefault(require("qs"));
-const fs_extra_1 = __importDefault(require("fs-extra"));
-const path_1 = __importDefault(require("path"));
-const MEGAMENU_CACHE_PATH = path_1.default.resolve('.megamenu');
 const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), rest_client_1.ClientCredentialProperties), { pcm_url: {
         title: "PCM URL",
         type: "string"
@@ -108,18 +105,7 @@ const epCodec = {
         //     }
         // })
         const mapper = (0, mappers_1.default)(api);
-        // megamenu cache logic
-        let megaMenu;
-        if (fs_extra_1.default.existsSync(MEGAMENU_CACHE_PATH)) {
-            console.log(`using cached megamenu`);
-            megaMenu = fs_extra_1.default.readJsonSync(MEGAMENU_CACHE_PATH);
-        }
-        else {
-            console.log(`caching megamenu`);
-            megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
-            fs_extra_1.default.writeJsonSync(MEGAMENU_CACHE_PATH, megaMenu);
-        }
-        // end megamenu cache logic
+        let megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
         const populateCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
         });
