@@ -20,7 +20,7 @@ const index_2 = require("../index");
 exports.baseConfigLocator = process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || process.env.STORYBOOK_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default`;
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     let configLocator;
-    if (!config) {
+    if (!config || !config.hasOwnProperty('config_locator')) {
         configLocator = exports.baseConfigLocator;
     }
     else if ('config_locator' in config && config.config_locator) {
