@@ -58,12 +58,12 @@ const apiRouteHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
-    let commerceAPI = yield (0, exports.getCommerceAPI)(req.body || req.query);
+    let config = req.body || req.query;
+    let commerceAPI = yield (0, exports.getCommerceAPI)(config);
     switch (req.method.toLowerCase()) {
         case 'get':
-            return res.status(200).json(yield commerceAPI[req.query.operation](req.query));
         case 'post':
-            return res.status(200).json(yield commerceAPI[req.body.operation](req.body));
+            return res.status(200).json(yield commerceAPI[config.operation](config));
         case 'options':
             return res.status(200).send();
         default:

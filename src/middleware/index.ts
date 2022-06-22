@@ -57,13 +57,12 @@ export const apiRouteHandler = async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', '*')
     res.setHeader('Access-Control-Allow-Methods', '*')
 
-    let commerceAPI = await getCommerceAPI(req.body || req.query)
+    let config = req.body || req.query
+    let commerceAPI = await getCommerceAPI(config)
     switch (req.method.toLowerCase()) {
         case 'get':
-            return res.status(200).json(await commerceAPI[req.query.operation](req.query))
-
         case 'post':
-            return res.status(200).json(await commerceAPI[req.body.operation](req.body))
+            return res.status(200).json(await commerceAPI[config.operation](config))
 
         case 'options':
             return res.status(200).send()
