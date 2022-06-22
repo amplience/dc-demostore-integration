@@ -1,5 +1,5 @@
 import _, { Dictionary } from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../common/types'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import mappers from './mappers'
@@ -65,13 +65,13 @@ const restCodec: CommerceCodec = {
             getCategory: (args: GetCommerceObjectArgs) => {
                 let category = categories.find(cat => cat.slug === args.slug)
                 if (category) {
-                    return api.populateCategory(category)
+                    return api.populateCategory(category, args)
                 }
                 return null
             },
-            populateCategory: (category: Category): Category => ({
+            populateCategory: (category: Category, args: CommonArgs): Category => ({
                 ...category,
-                products: _.take(api.getProductsForCategory(category), 12)
+                products: _.take(api.getProductsForCategory(category), 12).map(prod => mappers.mapProduct(prod, args))
             }),
             getCustomerGroups: (): CustomerGroup[] => {
                 return customerGroups
@@ -95,7 +95,7 @@ const restCodec: CommerceCodec = {
             getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
                 let category = api.getCategory(args)
                 if (category) {
-                    return mappers.mapCategory(api.populateCategory(category))
+                    return mappers.mapCategory(api.populateCategory(category, args))
                 }
                 return null
             },

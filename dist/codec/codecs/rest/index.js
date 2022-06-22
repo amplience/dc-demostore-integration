@@ -68,11 +68,11 @@ const restCodec = {
                 getCategory: (args) => {
                     let category = categories.find(cat => cat.slug === args.slug);
                     if (category) {
-                        return api.populateCategory(category);
+                        return api.populateCategory(category, args);
                     }
                     return null;
                 },
-                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 12) })),
+                populateCategory: (category, args) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 12).map(prod => mappers_1.default.mapProduct(prod, args)) })),
                 getCustomerGroups: () => {
                     return customerGroups;
                 }
@@ -99,7 +99,7 @@ const restCodec = {
                     return __awaiter(this, void 0, void 0, function* () {
                         let category = api.getCategory(args);
                         if (category) {
-                            return mappers_1.default.mapCategory(api.populateCategory(category));
+                            return mappers_1.default.mapCategory(api.populateCategory(category, args));
                         }
                         return null;
                     });
