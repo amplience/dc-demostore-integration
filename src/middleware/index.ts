@@ -37,6 +37,7 @@ export const getCommerceAPI = async (params: Config = undefined): Promise<Commer
     else {
         const getResponse = (operation: CommerceOperation) => async (args: any): Promise<any> => {
             const apiUrl = (window as any).isStorybook ? `https://core.dc-demostore.com/api` : `/api`
+            console.log(`getResponse from url [ ${apiUrl} ]`)
             return await (await axios.get(apiUrl, { params: { ...args, ...params, operation } })).data
         }
 

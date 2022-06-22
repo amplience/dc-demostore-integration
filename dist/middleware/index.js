@@ -40,6 +40,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
             const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+            console.log(`getResponse from url [ ${apiUrl} ]`);
             return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {
