@@ -17,7 +17,7 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
 
     if ('config_locator' in config) {
         let configItem: any = await getContentItemFromConfigLocator(config.config_locator)
-        if (configItem._meta && configItem._meta.schema === CONSTANTS.demostoreConfigUri) {
+        if (configItem?._meta?.schema === CONSTANTS.demostoreConfigUri) {
             config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
         }
         else {

@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { ClientCredentialProperties, ClientCredentialsConfiguration, CodecConfiguration, CommerceAPI, OAuthRestClient, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
+import { ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, OAuthRestClient, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
 import { CodecType } from '../../index'
 import { findInMegaMenu } from '../common'
 import slugify from 'slugify'
