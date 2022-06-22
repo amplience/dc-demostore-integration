@@ -70,7 +70,9 @@ const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* (
     }
     let configHash = lodash_1.default.values(config).join('');
     if (!apis[configHash]) {
-        let api = yield lodash_1.default.first(codecsMatchingConfig).getAPI(config);
+        let codec = lodash_1.default.first(codecsMatchingConfig);
+        console.log(`[ demostore ] creating codec: ${codec.schema.uri}...`);
+        let api = yield codec.getAPI(config);
         apis[configHash] = lodash_1.default.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key) => {
             // apply default arguments for those not provided in the query
             return (args) => __awaiter(void 0, void 0, void 0, function* () {

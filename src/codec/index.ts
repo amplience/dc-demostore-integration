@@ -87,7 +87,9 @@ export const getCodec = async (config: any, type: CodecType): Promise<API> => {
 
     let configHash = _.values(config).join('')
     if (!apis[configHash]) {
-        let api = await _.first(codecsMatchingConfig).getAPI(config)
+        let codec = _.first(codecsMatchingConfig)
+        console.log(`[ demostore ] creating codec: ${codec.schema.uri}...`)
+        let api = await codec.getAPI(config)
         apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
             // apply default arguments for those not provided in the query
             return async (args: CommonArgs): Promise<any> => await api[key]({
