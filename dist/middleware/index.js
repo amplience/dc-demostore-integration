@@ -22,7 +22,7 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
     if ('config_locator' in config) {
         let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
-        if (configItem._meta.schema === 'https://demostore.amplience.com/site/demostoreconfig') {
+        if (configItem._meta && configItem._meta.schema === index_1.CONSTANTS.demostoreConfigUri) {
             config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
         }
         else {

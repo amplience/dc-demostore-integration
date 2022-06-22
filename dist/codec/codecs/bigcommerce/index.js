@@ -18,10 +18,9 @@ const mappers_1 = require("./mappers");
 const common_1 = require("../common");
 const rest_client_1 = require("../../../common/rest-client");
 const bigCommerceCodec = {
-    schema: {
+    metadata: {
+        vendor: 'bigcommerce',
         type: __1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/bigcommerce.png',
         properties: Object.assign(Object.assign({}, rest_client_1.APIProperties), { api_token: {
                 title: "API Token",
                 type: "string"
@@ -72,6 +71,9 @@ const bigCommerceCodec = {
                     }
                     else if (args.keyword) {
                         return (yield api.searchProducts(args.keyword)).map(mappers_1.mapProduct);
+                    }
+                    else if (args.category) {
+                        return (yield api.getProductsForCategory(args.category)).map(mappers_1.mapProduct);
                     }
                     throw new Error(`getProducts(): must specify either productIds or keyword`);
                 });

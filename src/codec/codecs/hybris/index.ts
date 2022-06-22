@@ -43,10 +43,9 @@ const mapProduct = (product: HybrisProduct): Product => ({
 })
 
 const hybrisCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/hybris',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/hybris.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'hybris',
         properties
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {

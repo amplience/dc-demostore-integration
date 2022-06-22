@@ -22,11 +22,10 @@ const btoa_1 = __importDefault(require("btoa"));
 const util_1 = require("../../../common/util");
 const properties = Object.assign(Object.assign({}, __2.UsernamePasswordProperties), __2.ClientCredentialProperties);
 const akeneoCodec = {
-    schema: {
+    metadata: {
         type: index_1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/akeneo',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/akeneo.png',
-        properties
+        properties,
+        vendor: 'akeneo'
     },
     getAPI: function (config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -121,14 +120,16 @@ const akeneoCodec = {
                         let searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
                         return searchResults.map(mapProduct(args));
                     }
+                    else if (args.category) {
+                        let products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`);
+                        return products.map(mapProduct(args));
+                    }
                 }),
                 getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
                     return yield api.populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug), args);
                 }),
                 populateCategory: (category, args) => __awaiter(this, void 0, void 0, function* () {
-                    let products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${category.id}"]}]}`);
-                    category.products = products.map(mapProduct(args));
-                    return category;
+                    return (Object.assign({ products: yield api.getProducts(Object.assign({ category }, args)) }, category));
                 }),
                 getMegaMenu: () => __awaiter(this, void 0, void 0, function* () {
                     return megaMenu;

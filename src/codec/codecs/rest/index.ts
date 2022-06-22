@@ -34,10 +34,9 @@ const properties: CodecConfig = {
 const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
 
 const restCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/rest',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/rest.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'rest',
         properties
     },
     getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {

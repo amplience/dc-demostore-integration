@@ -55,6 +55,7 @@ export declare type GetCommerceObjectArgs = CommonArgs & {
 export declare type GetProductsArgs = CommonArgs & {
     keyword?: string;
     productIds?: string;
+    category?: Category;
 };
 export declare type AlgoliaConfig = {
     appId: string;

@@ -52,10 +52,9 @@ const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.O
         type: "string"
     } });
 const fabricCodec = {
-    schema: {
+    metadata: {
         type: __1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/fabric',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/fabric.png',
+        vendor: 'fabric',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

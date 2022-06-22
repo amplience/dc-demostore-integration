@@ -46,10 +46,9 @@ export interface PriceBookPrice extends PriceBookPriceBase {
 }
 
 const epCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/elasticpath.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'elasticpath',
         properties
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {

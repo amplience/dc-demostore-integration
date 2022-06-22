@@ -31,10 +31,9 @@ const properties: CodecConfig = {
 }
 
 const fabricCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/fabric',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/fabric.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'fabric',
         properties
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {

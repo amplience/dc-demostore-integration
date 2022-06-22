@@ -28,10 +28,9 @@ const properties: CodecConfig = {
 }
 
 const sfccCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/sfcc',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/salesforce.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'sfcc',
         properties
     },
     getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {

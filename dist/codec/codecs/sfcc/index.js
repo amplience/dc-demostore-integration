@@ -50,10 +50,9 @@ const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentia
         type: "string"
     } });
 const sfccCodec = {
-    schema: {
+    metadata: {
         type: index_1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/sfcc',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/salesforce.png',
+        vendor: 'sfcc',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

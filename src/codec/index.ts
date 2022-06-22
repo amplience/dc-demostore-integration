@@ -1,7 +1,8 @@
 import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI } from '..'
-import { CommonArgs } from '../common/types'
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
+import { findInMegaMenu } from './codecs/common'
 
 export type Property = {
     title: string
@@ -12,6 +13,10 @@ export type StringProperty = Property & {
     minLength?: number
     maxLength?: number
     pattern?: string
+}
+
+export type StringConstProperty = StringProperty & {
+    const: string
 }
 
 export type NumberProperty = Property & {
@@ -42,11 +47,10 @@ export enum CodecType {
 
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 export type Codec<T> = {
-    schema: {
+    metadata: {
         type:       CodecType
-        uri:        string
         properties: Dictionary<AnyProperty>
-        icon: string
+        vendor:     string
     }
     getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>
 }
@@ -55,7 +59,11 @@ export type GenericCodec = Codec<API>
 export type CommerceCodec = Codec<CommerceAPI>
 
 export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
-    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[]
+    [K in keyof T]: T[K] extends StringProperty ? string 
+                    : T[K] extends StringConstProperty ? string 
+                    : T[K] extends NumberProperty ? number 
+                    : T[K] extends IntegerProperty ? number 
+                    : any[]
 }
 
 const codecs = new Map<CodecType, GenericCodec[]>()
@@ -67,8 +75,8 @@ export const getCodecs = (type: CodecType): GenericCodec[] => {
 }
 
 export const registerCodec = (codec: GenericCodec) => {
-    if (!codecs[codec.schema.type].includes(codec)) {
-        codecs[codec.schema.type].push(codec)
+    if (!codecs[codec.metadata.type].includes(codec)) {
+        codecs[codec.metadata.type].push(codec)
     }
 }
 
@@ -76,7 +84,7 @@ export const registerCodec = (codec: GenericCodec) => {
 const apis = new Map<any, API>()
 
 export const getCodec = async (config: any, type: CodecType): Promise<API> => {
-    let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0)
+    let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0)
 
     if (codecsMatchingConfig.length === 0) {
         throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
@@ -88,21 +96,49 @@ export const getCodec = async (config: any, type: CodecType): Promise<API> => {
     let configHash = _.values(config).join('')
     if (!apis[configHash]) {
         let codec = _.first(codecsMatchingConfig)
-        console.log(`[ demostore ] creating codec: ${codec.schema.uri}...`)
+        console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`)
         let api = await codec.getAPI(config)
-        apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
-            // apply default arguments for those not provided in the query
-            return async (args: CommonArgs): Promise<any> => await api[key]({
-                locale:     'en-US',
-                language:   'en',
-                country:    'US',
-                currency:   'USD',
-                segment:    '',
-                ...args
-            })
-        }))
+        apis[configHash] = wrappedCommerceApi(api as CommerceAPI)
     }
     return apis[configHash]
+}
+
+const defaultArgs = (args: CommonArgs): CommonArgs => ({
+    locale:     'en-US',
+    language:   'en',
+    country:    'US',
+    currency:   'USD',
+    segment:    '',
+    ...args
+})
+
+const wrappedCommerceApi = async (api: CommerceAPI): Promise<CommerceAPI> => {
+    // cache the mega menu
+    let megaMenu: Category[] = await api.getMegaMenu(defaultArgs({}))
+
+    let wrapped: CommerceAPI = {
+        getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
+            return await api.getProduct(defaultArgs(args))
+        },
+        getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
+            return await api.getProducts(defaultArgs(args))
+        },
+        getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
+            let category = findInMegaMenu(megaMenu, args.slug) || await api.getCategory(defaultArgs(args))
+            if (category) {
+                category.products = await api.getProducts({ category })
+            }
+            return category
+        },
+        getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
+            return megaMenu
+        },
+        getCustomerGroups: async (args: CommonArgs): Promise<Identifiable[]> => {
+            return await api.getCustomerGroups(defaultArgs(args))
+        }
+    }
+
+    return wrapped
 }
 
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecType.commerce) as CommerceAPI

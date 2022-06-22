@@ -1,3 +1,4 @@
+import { CONSTANTS } from "../../index";
 import { ContentType, ContentTypeSchema, ValidationLevel } from "dc-management-sdk-js";
 import _ from "lodash";
 import { GenericCodec } from "..";
@@ -19,28 +20,37 @@ export const flattenCategories = (categories: Category[]) => {
 
 export const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
-    schema.schemaId = codec.schema.uri
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    schema.schemaId = schemaUri
     schema.validationLevel = ValidationLevel.CONTENT_TYPE
     schema.body = JSON.stringify({
-        id: codec.schema.uri,
-        title: `${_.last(codec.schema.uri.split('/'))} integration`,
-        description: `${_.last(codec.schema.uri.split('/'))} integration`,
+        id: schemaUri,
+        title: `${codec.metadata.vendor} integration`,
+        description: `${codec.metadata.vendor} integration`,
         allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
         type: "object",
-        properties: codec.schema.properties,
-        propertyOrder: Object.keys(codec.schema.properties)
+        properties: {
+            ...codec.metadata.properties,
+            vendor: {
+                type: 'string',
+                title: 'vendor',
+                const: codec.metadata.vendor
+            }
+        },
+        propertyOrder: Object.keys(codec.metadata.properties)
     })
     return schema
 }
 
 export const getContentType = (codec: GenericCodec): ContentType => {
     let contentType = new ContentType()
-    contentType.contentTypeUri = codec.schema.uri
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    contentType.contentTypeUri = schemaUri
     contentType.settings = {
-        label: `${_.last(codec.schema.uri.split('/'))} integration`,
+        label: `${codec.metadata.vendor} integration`,
         icons: [{
             size: 256,
-            url: codec.schema.icon
+            url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.metadata.vendor}.png`
         }]
     }
     return contentType

@@ -67,6 +67,7 @@ export type GetCommerceObjectArgs = CommonArgs & {
 export type GetProductsArgs = CommonArgs & {
     keyword?:           string
     productIds?:        string
+    category?:          Category
 }
 
 export type AlgoliaConfig = {

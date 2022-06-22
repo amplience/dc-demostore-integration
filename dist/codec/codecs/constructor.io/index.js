@@ -31,10 +31,9 @@ const properties = {
     }
 };
 const constructorIOCodec = {
-    schema: {
+    metadata: {
         type: index_1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/constructor.io',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/constructor.io.png',
+        vendor: 'constructor.io',
         properties
     },
     getAPI: function (config) {

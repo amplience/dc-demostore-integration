@@ -12,10 +12,9 @@ type CodecConfig = APIConfiguration & {
 }
 
 const bigCommerceCodec: CommerceCodec = {
-    schema: {
+    metadata: {
+        vendor:     'bigcommerce',
         type:       CodecType.commerce,
-        uri:        'https://demostore.amplience.com/site/integration/bigcommerce',
-        icon:       'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/bigcommerce.png',
         properties: {
             ...APIProperties,
             api_token: {
@@ -70,6 +69,9 @@ const bigCommerceCodec: CommerceCodec = {
                 }
                 else if (args.keyword) {
                     return (await api.searchProducts(args.keyword)).map(mapProduct)
+                }
+                else if (args.category) {
+                    return (await api.getProductsForCategory(args.category)).map(mapProduct)
                 }
                 throw new Error(`getProducts(): must specify either productIds or keyword`)
             },

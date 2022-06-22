@@ -31,10 +31,9 @@ const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id:
             attributes: lodash_1.default.zipObject(Object.keys(product), Object.values(product))
         }] }));
 const hybrisCodec = {
-    schema: {
+    metadata: {
         type: __1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/hybris',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/hybris.png',
+        vendor: 'hybris',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

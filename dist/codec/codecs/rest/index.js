@@ -36,10 +36,9 @@ const properties = {
 };
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 const restCodec = {
-    schema: {
+    metadata: {
         type: index_1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/rest',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/rest.png',
+        vendor: 'rest',
         properties
     },
     getAPI: function (config) {

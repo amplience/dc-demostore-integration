@@ -41,6 +41,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommerceCodec = exports.getCodec = exports.registerCodec = exports.getCodecs = exports.CodecType = void 0;
 const util_1 = require("../common/util");
 const lodash_1 = __importDefault(require("lodash"));
+const common_1 = require("./codecs/common");
 var CodecType;
 (function (CodecType) {
     CodecType[CodecType["commerce"] = 0] = "commerce";
@@ -53,15 +54,15 @@ const getCodecs = (type) => {
 };
 exports.getCodecs = getCodecs;
 const registerCodec = (codec) => {
-    if (!codecs[codec.schema.type].includes(codec)) {
-        codecs[codec.schema.type].push(codec);
+    if (!codecs[codec.metadata.type].includes(codec)) {
+        codecs[codec.metadata.type].push(codec);
     }
 };
 exports.registerCodec = registerCodec;
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map();
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
-    let codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.schema.properties), Object.keys(config)).length === 0);
+    let codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0);
     if (codecsMatchingConfig.length === 0) {
         throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`;
     }
@@ -71,18 +72,40 @@ const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* (
     let configHash = lodash_1.default.values(config).join('');
     if (!apis[configHash]) {
         let codec = lodash_1.default.first(codecsMatchingConfig);
-        console.log(`[ demostore ] creating codec: ${codec.schema.uri}...`);
+        console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`);
         let api = yield codec.getAPI(config);
-        apis[configHash] = lodash_1.default.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key) => {
-            // apply default arguments for those not provided in the query
-            return (args) => __awaiter(void 0, void 0, void 0, function* () {
-                return yield api[key](Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
-            });
-        }));
+        apis[configHash] = wrappedCommerceApi(api);
     }
     return apis[configHash];
 });
 exports.getCodec = getCodec;
+const defaultArgs = (args) => (Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
+const wrappedCommerceApi = (api) => __awaiter(void 0, void 0, void 0, function* () {
+    // cache the mega menu
+    let megaMenu = yield api.getMegaMenu(defaultArgs({}));
+    let wrapped = {
+        getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield api.getProduct(defaultArgs(args));
+        }),
+        getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield api.getProducts(defaultArgs(args));
+        }),
+        getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug) || (yield api.getCategory(defaultArgs(args)));
+            if (category) {
+                category.products = yield api.getProducts({ category });
+            }
+            return category;
+        }),
+        getMegaMenu: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return megaMenu;
+        }),
+        getCustomerGroups: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield api.getCustomerGroups(defaultArgs(args));
+        })
+    };
+    return wrapped;
+});
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecType.commerce); });
 exports.getCommerceCodec = getCommerceCodec;
 // end public interface

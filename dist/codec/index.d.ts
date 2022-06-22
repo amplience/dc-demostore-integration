@@ -9,6 +9,9 @@ export declare type StringProperty = Property & {
     maxLength?: number;
     pattern?: string;
 };
+export declare type StringConstProperty = StringProperty & {
+    const: string;
+};
 export declare type NumberProperty = Property & {
     type: 'number';
     multipleOf?: number;
@@ -33,18 +36,17 @@ export declare enum CodecType {
 }
 export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
 export declare type Codec<T> = {
-    schema: {
+    metadata: {
         type: CodecType;
-        uri: string;
         properties: Dictionary<AnyProperty>;
-        icon: string;
+        vendor: string;
     };
     getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>;
 };
 export declare type GenericCodec = Codec<API>;
 export declare type CommerceCodec = Codec<CommerceAPI>;
 export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
-    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
+    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
 export declare const getCodecs: (type: CodecType) => GenericCodec[];
 export declare const registerCodec: (codec: GenericCodec) => void;

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { sleep } from '../common/util'
 import _ from 'lodash'
-import { CodecPropertyConfig, StringProperty } from '..'
+import { CodecPropertyConfig, StringConstProperty, StringProperty } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
 
 export type APIConfiguration = {

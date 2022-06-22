@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
 import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, OAuthRestClient, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
+import { ClientCredentialProperties, ClientCredentialsConfiguration, CodecConfiguration, CommerceAPI, OAuthRestClient, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
 import { CodecType } from '../../index'
 import { findInMegaMenu } from '../common'
 import slugify from 'slugify'
@@ -17,11 +17,10 @@ const properties: CodecConfig = {
 }
 
 const akeneoCodec: CommerceCodec = {
-    schema: {
+    metadata: {
         type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/akeneo',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/akeneo.png',
-        properties
+        properties,
+        vendor: 'akeneo'
     },
     getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
         const rest = OAuthRestClient({
@@ -123,15 +122,18 @@ const akeneoCodec: CommerceCodec = {
                     let searchResults = await fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`)
                     return searchResults.map(mapProduct(args))
                 }
+                else if (args.category) {
+                    let products = await fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`)
+                    return products.map(mapProduct(args))
+                }
             },
             getCategory: async (args: GetCommerceObjectArgs) => {
                 return await api.populateCategory(findInMegaMenu(megaMenu, args.slug), args)
             },
-            populateCategory: async (category: Category, args: CommonArgs): Promise<Category> => {
-                let products = await fetch(`/products?search={"categories":[{"operator":"IN","value":["${category.id}"]}]}`)
-                category.products = products.map(mapProduct(args))
-                return category
-            },
+            populateCategory: async (category: Category, args: CommonArgs): Promise<Category> => ({
+                products: await api.getProducts({ category, ...args }),
+                ...category
+            }),
             getMegaMenu: async (): Promise<Category[]> => {
                 return megaMenu
             },

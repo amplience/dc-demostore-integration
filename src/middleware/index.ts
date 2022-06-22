@@ -1,6 +1,6 @@
 import { getContentItem, getContentItemFromConfigLocator } from "../amplience";
 import axios from "axios";
-import { CommerceAPI, getCommerceCodec } from "../index";
+import { CommerceAPI, CONSTANTS, getCommerceCodec } from "../index";
 import { isServer } from "../common/util";
 
 export type Config = ConfigLocatorBlock | any | undefined
@@ -17,7 +17,7 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
 
     if ('config_locator' in config) {
         let configItem: any = await getContentItemFromConfigLocator(config.config_locator)
-        if (configItem._meta.schema === 'https://demostore.amplience.com/site/demostoreconfig') {
+        if (configItem._meta && configItem._meta.schema === CONSTANTS.demostoreConfigUri) {
             config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
         }
         else {

@@ -49,10 +49,9 @@ const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.O
         type: "string"
     } });
 const epCodec = {
-    schema: {
+    metadata: {
         type: __1.CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/elasticpath.png',
+        vendor: 'elasticpath',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {

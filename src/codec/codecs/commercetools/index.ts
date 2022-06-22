@@ -89,10 +89,9 @@ const getMapper = (args: GetCommerceObjectArgs, megaMenu: CTCategory[] = []): an
 }
 
 const commerceToolsCodec: CommerceCodec = {
-    schema: {
-        type: CodecType.commerce,
-        uri: 'https://demostore.amplience.com/site/integration/commercetools',
-        icon: 'https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/commercetools.png',
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'commercetools',
         properties: {
             ...ClientCredentialProperties,
             project: {
