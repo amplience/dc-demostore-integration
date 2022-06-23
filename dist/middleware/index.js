@@ -20,15 +20,12 @@ const util_1 = require("../common/util");
 exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
     if ('config_locator' in config) {
         let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
         if (((_a = configItem === null || configItem === void 0 ? void 0 : configItem._meta) === null || _a === void 0 ? void 0 : _a.schema) === index_1.CONSTANTS.demostoreConfigUri) {
             config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
         }
-        else {
-            config = configItem;
-        }
+        config = configItem;
     }
     return yield (0, index_1.getCommerceCodec)(config);
 });
@@ -40,6 +37,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
             const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+            console.log(`getResponse from url [ ${apiUrl} ]`);
             return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {
@@ -58,12 +56,12 @@ const apiRouteHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
-    let commerceAPI = yield (0, exports.getCommerceAPI)(req.body || req.query);
+    let config = req.body || req.query;
+    let commerceAPI = yield (0, exports.getCommerceAPI)(config);
     switch (req.method.toLowerCase()) {
         case 'get':
-            return res.status(200).json(yield commerceAPI[req.query.operation](req.query));
         case 'post':
-            return res.status(200).json(yield commerceAPI[req.body.operation](req.body));
+            return res.status(200).json(yield commerceAPI[config.operation](config));
         case 'options':
             return res.status(200).send();
         default:
