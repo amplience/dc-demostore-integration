@@ -20,13 +20,12 @@ const util_1 = require("../common/util");
 exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
     if ('config_locator' in config) {
         let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
         if (((_a = configItem === null || configItem === void 0 ? void 0 : configItem._meta) === null || _a === void 0 ? void 0 : _a.schema) === index_1.CONSTANTS.demostoreConfigUri) {
             config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
         }
-        else {
+        else if (configItem) {
             config = configItem;
         }
     }

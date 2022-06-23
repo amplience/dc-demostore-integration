@@ -10,17 +10,12 @@ export type ConfigLocatorBlock = {
 
 export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
 const getAPI = async (config: Config): Promise<CommerceAPI> => {
-    config = {
-        ...baseConfigLocator,
-        ...config
-    }
-
     if ('config_locator' in config) {
         let configItem: any = await getContentItemFromConfigLocator(config.config_locator)
         if (configItem?._meta?.schema === CONSTANTS.demostoreConfigUri) {
             config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
         }
-        else {
+        else if (configItem) {
             config = configItem
         }
     }
