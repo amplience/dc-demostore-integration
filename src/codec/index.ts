@@ -2,7 +2,7 @@ import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI } from '..'
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
-import { findInMegaMenu } from './codecs/common'
+import { CodecNotFoundError } from '../common/errors'
 
 export type Property = {
     title: string
@@ -52,7 +52,7 @@ export type Codec<T> = {
         properties: Dictionary<AnyProperty>
         vendor:     string
     }
-    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>
+    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<Partial<T>>
 }
 
 export type GenericCodec = Codec<API>
@@ -86,11 +86,8 @@ const apis = new Map<any, API>()
 export const getCodec = async (config: any, type: CodecType): Promise<API> => {
     let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0)
 
-    if (codecsMatchingConfig.length === 0) {
-        throw `[ demostore ] no codecs found matching schema [ ${JSON.stringify(config)} ]`
-    }
-    else if (codecsMatchingConfig.length > 1) {
-        throw `[ demostore ] multiple codecs found matching schema [ ${JSON.stringify(config)} ]`
+    if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
+        throw new CodecNotFoundError(`[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`)
     }
 
     let configHash = _.values(config).join('')
@@ -112,21 +109,34 @@ const defaultArgs = (args: CommonArgs): CommonArgs => ({
     ...args
 })
 
-const wrappedCommerceApi = async (api: CommerceAPI): Promise<CommerceAPI> => {
+const wrappedCommerceApi = async (api: Partial<CommerceAPI>): Promise<Partial<CommerceAPI>> => {
     // cache the mega menu
     let megaMenu: Category[] = await api.getMegaMenu(defaultArgs({}))
 
+    let flattenedCategories: Category[] = []
+    const bulldozeCategories = cat => {
+        flattenedCategories.push(cat)
+        cat.children && cat.children.forEach(bulldozeCategories)
+    }
+    megaMenu.forEach(bulldozeCategories)
+ 
+    const findCategory = (slug: string) => {
+        return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
+    }
+    
     let wrapped: CommerceAPI = {
         getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
-            return await api.getProduct(defaultArgs(args))
+            // current thinking: point to wrapped.getProducts() as getProduct() is really a subset of getProducts()
+            return _.first(await wrapped.getProducts({ ...args, productIds: args.id }))
         },
         getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
             return await api.getProducts(defaultArgs(args))
         },
         getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
-            let category = findInMegaMenu(megaMenu, args.slug) || await api.getCategory(defaultArgs(args))
+            let category = findCategory(args.slug)
             if (category) {
-                category.products = await api.getProducts({ category })
+                // populate products into category
+                category.products = category.products?.length > 0 ? category.products : await wrapped.getProducts({ category })
             }
             return category
         },
@@ -134,6 +144,7 @@ const wrappedCommerceApi = async (api: CommerceAPI): Promise<CommerceAPI> => {
             return megaMenu
         },
         getCustomerGroups: async (args: CommonArgs): Promise<Identifiable[]> => {
+            // pass through
             return await api.getCustomerGroups(defaultArgs(args))
         }
     }

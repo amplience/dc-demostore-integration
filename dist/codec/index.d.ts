@@ -41,7 +41,7 @@ export declare type Codec<T> = {
         properties: Dictionary<AnyProperty>;
         vendor: string;
     };
-    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<T>;
+    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<Partial<T>>;
 };
 export declare type GenericCodec = Codec<API>;
 export declare type CommerceCodec = Codec<CommerceAPI>;

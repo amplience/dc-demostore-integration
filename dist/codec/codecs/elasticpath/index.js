@@ -105,7 +105,7 @@ const epCodec = {
         const populateCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
         });
-        const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
+        const getProductsFromEPCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             if (category.id === category.hierarchyId) {
                 products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))), 1)), x => x.id);
@@ -115,8 +115,27 @@ const epCodec = {
             }
             return yield Promise.all(products.map(yield mapper.mapProduct));
         });
-        const megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
+        const getHierarchyRootNode = (category) => {
+            if (category.parent) {
+                const parent = (0, common_1.findInMegaMenu)(megaMenu, category.parent.slug);
+                return getHierarchyRootNode(parent);
+            }
+            return category;
+        };
+        const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
+            let products = [];
+            if (category.parent) {
+                // find hierarchy root
+                const rootNode = getHierarchyRootNode(category);
+                products = yield api.getProductsByNodeId(rootNode.id, category.id);
+            }
+            else {
+                products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.id, child.id); }))), 1)), x => x.id);
+            }
+            return yield Promise.all(products.map(yield mapper.mapProduct));
+        });
         const catalog = lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === config.catalog_name; });
+        const megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
         // CommerceAPI
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -134,6 +153,9 @@ const epCodec = {
                 else if (args.keyword) {
                     // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
                     return [yield mapper.mapProduct(yield api.getProductBySku(args.keyword))];
+                }
+                else if (args.category) {
+                    return yield getProductsFromCategory(args.category);
                 }
                 throw new Error(`getProducts(): must specify either productIds or keyword`);
             });

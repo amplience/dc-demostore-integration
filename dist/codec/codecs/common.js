@@ -3,10 +3,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getContentType = exports.getContentTypeSchema = exports.flattenCategories = exports.findInMegaMenu = void 0;
 const index_1 = require("../../index");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
+/**
+ * @deprecated The method should not be used
+ */
 const findInMegaMenu = (categories, slug) => {
     return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
 exports.findInMegaMenu = findInMegaMenu;
+/**
+ * @deprecated The method should not be used
+ */
 const flattenCategories = (categories) => {
     const allCategories = [];
     const bulldozeCategories = cat => {

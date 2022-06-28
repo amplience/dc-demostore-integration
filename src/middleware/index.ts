@@ -15,7 +15,9 @@ const getAPI = async (config: Config): Promise<CommerceAPI> => {
         if (configItem?._meta?.schema === CONSTANTS.demostoreConfigUri) {
             config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
         }
-        config = configItem
+        else {
+            config = configItem
+        }
     }
     return await getCommerceCodec(config)
 }
@@ -30,16 +32,15 @@ export const getCommerceAPI = async (params: Config = undefined): Promise<Commer
     else {
         const getResponse = (operation: CommerceOperation) => async (args: any): Promise<any> => {
             const apiUrl = (window as any).isStorybook ? `https://core.dc-demostore.com/api` : `/api`
-            console.log(`getResponse from url [ ${apiUrl} ]`)
             return await (await axios.get(apiUrl, { params: { ...args, ...params, operation } })).data
         }
 
         return {
-            getProduct:         getResponse('getProduct'),
-            getProducts:        getResponse('getProducts'),
-            getCategory:        getResponse('getCategory'),
-            getMegaMenu:        getResponse('getMegaMenu'),
-            getCustomerGroups:  getResponse('getCustomerGroups')
+            getProduct: getResponse('getProduct'),
+            getProducts: getResponse('getProducts'),
+            getCategory: getResponse('getCategory'),
+            getMegaMenu: getResponse('getMegaMenu'),
+            getCustomerGroups: getResponse('getCustomerGroups')
         }
     }
 }

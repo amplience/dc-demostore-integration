@@ -110,7 +110,7 @@ const epCodec: CommerceCodec = {
             products: await getProductsFromCategory(category)
         })
         
-        const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
+        const getProductsFromEPCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
             let products: Moltin.Product[] = []
             if (category.id === category.hierarchyId) {
                 products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
@@ -121,8 +121,30 @@ const epCodec: CommerceCodec = {
             return await Promise.all(products.map(await mapper.mapProduct))
         }
 
-        const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+        const getHierarchyRootNode = (category: Category): Category => {
+            if (category.parent) {
+                const parent = findInMegaMenu(megaMenu, category.parent.slug)
+                return getHierarchyRootNode(parent)
+            }
+            return category
+        }
+
+        const getProductsFromCategory = async (category: Category): Promise<Product[]> => {
+            let products: Moltin.Product[] = []
+
+            if (category.parent) {
+                // find hierarchy root
+                const rootNode = getHierarchyRootNode(category)
+                products = await api.getProductsByNodeId(rootNode.id, category.id)
+            }
+            else {
+                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.id, child.id))), 1)), x => x.id)
+            }
+            return await Promise.all(products.map(await mapper.mapProduct))
+        }
+
         const catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
+        const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
 
         // CommerceAPI
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
@@ -139,6 +161,9 @@ const epCodec: CommerceCodec = {
             else if (args.keyword) {
                 // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
                 return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
+            }
+            else if (args.category) {
+                return await getProductsFromCategory(args.category)
             }
             throw new Error(`getProducts(): must specify either productIds or keyword`)
         }
