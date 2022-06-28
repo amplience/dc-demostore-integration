@@ -4,10 +4,16 @@ import _ from "lodash";
 import { GenericCodec } from "..";
 import { Category } from "../../common/types";
 
+/**
+ * @deprecated The method should not be used
+ */
 export const findInMegaMenu = (categories: Category[], slug: string) => {
     return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 
+/**
+ * @deprecated The method should not be used
+ */
 export const flattenCategories = (categories: Category[]) => {
     const allCategories: Category[] = []
     const bulldozeCategories = cat => {

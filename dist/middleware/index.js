@@ -25,7 +25,9 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         if (((_a = configItem === null || configItem === void 0 ? void 0 : configItem._meta) === null || _a === void 0 ? void 0 : _a.schema) === index_1.CONSTANTS.demostoreConfigUri) {
             config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
         }
-        config = configItem;
+        else {
+            config = configItem;
+        }
     }
     return yield (0, index_1.getCommerceCodec)(config);
 });
@@ -37,7 +39,6 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
             const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
-            console.log(`getResponse from url [ ${apiUrl} ]`);
             return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {

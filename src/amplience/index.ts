@@ -1,6 +1,5 @@
 import _ from 'lodash'
 import { DemoStoreConfiguration } from '../common/types'
-import { ContentItem } from 'dc-management-sdk-js'
 import { CryptKeeper } from '../common/crypt-keeper'
 
 export const getContentItem = async (hub: string, args: any): Promise<any> => {
