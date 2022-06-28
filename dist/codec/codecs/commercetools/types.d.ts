@@ -1,10 +1,3 @@
-import { OAuthCodecConfiguration } from "../../../common/rest-client";
-export interface CommerceToolsCodecConfiguration extends OAuthCodecConfiguration {
-    client_id: string;
-    client_secret: string;
-    project: string;
-    scope: string;
-}
 export interface CTCategory {
     id: string;
     version: number;

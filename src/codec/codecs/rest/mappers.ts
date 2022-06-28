@@ -1,4 +1,4 @@
-import { Product, Category, CommonArgs } from "../../../types"
+import { Product, Category, CommonArgs } from "../../../common/types"
 import _ from "lodash"
 
 const getCategoryIdsFromCategory = (category: Category): string[] => {

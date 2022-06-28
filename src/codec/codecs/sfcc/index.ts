@@ -1,17 +1,20 @@
 // 3rd party libs
 import _ from 'lodash'
 import axios from 'axios'
-import { Category, Codec, CodecStringConfig, CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, OAuthRestClient, Product, StringProperty } from '../../../index'
-import { SFCCCategory, SFCCCustomerGroup } from './types'
-import { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from './types'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration } from '../../../common/rest-client'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../../index'
+import { CommerceAPI, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Category, Product, CommonArgs } from '../../../common'
+import slugify from 'slugify'
+import { formatMoneyString } from '../../../common/util'
+import { findInMegaMenu } from '../common'
 
-type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
-    api_token:  StringProperty
-    site_id:    StringProperty
+type CodecConfig = ClientCredentialsConfiguration & {
+    api_token: StringProperty
+    site_id: StringProperty
 }
 
 const properties: CodecConfig = {
-    ...OAuthProperties,
     ...ClientCredentialProperties,
     api_token: {
         title: "Shopper API Token",
@@ -24,24 +27,30 @@ const properties: CodecConfig = {
     }
 }
 
-const sfccCodec: Codec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/sfcc',
-        icon: 'https://www.pikpng.com/pngl/b/321-3219605_salesforce-logo-png-clipart.png',
+const sfccCodec: CommerceCodec = {
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'sfcc',
         properties
     },
-    getAPI: (config: CodecStringConfig<CodecConfig>): CommerceAPI => {
-        if (!config.api_token) {
-            return null
-        }
-
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
-            return (await axios.get(url, {
-                baseURL: config.api_url,
-                params: {
-                    client_id: config.client_id
+            try {
+                return (await axios.get(url, {
+                    baseURL: config.api_url,
+                    params: {
+                        client_id: config.client_id
+                    }
+                })).data
+            } catch (error) {
+                console.log(`url ${url} status ${error.response?.status}`)
+                if (error.response?.status === 404) {
+                    return null
                 }
-            })).data
+                else {
+                    throw error
+                }
+            }
         }
 
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
@@ -59,65 +68,107 @@ const sfccCodec: Codec = {
         const authenticatedFetch = async url => (await rest.get({ url })).data
         // end authenticated fetch
 
-        const api = {
+        const shopApi = `/s/${config.site_id}/dw/shop/v22_4`
+        const sitesApi = `/s/-/dw/data/v22_4/sites/${config.site_id}`
+        const api = (args: CommonArgs) => ({
             getCategory: async (slug: string = 'root'): Promise<Category> => {
-                return api.mapCategory(await fetch(`/s/${config.site_id}/dw/shop/v20_4/categories/${slug}?levels=4`))
+                return api(args).mapCategory(await fetch(`${shopApi}/categories/${slug}?levels=4`))
             },
             getCustomerGroups: async (): Promise<CustomerGroup[]> => {
-                return (await authenticatedFetch(`/s/-/dw/data/v22_4/sites/${config.site_id}/customer_groups`)).map(api.mapCustomerGroup)
+                return (await authenticatedFetch(`${sitesApi}/customer_groups`)).map(api(args).mapCustomerGroup)
             },
-            getProducts: () => fetch(`/products`),
-            searchProducts: keyword => fetch(`/products?keyword=${keyword}`),
-            getProductById: id => fetch(`/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/products?categories:in=${cat.id}`),
-            mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => ({
+            getProducts: async (productIds: string[]): Promise<Product[]> => {
+                return await Promise.all(productIds.map(api(args).getProductById))
+            },
+            search: async (query: string): Promise<Product[]> => {
+                let searchResults = (await fetch(`${shopApi}/product_search?${query}`)).hits
+                if (searchResults) {
+                    return await api(args).getProducts(searchResults.map(sr => sr.product_id))
+                }
+                return []
+            },
+            searchProducts: async (keyword: string): Promise<Product[]> => {
+                return await api(args).search(`q=${keyword}`)
+            },
+            getProductsForCategory: async (cat: Category): Promise<Product[]> => {
+                return await api(args).search(`refine_1=cgid=${cat.id}`)
+            },
+            getProductById: async (id: string): Promise<Product> => {
+                return api(args).mapProduct(await fetch(`${shopApi}/products/${id}?expand=prices,options,images,variations`))
+            },
+            mapProduct: (product: SFCCProduct): Product => {
+                if (!product) { return null }
+                const largeImages = product.image_groups.find(group => group.view_type === 'large')
+                const images = largeImages.images.map(image => ({ url: image.link }))
+                return {
+                    id: product.id,
+                    name: product.name,
+                    slug: slugify(product.name, { lower: true }),
+                    shortDescription: product.short_description,
+                    longDescription: product.long_description,
+                    categories: [],
+                    variants: product.variants?.map(variant => ({
+                        sku: variant.product_id,
+                        listPrice: formatMoneyString(variant.price, { currency: product.currency, locale: args.locale }),
+                        salePrice: formatMoneyString(variant.price, { currency: product.currency, locale: args.locale }),
+                        images,
+                        attributes: variant.variation_values
+                    })) || [{
+                        sku: product.id,
+                        listPrice: formatMoneyString(product.price, { currency: product.currency, locale: args.locale }),
+                        salePrice: formatMoneyString(product.price, { currency: product.currency, locale: args.locale }),
+                        images,
+                        attributes: {}
+                    }]
+                }
+            },
+            mapCustomerGroup: (group: SFCCCustomerGroup): CustomerGroup => group && ({
                 ...group,
                 name: group.id
             }),
-            mapCategory: (cat: SFCCCategory): Category => ({
-                id: cat.id,
-                slug: cat.id,
-                name: cat.name,
-                image: { url: cat.image },
-                children: cat.categories?.map(api.mapCategory) || [],
-                products: []
-            })
-        }
+            mapCategory: (cat: SFCCCategory): Category => {
+                if (!cat) { return null }
+                return {
+                    id: cat.id,
+                    slug: cat.id,
+                    name: cat.name,
+                    children: cat.categories?.map(api(args).mapCategory) || [],
+                    products: []
+                }
+            }
+        })
 
+        const megaMenu = await (await api({}).getCategory()).children
         return {
             getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
-                // if (query.args.id) {
-                //     return mapProduct(await api.getProductById(query.args.id))
-                // }
-                throw new Error(`getProduct(): must specify id`)
+                return await api(args).getProductById(args.id)
             },
             getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
-                // if (query.args.productIds) {
-                //     return await Promise.all(query.args.productIds.split(',').map(async id => mapProduct(await api.getProductById(id))))
-                // }
-                // else if (query.args.keyword) {
-                //     return (await api.searchProducts(query.args.keyword)).map(mapProduct)
-                // }
-                throw new Error(`getProducts(): must specify either productIds or keyword`)
+                if (args.productIds) {
+                    return await api(args).getProducts(args.productIds.split(','))
+                }
+                else if (args.keyword) {
+                    return await api(args).searchProducts(args.keyword)
+                }
             },
             getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
-                if (!args.slug) {
-                    throw new Error(`getCategory(): must specify slug`)
+                // let category = await api(args).getCategory(args.slug)
+                let category = findInMegaMenu(megaMenu, args.slug)
+                if (category) {
+                    return {
+                        ...category,
+                        products: await api(args).getProductsForCategory(category)
+                    }    
                 }
-
-                let category = await api.getCategory(args.slug)
-                return {
-                    ...category,
-                    products: await api.getProductsForCategory(category)
-                }
+                return null
             },
             getMegaMenu: async function (): Promise<Category[]> {
-                return await (await api.getCategory()).children
+                return megaMenu
             },
             getCustomerGroups: async function (): Promise<CustomerGroup[]> {
-                return await api.getCustomerGroups()
+                return await api({}).getCustomerGroups()
             }
         }
     }
 }
-export default sfccCodec
+registerCodec(sfccCodec)

@@ -1,6 +1,6 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { Codec, CodecStringConfig, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import { findInMegaMenu } from '../common'
 import axios from 'axios'
@@ -42,21 +42,14 @@ const mapProduct = (product: HybrisProduct): Product => ({
     }]
 })
 
-let megaMenu: Category[]
-const hybrisCodec: Codec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/hybris',
-        icon: 'https://images.squarespace-cdn.com/content/v1/54dd763ce4b01f6b05bab7db/1511645929126-9BGFQ3VFVOQX75PHZ7JS/logos-014__2_.png',
+const hybrisCodec: CommerceCodec = {
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'hybris',
         properties
     },
-    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
-        if (!config.catalog_id) {
-            return null
-        }
-
-        const rest = axios.create({
-            baseURL: `${config.api_url}/occ/v2/${config.catalog_id}`
-        })
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
+        const rest = axios.create({ baseURL: `${config.api_url}/occ/v2/${config.catalog_id}` })
         const fetch = async (url: string) => await (await rest.get(url)).data
 
         const populate = async function (category: Category): Promise<Category> {
@@ -65,6 +58,8 @@ const hybrisCodec: Codec = {
                 products: (await fetch(`/categories/${category.id}/products?fields=FULL`)).products.map(mapProduct)
             }
         }
+
+        const megaMenu: Category[] = mapCategory((await rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children
 
         // CommerceAPI implementation
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
@@ -85,9 +80,6 @@ const hybrisCodec: Codec = {
         }
 
         const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
-            if (!megaMenu) {
-                megaMenu = mapCategory((await rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children
-            }
             return megaMenu
         }
 
@@ -106,4 +98,4 @@ const hybrisCodec: Codec = {
         }
     }
 }
-export default hybrisCodec
+registerCodec(hybrisCodec)

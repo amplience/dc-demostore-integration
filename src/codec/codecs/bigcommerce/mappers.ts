@@ -1,6 +1,6 @@
-import { formatMoneyString } from "../../../util"
+import { formatMoneyString } from "../../../common/util"
 import slugify from "slugify"
-import { Category, CustomerGroup, Product, Variant } from "../../../types"
+import { Category, CustomerGroup, Product, Variant } from "../../../common/types"
 import { BigCommerceCategory, BigCommerceCustomerGroup, BigCommerceProduct, BigCommerceVariant } from "./types"
 import _ from "lodash"
 

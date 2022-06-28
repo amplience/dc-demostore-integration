@@ -1,39 +1,42 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { sleep } from '../util'
+import { sleep } from '../common/util'
 import _ from 'lodash'
-import { AnyProperty, StringProperty } from '..'
+import { CodecPropertyConfig, StringConstProperty, StringProperty } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
 
-export interface OAuthRestClientInterface {
-    get:    (config: AxiosRequestConfig | string) => Promise<any>
-    patch:  (config: AxiosRequestConfig | string) => Promise<any>
-    delete: (config: AxiosRequestConfig | string) => Promise<any>
-    post:   (config: AxiosRequestConfig | string) => Promise<any>
-}
-
 export type APIConfiguration = {
-    api_url: StringProperty
+    api_url:        StringProperty
 }
 
 export type OAuthCodecConfiguration = APIConfiguration & {
-    auth_url: StringProperty
+    auth_url:       StringProperty
 }
 
-export type OAuthCodecStringConfiguration = {
-    [Key in keyof OAuthCodecConfiguration]: string
-}
-
-export type ClientCredentialsConfiguration = {
+export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
     client_id:      StringProperty
     client_secret:  StringProperty
+}
+
+export type UsernamePasswordConfiguration = {
+    username:   StringProperty
+    password:   StringProperty
+}
+
+export const UsernamePasswordProperties: UsernamePasswordConfiguration = {
+    username: {
+        title: "Username",
+        type: "string"
+    },
+    password: {
+        title: "Password",
+        type: "string"
+    }
 }
 
 export const APIProperties: APIConfiguration = {
     api_url: {
         title: "Base API URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     }
 }
 
@@ -41,40 +44,34 @@ export const OAuthProperties: OAuthCodecConfiguration = {
     ...APIProperties,
     auth_url: {
         title: "Oauth URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     }
 }
 
 export const ClientCredentialProperties: ClientCredentialsConfiguration = {
+    ...OAuthProperties,
     client_id: {
         title: "Client ID",
-        type: "string",
-        minLength: 0,
-        maxLength: 50
+        type: "string"
     },
     client_secret: {
         title: "Client secret",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     }
 }
 
-// enum AuthenticationStatus {
-//     NOT_LOGGED_IN,
-//     LOGGING_IN,
-//     LOGGED_ID
-// }
+export type OAuthRestClientInterface = {
+    [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
+}
 
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
-
-export const OAuthRestClient = (config: OAuthCodecStringConfiguration, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any) => {
+export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any): OAuthRestClientInterface => {
     let authenticatedAxios: AxiosInstance
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
     const authenticate = async (): Promise<AxiosInstance> => {
+        // console.log(`authenticating to ${config.auth_url}`)
+
         if (!authenticatedAxios) {
             let response = await axios.post(config.auth_url, payload, requestConfig)
             const auth = response.data
@@ -141,10 +138,11 @@ export const OAuthRestClient = (config: OAuthCodecStringConfiguration, payload: 
     }
 
     return {
-        get: request(HttpMethod.GET),
+        get:    request(HttpMethod.GET),
         delete: request(HttpMethod.DELETE),
-        post: request(HttpMethod.POST),
-        patch: request(HttpMethod.PATCH)
+        put:    request(HttpMethod.PUT),
+        post:   request(HttpMethod.POST),
+        patch:  request(HttpMethod.PATCH)
     }
 }
 
