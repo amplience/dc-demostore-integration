@@ -12,42 +12,42 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = exports.APIProperties = void 0;
+exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = exports.APIProperties = exports.UsernamePasswordProperties = void 0;
 const axios_1 = __importDefault(require("axios"));
-const util_1 = require("../util");
+const util_1 = require("../common/util");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
+exports.UsernamePasswordProperties = {
+    username: {
+        title: "Username",
+        type: "string"
+    },
+    password: {
+        title: "Password",
+        type: "string"
+    }
+};
 exports.APIProperties = {
     api_url: {
         title: "Base API URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     }
 };
 exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties), { auth_url: {
         title: "Oauth URL",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
+        type: "string"
     } });
-exports.ClientCredentialProperties = {
-    client_id: {
+exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAuthProperties), { client_id: {
         title: "Client ID",
-        type: "string",
-        minLength: 0,
-        maxLength: 50
-    },
-    client_secret: {
+        type: "string"
+    }, client_secret: {
         title: "Client secret",
-        type: "string",
-        minLength: 0,
-        maxLength: 100
-    }
-};
+        type: "string"
+    } });
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
+        // console.log(`authenticating to ${config.auth_url}`)
         if (!authenticatedAxios) {
             let response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
             const auth = response.data;
@@ -106,6 +106,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     return {
         get: request(dc_management_sdk_js_1.HttpMethod.GET),
         delete: request(dc_management_sdk_js_1.HttpMethod.DELETE),
+        put: request(dc_management_sdk_js_1.HttpMethod.PUT),
         post: request(dc_management_sdk_js_1.HttpMethod.POST),
         patch: request(dc_management_sdk_js_1.HttpMethod.PATCH)
     };

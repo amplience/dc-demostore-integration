@@ -1,13 +1,5 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
-export declare type CodecConfiguration = {
-    _meta?: {
-        deliveryKey?: string;
-        deliveryId: string;
-        schema: string;
-    };
-    locator?: string;
-};
 export declare type Property = {
     title: string;
 };
@@ -16,6 +8,9 @@ export declare type StringProperty = Property & {
     minLength?: number;
     maxLength?: number;
     pattern?: string;
+};
+export declare type StringConstProperty = StringProperty & {
+    const: string;
 };
 export declare type NumberProperty = Property & {
     type: 'number';
@@ -36,21 +31,25 @@ export declare type ArrayProperty = Property & {
     required?: boolean;
     uniqueItems?: boolean;
 };
+export declare enum CodecType {
+    commerce = 0
+}
 export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
-export interface Codec {
-    schema: {
-        uri: string;
+export declare type Codec<T> = {
+    metadata: {
+        type: CodecType;
         properties: Dictionary<AnyProperty>;
-        icon: string;
+        vendor: string;
     };
-    getAPI(config: any): any;
-}
-export interface CommerceCodec extends Codec {
-    getAPI(config: any): CommerceAPI;
-}
-export declare type CodecStringConfig<T> = {
-    [Key in keyof T]: string;
+    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<Partial<T>>;
 };
-export declare const getCodecs: () => Codec[];
-export declare const registerCodec: (codec: Codec) => void;
-export declare const getCodec: (config: any) => Promise<API>;
+export declare type GenericCodec = Codec<API>;
+export declare type CommerceCodec = Codec<CommerceAPI>;
+export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
+    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
+};
+export declare const getCodecs: (type: CodecType) => GenericCodec[];
+export declare const registerCodec: (codec: GenericCodec) => void;
+export declare const getCodec: (config: any, type: CodecType) => Promise<API>;
+export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;
+export * from './codecs/common';

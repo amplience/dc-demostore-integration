@@ -1,33 +1,30 @@
 import _ from 'lodash'
-import { DemoStoreConfiguration } from '../types'
-import { ContentItem } from 'dc-management-sdk-js'
-import { CryptKeeper } from '..'
+import { DemoStoreConfiguration } from '../common/types'
+import { CryptKeeper } from '../common/crypt-keeper'
 
-const getContentItem = async (hub: string, args: any): Promise<ContentItem> => {
+export const getContentItem = async (hub: string, args: any): Promise<any> => {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
+    // console.log(`[ amp ] https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     let response = await fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     return response.status === 200 ? CryptKeeper((await response.json()).content, hub).decryptAll() : null
 }
 
-const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> => {
-    let [hub, lookup] = key.split(':')
+export const getContentItemFromConfigLocator = async (configLocator: string): Promise<any> => {
+    let [hub, lookup] = configLocator.split(':')
+    if (lookup.indexOf('/') === -1) {
+        lookup = `config/${lookup}`
+    }
+    return await getContentItem(hub, { key: `demostore/${lookup}` })
+}
 
-    // look up aria/env as a fallback to demostore/config for backward compatibility
-    let obj: any = await getContentItem(hub, { key: `demostore/config/${lookup}` }) ||
-        await getContentItem(hub, { key: `aria/env/${lookup}` })
-
+export const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> => {
+    let obj: any = await getContentItemFromConfigLocator(key)
     if (!obj) {
         throw `[ demostore ] Couldn't find config with key '${key}'`
     }
 
-    obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
+    // obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
     obj.algolia.credentials = _.keyBy(obj.algolia.credentials, 'key')
     obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
-    obj.locator = key
-
-    return obj as DemoStoreConfiguration
-}
-
-export {
-    getDemoStoreConfig
+    return obj
 }

@@ -1,14 +1,20 @@
-import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
+import { CONSTANTS } from "../../index";
+import { ContentType, ContentTypeSchema, ValidationLevel } from "dc-management-sdk-js";
 import _ from "lodash";
-import { Codec } from "..";
-import { Category } from "../../types";
+import { GenericCodec } from "..";
+import { Category } from "../../common/types";
 
-const findInMegaMenu = (categories: Category[], slug: string) => {
-    let allCategories = flattenCategories(categories)
-    return allCategories.find(category => category.slug.toLowerCase() === slug.toLowerCase())
+/**
+ * @deprecated The method should not be used
+ */
+export const findInMegaMenu = (categories: Category[], slug: string) => {
+    return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 
-const flattenCategories = (categories: Category[]) => {
+/**
+ * @deprecated The method should not be used
+ */
+export const flattenCategories = (categories: Category[]) => {
     const allCategories: Category[] = []
     const bulldozeCategories = cat => {
         allCategories.push(cat)
@@ -18,32 +24,40 @@ const flattenCategories = (categories: Category[]) => {
     return allCategories
 }
 
-const getContentTypeSchema = (codec: Codec): ContentTypeSchema => {
+export const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
-    schema.schemaId = codec.schema.uri
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    schema.schemaId = schemaUri
+    schema.validationLevel = ValidationLevel.CONTENT_TYPE
     schema.body = JSON.stringify({
-        id: codec.schema.uri,
-        title: `${_.last(codec.schema.uri.split('/'))} integration`,
-        description: `${_.last(codec.schema.uri.split('/'))} integration`,
+        id: schemaUri,
+        title: `${codec.metadata.vendor} integration`,
+        description: `${codec.metadata.vendor} integration`,
         allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
         type: "object",
-        properties: codec.schema.properties,
-        propertyOrder: Object.keys(codec.schema.properties)
+        properties: {
+            ...codec.metadata.properties,
+            vendor: {
+                type: 'string',
+                title: 'vendor',
+                const: codec.metadata.vendor
+            }
+        },
+        propertyOrder: Object.keys(codec.metadata.properties)
     })
     return schema
 }
 
-const getContentType = (codec: Codec): ContentType => {
+export const getContentType = (codec: GenericCodec): ContentType => {
     let contentType = new ContentType()
-    contentType.contentTypeUri = codec.schema.uri
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    contentType.contentTypeUri = schemaUri
     contentType.settings = {
-        label: `${_.last(codec.schema.uri.split('/'))} integration`,
+        label: `${codec.metadata.vendor} integration`,
         icons: [{
             size: 256,
-            url: codec.schema.icon
+            url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.metadata.vendor}.png`
         }]
     }
     return contentType
 }
-
-export { findInMegaMenu, flattenCategories, getContentType, getContentTypeSchema }

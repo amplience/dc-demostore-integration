@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("../../../util");
+const util_1 = require("../../../common/util");
 const lodash_1 = __importDefault(require("lodash"));
 const mappers = (api) => {
     const mapProduct = (skeletonProduct) => __awaiter(void 0, void 0, void 0, function* () {
@@ -80,7 +80,10 @@ const mappers = (api) => {
             name: node.attributes.name,
             id: node.id,
             slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
-            children: yield Promise.all((yield api.getChildrenByNodeId(hierarchy.id, node.id)).map(yield mapNode(hierarchy))),
+            children: (yield Promise.all((yield api.getChildrenByNodeId(hierarchy.id, node.id)).map(yield mapNode(hierarchy)))).map(child => (Object.assign({ parent: {
+                    id: node.id,
+                    slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`
+                } }, child))),
             products: []
         });
     });
@@ -90,7 +93,10 @@ const mappers = (api) => {
             name: hierarchy.attributes.name,
             id: hierarchy.id,
             slug: hierarchy.attributes.slug,
-            children: yield Promise.all((yield api.getChildrenByHierarchyId(hierarchy.id)).map(yield mapNode(hierarchy))),
+            children: (yield Promise.all((yield api.getChildrenByHierarchyId(hierarchy.id)).map(yield mapNode(hierarchy)))).map(child => (Object.assign({ parent: {
+                    id: hierarchy.id,
+                    slug: hierarchy.attributes.slug
+                } }, child))),
             products: []
         });
     });

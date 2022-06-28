@@ -1,4 +1,4 @@
-import { Category, CustomerGroup, Product, Variant } from "../../../types";
+import { Category, CustomerGroup, Product, Variant } from "../../../common/types";
 import { BigCommerceCategory, BigCommerceCustomerGroup, BigCommerceProduct, BigCommerceVariant } from "./types";
 export declare const mapCategory: (category: BigCommerceCategory) => Category;
 export declare const mapVariant: (variant: BigCommerceVariant, product: BigCommerceProduct) => Variant;

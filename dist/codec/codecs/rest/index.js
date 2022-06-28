@@ -13,7 +13,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("../..");
 const mappers_1 = __importDefault(require("./mappers"));
+const index_1 = require("../../index");
 const properties = {
     productURL: {
         title: "Product file URL",
@@ -34,28 +36,18 @@ const properties = {
 };
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 const restCodec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/rest',
-        icon: 'https://cdn-icons-png.flaticon.com/512/180/180954.png',
+    metadata: {
+        type: index_1.CodecType.commerce,
+        vendor: 'rest',
         properties
     },
     getAPI: function (config) {
-        if (!config.productURL) {
-            return null;
-        }
-        let categories = [];
-        let products = [];
-        let customerGroups = [];
-        let translations = {};
-        let api = null;
-        const loadAPI = () => __awaiter(this, void 0, void 0, function* () {
-            if (lodash_1.default.isEmpty(products)) {
-                products = yield fetchFromURL(config.productURL, []);
-                categories = yield fetchFromURL(config.categoryURL, []);
-                customerGroups = yield fetchFromURL(config.customerGroupURL, []);
-                translations = yield fetchFromURL(config.translationsURL, {});
-            }
-            api = {
+        return __awaiter(this, void 0, void 0, function* () {
+            const categories = yield fetchFromURL(config.categoryURL, []);
+            const products = yield fetchFromURL(config.productURL, []);
+            const customerGroups = yield fetchFromURL(config.customerGroupURL, []);
+            const translations = yield fetchFromURL(config.translationsURL, {});
+            const api = {
                 getProductsForCategory: (category) => {
                     return [
                         ...lodash_1.default.filter(products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), category.id)),
@@ -75,59 +67,54 @@ const restCodec = {
                 getCategory: (args) => {
                     let category = categories.find(cat => cat.slug === args.slug);
                     if (category) {
-                        return api.populateCategory(category);
+                        return api.populateCategory(category, args);
                     }
                     return null;
                 },
-                populateCategory: (category) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 20) })),
+                populateCategory: (category, args) => (Object.assign(Object.assign({}, category), { products: lodash_1.default.take(api.getProductsForCategory(category), 12).map(prod => mappers_1.default.mapProduct(prod, args)) })),
                 getCustomerGroups: () => {
                     return customerGroups;
                 }
             };
+            return {
+                getProduct: function (args) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let product = api.getProduct(args);
+                        if (product) {
+                            return mappers_1.default.mapProduct(product, args);
+                        }
+                    });
+                },
+                getProducts: function (args) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let filtered = api.getProducts(args);
+                        if (filtered) {
+                            return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
+                        }
+                        return null;
+                    });
+                },
+                getCategory: function (args) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        let category = api.getCategory(args);
+                        if (category) {
+                            return mappers_1.default.mapCategory(api.populateCategory(category, args));
+                        }
+                        return null;
+                    });
+                },
+                getMegaMenu: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return categories.filter(cat => !cat.parent).map(mappers_1.default.mapCategory);
+                    });
+                },
+                getCustomerGroups: function () {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        return api.getCustomerGroups();
+                    });
+                }
+            };
         });
-        return {
-            getProduct: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield loadAPI();
-                    let product = api.getProduct(args);
-                    if (product) {
-                        return mappers_1.default.mapProduct(product, args);
-                    }
-                });
-            },
-            getProducts: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield loadAPI();
-                    let filtered = api.getProducts(args);
-                    if (filtered) {
-                        return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
-                    }
-                    return null;
-                });
-            },
-            getCategory: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield loadAPI();
-                    let category = api.getCategory(args);
-                    if (category) {
-                        return mappers_1.default.mapCategory(api.populateCategory(category));
-                    }
-                    return null;
-                });
-            },
-            getMegaMenu: function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield loadAPI();
-                    return categories.filter(cat => !cat.parent).map(mappers_1.default.mapCategory);
-                });
-            },
-            getCustomerGroups: function () {
-                return __awaiter(this, void 0, void 0, function* () {
-                    yield loadAPI();
-                    return api.getCustomerGroups();
-                });
-            }
-        };
     }
 };
-exports.default = restCodec;
+(0, __1.registerCodec)(restCodec);

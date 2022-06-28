@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("../..");
 const common_1 = require("../common");
 const axios_1 = __importDefault(require("axios"));
 const slugify_1 = __importDefault(require("slugify"));
@@ -29,26 +30,21 @@ const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id:
             images: [],
             attributes: lodash_1.default.zipObject(Object.keys(product), Object.values(product))
         }] }));
-let megaMenu;
 const hybrisCodec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/hybris',
-        icon: 'https://images.squarespace-cdn.com/content/v1/54dd763ce4b01f6b05bab7db/1511645929126-9BGFQ3VFVOQX75PHZ7JS/logos-014__2_.png',
+    metadata: {
+        type: __1.CodecType.commerce,
+        vendor: 'hybris',
         properties
     },
-    getAPI: function (config) {
-        if (!config.catalog_id) {
-            return null;
-        }
-        const rest = axios_1.default.create({
-            baseURL: `${config.api_url}/occ/v2/${config.catalog_id}`
-        });
-        const fetch = (url) => __awaiter(this, void 0, void 0, function* () { return yield (yield rest.get(url)).data; });
+    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
+        const rest = axios_1.default.create({ baseURL: `${config.api_url}/occ/v2/${config.catalog_id}` });
+        const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return yield (yield rest.get(url)).data; });
         const populate = function (category) {
             return __awaiter(this, void 0, void 0, function* () {
                 return Object.assign(Object.assign({}, category), { products: (yield fetch(`/categories/${category.id}/products?fields=FULL`)).products.map(mapProduct) });
             });
         };
+        const megaMenu = mapCategory((yield rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children;
         // CommerceAPI implementation
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -72,9 +68,6 @@ const hybrisCodec = {
         };
         const getMegaMenu = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (!megaMenu) {
-                    megaMenu = mapCategory((yield rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children;
-                }
                 return megaMenu;
             });
         };
@@ -92,6 +85,6 @@ const hybrisCodec = {
             getMegaMenu,
             getCustomerGroups
         };
-    }
+    })
 };
-exports.default = hybrisCodec;
+(0, __1.registerCodec)(hybrisCodec);

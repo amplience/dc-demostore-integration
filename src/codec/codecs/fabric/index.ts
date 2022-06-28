@@ -1,17 +1,13 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../types'
-import { Codec, CodecStringConfig, StringProperty } from '../..'
-import { CommerceAPI } from '../../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
+import { CommerceAPI, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
 import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
 import slugify from 'slugify'
 import { findInMegaMenu } from '../common'
 import { Attribute, FabricCategory, FabricProduct } from './types'
 
-let megaMenu: Category[]
-
-type CodecConfig = OAuthCodecConfiguration & {
-    username:   StringProperty
-    password:   StringProperty
+type CodecConfig = OAuthCodecConfiguration & UsernamePasswordConfiguration & {
     accountId:  StringProperty
     accountKey: StringProperty
     stage:      StringProperty
@@ -19,14 +15,7 @@ type CodecConfig = OAuthCodecConfiguration & {
 
 const properties: CodecConfig = {
     ...OAuthProperties,
-    username: {
-        title: "Username",
-        type: "string"
-    },
-    password: {
-        title: "Password",
-        type: "string"
-    },
+    ...UsernamePasswordProperties,
     accountId: {
         title: "Account ID",
         type: "string"
@@ -41,22 +30,14 @@ const properties: CodecConfig = {
     }
 }
 
-const fabricCodec: Codec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/fabric',
-        icon: 'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/qhb7eb9tdr9qf2xzy8w5',
+const fabricCodec: CommerceCodec = {
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'fabric',
         properties
     },
-    getAPI: function (config: CodecStringConfig<CodecConfig>): CommerceAPI {
-        if (!config.username) {
-            return null
-        }
-
-        const rest = OAuthRestClient(config, {
-            username: config.username,
-            password: config.password,
-            accountId: config.accountId
-        }, {
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
+        const rest = OAuthRestClient(config, config, {
             headers: {
                 'content-type': 'application/json'
             }
@@ -117,6 +98,14 @@ const fabricCodec: Codec = {
             }
         }
 
+        // the 'categories[0].children' of the node returned from this URL are the top level categories
+        let categories: any[] = _.get(await fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children')
+        if (!categories) {
+            throw new Error('megaMenu node not found')
+        }
+
+        const megaMenu = categories.map(mapCategory)
+
         // CommerceAPI implementation
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
             return _.first(await getProducts({ productIds: args.id }))
@@ -137,17 +126,7 @@ const fabricCodec: Codec = {
         }
 
         const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
-            if (megaMenu) {
-                return megaMenu
-            }
-
-            // the 'categories[0].children' of the node returned from this URL are the top level categories
-            let categories: any[] = _.get(await fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children')
-            if (categories) {
-                return megaMenu = categories.map(mapCategory)
-            }
-
-            throw new Error('megaMenu node not found')
+            return megaMenu
         }
 
         const getCustomerGroups = async function (args: CommonArgs): Promise<CustomerGroup[]> {
@@ -165,4 +144,4 @@ const fabricCodec: Codec = {
         }
     }
 }
-export default fabricCodec
+registerCodec(fabricCodec)

@@ -1,4 +1,4 @@
-import { Product, CustomerGroup } from "../../../types";
+import { Product, CustomerGroup } from "../../../common/types";
 import Moltin, { Hierarchy } from "@moltin/sdk";
 import { AttributedProduct, ElasticPathCategory } from ".";
 import { EPCustomerGroup } from "./types";

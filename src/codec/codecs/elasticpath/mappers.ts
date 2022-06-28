@@ -1,5 +1,5 @@
-import { Product, Image, CustomerGroup } from "../../../types"
-import { formatMoneyString } from "../../../util"
+import { Product, Image, CustomerGroup } from "../../../common/types"
+import { formatMoneyString } from "../../../common/util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
 import { AttributedProduct, ElasticPathCategory } from "."
@@ -81,7 +81,13 @@ const mappers = (api: any) => {
         name: node.attributes.name,
         id: node.id,
         slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`,
-        children: await Promise.all((await api.getChildrenByNodeId(hierarchy.id, node.id)).map(await mapNode(hierarchy))),
+        children: (await Promise.all((await api.getChildrenByNodeId(hierarchy.id, node.id)).map(await mapNode(hierarchy)))).map(child => ({
+            parent: {
+                id: node.id,
+                slug: `${hierarchy.attributes.slug}-${node.attributes.slug}`
+            },
+            ...child
+        })),
         products: []
     })
     
@@ -90,7 +96,13 @@ const mappers = (api: any) => {
         name: hierarchy.attributes.name,
         id: hierarchy.id,
         slug: hierarchy.attributes.slug,
-        children: await Promise.all((await api.getChildrenByHierarchyId(hierarchy.id)).map(await mapNode(hierarchy))),
+        children: (await Promise.all((await api.getChildrenByHierarchyId(hierarchy.id)).map(await mapNode(hierarchy)))).map(child => ({
+            parent: {
+                id: hierarchy.id,
+                slug: hierarchy.attributes.slug
+            },
+            ...child
+        })),
         products: []
     })
 

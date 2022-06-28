@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import axios from 'axios'
-import { Codec, CodecStringConfig, StringProperty } from '../../../codec'
+import { CodecPropertyConfig, CodecType, CommerceCodec, NumberProperty, registerCodec, StringProperty } from '../..'
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
 import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
 import { findInMegaMenu } from '../common'
@@ -11,29 +11,23 @@ type CodecConfig = APIConfiguration & {
     store_hash: StringProperty
 }
 
-const properties: CodecConfig = {
-    ...APIProperties,
-    api_token: {
-        title: "API Token",
-        type: "string"
-    },
-    store_hash: {
-        title: "Store hash",
-        type: "string"
-    }
-}
-
-const bigCommerceCodec: Codec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/bigcommerce',
-        icon: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQbiO1xUphQh2fOp8cbLS0_NkELL3oyq9QP7DgcJ5d1YMcUx5tkpY7FpFzVGaU-zKkE3ss&usqp=CAU',
-        properties
-    },
-    getAPI: (config: CodecStringConfig<CodecConfig>): CommerceAPI => {
-        if (!config.store_hash) {
-            return null
+const bigCommerceCodec: CommerceCodec = {
+    metadata: {
+        vendor:     'bigcommerce',
+        type:       CodecType.commerce,
+        properties: {
+            ...APIProperties,
+            api_token: {
+                title: "API Token",
+                type: "string"
+            },
+            store_hash: {
+                title: "Store hash",
+                type: "string"
+            }
         }
-
+    },
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const fetch = async (url: string): Promise<any> => {
             let response = await axios.request({
                 method: 'get',
@@ -61,10 +55,7 @@ const bigCommerceCodec: Codec = {
             getCustomerGroups: () => fetch(`/v2/customer_groups`)
         }
 
-        const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
-            return (await api.getCategoryTree()).map(mapCategory)
-        }
-
+        const megaMenu: Category[] = (await api.getCategoryTree()).map(mapCategory)
         return {
             getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
                 if (args.id) {
@@ -79,6 +70,9 @@ const bigCommerceCodec: Codec = {
                 else if (args.keyword) {
                     return (await api.searchProducts(args.keyword)).map(mapProduct)
                 }
+                else if (args.category) {
+                    return (await api.getProductsForCategory(args.category)).map(mapProduct)
+                }
                 throw new Error(`getProducts(): must specify either productIds or keyword`)
             },
             getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
@@ -86,17 +80,19 @@ const bigCommerceCodec: Codec = {
                     throw new Error(`getCategory(): must specify slug`)
                 }
 
-                let category = findInMegaMenu(await getMegaMenu(args), args.slug)
+                let category = findInMegaMenu(megaMenu, args.slug)
                 return {
                     ...category,
                     products: (await api.getProductsForCategory(category)).map(mapProduct)
                 }
             },
-            getMegaMenu,
+            getMegaMenu: async function (args: CommonArgs): Promise<Category[]> {
+                return megaMenu
+            },
             getCustomerGroups: async function (args: CommonArgs): Promise<CustomerGroup[]> {
                 return (await api.getCustomerGroups()).map(mapCustomerGroup)
             }
         }
     }
 }
-export default bigCommerceCodec
+registerCodec(bigCommerceCodec)

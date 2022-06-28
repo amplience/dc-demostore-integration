@@ -36,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_1 = __importDefault(require("lodash"));
+const __1 = require("../..");
 const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const mappers_1 = __importDefault(require("./mappers"));
 const common_1 = require("../common");
@@ -48,22 +49,18 @@ const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.O
         type: "string"
     } });
 const epCodec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
+    metadata: {
+        type: __1.CodecType.commerce,
+        vendor: 'elasticpath',
         properties
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
-        if (!config.pcm_url) {
-            return null;
-        }
         const rest = (0, rest_client_1.default)(config, qs_1.default.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
             client_secret: config.client_secret
         }));
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).data; });
-        let catalog = lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === config.catalog_name; });
         const api = {
             getProductById: (id) => fetch(`/pcm/products/${id}`),
             getProductBySku: (sku) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.first(yield fetch(`/pcm/products/?filter=like(sku,string:${sku})`)); }),
@@ -105,11 +102,10 @@ const epCodec = {
         //     }
         // })
         const mapper = (0, mappers_1.default)(api);
-        let megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
         const populateCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             return (Object.assign(Object.assign({}, category), { products: yield getProductsFromCategory(category) }));
         });
-        const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
+        const getProductsFromEPCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             if (category.id === category.hierarchyId) {
                 products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.hierarchyId, child.id); }))), 1)), x => x.id);
@@ -119,6 +115,27 @@ const epCodec = {
             }
             return yield Promise.all(products.map(yield mapper.mapProduct));
         });
+        const getHierarchyRootNode = (category) => {
+            if (category.parent) {
+                const parent = (0, common_1.findInMegaMenu)(megaMenu, category.parent.slug);
+                return getHierarchyRootNode(parent);
+            }
+            return category;
+        };
+        const getProductsFromCategory = (category) => __awaiter(void 0, void 0, void 0, function* () {
+            let products = [];
+            if (category.parent) {
+                // find hierarchy root
+                const rootNode = getHierarchyRootNode(category);
+                products = yield api.getProductsByNodeId(rootNode.id, category.id);
+            }
+            else {
+                products = lodash_1.default.uniqBy(lodash_1.default.flatten(lodash_1.default.take(yield Promise.all(category.children.map((child) => __awaiter(void 0, void 0, void 0, function* () { return yield api.getProductsByNodeId(category.id, child.id); }))), 1)), x => x.id);
+            }
+            return yield Promise.all(products.map(yield mapper.mapProduct));
+        });
+        const catalog = lodash_1.default.find((yield fetch(`catalogs`)), cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === config.catalog_name; });
+        const megaMenu = yield Promise.all((yield api.getMegaMenu()).map(yield mapper.mapHierarchy));
         // CommerceAPI
         const getProduct = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -136,6 +153,9 @@ const epCodec = {
                 else if (args.keyword) {
                     // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
                     return [yield mapper.mapProduct(yield api.getProductBySku(args.keyword))];
+                }
+                else if (args.category) {
+                    return yield getProductsFromCategory(args.category);
                 }
                 throw new Error(`getProducts(): must specify either productIds or keyword`);
             });
@@ -170,4 +190,4 @@ const epCodec = {
         };
     })
 };
-exports.default = epCodec;
+(0, __1.registerCodec)(epCodec);

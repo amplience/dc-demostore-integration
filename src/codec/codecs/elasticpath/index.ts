@@ -1,15 +1,15 @@
 import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../types'
-import { Codec, CodecStringConfig, StringProperty } from '../..'
+import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs } from '../../../common/types'
+import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
 import { CommerceAPI } from '../../..'
 import Moltin, { Catalog, Hierarchy, Price, File, PriceBook, PriceBookPriceBase } from '@moltin/sdk'
-import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
+import OAuthRestClient, { ClientCredentialProperties, ClientCredentialsConfiguration, OAuthProperties } from '../../../common/rest-client'
 import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
 import { EPCustomerGroup } from './types'
 
-type CodecConfig = OAuthCodecConfiguration & ClientCredentialsConfiguration & {
+type CodecConfig = ClientCredentialsConfiguration & {
     pcm_url:        StringProperty
     catalog_name:   StringProperty
 }
@@ -45,17 +45,13 @@ export interface PriceBookPrice extends PriceBookPriceBase {
     pricebook: PriceBook
 }
 
-const epCodec: Codec = {
-    schema: {
-        uri: 'https://demostore.amplience.com/site/integration/elasticpath',
-        icon: 'https://pbs.twimg.com/profile_images/1138115910449844226/PBnkfVHY_400x400.png',
+const epCodec: CommerceCodec = {
+    metadata: {
+        type:   CodecType.commerce,
+        vendor: 'elasticpath',
         properties
     },
-    getAPI: async (config: CodecStringConfig<CodecConfig>): Promise<CommerceAPI> => {
-        if (!config.pcm_url) {
-            return null
-        }
-
+    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
         const rest = OAuthRestClient(config, qs.stringify({
             grant_type: 'client_credentials',
             client_id: config.client_id,
@@ -64,7 +60,6 @@ const epCodec: Codec = {
 
         const fetch = async url => (await rest.get({ url })).data
         
-        let catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
         const api = {
             getProductById: (id: string): Promise<AttributedProduct> => fetch(`/pcm/products/${id}`),
             getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first(await fetch(`/pcm/products/?filter=like(sku,string:${sku})`)),
@@ -110,13 +105,12 @@ const epCodec: Codec = {
         // })
         
         const mapper = mappers(api)
-        let megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
         const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
             ...category,
             products: await getProductsFromCategory(category)
         })
         
-        const getProductsFromCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
+        const getProductsFromEPCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
             let products: Moltin.Product[] = []
             if (category.id === category.hierarchyId) {
                 products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
@@ -126,6 +120,31 @@ const epCodec: Codec = {
             }
             return await Promise.all(products.map(await mapper.mapProduct))
         }
+
+        const getHierarchyRootNode = (category: Category): Category => {
+            if (category.parent) {
+                const parent = findInMegaMenu(megaMenu, category.parent.slug)
+                return getHierarchyRootNode(parent)
+            }
+            return category
+        }
+
+        const getProductsFromCategory = async (category: Category): Promise<Product[]> => {
+            let products: Moltin.Product[] = []
+
+            if (category.parent) {
+                // find hierarchy root
+                const rootNode = getHierarchyRootNode(category)
+                products = await api.getProductsByNodeId(rootNode.id, category.id)
+            }
+            else {
+                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.id, child.id))), 1)), x => x.id)
+            }
+            return await Promise.all(products.map(await mapper.mapProduct))
+        }
+
+        const catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
+        const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
 
         // CommerceAPI
         const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
@@ -142,6 +161,9 @@ const epCodec: Codec = {
             else if (args.keyword) {
                 // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
                 return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
+            }
+            else if (args.category) {
+                return await getProductsFromCategory(args.category)
             }
             throw new Error(`getProducts(): must specify either productIds or keyword`)
         }
@@ -173,4 +195,4 @@ const epCodec: Codec = {
         }
     }
 }
-export default epCodec
+registerCodec(epCodec)
