@@ -1,22 +1,33 @@
-import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
-import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { CommerceAPI } from '../../..'
-import { findInMegaMenu } from '../common'
-import axios from 'axios'
-import { HybrisCategory, HybrisProduct } from './types'
-import slugify from 'slugify'
-import { APIConfiguration, APIProperties } from '../../../common/rest-client'
+import { APIConfiguration, APIProperties, Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
+import _ from "lodash";
+import { Dictionary } from "lodash";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
+import { StringProperty } from "../../cms-property-types";
+import slugify from "slugify";
+import { HybrisCategory, HybrisProduct } from "./types";
+import axios, { AxiosInstance } from "axios";
 
 type CodecConfig = APIConfiguration & {
     catalog_id: StringProperty
 }
 
-const properties: CodecConfig = {
-    ...APIProperties,
-    catalog_id: {
-        title: "Catalog ID",
-        type: "string"
+export class HybrisCommerceCodecType extends CommerceCodecType {
+    get vendor(): string {
+        return 'hybris'
+    }
+
+    get properties(): CodecConfig {
+        return {
+            ...APIProperties,
+            catalog_id: {
+                title: "Catalog ID",
+                type: "string"
+            }
+        }
+    }
+
+    async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
+        return await new HybrisCommerceCodec(config).init()
     }
 }
 
@@ -42,60 +53,48 @@ const mapProduct = (product: HybrisProduct): Product => ({
     }]
 })
 
-const hybrisCodec: CommerceCodec = {
-    metadata: {
-        type:   CodecType.commerce,
-        vendor: 'hybris',
-        properties
-    },
-    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
-        const rest = axios.create({ baseURL: `${config.api_url}/occ/v2/${config.catalog_id}` })
-        const fetch = async (url: string) => await (await rest.get(url)).data
+export class HybrisCommerceCodec extends CommerceCodec {
+    declare config: CodecPropertyConfig<CodecConfig>
 
-        const populate = async function (category: Category): Promise<Category> {
-            return {
-                ...category,
-                products: (await fetch(`/categories/${category.id}/products?fields=FULL`)).products.map(mapProduct)
-            }
+    // instance variables
+    rest: AxiosInstance
+
+    async init(): Promise<CommerceCodec> {
+        this.rest = axios.create({ baseURL: `${this.config.api_url}/occ/v2/${this.config.catalog_id}` })
+        return await super.init()
+    }
+
+    async fetch(url: string): Promise<any> {
+        return await (await this.rest.get(url)).data
+    }
+
+    async cacheMegaMenu(): Promise<void> {
+        this.megaMenu = mapCategory((await this.rest.get(`/catalogs/${this.config.catalog_id}ProductCatalog/Online/categories/1`)).data).children
+        return null
+    }
+
+    async getProductById(id: string): Promise<HybrisProduct> {
+        return await this.fetch(`/products/${id}?fields=FULL`)
+    }
+
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
+        let products: HybrisProduct[] = []
+        if (args.productIds) {
+            products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
         }
-
-        const megaMenu: Category[] = mapCategory((await rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children
-
-        // CommerceAPI implementation
-        const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
-            return mapProduct(await fetch(`/products/${args.id}?fields=FULL`))
+        else if (args.keyword) {
+            products = (await this.fetch(`/products/search?query=${args.keyword}&fields=FULL`)).products
         }
-
-        const getProducts = async function (args: GetProductsArgs): Promise<Product[]> {
-            if (args.productIds) {
-                return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
-            }
-            else if (args.keyword) {
-                return (await fetch(`/products/search?query=${args.keyword}&fields=FULL`)).map(mapProduct)
-            }
+        else if (args.category) {
+            products = (await this.fetch(`/categories/${args.category.id}/products?fields=FULL`)).products
         }
+        return products.map(mapProduct)
+    }
 
-        const getCategory = async function (args: GetCommerceObjectArgs): Promise<Category> {
-            return await populate(findInMegaMenu(await getMegaMenu(args), args.slug))
-        }
-
-        const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
-            return megaMenu
-        }
-
-        const getCustomerGroups = async function (args: CommonArgs): Promise<CustomerGroup[]> {
-            // don't know where these will come from
-            return []
-        }
-        // end CommerceAPI implementation
-
-        return {
-            getProduct,
-            getProducts,
-            getCategory,
-            getMegaMenu,
-            getCustomerGroups
-        }
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+        return []
     }
 }
-registerCodec(hybrisCodec)
+
+export default HybrisCommerceCodecType
+registerCodec(new HybrisCommerceCodecType())

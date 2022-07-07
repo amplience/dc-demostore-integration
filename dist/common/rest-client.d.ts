@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
-import { CodecPropertyConfig, StringProperty } from '..';
+import { CodecPropertyConfig } from '..';
 import { HttpMethod } from 'dc-management-sdk-js';
+import { StringProperty } from '../codec/cms-property-types';
 export declare type APIConfiguration = {
     api_url: StringProperty;
 };

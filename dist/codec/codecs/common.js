@@ -16,8 +16,9 @@ exports.findInMegaMenu = findInMegaMenu;
 const flattenCategories = (categories) => {
     const allCategories = [];
     const bulldozeCategories = cat => {
+        var _a;
         allCategories.push(cat);
-        cat.children && cat.children.forEach(bulldozeCategories);
+        (_a = cat === null || cat === void 0 ? void 0 : cat.children) === null || _a === void 0 ? void 0 : _a.forEach(bulldozeCategories);
     };
     categories.forEach(bulldozeCategories);
     return allCategories;
@@ -25,34 +26,34 @@ const flattenCategories = (categories) => {
 exports.flattenCategories = flattenCategories;
 const getContentTypeSchema = (codec) => {
     let schema = new dc_management_sdk_js_1.ContentTypeSchema();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
+    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`;
     schema.schemaId = schemaUri;
     schema.validationLevel = dc_management_sdk_js_1.ValidationLevel.CONTENT_TYPE;
     schema.body = JSON.stringify({
         id: schemaUri,
-        title: `${codec.metadata.vendor} integration`,
-        description: `${codec.metadata.vendor} integration`,
+        title: `${codec.vendor} integration`,
+        description: `${codec.vendor} integration`,
         allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
         type: "object",
-        properties: Object.assign(Object.assign({}, codec.metadata.properties), { vendor: {
+        properties: Object.assign(Object.assign({}, codec.properties), { vendor: {
                 type: 'string',
                 title: 'vendor',
-                const: codec.metadata.vendor
+                const: codec.vendor
             } }),
-        propertyOrder: Object.keys(codec.metadata.properties)
+        propertyOrder: Object.keys(codec.properties)
     });
     return schema;
 };
 exports.getContentTypeSchema = getContentTypeSchema;
 const getContentType = (codec) => {
     let contentType = new dc_management_sdk_js_1.ContentType();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
+    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`;
     contentType.contentTypeUri = schemaUri;
     contentType.settings = {
-        label: `${codec.metadata.vendor} integration`,
+        label: `${codec.vendor} integration`,
         icons: [{
                 size: 256,
-                url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.metadata.vendor}.png`
+                url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.vendor}.png`
             }]
     };
     return contentType;

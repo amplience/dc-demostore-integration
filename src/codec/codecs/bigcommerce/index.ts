@@ -1,21 +1,23 @@
-import _ from 'lodash'
-import axios from 'axios'
-import { CodecPropertyConfig, CodecType, CommerceCodec, NumberProperty, registerCodec, StringProperty } from '../..'
-import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, Product } from '../../../index'
-import { mapProduct, mapCategory, mapCustomerGroup } from './mappers'
-import { findInMegaMenu } from '../common'
-import { APIConfiguration, APIProperties } from '../../../common/rest-client'
+import { APIConfiguration, APIProperties, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
+import _ from "lodash";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
+import { StringProperty } from "../../cms-property-types";
+import axios from "axios";
+import { BigCommerceProduct } from "./types";
+import { mapCategory, mapCustomerGroup, mapProduct } from "./mappers";
 
 type CodecConfig = APIConfiguration & {
     api_token:  StringProperty
     store_hash: StringProperty
 }
 
-const bigCommerceCodec: CommerceCodec = {
-    metadata: {
-        vendor:     'bigcommerce',
-        type:       CodecType.commerce,
-        properties: {
+export class BigCommerceCommerceCodecType extends CommerceCodecType {
+    get vendor(): string {
+        return 'bigcommerce'
+    }
+
+    get properties(): CodecConfig {
+        return {
             ...APIProperties,
             api_token: {
                 title: "API Token",
@@ -26,73 +28,56 @@ const bigCommerceCodec: CommerceCodec = {
                 type: "string"
             }
         }
-    },
-    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
-        const fetch = async (url: string): Promise<any> => {
-            let response = await axios.request({
-                method: 'get',
-                url,
-                baseURL: `${config.api_url}/stores/${config.store_hash}`,
-                headers: {
-                    'X-Auth-Token': config.api_token,
-                    'Accept': `application/json`,
-                    'Content-Type': `application/json`
-                }
-            })
+    }
 
-            if (url.indexOf('customer_groups') > -1) {
-                return response.data
-            }
-            return response.data.data
-        }
-
-        const api = {
-            getCategoryTree: () => fetch(`/v3/catalog/categories/tree`),
-            getProducts: () => fetch(`/v3/catalog/products`),
-            searchProducts: keyword => fetch(`/v3/catalog/products?keyword=${keyword}`),
-            getProductById: id => fetch(`/v3/catalog/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
-            getCustomerGroups: () => fetch(`/v2/customer_groups`)
-        }
-
-        const megaMenu: Category[] = (await api.getCategoryTree()).map(mapCategory)
-        return {
-            getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
-                if (args.id) {
-                    return mapProduct(await api.getProductById(args.id))
-                }
-                throw new Error(`getProduct(): must specify id`)
-            },
-            getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
-                if (args.productIds) {
-                    return await Promise.all(args.productIds.split(',').map(async (id) => mapProduct(await api.getProductById(id))))
-                }
-                else if (args.keyword) {
-                    return (await api.searchProducts(args.keyword)).map(mapProduct)
-                }
-                else if (args.category) {
-                    return (await api.getProductsForCategory(args.category)).map(mapProduct)
-                }
-                throw new Error(`getProducts(): must specify either productIds or keyword`)
-            },
-            getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
-                if (!args.slug) {
-                    throw new Error(`getCategory(): must specify slug`)
-                }
-
-                let category = findInMegaMenu(megaMenu, args.slug)
-                return {
-                    ...category,
-                    products: (await api.getProductsForCategory(category)).map(mapProduct)
-                }
-            },
-            getMegaMenu: async function (args: CommonArgs): Promise<Category[]> {
-                return megaMenu
-            },
-            getCustomerGroups: async function (args: CommonArgs): Promise<CustomerGroup[]> {
-                return (await api.getCustomerGroups()).map(mapCustomerGroup)
-            }
-        }
+    async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
+        return await new BigCommerceCommerceCodec(config).init()
     }
 }
-registerCodec(bigCommerceCodec)
+
+export class BigCommerceCommerceCodec extends CommerceCodec {
+    declare config: CodecPropertyConfig<CodecConfig>
+
+    async cacheMegaMenu(): Promise<void> {
+        this.megaMenu = (await this.fetch(`/v3/catalog/categories/tree`)).map(mapCategory)
+    }
+
+    async fetch(url: string): Promise<any> {
+        let response = await axios.request({
+            method: 'get',
+            url,
+            baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
+            headers: {
+                'X-Auth-Token': this.config.api_token,
+                'Accept': `application/json`,
+                'Content-Type': `application/json`
+            }
+        })
+
+        if (url.indexOf('customer_groups') > -1) {
+            return response.data
+        }
+        return response.data.data
+    }
+
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
+        let products: BigCommerceProduct[] = []
+        if (args.productIds) {
+            products = await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`)
+        }
+        else if (args.keyword) {
+            products = await this.fetch(`/v3/catalog/products?keyword=${args.keyword}`)
+        }
+        else if (args.category) {
+            products = await this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`)
+        }
+        return products.map(mapProduct)
+    }
+
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+        return (await this.fetch(`/v2/customer_groups`)).map(mapCustomerGroup)
+    }
+}
+
+export default BigCommerceCommerceCodecType
+registerCodec(new BigCommerceCommerceCodecType())

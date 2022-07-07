@@ -63,6 +63,7 @@ export declare type AlgoliaConfig = {
 };
 export declare type AmplienceConfig = {
     hub: string;
+    hubId: string;
     stagingApi: string;
     imageHub?: string;
 };

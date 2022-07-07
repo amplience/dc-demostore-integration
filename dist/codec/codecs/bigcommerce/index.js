@@ -12,31 +12,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __importDefault(require("axios"));
+exports.BigCommerceCommerceCodec = exports.BigCommerceCommerceCodecType = void 0;
+const common_1 = require("../../../common");
 const __1 = require("../..");
+const axios_1 = __importDefault(require("axios"));
 const mappers_1 = require("./mappers");
-const common_1 = require("../common");
-const rest_client_1 = require("../../../common/rest-client");
-const bigCommerceCodec = {
-    metadata: {
-        vendor: 'bigcommerce',
-        type: __1.CodecType.commerce,
-        properties: Object.assign(Object.assign({}, rest_client_1.APIProperties), { api_token: {
+class BigCommerceCommerceCodecType extends __1.CommerceCodecType {
+    get vendor() {
+        return 'bigcommerce';
+    }
+    get properties() {
+        return Object.assign(Object.assign({}, common_1.APIProperties), { api_token: {
                 title: "API Token",
                 type: "string"
             }, store_hash: {
                 title: "Store hash",
                 type: "string"
-            } })
-    },
-    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
-        const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
+            } });
+    }
+    getApi(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield new BigCommerceCommerceCodec(config).init();
+        });
+    }
+}
+exports.BigCommerceCommerceCodecType = BigCommerceCommerceCodecType;
+class BigCommerceCommerceCodec extends __1.CommerceCodec {
+    cacheMegaMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.megaMenu = (yield this.fetch(`/v3/catalog/categories/tree`)).map(mappers_1.mapCategory);
+        });
+    }
+    fetch(url) {
+        return __awaiter(this, void 0, void 0, function* () {
             let response = yield axios_1.default.request({
                 method: 'get',
                 url,
-                baseURL: `${config.api_url}/stores/${config.store_hash}`,
+                baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
                 headers: {
-                    'X-Auth-Token': config.api_token,
+                    'X-Auth-Token': this.config.api_token,
                     'Accept': `application/json`,
                     'Content-Type': `application/json`
                 }
@@ -46,58 +60,28 @@ const bigCommerceCodec = {
             }
             return response.data.data;
         });
-        const api = {
-            getCategoryTree: () => fetch(`/v3/catalog/categories/tree`),
-            getProducts: () => fetch(`/v3/catalog/products`),
-            searchProducts: keyword => fetch(`/v3/catalog/products?keyword=${keyword}`),
-            getProductById: id => fetch(`/v3/catalog/products/${id}?include=images,variants`),
-            getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
-            getCustomerGroups: () => fetch(`/v2/customer_groups`)
-        };
-        const megaMenu = (yield api.getCategoryTree()).map(mappers_1.mapCategory);
-        return {
-            getProduct: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (args.id) {
-                        return (0, mappers_1.mapProduct)(yield api.getProductById(args.id));
-                    }
-                    throw new Error(`getProduct(): must specify id`);
-                });
-            },
-            getProducts: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (args.productIds) {
-                        return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return (0, mappers_1.mapProduct)(yield api.getProductById(id)); })));
-                    }
-                    else if (args.keyword) {
-                        return (yield api.searchProducts(args.keyword)).map(mappers_1.mapProduct);
-                    }
-                    else if (args.category) {
-                        return (yield api.getProductsForCategory(args.category)).map(mappers_1.mapProduct);
-                    }
-                    throw new Error(`getProducts(): must specify either productIds or keyword`);
-                });
-            },
-            getCategory: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    if (!args.slug) {
-                        throw new Error(`getCategory(): must specify slug`);
-                    }
-                    let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
-                    return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(mappers_1.mapProduct) });
-                });
-            },
-            getMegaMenu: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    return megaMenu;
-                });
-            },
-            getCustomerGroups: function (args) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    return (yield api.getCustomerGroups()).map(mappers_1.mapCustomerGroup);
-                });
+    }
+    getProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let products = [];
+            if (args.productIds) {
+                products = yield this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`);
             }
-        };
-    })
-};
-(0, __1.registerCodec)(bigCommerceCodec);
+            else if (args.keyword) {
+                products = yield this.fetch(`/v3/catalog/products?keyword=${args.keyword}`);
+            }
+            else if (args.category) {
+                products = yield this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`);
+            }
+            return products.map(mappers_1.mapProduct);
+        });
+    }
+    getCustomerGroups(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (yield this.fetch(`/v2/customer_groups`)).map(mappers_1.mapCustomerGroup);
+        });
+    }
+}
+exports.BigCommerceCommerceCodec = BigCommerceCommerceCodec;
+exports.default = BigCommerceCommerceCodecType;
+(0, __1.registerCodec)(new BigCommerceCommerceCodecType());

@@ -1,55 +1,43 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
-export declare type Property = {
-    title: string;
-};
-export declare type StringProperty = Property & {
-    type: 'string';
-    minLength?: number;
-    maxLength?: number;
-    pattern?: string;
-};
-export declare type StringConstProperty = StringProperty & {
-    const: string;
-};
-export declare type NumberProperty = Property & {
-    type: 'number';
-    multipleOf?: number;
-    minimum?: number;
-    maximum?: number;
-    exclusiveMinimum?: number;
-    exclusiveMaximum?: number;
-};
-export declare type IntegerProperty = NumberProperty & {
-    type: 'integer';
-};
-export declare type ArrayProperty = Property & {
-    type: 'array';
-    items?: number;
-    minItems?: number;
-    maxItems?: number;
-    required?: boolean;
-    uniqueItems?: boolean;
-};
-export declare enum CodecType {
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types';
+export declare enum CodecTypes {
     commerce = 0
 }
 export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
-export declare type Codec<T> = {
-    metadata: {
-        type: CodecType;
-        properties: Dictionary<AnyProperty>;
-        vendor: string;
-    };
-    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<Partial<T>>;
-};
-export declare type GenericCodec = Codec<API>;
-export declare type CommerceCodec = Codec<CommerceAPI>;
+export declare class CodecType {
+    _type: CodecTypes;
+    _properties: Dictionary<AnyProperty>;
+    _vendor: string;
+    get type(): CodecTypes;
+    get vendor(): string;
+    get properties(): Dictionary<AnyProperty>;
+    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API>;
+}
+export declare class CommerceCodecType extends CodecType {
+    get type(): CodecTypes;
+    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI>;
+}
+export declare class CommerceCodec implements CommerceAPI {
+    config: CodecPropertyConfig<Dictionary<AnyProperty>>;
+    megaMenu: Category[];
+    constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>);
+    init(): Promise<CommerceCodec>;
+    findCategory(slug: string): Category;
+    cacheMegaMenu(): Promise<void>;
+    getProduct(args: GetCommerceObjectArgs): Promise<Product>;
+    getProducts(args: GetProductsArgs): Promise<Product[]>;
+    getCategory(args: GetCommerceObjectArgs): Promise<Category>;
+    getMegaMenu(args: CommonArgs): Promise<Category[]>;
+    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+}
 export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
-export declare const getCodecs: (type: CodecType) => GenericCodec[];
-export declare const registerCodec: (codec: GenericCodec) => void;
-export declare const getCodec: (config: any, type: CodecType) => Promise<API>;
+export declare const getCodecs: (type: CodecTypes) => CodecType[];
+export declare const registerCodec: (codec: CodecType) => void;
+import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types';
+export declare const getCodec: (config: any, type: CodecTypes) => Promise<API>;
+export declare const defaultArgs: CommonArgs;
 export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;
 export * from './codecs/common';

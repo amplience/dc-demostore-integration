@@ -2,7 +2,7 @@ import { Product, Image, CustomerGroup } from "../../../common/types"
 import { formatMoneyString } from "../../../common/util"
 import Moltin, { Hierarchy } from "@moltin/sdk"
 import _, { Dictionary } from "lodash"
-import { AttributedProduct, ElasticPathCategory } from "."
+import { AttributedProduct, ElasticPathCategory } from "./types"
 import { EPCustomerGroup } from "./types"
 
 const mappers = (api: any) => {

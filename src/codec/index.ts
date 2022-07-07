@@ -2,61 +2,101 @@ import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI } from '..'
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
-import { CodecNotFoundError } from '../common/errors'
+import { IntegrationError } from '../common/errors'
 
-export type Property = {
-    title: string
-}
-
-export type StringProperty = Property & {
-    type: 'string'
-    minLength?: number
-    maxLength?: number
-    pattern?: string
-}
-
-export type StringConstProperty = StringProperty & {
-    const: string
-}
-
-export type NumberProperty = Property & {
-    type: 'number'
-    multipleOf?: number
-    minimum?: number
-    maximum?: number
-    exclusiveMinimum?: number
-    exclusiveMaximum?: number
-}
-
-export type IntegerProperty = NumberProperty & {
-    type:   'integer'
-}
-
-export type ArrayProperty = Property & {
-    type: 'array'
-    items?: number
-    minItems?: number
-    maxItems?: number
-    required?: boolean
-    uniqueItems?: boolean
-}
-
-export enum CodecType {
+export enum CodecTypes {
     commerce
 }
 
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
-export type Codec<T> = {
-    metadata: {
-        type:       CodecType
-        properties: Dictionary<AnyProperty>
-        vendor:     string
+
+export class CodecType {
+    _type:       CodecTypes
+    _properties: Dictionary<AnyProperty>
+    _vendor:     string
+
+    get type(): CodecTypes {
+        return this._type
     }
-    getAPI(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<Partial<T>>
+
+    get vendor(): string {
+        return this._vendor
+    }
+
+    get properties(): Dictionary<AnyProperty> {
+        return this._properties
+    }
+
+    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API> {
+        throw new Error('must implement getCodec')
+    }
 }
 
-export type GenericCodec = Codec<API>
-export type CommerceCodec = Codec<CommerceAPI>
+export class CommerceCodecType extends CodecType {
+    get type() {
+        return CodecTypes.commerce
+    }
+
+    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI> {
+        throw new Error('must implement getCodec')
+    }
+}
+
+export class CommerceCodec implements CommerceAPI {
+    config: CodecPropertyConfig<Dictionary<AnyProperty>>
+    megaMenu: Category[] = []
+ 
+    constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>) {
+        this.config = config
+    }
+
+    async init(): Promise<CommerceCodec> {
+        await this.cacheMegaMenu()
+        if (this.megaMenu.length === 0) {
+            console.warn(`megaMenu has no categories, check setup`)
+        }
+        return this
+    }
+
+    findCategory(slug: string) {
+        let flattenedCategories: Category[] = []
+        const bulldozeCategories = cat => {
+            flattenedCategories.push(cat)
+            cat.children && cat.children.forEach(bulldozeCategories)
+        }
+        this.megaMenu.forEach(bulldozeCategories)
+        return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
+    }    
+
+    async cacheMegaMenu(): Promise<void> {
+        this.megaMenu = []
+    }
+
+    // defined in terms of getProducts()
+    async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
+        return _.first(await this.getProducts({ ...args, productIds: args.id }))
+    }
+
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
+        throw new Error('must implement getProducts')
+    }
+
+    // defined in terms of getMegaMenu, effectively
+    async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
+        let category = this.findCategory(args.slug)
+        category.products = await this.getProducts({ ...args, category })
+        return category
+    }
+
+    async getMegaMenu(args: CommonArgs): Promise<Category[]> {
+        return this.megaMenu
+    }
+
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+        throw new Error('must implement getCustomerGroups')
+    }
+}
+
 
 export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string 
@@ -66,105 +106,83 @@ export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
                     : any[]
 }
 
-const codecs = new Map<CodecType, GenericCodec[]>()
-codecs[CodecType.commerce] = []
+const codecs = new Map<CodecTypes, CodecType[]>()
+codecs[CodecTypes.commerce] = []
 
 // public interface
-export const getCodecs = (type: CodecType): GenericCodec[] => {
+export const getCodecs = (type: CodecTypes): CodecType[] => {
     return codecs[type]
 }
 
-export const registerCodec = (codec: GenericCodec) => {
-    if (!codecs[codec.metadata.type].includes(codec)) {
-        codecs[codec.metadata.type].push(codec)
+export const registerCodec = (codec: CodecType) => {
+    if (!codecs[codec.type].includes(codec)) {
+        codecs[codec.type].push(codec)
     }
 }
 
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map<any, API>()
 
-export const getCodec = async (config: any, type: CodecType): Promise<API> => {
-    let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0)
+import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types'
 
+const maskSensitiveData = (obj: any) => {
+    return {
+        ...obj,
+        client_secret: obj.client_secret && `**** redacted ****`,
+        api_token: obj.api_token && `**** redacted ****`,
+        password: obj.password && `**** redacted ****`,
+    }
+}
+
+export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
+    let codecsMatchingConfig: CodecType[] = getCodecs(type).filter(c => _.difference(Object.keys(c.properties), Object.keys(config)).length === 0)
     if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-        throw new CodecNotFoundError(`[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`)
+        throw new IntegrationError({
+            message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
+            helpUrl: `https://help.dc-demostore.com/codec-error`
+        })
     }
 
     let configHash = _.values(config).join('')
     if (!apis[configHash]) {
-        let codec = _.first(codecsMatchingConfig)
-        console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`)
-        let api = await codec.getAPI(config)
-        apis[configHash] = wrappedCommerceApi(api as CommerceAPI)
+        let CType = _.first(codecsMatchingConfig)
+        console.log(`[ demostore ] creating codec: ${CType.vendor}...`)
+        let api = await CType.getApi(config)
+        apis[configHash] = api
+
+        // apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
+        //     // apply default arguments for those not provided in the query
+        //     return async (args: CommonArgs): Promise<any> => await api[key]({
+        //         ...defaultArgs,
+        //         ...args
+        //     })
+        // }))
     }
+
     return apis[configHash]
 }
 
-const defaultArgs = (args: CommonArgs): CommonArgs => ({
+export const defaultArgs: CommonArgs = {
     locale:     'en-US',
     language:   'en',
     country:    'US',
     currency:   'USD',
-    segment:    '',
-    ...args
-})
-
-const wrappedCommerceApi = async (api: Partial<CommerceAPI>): Promise<Partial<CommerceAPI>> => {
-    // cache the mega menu
-    let megaMenu: Category[] = await api.getMegaMenu(defaultArgs({}))
-
-    let flattenedCategories: Category[] = []
-    const bulldozeCategories = cat => {
-        flattenedCategories.push(cat)
-        cat.children && cat.children.forEach(bulldozeCategories)
-    }
-    megaMenu.forEach(bulldozeCategories)
- 
-    const findCategory = (slug: string) => {
-        return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
-    }
-    
-    let wrapped: CommerceAPI = {
-        getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
-            // current thinking: point to wrapped.getProducts() as getProduct() is really a subset of getProducts()
-            return _.first(await wrapped.getProducts({ ...args, productIds: args.id }))
-        },
-        getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
-            return await api.getProducts(defaultArgs(args))
-        },
-        getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
-            let category = findCategory(args.slug)
-            if (category) {
-                // populate products into category
-                category.products = category.products?.length > 0 ? category.products : await wrapped.getProducts({ category })
-            }
-            return category
-        },
-        getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
-            return megaMenu
-        },
-        getCustomerGroups: async (args: CommonArgs): Promise<Identifiable[]> => {
-            // pass through
-            return await api.getCustomerGroups(defaultArgs(args))
-        }
-    }
-
-    return wrapped
+    segment:    ''
 }
 
-export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecType.commerce) as CommerceAPI
+export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
 
 // register codecs
 if (isServer()) {
-    import('./codecs/akeneo')
-    import('./codecs/bigcommerce')
+    import('./codecs/rest')
     import('./codecs/commercetools')
+    import('./codecs/bigcommerce')
+    import('./codecs/akeneo')
+    import('./codecs/fabric')
     import('./codecs/constructor.io')
     import('./codecs/elasticpath')
-    import('./codecs/fabric')
     import('./codecs/hybris')
-    import('./codecs/rest')
     import('./codecs/sfcc')
 }
 

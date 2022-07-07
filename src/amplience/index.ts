@@ -11,7 +11,7 @@ export const getContentItem = async (hub: string, args: any): Promise<any> => {
 
 export const getContentItemFromConfigLocator = async (configLocator: string): Promise<any> => {
     let [hub, lookup] = configLocator.split(':')
-    if (lookup.indexOf('/') === -1) {
+    if (lookup?.indexOf('/') === -1) {
         lookup = `config/${lookup}`
     }
     return await getContentItem(hub, { key: `demostore/${lookup}` })

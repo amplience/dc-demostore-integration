@@ -1,6 +1,6 @@
 import { Product, CustomerGroup } from "../../../common/types";
 import Moltin, { Hierarchy } from "@moltin/sdk";
-import { AttributedProduct, ElasticPathCategory } from ".";
+import { AttributedProduct, ElasticPathCategory } from "./types";
 import { EPCustomerGroup } from "./types";
 declare const mappers: (api: any) => {
     mapHierarchy: (hierarchy: Hierarchy) => Promise<ElasticPathCategory>;

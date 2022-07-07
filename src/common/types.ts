@@ -77,6 +77,7 @@ export type AlgoliaConfig = {
 
 export type AmplienceConfig = {
     hub:                string
+    hubId:              string
     stagingApi:         string
     imageHub?:          string
 }

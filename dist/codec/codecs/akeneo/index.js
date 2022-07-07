@@ -12,134 +12,90 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AkeneoCommerceCodec = exports.AkeneoCommerceCodecType = void 0;
+const common_1 = require("../../../common");
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../..");
-const __2 = require("../../..");
-const index_1 = require("../../index");
-const common_1 = require("../common");
-const slugify_1 = __importDefault(require("slugify"));
-const btoa_1 = __importDefault(require("btoa"));
+const mappers_1 = require("./mappers");
 const util_1 = require("../../../common/util");
-const properties = Object.assign(Object.assign({}, __2.UsernamePasswordProperties), __2.ClientCredentialProperties);
-const akeneoCodec = {
-    metadata: {
-        type: index_1.CodecType.commerce,
-        properties,
-        vendor: 'akeneo'
-    },
-    getAPI: function (config) {
+const btoa_1 = __importDefault(require("btoa"));
+class AkeneoCommerceCodecType extends __1.CommerceCodecType {
+    get vendor() {
+        return 'akeneo';
+    }
+    get properties() {
+        return Object.assign(Object.assign({}, common_1.UsernamePasswordProperties), common_1.ClientCredentialProperties);
+    }
+    getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            const rest = (0, __2.OAuthRestClient)({
-                api_url: `${config.api_url}/api/rest/v1`,
-                auth_url: `${config.api_url}/api/oauth/v1/token`
+            return yield new AkeneoCommerceCodec(config).init();
+        });
+    }
+}
+exports.AkeneoCommerceCodecType = AkeneoCommerceCodecType;
+class AkeneoCommerceCodec extends __1.CommerceCodec {
+    init() {
+        const _super = Object.create(null, {
+            init: { get: () => super.init }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.rest = (0, common_1.OAuthRestClient)({
+                api_url: `${this.config.api_url}/api/rest/v1`,
+                auth_url: `${this.config.api_url}/api/oauth/v1/token`
             }, {
-                username: config.username,
-                password: config.password,
+                username: this.config.username,
+                password: this.config.password,
                 grant_type: "password"
             }, {
                 headers: {
-                    Authorization: `Basic ${(0, btoa_1.default)(`${config.client_id}:${config.client_secret}`)}`
+                    Authorization: `Basic ${(0, btoa_1.default)(`${this.config.client_id}:${this.config.client_secret}`)}`
                 }
             }, (auth) => ({
                 Authorization: `Bearer ${auth.access_token}`
             }));
-            const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
-                try {
-                    let result = yield rest.get({ url });
-                    return result._embedded ? result._embedded.items : result;
-                }
-                catch (error) {
-                    console.log(`error url [ ${url} ]`);
-                }
-            });
-            let categories = yield fetch('/categories?limit=100');
-            categories = lodash_1.default.concat(categories, yield fetch('/categories?limit=100&page=2'));
-            categories = lodash_1.default.concat(categories, yield fetch('/categories?limit=100&page=3'));
-            const mapCategory = (category) => ({
-                id: category.code,
-                name: category.labels['en_US'],
-                slug: category.code,
-                children: [],
-                products: []
-            });
-            const findValue = (values) => { var _a; return values && ((_a = values.find(value => !value.locale || value.locale === 'en_US')) === null || _a === void 0 ? void 0 : _a.data); };
-            const mapProduct = (args) => (product) => {
-                const prices = findValue(product.values.price);
-                let price = '--';
-                if (prices) {
-                    let locationPrice = prices.find(p => p.currency === args.currency);
-                    if (locationPrice) {
-                        price = (0, util_1.formatMoneyString)(locationPrice.amount, args);
-                    }
-                }
-                return {
-                    id: product.identifier,
-                    name: findValue(product.values.name),
-                    slug: product.values.name && (0, slugify_1.default)(findValue(product.values.name), { lower: true }),
-                    shortDescription: findValue(product.values.description),
-                    longDescription: findValue(product.values.description),
-                    categories: [],
-                    variants: [{
-                            sku: product.identifier,
-                            listPrice: price,
-                            salePrice: price,
-                            // images: [],
-                            images: [{ url: `https://assets.ellosgroup.com/s/ellos/ell_${product.identifier}_MS` }],
-                            attributes: lodash_1.default.mapValues(product.values, findValue)
-                        }]
-                };
-            };
-            // 'master' is the catalog root node, so top-level categories its children
-            let megaMenu = [];
-            categories.forEach(cat => {
-                if (cat.code === 'master') {
-                    // top level category
-                    megaMenu.push(mapCategory(cat));
-                }
-                else {
-                    // try to find in the megamenu
-                    let parent = (0, common_1.findInMegaMenu)(megaMenu, cat.parent);
-                    if (parent) {
-                        parent.children.push(mapCategory(cat));
-                    }
-                }
-            });
-            megaMenu = (0, common_1.findInMegaMenu)(megaMenu, 'master').children;
-            const api = {
-                getProductById: (args) => (id) => __awaiter(this, void 0, void 0, function* () {
-                    return mapProduct(args)(yield fetch(`/products/${id}`));
-                }),
-                getProduct: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield api.getProductById(args)(args.id);
-                }),
-                getProducts: (args) => __awaiter(this, void 0, void 0, function* () {
-                    if (args.productIds) {
-                        return yield Promise.all(args.productIds.split(',').map(api.getProductById(args)));
-                    }
-                    else if (args.keyword) {
-                        let searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
-                        return searchResults.map(mapProduct(args));
-                    }
-                    else if (args.category) {
-                        let products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`);
-                        return products.map(mapProduct(args));
-                    }
-                }),
-                getCategory: (args) => __awaiter(this, void 0, void 0, function* () {
-                    return yield api.populateCategory((0, common_1.findInMegaMenu)(megaMenu, args.slug), args);
-                }),
-                populateCategory: (category, args) => __awaiter(this, void 0, void 0, function* () {
-                    return (Object.assign({ products: yield api.getProducts(Object.assign({ category }, args)) }, category));
-                }),
-                getMegaMenu: () => __awaiter(this, void 0, void 0, function* () {
-                    return megaMenu;
-                }),
-                getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
-                    return [];
-                })
-            };
-            return api;
+            return yield _super.init.call(this);
         });
     }
-};
-(0, __1.registerCodec)(akeneoCodec);
+    cacheMegaMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let categories = yield this.fetch('/categories?limit=100');
+            categories = lodash_1.default.concat(categories, yield this.fetch('/categories?limit=100&page=2'));
+            categories = lodash_1.default.concat(categories, yield this.fetch('/categories?limit=100&page=3'));
+            this.megaMenu = categories.filter(cat => cat.parent === 'master').map((0, mappers_1.mapCategory)(categories));
+        });
+    }
+    fetch(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let result = yield this.rest.get({ url });
+                return result._embedded ? result._embedded.items : result;
+            }
+            catch (error) {
+                console.log(`error url [ ${url} ]`);
+            }
+        });
+    }
+    getProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let products = [];
+            if (args.productIds) {
+                products = yield this.fetch(`/products?search={"identifier":[{"operator":"IN","value":[${(0, util_1.quoteProductIdString)(args.productIds)}]}]}`);
+            }
+            else if (args.keyword) {
+                products = yield this.fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
+            }
+            else if (args.category) {
+                products = yield this.fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`);
+            }
+            return products.map((0, mappers_1.mapProduct)(args));
+        });
+    }
+    getCustomerGroups(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
+}
+exports.AkeneoCommerceCodec = AkeneoCommerceCodec;
+exports.default = AkeneoCommerceCodecType;
+(0, __1.registerCodec)(new AkeneoCommerceCodecType());

@@ -1,43 +1,56 @@
-import _ from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
-import { CodecPropertyConfig, CodecType, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { CommerceAPI, UsernamePasswordConfiguration, UsernamePasswordProperties } from '../../..'
-import OAuthRestClient, { OAuthCodecConfiguration, OAuthProperties } from '../../../common/rest-client'
-import slugify from 'slugify'
-import { findInMegaMenu } from '../common'
-import { Attribute, FabricCategory, FabricProduct } from './types'
+import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthCodecConfiguration, OAuthProperties, OAuthRestClient, OAuthRestClientInterface, Product, UsernamePasswordConfiguration, UsernamePasswordProperties } from "../../../common";
+import _ from "lodash";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
+import { StringProperty } from "../../cms-property-types";
+import { mapCategory, mapProduct } from "./mappers";
+import { FabricProduct } from "./types";
+import { quote, quoteProductIdString } from "../../../common/util";
 
 type CodecConfig = OAuthCodecConfiguration & UsernamePasswordConfiguration & {
-    accountId:  StringProperty
+    accountId: StringProperty
     accountKey: StringProperty
-    stage:      StringProperty
+    stage: StringProperty
 }
 
-const properties: CodecConfig = {
-    ...OAuthProperties,
-    ...UsernamePasswordProperties,
-    accountId: {
-        title: "Account ID",
-        type: "string"
-    },
-    accountKey: {
-        title: "Account Key",
-        type: "string"
-    },
-    stage: {
-        title: "Stage",
-        type: "string"
+export class FabricCommerceCodecType extends CommerceCodecType {
+    get vendor(): string {
+        return 'fabric'
+    }
+
+    get properties(): CodecConfig {
+        return {
+            ...OAuthProperties,
+            ...UsernamePasswordProperties,
+            accountId: {
+                title: "Account ID",
+                type: "string"
+            },
+            accountKey: {
+                title: "Account Key",
+                type: "string"
+            },
+            stage: {
+                title: "Stage",
+                type: "string"
+            }
+        }
+    }
+
+    async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
+        return await new FabricCommerceCodec(config).init()
     }
 }
 
-const fabricCodec: CommerceCodec = {
-    metadata: {
-        type:   CodecType.commerce,
-        vendor: 'fabric',
-        properties
-    },
-    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
-        const rest = OAuthRestClient(config, config, {
+export class FabricCommerceCodec extends CommerceCodec {
+    declare config: CodecPropertyConfig<CodecConfig>
+    rest: OAuthRestClientInterface
+
+    // instance variables
+    // products: Product[]
+    // categories: Category[]
+
+    async init(): Promise<CommerceCodec> {
+        this.rest = OAuthRestClient(this.config, this.config, {
             headers: {
                 'content-type': 'application/json'
             }
@@ -48,100 +61,53 @@ const fabricCodec: CommerceCodec = {
                 // todo: what comprises site-context?
                 // todo: what do we need to remove (abstract) from here?  account?  stage?
                 'x-site-context': JSON.stringify({
-                    stage: config.stage,
-                    account: config.accountKey,
+                    stage: this.config.stage,
+                    account: this.config.accountKey,
                     date: new Date().toISOString(),
                     channel: 12
                 })
             }
         })
-        const fetch = async url => await rest.get({ url })
+        return await super.init()
+    }
 
-        const getProductAttributes = async function (sku: string): Promise<Attribute[]> {
-            return _.get(await fetch(`/api-product/v1/product/attribute?sku=${sku}`), 'attributes')
-        }
+    async fetch(url: string): Promise<any> {
+        return await this.rest.get({ url })
+    }
 
-        const getProductsForCategory = async function (category: Category): Promise<Product[]> {
-            let skus = _.take(_.get(await fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 20)
-            return _.isEmpty(skus) ? [] : await getProducts({ productIds: skus.join(',') })
-        }
-
-        const mapCategory = (category: FabricCategory): Category => ({
-            id: category.id,
-            slug: slugify(category.name, { lower: true }),
-            name: category.name,
-            children: category.children.map(mapCategory),
-            products: []
-        })
-
-        const mapProduct = async (product: FabricProduct): Promise<Product> => {
-            let attributes = await getProductAttributes(product.sku)
-            const getAttributeValue = name => attributes.find(att => att.name === name).value
-
-            let name = getAttributeValue('title')
-            return {
-                id: product._id,
-                name,
-                longDescription: getAttributeValue('description'),
-                slug: slugify(name, { lower: true }),
-                categories: [],
-                variants: [{
-                    sku: product.sku,
-                    listPrice: '--',
-                    salePrice: '--',
-                    images: [
-                        { url: getAttributeValue('Image 1') },
-                        ...JSON.parse(getAttributeValue('ImageArray'))
-                    ],
-                    attributes: _.zipObject(_.map(attributes, 'name'), _.map(attributes, 'value'))
-                }]
-            }
-        }
-
+    async cacheMegaMenu(): Promise<void> {
         // the 'categories[0].children' of the node returned from this URL are the top level categories
-        let categories: any[] = _.get(await fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children')
+        let categories: any[] = _.get(await this.fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children')
         if (!categories) {
             throw new Error('megaMenu node not found')
         }
+        this.megaMenu = categories.map(mapCategory)
+    }
 
-        const megaMenu = categories.map(mapCategory)
-
-        // CommerceAPI implementation
-        const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
-            return _.first(await getProducts({ productIds: args.id }))
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
+        let products: FabricProduct[] = []
+        if (args.productIds) {
+            products = (await this.fetch(`/api-product/v1/product/search?query=[${args.productIds}]`)).products
+        }
+        else if (args.keyword) {
+            products = (await this.fetch(`/api-product/v1/product/search?query=${args.keyword}`)).products
+        }
+        else if (args.category) {
+            let skus = _.take(_.get(await this.fetch(`/api-category/v1/category/sku?id=${args.category.id}`), 'skus'), 20)
+            products = (await this.fetch(`/api-product/v1/product/search?query=[${skus.join(',')}]`)).products
         }
 
-        const getProducts = async function (args: GetProductsArgs): Promise<Product[]> {
-            let url = args.productIds ? `/api-product/v1/product/search?size=${args.productIds.split(',').length}&page=1&query=${args.productIds}` : `/api-product/v1/product/search?size=12&page=1&query=${args.keyword}`
-            let products = _.get(await fetch(url), 'products')
-            return await Promise.all(products.map(mapProduct))
-        }
+        await Promise.all(products.map(async product => {
+            product.attributes = (await this.fetch(`/api-product/v1/product/attribute?sku=${product.sku}`)).attributes
+        }))
 
-        const getCategory = async function (args: GetCommerceObjectArgs): Promise<Category> {
-            let category = findInMegaMenu(await getMegaMenu(args), args.slug)
-            return {
-                ...category,
-                products: await getProductsForCategory(category)
-            }
-        }
+        return products.map(mapProduct)
+    }
 
-        const getMegaMenu = async function (args: CommonArgs): Promise<Category[]> {
-            return megaMenu
-        }
-
-        const getCustomerGroups = async function (args: CommonArgs): Promise<CustomerGroup[]> {
-            // i think these will live here: https://sandbox.copilot.fabric.inc/api-identity/tags/get
-            return []
-        }
-        // end CommerceAPI implementation
-
-        return {
-            getProduct,
-            getProducts,
-            getCategory,
-            getMegaMenu,
-            getCustomerGroups
-        }
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+        return []
     }
 }
-registerCodec(fabricCodec)
+
+export default FabricCommerceCodecType
+registerCodec(new FabricCommerceCodecType())

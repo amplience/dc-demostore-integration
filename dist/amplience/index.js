@@ -24,7 +24,7 @@ const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function
 exports.getContentItem = getContentItem;
 const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
     let [hub, lookup] = configLocator.split(':');
-    if (lookup.indexOf('/') === -1) {
+    if ((lookup === null || lookup === void 0 ? void 0 : lookup.indexOf('/')) === -1) {
         lookup = `config/${lookup}`;
     }
     return yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });

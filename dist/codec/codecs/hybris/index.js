@@ -12,16 +12,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.HybrisCommerceCodec = exports.HybrisCommerceCodecType = void 0;
+const common_1 = require("../../../common");
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../..");
-const common_1 = require("../common");
-const axios_1 = __importDefault(require("axios"));
 const slugify_1 = __importDefault(require("slugify"));
-const rest_client_1 = require("../../../common/rest-client");
-const properties = Object.assign(Object.assign({}, rest_client_1.APIProperties), { catalog_id: {
-        title: "Catalog ID",
-        type: "string"
-    } });
+const axios_1 = __importDefault(require("axios"));
+class HybrisCommerceCodecType extends __1.CommerceCodecType {
+    get vendor() {
+        return 'hybris';
+    }
+    get properties() {
+        return Object.assign(Object.assign({}, common_1.APIProperties), { catalog_id: {
+                title: "Catalog ID",
+                type: "string"
+            } });
+    }
+    getApi(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield new HybrisCommerceCodec(config).init();
+        });
+    }
+}
+exports.HybrisCommerceCodecType = HybrisCommerceCodecType;
 const mapCategory = (category) => (Object.assign(Object.assign({}, category), { slug: (0, slugify_1.default)(category.name, { lower: true }), children: category.subcategories.map(mapCategory), products: [] }));
 const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id: product.code, slug: (0, slugify_1.default)(product.name, { lower: true }), longDescription: product.description, categories: [], variants: [{
             sku: product.code,
@@ -30,61 +43,53 @@ const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id:
             images: [],
             attributes: lodash_1.default.zipObject(Object.keys(product), Object.values(product))
         }] }));
-const hybrisCodec = {
-    metadata: {
-        type: __1.CodecType.commerce,
-        vendor: 'hybris',
-        properties
-    },
-    getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
-        const rest = axios_1.default.create({ baseURL: `${config.api_url}/occ/v2/${config.catalog_id}` });
-        const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return yield (yield rest.get(url)).data; });
-        const populate = function (category) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return Object.assign(Object.assign({}, category), { products: (yield fetch(`/categories/${category.id}/products?fields=FULL`)).products.map(mapProduct) });
-            });
-        };
-        const megaMenu = mapCategory((yield rest.get(`/catalogs/${config.catalog_id}ProductCatalog/Online/categories/1`)).data).children;
-        // CommerceAPI implementation
-        const getProduct = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return mapProduct(yield fetch(`/products/${args.id}?fields=FULL`));
-            });
-        };
-        const getProducts = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (args.productIds) {
-                    return yield Promise.all(args.productIds.split(',').map((id) => __awaiter(this, void 0, void 0, function* () { return yield getProduct({ id }); })));
-                }
-                else if (args.keyword) {
-                    return (yield fetch(`/products/search?query=${args.keyword}&fields=FULL`)).map(mapProduct);
-                }
-            });
-        };
-        const getCategory = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return yield populate((0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug));
-            });
-        };
-        const getMegaMenu = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return megaMenu;
-            });
-        };
-        const getCustomerGroups = function (args) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // don't know where these will come from
-                return [];
-            });
-        };
-        // end CommerceAPI implementation
-        return {
-            getProduct,
-            getProducts,
-            getCategory,
-            getMegaMenu,
-            getCustomerGroups
-        };
-    })
-};
-(0, __1.registerCodec)(hybrisCodec);
+class HybrisCommerceCodec extends __1.CommerceCodec {
+    init() {
+        const _super = Object.create(null, {
+            init: { get: () => super.init }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.rest = axios_1.default.create({ baseURL: `${this.config.api_url}/occ/v2/${this.config.catalog_id}` });
+            return yield _super.init.call(this);
+        });
+    }
+    fetch(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (yield this.rest.get(url)).data;
+        });
+    }
+    cacheMegaMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.megaMenu = mapCategory((yield this.rest.get(`/catalogs/${this.config.catalog_id}ProductCatalog/Online/categories/1`)).data).children;
+            return null;
+        });
+    }
+    getProductById(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.fetch(`/products/${id}?fields=FULL`);
+        });
+    }
+    getProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let products = [];
+            if (args.productIds) {
+                products = yield Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)));
+            }
+            else if (args.keyword) {
+                products = (yield this.fetch(`/products/search?query=${args.keyword}&fields=FULL`)).products;
+            }
+            else if (args.category) {
+                products = (yield this.fetch(`/categories/${args.category.id}/products?fields=FULL`)).products;
+            }
+            return products.map(mapProduct);
+        });
+    }
+    getCustomerGroups(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return [];
+        });
+    }
+}
+exports.HybrisCommerceCodec = HybrisCommerceCodec;
+exports.default = HybrisCommerceCodecType;
+(0, __1.registerCodec)(new HybrisCommerceCodecType());

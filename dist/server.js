@@ -22,7 +22,10 @@ const wrappedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         yield (0, middleware_1.apiRouteHandler)(req, res);
     }
     catch (e) {
-        next(e);
+        if (e.helpUrl) {
+            console.error(e.getMessage());
+        }
+        res.status(500).json(e);
     }
 });
 // define a route handler for the default home page

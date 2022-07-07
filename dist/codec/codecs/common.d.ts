@@ -1,6 +1,6 @@
 import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
-import { GenericCodec } from "..";
 import { Category } from "../../common/types";
+import { CodecType } from "../../index";
 /**
  * @deprecated The method should not be used
  */
@@ -9,5 +9,5 @@ export declare const findInMegaMenu: (categories: Category[], slug: string) => C
  * @deprecated The method should not be used
  */
 export declare const flattenCategories: (categories: Category[]) => Category[];
-export declare const getContentTypeSchema: (codec: GenericCodec) => ContentTypeSchema;
-export declare const getContentType: (codec: GenericCodec) => ContentType;
+export declare const getContentTypeSchema: (codec: CodecType) => ContentTypeSchema;
+export declare const getContentType: (codec: CodecType) => ContentType;

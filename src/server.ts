@@ -9,7 +9,10 @@ const wrappedMiddleware = async (req: Request, res: Response, next: any) => {
     try {
         await apiRouteHandler(req, res)
     } catch (e) {
-        next(e)
+        if (e.helpUrl) {
+            console.error(e.getMessage())
+        }
+        res.status(500).json(e)
     }
 }
 

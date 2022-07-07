@@ -1,6 +1,9 @@
-export declare class IntegrationError extends Error {
-    errorUrl: string;
-}
-export declare class CodecNotFoundError extends IntegrationError {
-    constructor(message: string);
+export declare class IntegrationError {
+    message: string;
+    helpUrl: string;
+    constructor({ message, helpUrl }: {
+        message: any;
+        helpUrl: any;
+    });
+    getMessage(): string;
 }

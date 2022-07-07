@@ -1,9 +1,8 @@
-import _, { Dictionary } from 'lodash'
-import { Product, Category, CustomerGroup, GetCommerceObjectArgs, GetProductsArgs, CommonArgs } from '../../../common/types'
-import { CodecPropertyConfig, CommerceCodec, registerCodec, StringProperty } from '../..'
-import { CommerceAPI } from '../../..'
-import mappers from './mappers'
-import { CodecType } from '../../index'
+import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, Product } from "../../../common";
+import _ from "lodash";
+import { Dictionary } from "lodash";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../../";
+import { StringProperty } from "../../cms-property-types";
 
 type CodecConfig = {
     productURL:         StringProperty
@@ -12,99 +11,73 @@ type CodecConfig = {
     translationsURL:    StringProperty
 }
 
-const properties: CodecConfig = {
-    productURL: {
-        title: "Product file URL",
-        type: "string"
-    },
-    categoryURL: {
-        title: "Category file URL",
-        type: "string"
-    },
-    customerGroupURL: {
-        title: "Customer group file URL",
-        type: "string"
-    },
-    translationsURL: {
-        title: "Translations file URL",
-        type: "string"
-    }
-}
-
 const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
+export class RestCommerceCodecType extends CommerceCodecType {
+    get vendor(): string {
+        return 'rest'
+    }
 
-const restCodec: CommerceCodec = {
-    metadata: {
-        type:   CodecType.commerce,
-        vendor: 'rest',
-        properties
-    },
-    getAPI: async function (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        const categories: Category[] = await fetchFromURL(config.categoryURL, [])
-        const products: Product[] = await fetchFromURL(config.productURL, [])
-        const customerGroups: CustomerGroup[] = await fetchFromURL(config.customerGroupURL, [])
-        const translations: Dictionary<Dictionary<string>> = await fetchFromURL(config.translationsURL, {})
-
-        const api = {
-            getProductsForCategory: (category: Category): Product[] => {
-                return [
-                    ..._.filter(products, prod => _.includes(_.map(prod.categories, 'id'), category.id)),
-                    ..._.flatMap(category.children.map(api.getProductsForCategory))
-                ]
-            },
-            getProduct: (args: GetCommerceObjectArgs) => {
-                return args.id && _.find(products, prod => args.id === prod.id) ||
-                    args.slug && _.find(products, prod => args.slug === prod.slug)
-            },
-            getProducts: (args: GetProductsArgs): Product[] => {
-                let productIds: string[] = args.productIds?.split(',')
-                return productIds && _.filter(products, prod => productIds.includes(prod.id)) ||
-                    args.keyword && _.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1)
-            },
-            getCategory: (args: GetCommerceObjectArgs) => {
-                let category = categories.find(cat => cat.slug === args.slug)
-                if (category) {
-                    return api.populateCategory(category, args)
-                }
-                return null
-            },
-            populateCategory: (category: Category, args: CommonArgs): Category => ({
-                ...category,
-                products: _.take(api.getProductsForCategory(category), 12).map(prod => mappers.mapProduct(prod, args))
-            }),
-            getCustomerGroups: (): CustomerGroup[] => {
-                return customerGroups
-            }
-        }
-
+    get properties(): CodecConfig {
         return {
-            getProduct: async function (args: GetCommerceObjectArgs): Promise<Product> {
-                let product = api.getProduct(args)
-                if (product) {
-                    return mappers.mapProduct(product, args)
-                }
+            productURL: {
+                title: "Product file URL",
+                type: "string"
             },
-            getProducts: async function (args: GetProductsArgs): Promise<Product[]> {
-                let filtered: Product[] = api.getProducts(args)
-                if (filtered) {
-                    return filtered.map(prod => mappers.mapProduct(prod, args))
-                }
-                return null
+            categoryURL: {
+                title: "Category file URL",
+                type: "string"
             },
-            getCategory: async function (args: GetCommerceObjectArgs): Promise<Category> {
-                let category = api.getCategory(args)
-                if (category) {
-                    return mappers.mapCategory(api.populateCategory(category, args))
-                }
-                return null
+            customerGroupURL: {
+                title: "Customer group file URL",
+                type: "string"
             },
-            getMegaMenu: async function (): Promise<Category[]> {
-                return categories.filter(cat => !cat.parent).map(mappers.mapCategory)
-            },
-            getCustomerGroups: async function (): Promise<CustomerGroup[]> {
-                return api.getCustomerGroups()
+            translationsURL: {
+                title: "Translations file URL",
+                type: "string"
             }
         }
     }
+
+    async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
+        return await new RestCommerceCodec(config).init()
+    }
 }
-registerCodec(restCodec)
+
+export class RestCommerceCodec extends CommerceCodec {
+    declare config: CodecPropertyConfig<CodecConfig>
+
+    categories: Category[]
+    products: Product[]
+    customerGroups: CustomerGroup[]
+    translations: Dictionary<Dictionary<string>>
+
+    async cacheMegaMenu(): Promise<void> {
+        this.categories = await fetchFromURL(this.config.categoryURL, [])
+        this.products = await fetchFromURL(this.config.productURL, [])
+        this.customerGroups = await fetchFromURL(this.config.customerGroupURL, [])
+        this.translations = await fetchFromURL(this.config.translationsURL, {})
+        this.megaMenu = this.categories.filter(cat => !cat.parent)
+    }
+
+    async getProducts(args: GetProductsArgs): Promise<Product[]> {
+        if (args.productIds) {
+            return this.products.filter(prod => args.productIds.split(',').includes(prod.id))
+        }
+        else if (args.keyword) {
+            return this.products.filter(prod => prod.name.toLowerCase().indexOf(args.keyword.toLowerCase()) > -1)
+        }
+        else if (args.category) {
+            return [
+                ..._.filter(this.products, prod => _.includes(_.map(prod.categories, 'id'), args.category.id))
+            ]
+        }
+        throw new Error(`getProducts() requires either: productIds, keyword, or category reference`)
+    }
+
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+        return this.customerGroups
+    }
+}
+
+export default RestCommerceCodecType
+registerCodec(new RestCommerceCodecType())

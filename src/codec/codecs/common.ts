@@ -1,8 +1,8 @@
 import { CONSTANTS } from "../../index";
 import { ContentType, ContentTypeSchema, ValidationLevel } from "dc-management-sdk-js";
 import _ from "lodash";
-import { GenericCodec } from "..";
 import { Category } from "../../common/types";
+import { CodecType } from "../../index";
 
 /**
  * @deprecated The method should not be used
@@ -18,45 +18,45 @@ export const flattenCategories = (categories: Category[]) => {
     const allCategories: Category[] = []
     const bulldozeCategories = cat => {
         allCategories.push(cat)
-        cat.children && cat.children.forEach(bulldozeCategories)
+        cat?.children?.forEach(bulldozeCategories)
     }
     categories.forEach(bulldozeCategories)
     return allCategories
 }
 
-export const getContentTypeSchema = (codec: GenericCodec): ContentTypeSchema => {
+export const getContentTypeSchema = (codec: CodecType): ContentTypeSchema => {
     let schema = new ContentTypeSchema()
-    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`
     schema.schemaId = schemaUri
     schema.validationLevel = ValidationLevel.CONTENT_TYPE
     schema.body = JSON.stringify({
         id: schemaUri,
-        title: `${codec.metadata.vendor} integration`,
-        description: `${codec.metadata.vendor} integration`,
+        title: `${codec.vendor} integration`,
+        description: `${codec.vendor} integration`,
         allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
         type: "object",
         properties: {
-            ...codec.metadata.properties,
+            ...codec.properties,
             vendor: {
                 type: 'string',
                 title: 'vendor',
-                const: codec.metadata.vendor
+                const: codec.vendor
             }
         },
-        propertyOrder: Object.keys(codec.metadata.properties)
+        propertyOrder: Object.keys(codec.properties)
     })
     return schema
 }
 
-export const getContentType = (codec: GenericCodec): ContentType => {
+export const getContentType = (codec: CodecType): ContentType => {
     let contentType = new ContentType()
-    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`
+    let schemaUri = `${CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`
     contentType.contentTypeUri = schemaUri
     contentType.settings = {
-        label: `${codec.metadata.vendor} integration`,
+        label: `${codec.vendor} integration`,
         icons: [{
             size: 256,
-            url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.metadata.vendor}.png`
+            url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.vendor}.png`
         }]
     }
     return contentType

@@ -1,8 +1,9 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { sleep } from '../common/util'
 import _ from 'lodash'
-import { CodecPropertyConfig, StringConstProperty, StringProperty } from '..'
+import { CodecPropertyConfig } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
+import { StringProperty } from '../codec/cms-property-types'
 
 export type APIConfiguration = {
     api_url:        StringProperty
@@ -70,7 +71,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
     const authenticate = async (): Promise<AxiosInstance> => {
-        // console.log(`authenticating to ${config.auth_url}`)
+        console.log(`authenticating to ${config.auth_url}`)
 
         if (!authenticatedAxios) {
             let response = await axios.post(config.auth_url, payload, requestConfig)
@@ -118,7 +119,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
         }
 
         try {
-            // console.log(`[ rest ] get ${config.url}`)
+            console.log(`[ rest ] get ${config.url}`)
             return await (await authenticatedAxios.request({ method, ...config })).data
         } catch (error: any) {
             if (error.response?.status === 429) {
@@ -130,9 +131,9 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
                 return null
             }
 
-            if (error.stack) {
-                console.log(error.stack)
-            }
+            // if (error.stack) {
+            //     console.log(error.stack)
+            // }
             console.log(`Error while ${method}ing URL [ ${config.url} ]: ${error.message} ${error.code}`)
         }
     }
