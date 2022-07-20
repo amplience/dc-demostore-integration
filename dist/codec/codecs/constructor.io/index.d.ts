@@ -1,4 +1,4 @@
-import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
+import { CommerceAPI, GetProductsArgs, Product } from "../../../common";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
 import { StringProperty } from "../../cms-property-types";
 declare type CodecConfig = {
@@ -16,6 +16,5 @@ export declare class ConstructorIOCommerceCodec extends CommerceCodec {
     fetch(url: string): Promise<any>;
     cacheMegaMenu(): Promise<void>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }
 export default ConstructorIOCommerceCodecType;

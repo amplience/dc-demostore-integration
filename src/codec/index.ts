@@ -3,6 +3,7 @@ import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI } from '..'
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
 import { IntegrationError } from '../common/errors'
+import { Exception } from '../common/api'
 
 export enum CodecTypes {
     commerce
@@ -92,8 +93,8 @@ export class CommerceCodec implements CommerceAPI {
         return this.megaMenu
     }
 
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        throw new Error('must implement getCustomerGroups')
+    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[] | Exception> {
+        return { exception: `unsupported platform` }
     }
 }
 

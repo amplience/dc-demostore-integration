@@ -1,4 +1,4 @@
-import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
+import { ClientCredentialsConfiguration, CommerceAPI, GetProductsArgs, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
 declare type CodecConfig = UsernamePasswordConfiguration & ClientCredentialsConfiguration;
 export declare class AkeneoCommerceCodecType extends CommerceCodecType {
@@ -13,6 +13,5 @@ export declare class AkeneoCommerceCodec extends CommerceCodec {
     cacheMegaMenu(): Promise<void>;
     fetch(url: string): Promise<any>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }
 export default AkeneoCommerceCodecType;

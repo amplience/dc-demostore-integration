@@ -124,7 +124,7 @@ class CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('must implement getCustomerGroups');
+            return { exception: `unsupported platform` };
         });
     }
 }

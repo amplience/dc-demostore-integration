@@ -1,6 +1,7 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types';
+import { Exception } from '../common/api';
 export declare enum CodecTypes {
     commerce = 0
 }
@@ -29,7 +30,7 @@ export declare class CommerceCodec implements CommerceAPI {
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     getCategory(args: GetCommerceObjectArgs): Promise<Category>;
     getMegaMenu(args: CommonArgs): Promise<Category[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+    getCustomerGroups(args: CommonArgs): Promise<Identifiable[] | Exception>;
 }
 export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];

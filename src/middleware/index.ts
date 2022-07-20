@@ -2,24 +2,41 @@ import { getContentItem, getContentItemFromConfigLocator } from "../amplience";
 import axios from "axios";
 import { CommerceAPI, CONSTANTS, getCommerceCodec } from "../index";
 import { isServer } from "../common/util";
+import { IntegrationError } from "../common/errors";
 
 export type Config = ConfigLocatorBlock | any | undefined
 export type ConfigLocatorBlock = {
     config_locator: string
 }
 
-export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
-const getAPI = async (config: Config): Promise<CommerceAPI> => {
-    if ('config_locator' in config) {
-        let configItem: any = await getContentItemFromConfigLocator(config.config_locator)
-        if (configItem?._meta?.schema === CONSTANTS.demostoreConfigUri) {
-            config = await getContentItem(config.config_locator.split(':')[0], { id: configItem.commerce.id })
+export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
+
+const getCommerceApiForConfigLocator = async (locator: string): Promise<CommerceAPI> => {
+    let configItem: any = await getContentItemFromConfigLocator(locator)
+    if (configItem) {
+        if (configItem._meta?.schema === CONSTANTS.demostoreConfigUri) {
+            return await getCommerceCodec(await getContentItem(locator.split(':')[0], { id: configItem.commerce.id }))
         }
         else {
-            config = configItem
+            return await getCommerceCodec(configItem)
         }
     }
-    return await getCommerceCodec(config)
+}
+
+const getAPI = async (config: Config): Promise<CommerceAPI> => {
+    config = {
+        ...baseConfigLocator,
+        ...config
+    }
+
+    let codec = await getCommerceCodec(config) || await getCommerceApiForConfigLocator(config.config_locator)
+    if (codec) {
+        return codec
+    }
+    throw new IntegrationError({ 
+        message: `no codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`,
+        helpUrl: `https://foo.bar` 
+    })
 }
 
 export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups'
@@ -46,7 +63,7 @@ export const getCommerceAPI = async (params: Config = undefined): Promise<Commer
 }
 
 // handler for /api route
-export const apiRouteHandler = async (req, res) => {
+export const middleware = async (req, res) => {
     // CORS support
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', '*')
@@ -66,3 +83,4 @@ export const apiRouteHandler = async (req, res) => {
             break;
     }
 }
+export default middleware

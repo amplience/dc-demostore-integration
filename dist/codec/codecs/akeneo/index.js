@@ -90,11 +90,6 @@ class AkeneoCommerceCodec extends __1.CommerceCodec {
             return products.map((0, mappers_1.mapProduct)(args));
         });
     }
-    getCustomerGroups(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return [];
-        });
-    }
 }
 exports.AkeneoCommerceCodec = AkeneoCommerceCodec;
 exports.default = AkeneoCommerceCodecType;

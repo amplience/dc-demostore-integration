@@ -103,11 +103,6 @@ class FabricCommerceCodec extends __1.CommerceCodec {
             return products.map(mappers_1.mapProduct);
         });
     }
-    getCustomerGroups(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return [];
-        });
-    }
 }
 exports.FabricCommerceCodec = FabricCommerceCodec;
 exports.default = FabricCommerceCodecType;

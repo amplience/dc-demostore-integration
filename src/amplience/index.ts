@@ -14,7 +14,8 @@ export const getContentItemFromConfigLocator = async (configLocator: string): Pr
     if (lookup?.indexOf('/') === -1) {
         lookup = `config/${lookup}`
     }
-    return await getContentItem(hub, { key: `demostore/${lookup}` })
+    return await getContentItem(hub, { key: `demostore/${lookup}` }) ||
+        await getContentItem(hub, { key: `aria/${lookup}` })
 }
 
 export const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> => {
@@ -28,3 +29,6 @@ export const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfigur
     obj.algolia.indexes = _.keyBy(obj.algolia.indexes, 'key')
     return obj
 }
+
+// getConfig still used in place of getDemoStoreConfig as of v1.1.3
+export const getConfig = getDemoStoreConfig

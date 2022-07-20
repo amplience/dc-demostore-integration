@@ -71,7 +71,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
     let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
     const authenticate = async (): Promise<AxiosInstance> => {
-        console.log(`authenticating to ${config.auth_url}`)
+        // console.log(`authenticating to ${config.auth_url}`)
 
         if (!authenticatedAxios) {
             let response = await axios.post(config.auth_url, payload, requestConfig)
@@ -119,7 +119,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
         }
 
         try {
-            console.log(`[ rest ] get ${config.url}`)
+            // console.log(`[ rest ] get ${config.url}`)
             return await (await authenticatedAxios.request({ method, ...config })).data
         } catch (error: any) {
             if (error.response?.status === 429) {

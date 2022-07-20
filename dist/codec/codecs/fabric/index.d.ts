@@ -1,4 +1,4 @@
-import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthCodecConfiguration, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
+import { CommerceAPI, GetProductsArgs, OAuthCodecConfiguration, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
 import { StringProperty } from "../../cms-property-types";
 declare type CodecConfig = OAuthCodecConfiguration & UsernamePasswordConfiguration & {
@@ -18,6 +18,5 @@ export declare class FabricCommerceCodec extends CommerceCodec {
     fetch(url: string): Promise<any>;
     cacheMegaMenu(): Promise<void>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }
 export default FabricCommerceCodecType;

@@ -8,4 +8,5 @@ export declare const baseConfigLocator: {
 };
 export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups';
 export declare const getCommerceAPI: (params?: Config) => Promise<CommerceAPI>;
-export declare const apiRouteHandler: (req: any, res: any) => Promise<any>;
+export declare const middleware: (req: any, res: any) => Promise<any>;
+export default middleware;

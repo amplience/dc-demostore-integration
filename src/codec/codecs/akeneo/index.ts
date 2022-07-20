@@ -78,10 +78,6 @@ export class AkeneoCommerceCodec extends CommerceCodec {
         }
         return products.map(mapProduct(args))
     }
-
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return []
-    }
 }
 
 export default AkeneoCommerceCodecType

@@ -130,11 +130,6 @@ class ConstructorIOCommerceCodec extends __1.CommerceCodec {
             return products.map(prod => mapProduct(prod, this.megaMenu));
         });
     }
-    getCustomerGroups(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return [];
-        });
-    }
 }
 exports.ConstructorIOCommerceCodec = ConstructorIOCommerceCodec;
 exports.default = ConstructorIOCommerceCodecType;

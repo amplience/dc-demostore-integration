@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDemoStoreConfig = exports.getContentItemFromConfigLocator = exports.getContentItem = void 0;
+exports.getConfig = exports.getDemoStoreConfig = exports.getContentItemFromConfigLocator = exports.getContentItem = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
@@ -27,7 +27,8 @@ const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, voi
     if ((lookup === null || lookup === void 0 ? void 0 : lookup.indexOf('/')) === -1) {
         lookup = `config/${lookup}`;
     }
-    return yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
+    return (yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` })) ||
+        (yield (0, exports.getContentItem)(hub, { key: `aria/${lookup}` }));
 });
 exports.getContentItemFromConfigLocator = getContentItemFromConfigLocator;
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,3 +42,5 @@ const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* 
     return obj;
 });
 exports.getDemoStoreConfig = getDemoStoreConfig;
+// getConfig still used in place of getDemoStoreConfig as of v1.1.3
+exports.getConfig = exports.getDemoStoreConfig;

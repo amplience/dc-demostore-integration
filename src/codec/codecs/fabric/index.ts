@@ -103,10 +103,6 @@ export class FabricCommerceCodec extends CommerceCodec {
 
         return products.map(mapProduct)
     }
-
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return []
-    }
 }
 
 export default FabricCommerceCodecType

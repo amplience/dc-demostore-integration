@@ -47,7 +47,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
-        console.log(`authenticating to ${config.auth_url}`);
+        // console.log(`authenticating to ${config.auth_url}`)
         if (!authenticatedAxios) {
             let response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
             const auth = response.data;
@@ -85,7 +85,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
             status = 'LOGGED_IN';
         }
         try {
-            console.log(`[ rest ] get ${config.url}`);
+            // console.log(`[ rest ] get ${config.url}`)
             return yield (yield authenticatedAxios.request(Object.assign({ method }, config))).data;
         }
         catch (error) {

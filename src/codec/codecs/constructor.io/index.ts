@@ -123,10 +123,6 @@ export class ConstructorIOCommerceCodec extends CommerceCodec {
         }
         return products.map(prod => mapProduct(prod, this.megaMenu))
     }
-
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return []
-    }
 }
 
 export default ConstructorIOCommerceCodecType
