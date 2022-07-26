@@ -9,7 +9,7 @@ export declare class AkeneoCommerceCodecType extends CommerceCodecType {
 export declare class AkeneoCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     rest: OAuthRestClientInterface;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     cacheMegaMenu(): Promise<void>;
     fetch(url: string): Promise<any>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;

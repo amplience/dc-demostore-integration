@@ -14,7 +14,7 @@ export declare class HybrisCommerceCodecType extends CommerceCodecType {
 export declare class HybrisCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     rest: AxiosInstance;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     fetch(url: string): Promise<any>;
     cacheMegaMenu(): Promise<void>;
     getProductById(id: string): Promise<HybrisProduct>;

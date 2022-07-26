@@ -12,7 +12,7 @@ export declare class ConstructorIOCommerceCodecType extends CommerceCodecType {
 }
 export declare class ConstructorIOCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     fetch(url: string): Promise<any>;
     cacheMegaMenu(): Promise<void>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;

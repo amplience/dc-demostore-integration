@@ -72,19 +72,19 @@ class ConstructorIOCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new ConstructorIOCommerceCodec(config).init();
+            return yield new ConstructorIOCommerceCodec(config).init(this);
         });
     }
 }
 exports.ConstructorIOCommerceCodecType = ConstructorIOCommerceCodecType;
 class ConstructorIOCommerceCodec extends __1.CommerceCodec {
     // instance variables
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     fetch(url) {

@@ -30,7 +30,7 @@ class HybrisCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new HybrisCommerceCodec(config).init();
+            return yield new HybrisCommerceCodec(config).init(this);
         });
     }
 }
@@ -44,13 +44,13 @@ const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id:
             attributes: lodash_1.default.zipObject(Object.keys(product), Object.values(product))
         }] }));
 class HybrisCommerceCodec extends __1.CommerceCodec {
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
         return __awaiter(this, void 0, void 0, function* () {
             this.rest = axios_1.default.create({ baseURL: `${this.config.api_url}/occ/v2/${this.config.catalog_id}` });
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     fetch(url) {

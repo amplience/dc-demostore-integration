@@ -35,13 +35,13 @@ class ElasticPathCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new ElasticPathCommerceCodec(config).init();
+            return yield new ElasticPathCommerceCodec(config).init(this);
         });
     }
 }
 exports.ElasticPathCommerceCodecType = ElasticPathCommerceCodecType;
 class ElasticPathCommerceCodec extends __1.CommerceCodec {
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
@@ -55,7 +55,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
                 client_id: this.config.client_id,
                 client_secret: this.config.client_secret
             }));
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     fetch(url) {

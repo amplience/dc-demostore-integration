@@ -34,7 +34,7 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new CommercetoolsCodec(config).init();
+            return yield new CommercetoolsCodec(config).init(this);
         });
     }
 }
@@ -97,7 +97,7 @@ const mapVariant = (args) => (variant) => {
     };
 };
 class CommercetoolsCodec extends __1.CommerceCodec {
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
@@ -111,7 +111,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
                     password: this.config.client_secret
                 }
             });
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     cacheMegaMenu() {
@@ -143,7 +143,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return [];
+            return yield this.fetch(`/customer-groups`);
         });
     }
 }

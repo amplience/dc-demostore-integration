@@ -28,13 +28,13 @@ class AkeneoCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new AkeneoCommerceCodec(config).init();
+            return yield new AkeneoCommerceCodec(config).init(this);
         });
     }
 }
 exports.AkeneoCommerceCodecType = AkeneoCommerceCodecType;
 class AkeneoCommerceCodec extends __1.CommerceCodec {
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
@@ -53,7 +53,7 @@ class AkeneoCommerceCodec extends __1.CommerceCodec {
             }, (auth) => ({
                 Authorization: `Bearer ${auth.access_token}`
             }));
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     cacheMegaMenu() {

@@ -73,7 +73,7 @@ export class ConstructorIOCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new ConstructorIOCommerceCodec(config).init()
+        return await new ConstructorIOCommerceCodec(config).init(this)
     }
 }
 
@@ -81,8 +81,8 @@ export class ConstructorIOCommerceCodec extends CommerceCodec {
     declare config: CodecPropertyConfig<CodecConfig>
 
     // instance variables
-    async init(): Promise<CommerceCodec> {
-        return await super.init()
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
+        return await super.init(codecType)
     }
 
     async fetch(url: string): Promise<any> {

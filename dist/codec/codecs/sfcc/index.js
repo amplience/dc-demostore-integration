@@ -34,7 +34,7 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new SFCCCommerceCodec(config).init();
+            return yield new SFCCCommerceCodec(config).init(this);
         });
     }
 }
@@ -79,7 +79,7 @@ const mapProduct = (product) => {
     };
 };
 class SFCCCommerceCodec extends __1.CommerceCodec {
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
@@ -95,7 +95,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
                     client_id: this.config.client_id
                 }
             });
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     cacheMegaMenu() {

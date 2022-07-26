@@ -42,7 +42,7 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new RestCommerceCodec(config).init();
+            return yield new RestCommerceCodec(config).init(this);
         });
     }
 }

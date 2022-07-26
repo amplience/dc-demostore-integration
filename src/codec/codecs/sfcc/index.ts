@@ -33,7 +33,7 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new SFCCCommerceCodec(config).init()
+        return await new SFCCCommerceCodec(config).init(this)
     }
 }
 
@@ -82,7 +82,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
     shopApi: string
     sitesApi: string
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.shopApi = `/s/${this.config.site_id}/dw/shop/v22_4`
         this.sitesApi = `/s/-/dw/data/v22_4/sites/${this.config.site_id}`
         this.rest = OAuthRestClient({
@@ -97,7 +97,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
                     client_id: this.config.client_id
                 }
             })
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async cacheMegaMenu(): Promise<void> {

@@ -17,7 +17,7 @@ export declare class ElasticPathCommerceCodec extends CommerceCodec {
     moltin: MoltinApi;
     catalog: Moltin.Catalog;
     pricebooks: Moltin.PriceBook[];
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     fetch(url: string): Promise<any>;
     getHierarchyRootNode(category: Category): Category;
     getFileById(id: string): Promise<Moltin.File>;

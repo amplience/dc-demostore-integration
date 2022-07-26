@@ -27,7 +27,7 @@ export class HybrisCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new HybrisCommerceCodec(config).init()
+        return await new HybrisCommerceCodec(config).init(this)
     }
 }
 
@@ -59,9 +59,9 @@ export class HybrisCommerceCodec extends CommerceCodec {
     // instance variables
     rest: AxiosInstance
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.rest = axios.create({ baseURL: `${this.config.api_url}/occ/v2/${this.config.catalog_id}` })
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async fetch(url: string): Promise<any> {

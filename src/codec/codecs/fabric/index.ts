@@ -37,7 +37,7 @@ export class FabricCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new FabricCommerceCodec(config).init()
+        return await new FabricCommerceCodec(config).init(this)
     }
 }
 
@@ -49,7 +49,7 @@ export class FabricCommerceCodec extends CommerceCodec {
     // products: Product[]
     // categories: Category[]
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.rest = OAuthRestClient(this.config, this.config, {
             headers: {
                 'content-type': 'application/json'
@@ -68,7 +68,7 @@ export class FabricCommerceCodec extends CommerceCodec {
                 })
             }
         })
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async fetch(url: string): Promise<any> {

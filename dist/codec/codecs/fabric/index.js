@@ -35,7 +35,7 @@ class FabricCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new FabricCommerceCodec(config).init();
+            return yield new FabricCommerceCodec(config).init(this);
         });
     }
 }
@@ -44,7 +44,7 @@ class FabricCommerceCodec extends __1.CommerceCodec {
     // instance variables
     // products: Product[]
     // categories: Category[]
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
@@ -66,7 +66,7 @@ class FabricCommerceCodec extends __1.CommerceCodec {
                     })
                 };
             });
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     fetch(url) {

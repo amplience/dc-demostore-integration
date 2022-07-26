@@ -32,7 +32,7 @@ class BigCommerceCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new BigCommerceCommerceCodec(config).init();
+            return yield new BigCommerceCommerceCodec(config).init(this);
         });
     }
 }

@@ -16,7 +16,7 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     rest: OAuthRestClientInterface;
     shopApi: string;
     sitesApi: string;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     cacheMegaMenu(): Promise<void>;
     fetch(url: string): Promise<any>;
     authenticatedFetch(url: string): Promise<any>;

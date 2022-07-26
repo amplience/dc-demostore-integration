@@ -34,7 +34,7 @@ export class ElasticPathCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new ElasticPathCommerceCodec(config).init()
+        return await new ElasticPathCommerceCodec(config).init(this)
     }
 }
 
@@ -47,7 +47,7 @@ export class ElasticPathCommerceCodec extends CommerceCodec {
     catalog: Moltin.Catalog
     pricebooks: Moltin.PriceBook[]
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.moltin = MoltinGateway({
             client_id: this.config.client_id,
             client_secret: this.config.client_secret
@@ -58,7 +58,7 @@ export class ElasticPathCommerceCodec extends CommerceCodec {
             client_id: this.config.client_id,
             client_secret: this.config.client_secret
         }))
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async fetch(url: string): Promise<any> {

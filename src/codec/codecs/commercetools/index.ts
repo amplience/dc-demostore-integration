@@ -34,7 +34,7 @@ export class CommercetoolsCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new CommercetoolsCodec(config).init()
+        return await new CommercetoolsCodec(config).init(this)
     }
 }
 
@@ -107,7 +107,7 @@ export class CommercetoolsCodec extends CommerceCodec {
     declare config: CodecPropertyConfig<CodecConfig>
     rest: OAuthRestClientInterface
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.rest = OAuthRestClient({
             api_url: `${this.config.api_url}/${this.config.project}`,
             auth_url: `${this.config.auth_url}?grant_type=client_credentials`
@@ -119,7 +119,7 @@ export class CommercetoolsCodec extends CommerceCodec {
                 password: this.config.client_secret
             }
         })
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async cacheMegaMenu(): Promise<void> {
@@ -147,7 +147,7 @@ export class CommercetoolsCodec extends CommerceCodec {
     }
 
     async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return []
+        return await this.fetch(`/customer-groups`)
     }
 }
 

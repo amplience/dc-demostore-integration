@@ -31,7 +31,7 @@ export class BigCommerceCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new BigCommerceCommerceCodec(config).init()
+        return await new BigCommerceCommerceCodec(config).init(this)
     }
 }
 

@@ -39,7 +39,7 @@ export class RestCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new RestCommerceCodec(config).init()
+        return await new RestCommerceCodec(config).init(this)
     }
 }
 

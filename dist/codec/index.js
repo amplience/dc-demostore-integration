@@ -38,10 +38,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCommerceCodec = exports.defaultArgs = exports.getCodec = exports.registerCodec = exports.getCodecs = exports.CommerceCodec = exports.CommerceCodecType = exports.CodecType = exports.CodecTypes = void 0;
+exports.getCommerceCodec = exports.defaultArgs = exports.getCodec = exports.registerCodec = exports.getCodecs = exports.getRandom = exports.CommerceCodec = exports.CodecTestOperationType = exports.CommerceCodecType = exports.CodecType = exports.CodecTypes = void 0;
 const util_1 = require("../common/util");
 const lodash_1 = __importDefault(require("lodash"));
-const errors_1 = require("../common/errors");
+const __1 = require("..");
 var CodecTypes;
 (function (CodecTypes) {
     CodecTypes[CodecTypes["commerce"] = 0] = "commerce";
@@ -70,14 +70,26 @@ class CommerceCodecType extends CodecType {
     }
 }
 exports.CommerceCodecType = CommerceCodecType;
+var CodecTestOperationType;
+(function (CodecTestOperationType) {
+    CodecTestOperationType[CodecTestOperationType["megaMenu"] = 0] = "megaMenu";
+    CodecTestOperationType[CodecTestOperationType["getCategory"] = 1] = "getCategory";
+    CodecTestOperationType[CodecTestOperationType["getProductById"] = 2] = "getProductById";
+    CodecTestOperationType[CodecTestOperationType["getProductsByKeyword"] = 3] = "getProductsByKeyword";
+    CodecTestOperationType[CodecTestOperationType["getProductsByProductIds"] = 4] = "getProductsByProductIds";
+    CodecTestOperationType[CodecTestOperationType["getCustomerGroups"] = 5] = "getCustomerGroups";
+})(CodecTestOperationType = exports.CodecTestOperationType || (exports.CodecTestOperationType = {}));
 class CommerceCodec {
     constructor(config) {
         this.megaMenu = [];
         this.config = config;
     }
-    init() {
+    init(codecType) {
         return __awaiter(this, void 0, void 0, function* () {
+            const startInit = new Date().valueOf();
             yield this.cacheMegaMenu();
+            this.initDuration = new Date().valueOf() - startInit;
+            this.codecType = codecType;
             if (this.megaMenu.length === 0) {
                 console.warn(`megaMenu has no categories, check setup`);
             }
@@ -106,7 +118,8 @@ class CommerceCodec {
     }
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            throw new Error('must implement getProducts');
+            console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`);
+            return [];
         });
     }
     // defined in terms of getMegaMenu, effectively
@@ -124,11 +137,83 @@ class CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return { exception: `unsupported platform` };
+            console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`);
+            return [];
+        });
+    }
+    testIntegration() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let results = [{
+                    operationType: CodecTestOperationType.megaMenu,
+                    description: 'cache the megamenu',
+                    arguments: '',
+                    duration: this.initDuration,
+                    results: this.megaMenu
+                }];
+            // 2: get a category by slug, which is done implicitly for all categories here
+            let categories = yield Promise.all((0, __1.flattenCategories)(this.megaMenu).map((c) => __awaiter(this, void 0, void 0, function* () {
+                let categoryStart = new Date().valueOf();
+                let category = yield this.getCategory(c);
+                results.push({
+                    operationType: CodecTestOperationType.getCategory,
+                    description: `get category by slug`,
+                    arguments: category.slug,
+                    duration: new Date().valueOf() - categoryStart,
+                    results: category
+                });
+                return category;
+            })));
+            let productCategory = categories.find(cat => cat.products.length > 0);
+            // 3: get a single product by id
+            let singleProductStart = new Date().valueOf();
+            let singleProductById = yield this.getProduct((0, exports.getRandom)(productCategory.products));
+            results.push({
+                operationType: CodecTestOperationType.getProductById,
+                description: `get product by id`,
+                arguments: singleProductById.id,
+                duration: new Date().valueOf() - singleProductStart,
+                results: singleProductById
+            });
+            // 4: search for a product
+            let keywordStart = new Date().valueOf();
+            let keyword = singleProductById.name.split(' ').pop();
+            let searchResults = yield this.getProducts({ keyword });
+            results.push({
+                operationType: CodecTestOperationType.getProductsByKeyword,
+                description: `get products by search keyword`,
+                arguments: keyword,
+                duration: new Date().valueOf() - keywordStart,
+                results: searchResults
+            });
+            // 5: get a list of products given a list of product ids
+            let prodsStart = new Date().valueOf();
+            let prods = [singleProductById, ...lodash_1.default.take(searchResults, 1)];
+            let productIds = prods.map(product => product.id).join(',');
+            let productsByProductId = yield this.getProducts({ productIds });
+            results.push({
+                operationType: CodecTestOperationType.getProductsByProductIds,
+                description: `get products by product ids`,
+                arguments: productIds,
+                duration: new Date().valueOf() - prodsStart,
+                results: productsByProductId
+            });
+            // 6: get a list of customer groups
+            let customerGroupStart = new Date().valueOf();
+            let customerGroups = yield this.getCustomerGroups({});
+            results.push({
+                operationType: CodecTestOperationType.getCustomerGroups,
+                description: `get customer groups`,
+                arguments: '',
+                duration: new Date().valueOf() - customerGroupStart,
+                results: customerGroups
+            });
+            return results;
         });
     }
 }
 exports.CommerceCodec = CommerceCodec;
+const getRandom = (array) => array[Math.floor(Math.random() * (array.length - 1))];
+exports.getRandom = getRandom;
 const codecs = new Map();
 codecs[CodecTypes.commerce] = [];
 // public interface
@@ -150,15 +235,16 @@ const maskSensitiveData = (obj) => {
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
     let codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.properties), Object.keys(config)).length === 0);
     if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-        throw new errors_1.IntegrationError({
-            message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
-            helpUrl: `https://help.dc-demostore.com/codec-error`
-        });
+        return null;
+        // throw new IntegrationError({
+        //     message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
+        //     helpUrl: `https://help.dc-demostore.com/codec-error`
+        // })
     }
     let configHash = lodash_1.default.values(config).join('');
     if (!apis[configHash]) {
         let CType = lodash_1.default.first(codecsMatchingConfig);
-        console.log(`[ demostore ] creating codec: ${CType.vendor}...`);
+        // console.log(`[ demostore ] creating codec: ${CType.vendor}...`)
         let api = yield CType.getApi(config);
         apis[configHash] = api;
         // apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {

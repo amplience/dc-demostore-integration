@@ -8,7 +8,7 @@ export declare class TemplateCommerceCodecType extends CommerceCodecType {
 }
 export declare class TemplateCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }

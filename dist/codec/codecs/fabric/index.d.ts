@@ -14,7 +14,7 @@ export declare class FabricCommerceCodecType extends CommerceCodecType {
 export declare class FabricCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     rest: OAuthRestClientInterface;
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     fetch(url: string): Promise<any>;
     cacheMegaMenu(): Promise<void>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;

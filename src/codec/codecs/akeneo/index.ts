@@ -23,7 +23,7 @@ export class AkeneoCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new AkeneoCommerceCodec(config).init()
+        return await new AkeneoCommerceCodec(config).init(this)
     }
 }
 
@@ -31,7 +31,7 @@ export class AkeneoCommerceCodec extends CommerceCodec {
     declare config: CodecPropertyConfig<CodecConfig>
     rest: OAuthRestClientInterface
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         this.rest = OAuthRestClient({
             api_url: `${this.config.api_url}/api/rest/v1`,
             auth_url: `${this.config.api_url}/api/oauth/v1/token`
@@ -46,7 +46,7 @@ export class AkeneoCommerceCodec extends CommerceCodec {
         }, (auth: any) => ({
             Authorization: `Bearer ${auth.access_token}`
         }))
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async cacheMegaMenu(): Promise<void> {

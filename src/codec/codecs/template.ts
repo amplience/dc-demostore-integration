@@ -23,7 +23,7 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
     }
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new TemplateCommerceCodec(config).init()
+        return await new TemplateCommerceCodec(config).init(this)
     }
 }
 
@@ -34,10 +34,10 @@ export class TemplateCommerceCodec extends CommerceCodec {
     // products: Product[]
     // categories: Category[]
 
-    async init(): Promise<CommerceCodec> {
+    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
         // this.products = await fetchFromURL(this.config.productURL, [])
         // this.megaMenu = this.categories.filter(cat => !cat.parent)
-        return await super.init()
+        return await super.init(codecType)
     }
 
     async getProducts(args: GetProductsArgs): Promise<Product[]> {

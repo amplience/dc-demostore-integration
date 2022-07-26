@@ -25,7 +25,7 @@ class TemplateCommerceCodecType extends __1.CommerceCodecType {
     }
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield new TemplateCommerceCodec(config).init();
+            return yield new TemplateCommerceCodec(config).init(this);
         });
     }
 }
@@ -34,14 +34,14 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
     // instance variables
     // products: Product[]
     // categories: Category[]
-    init() {
+    init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
         return __awaiter(this, void 0, void 0, function* () {
             // this.products = await fetchFromURL(this.config.productURL, [])
             // this.megaMenu = this.categories.filter(cat => !cat.parent)
-            return yield _super.init.call(this);
+            return yield _super.init.call(this, codecType);
         });
     }
     getProducts(args) {

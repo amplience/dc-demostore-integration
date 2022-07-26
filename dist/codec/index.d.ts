@@ -1,7 +1,6 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types';
-import { Exception } from '../common/api';
 export declare enum CodecTypes {
     commerce = 0
 }
@@ -19,19 +18,38 @@ export declare class CommerceCodecType extends CodecType {
     get type(): CodecTypes;
     getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI>;
 }
+export declare enum CodecTestOperationType {
+    megaMenu = 0,
+    getCategory = 1,
+    getProductById = 2,
+    getProductsByKeyword = 3,
+    getProductsByProductIds = 4,
+    getCustomerGroups = 5
+}
+export interface CodecTestResult {
+    operationType: CodecTestOperationType;
+    description: string;
+    arguments: string;
+    duration: number;
+    results: any;
+}
 export declare class CommerceCodec implements CommerceAPI {
     config: CodecPropertyConfig<Dictionary<AnyProperty>>;
     megaMenu: Category[];
+    codecType: CommerceCodecType;
+    initDuration: number;
     constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>);
-    init(): Promise<CommerceCodec>;
+    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     findCategory(slug: string): Category;
     cacheMegaMenu(): Promise<void>;
     getProduct(args: GetCommerceObjectArgs): Promise<Product>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     getCategory(args: GetCommerceObjectArgs): Promise<Category>;
     getMegaMenu(args: CommonArgs): Promise<Category[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[] | Exception>;
+    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+    testIntegration(): Promise<CodecTestResult[]>;
 }
+export declare const getRandom: <T>(array: T[]) => T;
 export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
