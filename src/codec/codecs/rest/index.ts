@@ -2,7 +2,7 @@ import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Iden
 import _ from "lodash";
 import { Dictionary } from "lodash";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../../";
-import { StringProperty } from "../../cms-property-types";
+import { StringProperty, StringPatterns } from "../../cms-property-types";
 
 type CodecConfig = {
     productURL:         StringProperty
@@ -21,19 +21,23 @@ export class RestCommerceCodecType extends CommerceCodecType {
         return {
             productURL: {
                 title: "Product file URL",
-                type: "string"
+                type: "string",
+                pattern: StringPatterns.anyUrl
             },
             categoryURL: {
                 title: "Category file URL",
-                type: "string"
+                type: "string",
+                pattern: StringPatterns.anyUrl
             },
             customerGroupURL: {
                 title: "Customer group file URL",
-                type: "string"
+                type: "string",
+                pattern: StringPatterns.anyUrl
             },
             translationsURL: {
                 title: "Translations file URL",
-                type: "string"
+                type: "string",
+                pattern: StringPatterns.anyUrl
             }
         }
     }
@@ -80,4 +84,4 @@ export class RestCommerceCodec extends CommerceCodec {
 }
 
 export default RestCommerceCodecType
-registerCodec(new RestCommerceCodecType())
+// registerCodec(new RestCommerceCodecType())

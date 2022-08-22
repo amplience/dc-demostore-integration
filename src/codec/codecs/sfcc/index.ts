@@ -152,4 +152,4 @@ export class SFCCCommerceCodec extends CommerceCodec {
 }
 
 export default SFCCCommerceCodecType
-registerCodec(new SFCCCommerceCodecType())
+// registerCodec(new SFCCCommerceCodecType())

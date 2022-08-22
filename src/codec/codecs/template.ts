@@ -56,4 +56,4 @@ export class TemplateCommerceCodec extends CommerceCodec {
 }
 
 export default TemplateCommerceCodecType
-registerCodec(new TemplateCommerceCodecType())
+// registerCodec(new TemplateCommerceCodecType())

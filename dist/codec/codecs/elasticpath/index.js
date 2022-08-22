@@ -16,6 +16,7 @@ exports.ElasticPathCommerceCodec = exports.ElasticPathCommerceCodecType = void 0
 const common_1 = require("../../../common");
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../..");
+const cms_property_types_1 = require("../../cms-property-types");
 const qs_1 = __importDefault(require("qs"));
 const sdk_1 = require("@moltin/sdk");
 const slugify_1 = __importDefault(require("slugify"));
@@ -27,10 +28,12 @@ class ElasticPathCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return Object.assign(Object.assign(Object.assign({}, common_1.OAuthProperties), common_1.ClientCredentialProperties), { pcm_url: {
                 title: "PCM URL",
-                type: "string"
+                type: "string",
+                pattern: cms_property_types_1.StringPatterns.httpUrl
             }, catalog_name: {
                 title: "Catalog name",
-                type: "string"
+                type: "string",
+                minLength: 1
             } });
     }
     getApi(config) {
@@ -223,4 +226,4 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
 }
 exports.ElasticPathCommerceCodec = ElasticPathCommerceCodec;
 exports.default = ElasticPathCommerceCodecType;
-(0, __1.registerCodec)(new ElasticPathCommerceCodecType());
+// registerCodec(new ElasticPathCommerceCodecType())

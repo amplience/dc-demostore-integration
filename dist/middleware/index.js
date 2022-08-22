@@ -12,35 +12,25 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.middleware = exports.getCommerceAPI = exports.baseConfigLocator = void 0;
+exports.middleware = exports.getCommerceAPI = void 0;
 const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
-const errors_1 = require("../common/errors");
-exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
-const getCommerceApiForConfigLocator = (locator) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(locator);
-    if (configItem) {
-        if (((_a = configItem._meta) === null || _a === void 0 ? void 0 : _a.schema) === index_1.CONSTANTS.demostoreConfigUri) {
-            return yield (0, index_1.getCommerceCodec)(yield (0, amplience_1.getContentItem)(locator.split(':')[0], { id: configItem.commerce.id }));
-        }
-        else {
-            return yield (0, index_1.getCommerceCodec)(configItem);
-        }
-    }
-});
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
-    config = Object.assign(Object.assign({}, exports.baseConfigLocator), config);
-    let codec = (yield (0, index_1.getCommerceCodec)(config)) || (yield getCommerceApiForConfigLocator(config.config_locator));
-    if (codec) {
-        return codec;
+    // we are passed in an object here
+    //   - if it does not the key 'config_locator', it is assumed to be the config block for a codec
+    //   - else retrieve the object
+    //     - if the schema of the object is NOT the demostoreconfig, it is assumed to be the config block
+    //     - else retrieve the object with id <demostoreconfig.commerce.id>
+    if ('config_locator' in config) {
+        const [hub, _] = config.config_locator.split(':');
+        config = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
+        if (config._meta.schema === index_1.CONSTANTS.demostoreConfigUri) {
+            config = yield (0, amplience_1.getContentItem)(hub, config.commerce);
+        }
     }
-    throw new errors_1.IntegrationError({
-        message: `no codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`,
-        helpUrl: `https://foo.bar`
-    });
+    return yield (0, index_1.getCommerceCodec)(config);
 });
 // getCommerceAPI is the main client interaction point with the integration layer
 const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {

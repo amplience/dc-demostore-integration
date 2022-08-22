@@ -62,11 +62,13 @@ class ConstructorIOCommerceCodecType extends __1.CommerceCodecType {
         return {
             api_key: {
                 title: "API Key",
-                type: "string"
+                type: "string",
+                minLength: 1
             },
             api_token: {
                 title: "API Token",
-                type: "string"
+                type: "string",
+                minLength: 1
             }
         };
     }
@@ -133,4 +135,4 @@ class ConstructorIOCommerceCodec extends __1.CommerceCodec {
 }
 exports.ConstructorIOCommerceCodec = ConstructorIOCommerceCodec;
 exports.default = ConstructorIOCommerceCodecType;
-(0, __1.registerCodec)(new ConstructorIOCommerceCodecType());
+// registerCodec(new ConstructorIOCommerceCodecType())

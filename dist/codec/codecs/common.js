@@ -1,18 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentType = exports.getContentTypeSchema = exports.flattenCategories = exports.findInMegaMenu = void 0;
-const index_1 = require("../../index");
+exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.flattenCategories = exports.findInMegaMenu = void 0;
+const __1 = require("../..");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
-/**
- * @deprecated The method should not be used
- */
 const findInMegaMenu = (categories, slug) => {
     return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
 exports.findInMegaMenu = findInMegaMenu;
-/**
- * @deprecated The method should not be used
- */
 const flattenCategories = (categories) => {
     const allCategories = [];
     const bulldozeCategories = cat => {
@@ -24,38 +18,86 @@ const flattenCategories = (categories) => {
     return allCategories;
 };
 exports.flattenCategories = flattenCategories;
-const getContentTypeSchema = (codec) => {
-    let schema = new dc_management_sdk_js_1.ContentTypeSchema();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`;
-    schema.schemaId = schemaUri;
-    schema.validationLevel = dc_management_sdk_js_1.ValidationLevel.CONTENT_TYPE;
-    schema.body = JSON.stringify({
-        id: schemaUri,
-        title: `${codec.vendor} integration`,
-        description: `${codec.vendor} integration`,
-        allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
-        type: "object",
-        properties: Object.assign(Object.assign({}, codec.properties), { vendor: {
-                type: 'string',
-                title: 'vendor',
-                const: codec.vendor
-            } }),
-        propertyOrder: Object.keys(codec.properties)
-    });
-    return schema;
+exports.CTypes = {
+    demostoreconfig: {
+        label: `demostore config`,
+        schemaUri: __1.CONSTANTS.demostoreConfigUri,
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/627/627495.png",
+        schema: {
+            properties: {
+                url: {
+                    title: "App deployment URL",
+                    type: "string",
+                    minLength: 0,
+                    maxLength: 200
+                },
+                algolia: {
+                    title: "Algolia configuration",
+                    type: "object",
+                    allOf: [{ $ref: "https://demostore.amplience.com/site/integration/algolia#/definitions/config" }]
+                },
+                cms: {
+                    title: "Amplience configuration",
+                    type: "object",
+                    allOf: [{ $ref: "https://demostore.amplience.com/site/integration/amplience#/definitions/config" }]
+                },
+                commerce: {
+                    title: "Commerce integration",
+                    allOf: [
+                        { $ref: "http://bigcontent.io/cms/schema/v1/core#/definitions/content-reference" },
+                        {
+                            "properties": {
+                                "contentType": {
+                                    "enum": [
+                                        "https://demostore.amplience.com/site/integration/rest"
+                                    ]
+                                }
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    rest: {
+        label: `generic rest commerce configuration`,
+        schemaUri: `${__1.CONSTANTS.demostoreIntegrationUri}/rest`,
+        iconUrl: '',
+        schema: { properties: {} }
+    },
+    automation: {
+        label: `demostore automation`,
+        schemaUri: `https://demostore.amplience.com/site/automation`,
+        iconUrl: `https://cdn-icons-png.flaticon.com/512/3662/3662817.png`,
+        schema: { properties: {} }
+    }
 };
-exports.getContentTypeSchema = getContentTypeSchema;
-const getContentType = (codec) => {
+const getContentType = (ctype) => {
     let contentType = new dc_management_sdk_js_1.ContentType();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.vendor}`;
-    contentType.contentTypeUri = schemaUri;
+    contentType.contentTypeUri = ctype.schemaUri;
     contentType.settings = {
-        label: `${codec.vendor} integration`,
+        label: ctype.label,
         icons: [{
                 size: 256,
-                url: `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${codec.vendor}.png`
+                url: ctype.iconUrl
             }]
     };
     return contentType;
 };
 exports.getContentType = getContentType;
+const getContentTypeSchema = (ctype) => {
+    let schema = new dc_management_sdk_js_1.ContentTypeSchema();
+    schema.schemaId = schema.id = ctype.schemaUri;
+    schema.validationLevel = dc_management_sdk_js_1.ValidationLevel.CONTENT_TYPE;
+    schema.body = JSON.stringify({
+        id: ctype.schemaUri,
+        title: ctype.label,
+        description: ctype.label,
+        allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
+        type: "object",
+        properties: ctype.schema.properties,
+        propertyOrder: Object.keys(ctype.schema.properties)
+    });
+    return schema;
+};
+exports.getContentTypeSchema = getContentTypeSchema;

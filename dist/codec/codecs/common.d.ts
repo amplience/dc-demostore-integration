@@ -1,13 +1,18 @@
 import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
+import { Dictionary } from "lodash";
 import { Category } from "../../common/types";
-import { CodecType } from "../../index";
-/**
- * @deprecated The method should not be used
- */
 export declare const findInMegaMenu: (categories: Category[], slug: string) => Category;
-/**
- * @deprecated The method should not be used
- */
 export declare const flattenCategories: (categories: Category[]) => Category[];
-export declare const getContentTypeSchema: (codec: CodecType) => ContentTypeSchema;
-export declare const getContentType: (codec: CodecType) => ContentType;
+export interface CTypeSchema {
+    definitions?: any;
+    properties: any;
+}
+export interface CType {
+    label: string;
+    schemaUri: string;
+    iconUrl: string;
+    schema: CTypeSchema;
+}
+export declare const CTypes: Dictionary<CType>;
+export declare const getContentType: (ctype: CType) => ContentType;
+export declare const getContentTypeSchema: (ctype: CType) => ContentTypeSchema;

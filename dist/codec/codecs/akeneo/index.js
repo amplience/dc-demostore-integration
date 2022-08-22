@@ -93,4 +93,4 @@ class AkeneoCommerceCodec extends __1.CommerceCodec {
 }
 exports.AkeneoCommerceCodec = AkeneoCommerceCodec;
 exports.default = AkeneoCommerceCodecType;
-(0, __1.registerCodec)(new AkeneoCommerceCodecType());
+// registerCodec(new AkeneoCommerceCodecType())

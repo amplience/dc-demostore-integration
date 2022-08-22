@@ -16,32 +16,39 @@ exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProp
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../common/util");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
+const cms_property_types_1 = require("../codec/cms-property-types");
 exports.UsernamePasswordProperties = {
     username: {
         title: "Username",
-        type: "string"
+        type: "string",
+        minLength: 1
     },
     password: {
         title: "Password",
-        type: "string"
+        type: "string",
+        minLength: 1
     }
 };
 exports.APIProperties = {
     api_url: {
         title: "Base API URL",
-        type: "string"
+        type: "string",
+        pattern: cms_property_types_1.StringPatterns.httpUrl
     }
 };
 exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties), { auth_url: {
         title: "Oauth URL",
-        type: "string"
+        type: "string",
+        pattern: cms_property_types_1.StringPatterns.httpUrl
     } });
 exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAuthProperties), { client_id: {
         title: "Client ID",
-        type: "string"
+        type: "string",
+        minLength: 1
     }, client_secret: {
         title: "Client secret",
-        type: "string"
+        type: "string",
+        minLength: 1
     } });
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;

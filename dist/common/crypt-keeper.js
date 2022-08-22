@@ -11,11 +11,7 @@ const reverseString = str => str.split("").reverse().join("");
 const CryptKeeper = (config, hub) => {
     const hash = `${reverseString(lodash_1.default.last(config._meta.deliveryId.split('-')))}${hub}${lodash_1.default.last(config._meta.schema.split('/'))}${reverseString(lodash_1.default.first(config._meta.deliveryId.split('-')))}`;
     const encryptAES = (text) => crypto_js_1.default.AES.encrypt(text, hash).toString();
-    const decryptAES = (text) => {
-        const bytes = crypto_js_1.default.AES.decrypt(text, hash);
-        const originalText = bytes.toString(crypto_js_1.default.enc.Utf8);
-        return originalText;
-    };
+    const decryptAES = (text) => crypto_js_1.default.AES.decrypt(text, hash).toString(crypto_js_1.default.enc.Utf8);
     const encrypt = (text) => text.startsWith('===') && text.endsWith('===') ? text : `===${(0, rot47_1.default)(reverseString(encryptAES(text)))}===`;
     const decrypt = (text) => text.startsWith('===') && text.endsWith('===') ? decryptAES(reverseString((0, rot47_1.default)(text.substring(3, text.length - 3)))) : text;
     return {

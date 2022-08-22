@@ -15,31 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getConfig = exports.getDemoStoreConfig = exports.getContentItemFromConfigLocator = exports.getContentItem = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
+const errors_1 = require("../common/errors");
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
-    // console.log(`[ amp ] https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
     return response.status === 200 ? (0, crypt_keeper_1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });
 exports.getContentItem = getContentItem;
 const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
     let [hub, lookup] = configLocator.split(':');
-    if ((lookup === null || lookup === void 0 ? void 0 : lookup.indexOf('/')) === -1) {
-        lookup = `config/${lookup}`;
+    let contentItem = yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
+    if (!contentItem) {
+        // todo: add help url
+        throw new errors_1.IntegrationError({
+            message: `no content item found for config_locator ${configLocator}`,
+            helpUrl: ``
+        });
     }
-    return (yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` })) ||
-        (yield (0, exports.getContentItem)(hub, { key: `aria/${lookup}` }));
+    return contentItem;
 });
 exports.getContentItemFromConfigLocator = getContentItemFromConfigLocator;
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
     let obj = yield (0, exports.getContentItemFromConfigLocator)(key);
-    if (!obj) {
-        throw `[ demostore ] Couldn't find config with key '${key}'`;
-    }
-    // obj.commerce = obj.commerce && await getContentItem(hub, { id: obj.commerce.id })
-    obj.algolia.credentials = lodash_1.default.keyBy(obj.algolia.credentials, 'key');
-    obj.algolia.indexes = lodash_1.default.keyBy(obj.algolia.indexes, 'key');
-    return obj;
+    return Object.assign(Object.assign({}, obj), { algolia: {
+            credentials: lodash_1.default.keyBy(obj.algolia.credentials, 'key'),
+            indexes: lodash_1.default.keyBy(obj.algolia.indexes, 'key')
+        } });
 });
 exports.getDemoStoreConfig = getDemoStoreConfig;
 // getConfig still used in place of getDemoStoreConfig as of v1.1.3

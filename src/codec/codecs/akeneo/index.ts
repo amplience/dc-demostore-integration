@@ -1,7 +1,7 @@
 import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, OAuthRestClient, OAuthRestClientInterface, Product, UsernamePasswordConfiguration, UsernamePasswordProperties } from "../../../common";
 import _ from "lodash";
 import { Dictionary } from "lodash";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec, CTypeSchema } from "../..";
 import { StringProperty } from "../../cms-property-types";
 import { AkeneoCategory, AkeneoProduct } from "./types";
 import { mapCategory, mapProduct } from "./mappers";
@@ -81,4 +81,4 @@ export class AkeneoCommerceCodec extends CommerceCodec {
 }
 
 export default AkeneoCommerceCodecType
-registerCodec(new AkeneoCommerceCodecType())
+// registerCodec(new AkeneoCommerceCodecType())

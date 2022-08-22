@@ -1,4 +1,3 @@
-
 export type Property = {
     title: string;
 };
@@ -35,3 +34,8 @@ export type ArrayProperty = Property & {
     required?: boolean;
     uniqueItems?: boolean;
 };
+
+export const StringPatterns = {
+    anyUrl: ".+://.+",
+    httpUrl: "https?://.+"
+}

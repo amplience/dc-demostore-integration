@@ -2,7 +2,7 @@ import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, C
 import _ from "lodash";
 import { Dictionary } from "lodash";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
+import { StringProperty, StringPatterns } from "../../cms-property-types";
 import qs from "qs";
 import Moltin, { gateway as MoltinGateway, Moltin as MoltinApi, PriceBookPriceBase } from '@moltin/sdk'
 import slugify from "slugify";
@@ -24,11 +24,13 @@ export class ElasticPathCommerceCodecType extends CommerceCodecType {
             ...ClientCredentialProperties,
             pcm_url: {
                 title: "PCM URL",
-                type: "string"
+                type: "string",
+                pattern: StringPatterns.httpUrl
             },
             catalog_name: {
                 title: "Catalog name",
-                type: "string"
+                type: "string",
+                minLength: 1
             }
         }
     }
@@ -225,4 +227,4 @@ export class ElasticPathCommerceCodec extends CommerceCodec {
 }
 
 export default ElasticPathCommerceCodecType
-registerCodec(new ElasticPathCommerceCodecType())
+// registerCodec(new ElasticPathCommerceCodecType())

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestCommerceCodec = exports.RestCommerceCodecType = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../../");
+const cms_property_types_1 = require("../../cms-property-types");
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 class RestCommerceCodecType extends __1.CommerceCodecType {
     get vendor() {
@@ -24,19 +25,23 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
         return {
             productURL: {
                 title: "Product file URL",
-                type: "string"
+                type: "string",
+                pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             categoryURL: {
                 title: "Category file URL",
-                type: "string"
+                type: "string",
+                pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             customerGroupURL: {
                 title: "Customer group file URL",
-                type: "string"
+                type: "string",
+                pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             translationsURL: {
                 title: "Translations file URL",
-                type: "string"
+                type: "string",
+                pattern: cms_property_types_1.StringPatterns.anyUrl
             }
         };
     }
@@ -81,4 +86,4 @@ class RestCommerceCodec extends __1.CommerceCodec {
 }
 exports.RestCommerceCodec = RestCommerceCodec;
 exports.default = RestCommerceCodecType;
-(0, __1.registerCodec)(new RestCommerceCodecType());
+// registerCodec(new RestCommerceCodecType())

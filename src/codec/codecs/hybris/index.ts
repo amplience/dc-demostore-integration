@@ -21,7 +21,8 @@ export class HybrisCommerceCodecType extends CommerceCodecType {
             ...APIProperties,
             catalog_id: {
                 title: "Catalog ID",
-                type: "string"
+                type: "string",
+                minLength: 1
             }
         }
     }
@@ -97,4 +98,4 @@ export class HybrisCommerceCodec extends CommerceCodec {
 }
 
 export default HybrisCommerceCodecType
-registerCodec(new HybrisCommerceCodecType())
+// registerCodec(new HybrisCommerceCodecType())

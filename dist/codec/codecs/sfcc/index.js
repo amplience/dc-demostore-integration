@@ -158,4 +158,4 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
 }
 exports.SFCCCommerceCodec = SFCCCommerceCodec;
 exports.default = SFCCCommerceCodecType;
-(0, __1.registerCodec)(new SFCCCommerceCodecType());
+// registerCodec(new SFCCCommerceCodecType())

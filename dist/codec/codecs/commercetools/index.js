@@ -25,7 +25,8 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { project: {
                 title: "project key",
-                type: "string"
+                type: "string",
+                minLength: 1
             }, scope: {
                 title: "scope",
                 type: "string",
@@ -149,4 +150,4 @@ class CommercetoolsCodec extends __1.CommerceCodec {
 }
 exports.CommercetoolsCodec = CommercetoolsCodec;
 exports.default = CommercetoolsCodecType;
-(0, __1.registerCodec)(new CommercetoolsCodecType());
+// registerCodec(new CommercetoolsCodecType())

@@ -18,11 +18,10 @@ const mapCategory = (categories) => (category) => ({
 exports.mapCategory = mapCategory;
 const findValue = (values) => { var _a; return values && ((_a = values.find(value => !value.locale || value.locale === 'en_US')) === null || _a === void 0 ? void 0 : _a.data); };
 const mapProduct = (args) => (product) => {
-    args = Object.assign(Object.assign({}, codec_1.defaultArgs), args);
     const prices = findValue(product.values.price);
     let price = '--';
     if (prices) {
-        let locationPrice = prices.find(p => p.currency === args.currency);
+        let locationPrice = prices.find(p => p.currency === args.currency || codec_1.defaultArgs.currency);
         if (locationPrice) {
             price = (0, util_1.formatMoneyString)(locationPrice.amount, args);
         }

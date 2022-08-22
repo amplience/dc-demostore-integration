@@ -63,4 +63,4 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
 }
 exports.TemplateCommerceCodec = TemplateCommerceCodec;
 exports.default = TemplateCommerceCodecType;
-(0, __1.registerCodec)(new TemplateCommerceCodecType());
+// registerCodec(new TemplateCommerceCodecType())

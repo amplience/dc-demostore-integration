@@ -15,10 +15,6 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CONSTANTS = void 0;
-__exportStar(require("./amplience"), exports);
-__exportStar(require("./codec"), exports);
-__exportStar(require("./common"), exports);
-__exportStar(require("./middleware"), exports);
 const demostoreBaseUri = process.env.NEXT_PUBLIC_DEMOSTORE_BASE_URI || `https://demostore.amplience.com`;
 const demostoreSiteUri = `${demostoreBaseUri}/site`;
 const demostoreIntegrationUri = `${demostoreSiteUri}/integration`;
@@ -31,3 +27,9 @@ exports.CONSTANTS = {
     demostoreConfigUri,
     demostoreProductGridUri
 };
+// initialize codecs
+require("./codec");
+__exportStar(require("./codec"), exports);
+__exportStar(require("./amplience"), exports);
+__exportStar(require("./common"), exports);
+__exportStar(require("./middleware"), exports);

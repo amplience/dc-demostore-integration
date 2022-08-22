@@ -3,7 +3,8 @@ import { sleep } from '../common/util'
 import _ from 'lodash'
 import { CodecPropertyConfig } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
-import { StringProperty } from '../codec/cms-property-types'
+import { StringProperty, StringPatterns } from '../codec/cms-property-types'
+import { stringify } from 'querystring'
 
 export type APIConfiguration = {
     api_url:        StringProperty
@@ -26,18 +27,21 @@ export type UsernamePasswordConfiguration = {
 export const UsernamePasswordProperties: UsernamePasswordConfiguration = {
     username: {
         title: "Username",
-        type: "string"
+        type: "string",
+        minLength: 1
     },
     password: {
         title: "Password",
-        type: "string"
+        type: "string",
+        minLength: 1
     }
 }
 
 export const APIProperties: APIConfiguration = {
     api_url: {
         title: "Base API URL",
-        type: "string"
+        type: "string",
+        pattern: StringPatterns.httpUrl
     }
 }
 
@@ -45,7 +49,8 @@ export const OAuthProperties: OAuthCodecConfiguration = {
     ...APIProperties,
     auth_url: {
         title: "Oauth URL",
-        type: "string"
+        type: "string",
+        pattern: StringPatterns.httpUrl
     }
 }
 
@@ -53,11 +58,13 @@ export const ClientCredentialProperties: ClientCredentialsConfiguration = {
     ...OAuthProperties,
     client_id: {
         title: "Client ID",
-        type: "string"
+        type: "string",
+        minLength: 1
     },
     client_secret: {
         title: "Client secret",
-        type: "string"
+        type: "string",
+        minLength: 1
     }
 }
 

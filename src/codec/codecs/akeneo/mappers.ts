@@ -16,16 +16,11 @@ export const mapCategory = (categories: AkeneoCategory[]) => (category: AkeneoCa
 const findValue = (values: AkeneoProperty[]) => values && values.find(value => !value.locale || value.locale === 'en_US')?.data
 
 export const mapProduct = (args: CommonArgs) => (product: AkeneoProduct): Product => {
-    args = {
-        ...defaultArgs,
-        ...args
-    }
-
     const prices = findValue(product.values.price)
     let price = '--'
 
     if (prices) {
-        let locationPrice = prices.find(p => p.currency === args.currency)
+        let locationPrice = prices.find(p => p.currency === args.currency || defaultArgs.currency)
         if (locationPrice) {
             price = formatMoneyString(locationPrice.amount, args)
         }

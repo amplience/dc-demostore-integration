@@ -11,6 +11,10 @@ export declare class CodecType {
     _vendor: string;
     get type(): CodecTypes;
     get vendor(): string;
+    get schemaUri(): string;
+    get label(): string;
+    get iconUrl(): string;
+    get schema(): any;
     get properties(): Dictionary<AnyProperty>;
     getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API>;
 }
@@ -53,7 +57,7 @@ export declare const getRandom: <T>(array: T[]) => T;
 export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
-export declare const getCodecs: (type: CodecTypes) => CodecType[];
+export declare const getCodecs: (type?: CodecTypes) => CodecType[];
 export declare const registerCodec: (codec: CodecType) => void;
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types';
 export declare const getCodec: (config: any, type: CodecTypes) => Promise<API>;

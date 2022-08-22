@@ -4,17 +4,12 @@ exports.quoteProductIdString = exports.quote = exports.isServer = exports.format
 const __1 = require("..");
 const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 exports.sleep = sleep;
-const formatMoneyString = (money, args) => {
-    args = Object.assign(Object.assign({}, __1.defaultArgs), args);
-    return new Intl.NumberFormat(args.locale, {
-        style: 'currency',
-        currency: args.currency
-    }).format(money);
-};
+const formatMoneyString = (money, args) => new Intl.NumberFormat(args.locale, {
+    style: 'currency',
+    currency: args.currency || __1.defaultArgs.currency
+}).format(money);
 exports.formatMoneyString = formatMoneyString;
-const isServer = () => {
-    return typeof window === 'undefined';
-};
+const isServer = () => typeof window === 'undefined';
 exports.isServer = isServer;
 const quote = (str) => `"${str}"`;
 exports.quote = quote;

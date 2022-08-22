@@ -23,7 +23,8 @@ export class CommercetoolsCodecType extends CommerceCodecType {
             ...ClientCredentialProperties,
             project: {
                 title: "project key",
-                type: "string"
+                type: "string",
+                minLength: 1
             },
             scope: {
                 title: "scope",
@@ -152,4 +153,4 @@ export class CommercetoolsCodec extends CommerceCodec {
 }
 
 export default CommercetoolsCodecType
-registerCodec(new CommercetoolsCodecType())
+// registerCodec(new CommercetoolsCodecType())

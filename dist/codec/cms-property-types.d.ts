@@ -29,3 +29,7 @@ export declare type ArrayProperty = Property & {
     required?: boolean;
     uniqueItems?: boolean;
 };
+export declare const StringPatterns: {
+    anyUrl: string;
+    httpUrl: string;
+};

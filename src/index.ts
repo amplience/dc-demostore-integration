@@ -1,8 +1,3 @@
-export * from './amplience'
-export * from './codec'
-export * from './common'
-export * from './middleware'
-
 const demostoreBaseUri          = process.env.NEXT_PUBLIC_DEMOSTORE_BASE_URI || `https://demostore.amplience.com`
 const demostoreSiteUri          = `${demostoreBaseUri}/site`
 const demostoreIntegrationUri   = `${demostoreSiteUri}/integration`
@@ -16,3 +11,11 @@ export const CONSTANTS = {
     demostoreConfigUri,
     demostoreProductGridUri
 }
+
+// initialize codecs
+import './codec'
+
+export * from './codec'
+export * from './amplience'
+export * from './common'
+export * from './middleware'

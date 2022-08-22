@@ -24,13 +24,16 @@ class FabricCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return Object.assign(Object.assign(Object.assign({}, common_1.OAuthProperties), common_1.UsernamePasswordProperties), { accountId: {
                 title: "Account ID",
-                type: "string"
+                type: "string",
+                minLength: 1
             }, accountKey: {
                 title: "Account Key",
-                type: "string"
+                type: "string",
+                minLength: 1
             }, stage: {
                 title: "Stage",
-                type: "string"
+                type: "string",
+                minLength: 1
             } });
     }
     getApi(config) {
@@ -106,4 +109,4 @@ class FabricCommerceCodec extends __1.CommerceCodec {
 }
 exports.FabricCommerceCodec = FabricCommerceCodec;
 exports.default = FabricCommerceCodecType;
-(0, __1.registerCodec)(new FabricCommerceCodecType());
+// registerCodec(new FabricCommerceCodecType())

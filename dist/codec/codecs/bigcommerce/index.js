@@ -24,10 +24,12 @@ class BigCommerceCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return Object.assign(Object.assign({}, common_1.APIProperties), { api_token: {
                 title: "API Token",
-                type: "string"
+                type: "string",
+                minLength: 1
             }, store_hash: {
                 title: "Store hash",
-                type: "string"
+                type: "string",
+                minLength: 1
             } });
     }
     getApi(config) {
@@ -84,4 +86,4 @@ class BigCommerceCommerceCodec extends __1.CommerceCodec {
 }
 exports.BigCommerceCommerceCodec = BigCommerceCommerceCodec;
 exports.default = BigCommerceCommerceCodecType;
-(0, __1.registerCodec)(new BigCommerceCommerceCodecType());
+// registerCodec(new BigCommerceCommerceCodecType())

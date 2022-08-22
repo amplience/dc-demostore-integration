@@ -23,15 +23,18 @@ export class FabricCommerceCodecType extends CommerceCodecType {
             ...UsernamePasswordProperties,
             accountId: {
                 title: "Account ID",
-                type: "string"
+                type: "string",
+                minLength: 1
             },
             accountKey: {
                 title: "Account Key",
-                type: "string"
+                type: "string",
+                minLength: 1
             },
             stage: {
                 title: "Stage",
-                type: "string"
+                type: "string",
+                minLength: 1
             }
         }
     }
@@ -106,4 +109,4 @@ export class FabricCommerceCodec extends CommerceCodec {
 }
 
 export default FabricCommerceCodecType
-registerCodec(new FabricCommerceCodecType())
+// registerCodec(new FabricCommerceCodecType())

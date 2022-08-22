@@ -2,47 +2,28 @@ import { getContentItem, getContentItemFromConfigLocator } from "../amplience";
 import axios from "axios";
 import { CommerceAPI, CONSTANTS, getCommerceCodec } from "../index";
 import { isServer } from "../common/util";
-import { IntegrationError } from "../common/errors";
 
-export type Config = ConfigLocatorBlock | any | undefined
-export type ConfigLocatorBlock = {
-    config_locator: string
-}
+const getAPI = async (config: any): Promise<CommerceAPI> => {
+    // we are passed in an object here
+    //   - if it does not the key 'config_locator', it is assumed to be the config block for a codec
+    //   - else retrieve the object
+    //     - if the schema of the object is NOT the demostoreconfig, it is assumed to be the config block
+    //     - else retrieve the object with id <demostoreconfig.commerce.id>
 
-export const baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` }
-
-const getCommerceApiForConfigLocator = async (locator: string): Promise<CommerceAPI> => {
-    let configItem: any = await getContentItemFromConfigLocator(locator)
-    if (configItem) {
-        if (configItem._meta?.schema === CONSTANTS.demostoreConfigUri) {
-            return await getCommerceCodec(await getContentItem(locator.split(':')[0], { id: configItem.commerce.id }))
-        }
-        else {
-            return await getCommerceCodec(configItem)
+    if ('config_locator' in config) {
+        const [ hub, _ ] = config.config_locator.split(':')
+        config = await getContentItemFromConfigLocator(config.config_locator)
+        if (config._meta.schema === CONSTANTS.demostoreConfigUri) {
+            config = await getContentItem(hub, config.commerce)
         }
     }
-}
-
-const getAPI = async (config: Config): Promise<CommerceAPI> => {
-    config = {
-        ...baseConfigLocator,
-        ...config
-    }
-
-    let codec = await getCommerceCodec(config) || await getCommerceApiForConfigLocator(config.config_locator)
-    if (codec) {
-        return codec
-    }
-    throw new IntegrationError({ 
-        message: `no codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`,
-        helpUrl: `https://foo.bar` 
-    })
+    return await getCommerceCodec(config)
 }
 
 export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups'
 
 // getCommerceAPI is the main client interaction point with the integration layer
-export const getCommerceAPI = async (params: Config = undefined): Promise<CommerceAPI> => {
+export const getCommerceAPI = async (params: any = undefined): Promise<CommerceAPI> => {
     if (isServer()) {
         return await getAPI(params)
     }

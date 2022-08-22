@@ -1,6 +1,6 @@
 import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
-import { API, CommerceAPI, flattenCategories } from '..'
+import { API, CommerceAPI, CONSTANTS, findInMegaMenu, flattenCategories } from '..'
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
 import { IntegrationError } from '../common/errors'
 
@@ -11,9 +11,9 @@ export enum CodecTypes {
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
 export class CodecType {
-    _type:       CodecTypes
-    _properties: Dictionary<AnyProperty>
-    _vendor:     string
+    _type:          CodecTypes
+    _properties:    Dictionary<AnyProperty>
+    _vendor:        string
 
     get type(): CodecTypes {
         return this._type
@@ -21,6 +21,24 @@ export class CodecType {
 
     get vendor(): string {
         return this._vendor
+    }
+
+    get schemaUri(): string {
+        return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
+    }
+
+    get label(): string {
+        return `${this.vendor} integration`
+    }
+
+    get iconUrl(): string {
+        return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
+    }
+
+    get schema(): any {
+        return {
+            properties: this.properties
+        }
     }
 
     get properties(): Dictionary<AnyProperty> {
@@ -73,22 +91,19 @@ export class CommerceCodec implements CommerceAPI {
         const startInit = new Date().valueOf()
         await this.cacheMegaMenu()
         this.initDuration = new Date().valueOf() - startInit
-
         this.codecType = codecType
+
         if (this.megaMenu.length === 0) {
-            console.warn(`megaMenu has no categories, check setup`)
+            throw new IntegrationError({
+                message: 'megaMenu has no categories, cannot build navigation',
+                helpUrl: ``
+            })
         }
         return this
     }
 
     findCategory(slug: string) {
-        let flattenedCategories: Category[] = []
-        const bulldozeCategories = cat => {
-            flattenedCategories.push(cat)
-            cat.children && cat.children.forEach(bulldozeCategories)
-        }
-        this.megaMenu.forEach(bulldozeCategories)
-        return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
+        return findInMegaMenu(this.megaMenu, slug)
     }    
 
     async cacheMegaMenu(): Promise<void> {
@@ -211,8 +226,8 @@ const codecs = new Map<CodecTypes, CodecType[]>()
 codecs[CodecTypes.commerce] = []
 
 // public interface
-export const getCodecs = (type: CodecTypes): CodecType[] => {
-    return codecs[type]
+export const getCodecs = (type?: CodecTypes): CodecType[] => {
+    return type ? codecs[type] : _.flatMap(codecs)
 }
 
 export const registerCodec = (codec: CodecType) => {
@@ -225,7 +240,6 @@ export const registerCodec = (codec: CodecType) => {
 const apis = new Map<any, API>()
 
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types'
-import { start } from 'repl'
 
 const maskSensitiveData = (obj: any) => {
     return {
@@ -237,32 +251,46 @@ const maskSensitiveData = (obj: any) => {
 }
 
 export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
-    let codecsMatchingConfig: CodecType[] = getCodecs(type).filter(c => _.difference(Object.keys(c.properties), Object.keys(config)).length === 0)
-    if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-        return null
-        // throw new IntegrationError({
-        //     message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
-        //     helpUrl: `https://help.dc-demostore.com/codec-error`
-        // })
+    let codecs = getCodecs(type)
+    let codec: CodecType
+    
+    // novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
+    if ('vendor' in config) {
+        let vendorCodec = codecs.find(codec => codec.vendor === config.vendor)
+        if (!vendorCodec) {
+            throw new IntegrationError({
+                message: `codec not found for vendor [ ${config.vendor} ]`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            })
+        }
+
+        // check that all required properties are there
+        let difference = _.difference(Object.keys(vendorCodec.properties), Object.keys(config))
+        if (difference.length > 0) {
+            throw new IntegrationError({
+                message: `configuration missing properties required for vendor [ ${config.vendor} ]: [ ${difference.join(', ')} ]`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            })
+        }
+
+        codec = vendorCodec
+    }
+    // end novadev-450
+
+    else {
+        let codecsMatchingConfig: CodecType[] = codecs.filter(c => _.difference(Object.keys(c.properties), Object.keys(config)).length === 0)
+        if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
+            throw new IntegrationError({
+                message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            })
+        }
+        codec = codecsMatchingConfig.pop()
     }
 
     let configHash = _.values(config).join('')
-    if (!apis[configHash]) {
-        let CType = _.first(codecsMatchingConfig)
-        // console.log(`[ demostore ] creating codec: ${CType.vendor}...`)
-        let api = await CType.getApi(config)
-        apis[configHash] = api
-
-        // apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
-        //     // apply default arguments for those not provided in the query
-        //     return async (args: CommonArgs): Promise<any> => await api[key]({
-        //         ...defaultArgs,
-        //         ...args
-        //     })
-        // }))
-    }
-
-    return apis[configHash]
+    console.log(`[ demostore ] creating codec: ${codec.vendor}...`)
+    return apis[configHash] = apis[configHash] || await codec.getApi(config)
 }
 
 export const defaultArgs: CommonArgs = {
@@ -276,18 +304,32 @@ export const defaultArgs: CommonArgs = {
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
 
-// register codecs
-if (isServer()) {
-    import('./codecs/rest')
-    import('./codecs/commercetools')
-    import('./codecs/bigcommerce')
-    import('./codecs/akeneo')
-    import('./codecs/fabric')
-    import('./codecs/constructor.io')
-    import('./codecs/elasticpath')
-    import('./codecs/hybris')
-    import('./codecs/sfcc')
-}
+import AkeneoCodecType from './codecs/akeneo'
+registerCodec(new AkeneoCodecType())
+
+import BigCommerceCommerceCodecType from './codecs/bigcommerce'
+registerCodec(new BigCommerceCommerceCodecType())
+
+import CommerceToolsCodecType from './codecs/commercetools'
+registerCodec(new CommerceToolsCodecType())
+
+import ConstructorIOCodecType from './codecs/constructor.io'
+registerCodec(new ConstructorIOCodecType())
+
+import ElasticPathCommerceCodecType from './codecs/elasticpath'
+registerCodec(new ElasticPathCommerceCodecType())
+
+import FabricCodecType from './codecs/fabric'
+registerCodec(new FabricCodecType())
+
+import HybrisCodecType from './codecs/hybris'
+registerCodec(new HybrisCodecType())
+
+import RestCodecType from './codecs/rest'
+registerCodec(new RestCodecType())
+
+import SFCCCodecType from './codecs/sfcc'
+registerCodec(new SFCCCodecType())
 
 // reexport codec common functions
 export * from './codecs/common'

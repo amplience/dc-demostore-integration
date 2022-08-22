@@ -20,21 +20,21 @@ Concrete implementations of this interface are referred to as `Codec`s and are l
 
 ## Codecs in use
 
-### `restCodec`
-Location: `src/codec/codecs/rest`
+### `akeneoCodec`
+Location: `src/codec/codecs/akeneo`
 
-Schema: `https://demostore.amplience.com/site/integration/rest`
+Schema: `https://demostore.amplience.com/site/integration/akeneo`
 
-Takes its product catalog, category structure, and translation data from URLs specified in its configuration.
+Connects to an Akeneo instance.
 
 #### Configuration
 
 ```
 {
-    "productURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/products.json",
-    "categoryURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/categories.json",
-    "customerGroupURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/customerGroups.json",
-    "translationsURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json"
+    "username": "<akeneo username>",
+    "password": "<akeneo password>",
+    "client_id": "<akeneo client id>",
+    "client_secret": "<akeneo client secret>"
 }
 ```
 
@@ -75,6 +75,22 @@ Connects to a commercetools instance.
 }
 ```
 
+### `constructorioCodec`
+Location: `src/codec/codecs/constructor.io`
+
+Schema: `https://demostore.amplience.com/site/integration/constructor.io`
+
+Connects to a constructor.io instance.
+
+#### Configuration
+
+```
+{
+    "api_key": "<constructor.io api key>",
+    "api_token": "<constructor.io api token>"
+}
+```
+
 ### `elasticPathCodec`
 Location: `src/codec/codecs/elasticpath`
 
@@ -95,23 +111,22 @@ Connects to an Elastic Path instance.
 }
 ```
 
-### `sfccCodec`
-Location: `src/codec/codecs/sfcc`
+### `fabricCodec`
+Location: `src/codec/codecs/fabric`
 
-Schema: `https://demostore.amplience.com/site/integration/sfcc`
+Schema: `https://demostore.amplience.com/site/integration/fabric`
 
-Connects to a SalesForce Commerce Cloud instance.
+Connects to a fabric instance.
 
 #### Configuration
 
 ```
 {
-    "api_url": "<sfcc api url>",
-    "auth_url": "<sfcc auth url>",
-    "api_token": "<sfcc shopper api token>",
-    "site_id": "<sfcc site id>",
-    "client_id": "<sfcc client id>",
-    "client_secret": "<sfcc site secret>"
+    "username": "<fabric username>",
+    "password": "<fabric password>",
+    "accountId": "<fabric account id>",
+    "auth_url": "<fabric auth url>",
+    "api_url": "<fabric base url>"
 }
 ```
 
@@ -131,21 +146,40 @@ Connects to an SAP/Hybris instance.
 }
 ```
 
-### `fabricCodec`
-Location: `src/codec/codecs/fabric`
+### `restCodec`
+Location: `src/codec/codecs/rest`
 
-Schema: `https://demostore.amplience.com/site/integration/fabric`
+Schema: `https://demostore.amplience.com/site/integration/rest`
 
-Connects to a fabric instance.
+Takes its product catalog, category structure, and translation data from URLs specified in its configuration.
 
 #### Configuration
 
 ```
 {
-    "username": "<fabric username>",
-    "password": "<fabric password>",
-    "accountId": "<fabric account id>",
-    "auth_url": "<fabric auth url>",
-    "api_url": "<fabric base url>"
+    "productURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/products.json",
+    "categoryURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/categories.json",
+    "customerGroupURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/customerGroups.json",
+    "translationsURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/translations.json"
+}
+```
+
+### `sfccCodec`
+Location: `src/codec/codecs/sfcc`
+
+Schema: `https://demostore.amplience.com/site/integration/sfcc`
+
+Connects to a SalesForce Commerce Cloud instance.
+
+#### Configuration
+
+```
+{
+    "api_url": "<sfcc api url>",
+    "auth_url": "<sfcc auth url>",
+    "api_token": "<sfcc shopper api token>",
+    "site_id": "<sfcc site id>",
+    "client_id": "<sfcc client id>",
+    "client_secret": "<sfcc site secret>"
 }
 ```

@@ -25,7 +25,8 @@ class HybrisCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return Object.assign(Object.assign({}, common_1.APIProperties), { catalog_id: {
                 title: "Catalog ID",
-                type: "string"
+                type: "string",
+                minLength: 1
             } });
     }
     getApi(config) {
@@ -92,4 +93,4 @@ class HybrisCommerceCodec extends __1.CommerceCodec {
 }
 exports.HybrisCommerceCodec = HybrisCommerceCodec;
 exports.default = HybrisCommerceCodecType;
-(0, __1.registerCodec)(new HybrisCommerceCodecType());
+// registerCodec(new HybrisCommerceCodecType())

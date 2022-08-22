@@ -10,18 +10,6 @@ var __createBinding = (this && this.__createBinding) || (Object.create ? (functi
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
 }));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
@@ -39,9 +27,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getCommerceCodec = exports.defaultArgs = exports.getCodec = exports.registerCodec = exports.getCodecs = exports.getRandom = exports.CommerceCodec = exports.CodecTestOperationType = exports.CommerceCodecType = exports.CodecType = exports.CodecTypes = void 0;
-const util_1 = require("../common/util");
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("..");
+const errors_1 = require("../common/errors");
 var CodecTypes;
 (function (CodecTypes) {
     CodecTypes[CodecTypes["commerce"] = 0] = "commerce";
@@ -52,6 +40,20 @@ class CodecType {
     }
     get vendor() {
         return this._vendor;
+    }
+    get schemaUri() {
+        return `${__1.CONSTANTS.demostoreIntegrationUri}/${this.vendor}`;
+    }
+    get label() {
+        return `${this.vendor} integration`;
+    }
+    get iconUrl() {
+        return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`;
+    }
+    get schema() {
+        return {
+            properties: this.properties
+        };
     }
     get properties() {
         return this._properties;
@@ -91,19 +93,16 @@ class CommerceCodec {
             this.initDuration = new Date().valueOf() - startInit;
             this.codecType = codecType;
             if (this.megaMenu.length === 0) {
-                console.warn(`megaMenu has no categories, check setup`);
+                throw new errors_1.IntegrationError({
+                    message: 'megaMenu has no categories, cannot build navigation',
+                    helpUrl: ``
+                });
             }
             return this;
         });
     }
     findCategory(slug) {
-        let flattenedCategories = [];
-        const bulldozeCategories = cat => {
-            flattenedCategories.push(cat);
-            cat.children && cat.children.forEach(bulldozeCategories);
-        };
-        this.megaMenu.forEach(bulldozeCategories);
-        return flattenedCategories.find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
+        return (0, __1.findInMegaMenu)(this.megaMenu, slug);
     }
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -218,7 +217,7 @@ const codecs = new Map();
 codecs[CodecTypes.commerce] = [];
 // public interface
 const getCodecs = (type) => {
-    return codecs[type];
+    return type ? codecs[type] : lodash_1.default.flatMap(codecs);
 };
 exports.getCodecs = getCodecs;
 const registerCodec = (codec) => {
@@ -233,29 +232,41 @@ const maskSensitiveData = (obj) => {
     return Object.assign(Object.assign({}, obj), { client_secret: obj.client_secret && `**** redacted ****`, api_token: obj.api_token && `**** redacted ****`, password: obj.password && `**** redacted ****` });
 };
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
-    let codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.properties), Object.keys(config)).length === 0);
-    if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-        return null;
-        // throw new IntegrationError({
-        //     message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
-        //     helpUrl: `https://help.dc-demostore.com/codec-error`
-        // })
+    let codecs = (0, exports.getCodecs)(type);
+    let codec;
+    // novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
+    if ('vendor' in config) {
+        let vendorCodec = codecs.find(codec => codec.vendor === config.vendor);
+        if (!vendorCodec) {
+            throw new errors_1.IntegrationError({
+                message: `codec not found for vendor [ ${config.vendor} ]`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            });
+        }
+        // check that all required properties are there
+        let difference = lodash_1.default.difference(Object.keys(vendorCodec.properties), Object.keys(config));
+        if (difference.length > 0) {
+            throw new errors_1.IntegrationError({
+                message: `configuration missing properties required for vendor [ ${config.vendor} ]: [ ${difference.join(', ')} ]`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            });
+        }
+        codec = vendorCodec;
+    }
+    // end novadev-450
+    else {
+        let codecsMatchingConfig = codecs.filter(c => lodash_1.default.difference(Object.keys(c.properties), Object.keys(config)).length === 0);
+        if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
+            throw new errors_1.IntegrationError({
+                message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
+                helpUrl: `https://help.dc-demostore.com/codec-error`
+            });
+        }
+        codec = codecsMatchingConfig.pop();
     }
     let configHash = lodash_1.default.values(config).join('');
-    if (!apis[configHash]) {
-        let CType = lodash_1.default.first(codecsMatchingConfig);
-        // console.log(`[ demostore ] creating codec: ${CType.vendor}...`)
-        let api = yield CType.getApi(config);
-        apis[configHash] = api;
-        // apis[configHash] = _.zipObject(Object.keys(api), Object.keys(api).filter(key => typeof api[key] === 'function').map((key: string) => {
-        //     // apply default arguments for those not provided in the query
-        //     return async (args: CommonArgs): Promise<any> => await api[key]({
-        //         ...defaultArgs,
-        //         ...args
-        //     })
-        // }))
-    }
-    return apis[configHash];
+    console.log(`[ demostore ] creating codec: ${codec.vendor}...`);
+    return apis[configHash] = apis[configHash] || (yield codec.getApi(config));
 });
 exports.getCodec = getCodec;
 exports.defaultArgs = {
@@ -268,17 +279,23 @@ exports.defaultArgs = {
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecTypes.commerce); });
 exports.getCommerceCodec = getCommerceCodec;
 // end public interface
-// register codecs
-if ((0, util_1.isServer)()) {
-    Promise.resolve().then(() => __importStar(require('./codecs/rest')));
-    Promise.resolve().then(() => __importStar(require('./codecs/commercetools')));
-    Promise.resolve().then(() => __importStar(require('./codecs/bigcommerce')));
-    Promise.resolve().then(() => __importStar(require('./codecs/akeneo')));
-    Promise.resolve().then(() => __importStar(require('./codecs/fabric')));
-    Promise.resolve().then(() => __importStar(require('./codecs/constructor.io')));
-    Promise.resolve().then(() => __importStar(require('./codecs/elasticpath')));
-    Promise.resolve().then(() => __importStar(require('./codecs/hybris')));
-    Promise.resolve().then(() => __importStar(require('./codecs/sfcc')));
-}
+const akeneo_1 = __importDefault(require("./codecs/akeneo"));
+(0, exports.registerCodec)(new akeneo_1.default());
+const bigcommerce_1 = __importDefault(require("./codecs/bigcommerce"));
+(0, exports.registerCodec)(new bigcommerce_1.default());
+const commercetools_1 = __importDefault(require("./codecs/commercetools"));
+(0, exports.registerCodec)(new commercetools_1.default());
+const constructor_io_1 = __importDefault(require("./codecs/constructor.io"));
+(0, exports.registerCodec)(new constructor_io_1.default());
+const elasticpath_1 = __importDefault(require("./codecs/elasticpath"));
+(0, exports.registerCodec)(new elasticpath_1.default());
+const fabric_1 = __importDefault(require("./codecs/fabric"));
+(0, exports.registerCodec)(new fabric_1.default());
+const hybris_1 = __importDefault(require("./codecs/hybris"));
+(0, exports.registerCodec)(new hybris_1.default());
+const rest_1 = __importDefault(require("./codecs/rest"));
+(0, exports.registerCodec)(new rest_1.default());
+const sfcc_1 = __importDefault(require("./codecs/sfcc"));
+(0, exports.registerCodec)(new sfcc_1.default());
 // reexport codec common functions
 __exportStar(require("./codecs/common"), exports);

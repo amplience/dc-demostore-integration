@@ -21,11 +21,13 @@ export class BigCommerceCommerceCodecType extends CommerceCodecType {
             ...APIProperties,
             api_token: {
                 title: "API Token",
-                type: "string"
+                type: "string",
+                minLength: 1
             },
             store_hash: {
                 title: "Store hash",
-                type: "string"
+                type: "string",
+                minLength: 1
             }
         }
     }
@@ -80,4 +82,4 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 }
 
 export default BigCommerceCommerceCodecType
-registerCodec(new BigCommerceCommerceCodecType())
+// registerCodec(new BigCommerceCommerceCodecType())
