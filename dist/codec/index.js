@@ -61,6 +61,12 @@ class CodecType {
     getApi(config) {
         throw new Error('must implement getCodec');
     }
+    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+    postProcess(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return config;
+        });
+    }
 }
 exports.CodecType = CodecType;
 class CommerceCodecType extends CodecType {

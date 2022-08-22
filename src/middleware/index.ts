@@ -1,6 +1,6 @@
 import { getContentItem, getContentItemFromConfigLocator } from "../amplience";
 import axios from "axios";
-import { CommerceAPI, CONSTANTS, getCommerceCodec } from "../index";
+import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from "../index";
 import { isServer } from "../common/util";
 
 const getAPI = async (config: any): Promise<CommerceAPI> => {
@@ -17,6 +17,12 @@ const getAPI = async (config: any): Promise<CommerceAPI> => {
             config = await getContentItem(hub, config.commerce)
         }
     }
+
+    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+    let matchingCodec = getCodecs().find(c => c.vendor === config.vendor || c.schemaUri === config._meta.schema)
+    config = await matchingCodec.postProcess(config)
+    // end novadev-582
+
     return await getCommerceCodec(config)
 }
 

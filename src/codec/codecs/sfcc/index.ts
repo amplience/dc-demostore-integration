@@ -6,6 +6,7 @@ import axios from "axios";
 import { SFCCCategory, SFCCProduct } from "./types";
 import { formatMoneyString } from "../../../common/util";
 import slugify from "slugify";
+import btoa from 'btoa'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     api_token: StringProperty
@@ -34,6 +35,15 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 
     async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
         return await new SFCCCommerceCodec(config).init(this)
+    }
+
+    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+    async postProcess(config: CodecConfig): Promise<CodecConfig> {
+        // apply any postprocessing required
+        return {
+            api_token: btoa(`${config.client_id}:${config.client_secret}`),
+            ...config
+        }
     }
 }
 

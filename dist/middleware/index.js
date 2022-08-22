@@ -30,6 +30,10 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
             config = yield (0, amplience_1.getContentItem)(hub, config.commerce);
         }
     }
+    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+    let matchingCodec = (0, index_1.getCodecs)().find(c => c.vendor === config.vendor || c.schemaUri === config._meta.schema);
+    config = yield matchingCodec.postProcess(config);
+    // end novadev-582
     return yield (0, index_1.getCommerceCodec)(config);
 });
 // getCommerceAPI is the main client interaction point with the integration layer

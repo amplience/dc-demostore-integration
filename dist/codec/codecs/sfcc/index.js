@@ -18,6 +18,7 @@ const __1 = require("../..");
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
+const btoa_1 = __importDefault(require("btoa"));
 class SFCCCommerceCodecType extends __1.CommerceCodecType {
     get vendor() {
         return 'sfcc';
@@ -35,6 +36,13 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new SFCCCommerceCodec(config).init(this);
+        });
+    }
+    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+    postProcess(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // apply any postprocessing required
+            return Object.assign({ api_token: (0, btoa_1.default)(`${config.client_id}:${config.client_secret}`) }, config);
         });
     }
 }

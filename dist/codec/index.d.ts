@@ -17,6 +17,7 @@ export declare class CodecType {
     get schema(): any;
     get properties(): Dictionary<AnyProperty>;
     getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API>;
+    postProcess(config: any): Promise<any>;
 }
 export declare class CommerceCodecType extends CodecType {
     get type(): CodecTypes;

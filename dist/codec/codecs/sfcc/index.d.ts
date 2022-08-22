@@ -10,6 +10,7 @@ export declare class SFCCCommerceCodecType extends CommerceCodecType {
     get vendor(): string;
     get properties(): CodecConfig;
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
+    postProcess(config: CodecConfig): Promise<CodecConfig>;
 }
 export declare class SFCCCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
