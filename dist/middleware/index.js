@@ -31,8 +31,8 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
-    let matchingCodec = (0, index_1.getCodecs)().find(c => c.vendor === config.vendor || c.schemaUri === config._meta.schema);
-    config = yield matchingCodec.postProcess(config);
+    let matchingCodec = (0, index_1.getCodecs)().find(c => { var _a; return c.vendor === config.vendor || c.schemaUri === ((_a = config._meta) === null || _a === void 0 ? void 0 : _a.schema); });
+    config = yield (matchingCodec === null || matchingCodec === void 0 ? void 0 : matchingCodec.postProcess(config));
     // end novadev-582
     return yield (0, index_1.getCommerceCodec)(config);
 });

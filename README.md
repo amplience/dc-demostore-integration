@@ -177,7 +177,6 @@ Connects to a SalesForce Commerce Cloud instance.
 {
     "api_url": "<sfcc api url>",
     "auth_url": "<sfcc auth url>",
-    "api_token": "<sfcc shopper api token>",
     "site_id": "<sfcc site id>",
     "client_id": "<sfcc client id>",
     "client_secret": "<sfcc site secret>"

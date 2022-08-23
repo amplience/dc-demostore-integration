@@ -9,6 +9,8 @@ const wrappedMiddleware = async (req: Request, res: Response, next: any) => {
     try {
         await middleware(req, res)
     } catch (e) {
+        console.log(e.stack)
+
         if (e.helpUrl) {
             console.error(e.getMessage())
         }

@@ -22,6 +22,7 @@ const wrappedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, 
         yield (0, middleware_1.middleware)(req, res);
     }
     catch (e) {
+        console.log(e.stack);
         if (e.helpUrl) {
             console.error(e.getMessage());
         }
