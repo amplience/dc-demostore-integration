@@ -19,7 +19,6 @@ export interface SFCCCustomerGroup {
     _resource_state: string;
     id: string;
     link: string;
-    name: string;
 }
 export interface SFCCProduct {
     _v: string;

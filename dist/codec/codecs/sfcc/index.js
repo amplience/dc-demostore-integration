@@ -57,15 +57,13 @@ const mapCategory = (category) => {
         products: []
     };
 };
-const mapCustomerGroup = (group) => {
-    group.name = group.id + 'XXXX';
-    group.id += 'XXXXX';
-    return group;
-};
-/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
-    ...group,
-    name: group.id
-})*/
+/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
+    group.name = group.id + 'XXXX'
+    group.id += 'XXXXX'
+    return group
+
+}*/
+const mapCustomerGroup = (group) => group && (Object.assign(Object.assign({}, group), { name: group.id }));
 const mapProduct = (product) => {
     var _a;
     if (!product) {

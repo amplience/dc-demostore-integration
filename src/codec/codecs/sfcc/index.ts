@@ -57,17 +57,17 @@ const mapCategory = (category: SFCCCategory): Category => {
     }
 }
 
-const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
+/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
     group.name = group.id + 'XXXX'
     group.id += 'XXXXX'
     return group
 
-}
+}*/
 
-/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
+const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
     ...group,
     name: group.id
-})*/
+})
 
 
 const mapProduct = (product: SFCCProduct): Product => {
