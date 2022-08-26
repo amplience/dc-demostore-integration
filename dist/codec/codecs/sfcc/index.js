@@ -57,6 +57,15 @@ const mapCategory = (category) => {
         products: []
     };
 };
+const mapCustomerGroup = (group) => {
+    group.name = group.id + 'XXXX';
+    group.id += 'XXXXX';
+    return group;
+};
+/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
+    ...group,
+    name: group.id
+})*/
 const mapProduct = (product) => {
     var _a;
     if (!product) {
@@ -160,7 +169,8 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.authenticatedFetch(`${this.sitesApi}/customer_groups`);
+            return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups`)).map(mapCustomerGroup);
+            //return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
         });
     }
 }

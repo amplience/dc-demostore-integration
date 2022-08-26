@@ -1,4 +1,4 @@
-import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from "../../../common";
+import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, OAuthRestClientInterface, Product, CustomerGroup } from "../../../common";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
 import { StringProperty } from "../../cms-property-types";
 import { SFCCProduct } from "./types";
@@ -24,6 +24,6 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     getProductById(productId: string): Promise<SFCCProduct>;
     search(query: string): Promise<SFCCProduct[]>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+    getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]>;
 }
 export default SFCCCommerceCodecType;
