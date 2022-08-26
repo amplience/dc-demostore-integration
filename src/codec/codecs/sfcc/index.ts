@@ -1,9 +1,9 @@
-import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClient, OAuthRestClientInterface, Product } from "../../../common";
+import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClient, OAuthRestClientInterface, Product, CustomerGroup } from "../../../common";
 import _ from "lodash";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
 import { StringProperty } from "../../cms-property-types";
 import axios from "axios";
-import { SFCCCategory, SFCCProduct } from "./types";
+import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from "./types";
 import { formatMoneyString } from "../../../common/util";
 import slugify from "slugify";
 import btoa from 'btoa'
@@ -56,6 +56,12 @@ const mapCategory = (category: SFCCCategory): Category => {
         products: []
     }
 }
+
+const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
+    ...group,
+    name: group.id
+})
+
 
 const mapProduct = (product: SFCCProduct): Product => {
     if (!product) { return null }
@@ -156,8 +162,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
         return products.map(mapProduct)
     }
 
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
+    async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
+        return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)).map(mapCustomerGroup)
+        //return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
     }
 }
 
