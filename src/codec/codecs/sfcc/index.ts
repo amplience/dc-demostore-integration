@@ -58,7 +58,8 @@ const mapCategory = (category: SFCCCategory): Category => {
 }
 
 const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
-    group.name = group.id
+    group.name = group.id + 'XXXX'
+    group.id += 'XXXXX'
     return group
 
 }
