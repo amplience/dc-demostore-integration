@@ -170,7 +170,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
     }
 
     async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
-        return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)).map(mapCustomerGroup)
+        return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup)
         //return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
     }
 }

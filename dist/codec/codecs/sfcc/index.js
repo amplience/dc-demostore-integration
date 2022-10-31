@@ -167,7 +167,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups`)).map(mapCustomerGroup);
+            return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup);
             //return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
         });
     }
