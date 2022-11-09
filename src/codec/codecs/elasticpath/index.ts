@@ -1,12 +1,12 @@
-import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthProperties, OAuthRestClient, OAuthRestClientInterface, Product, Image } from "../../../common";
-import _ from "lodash";
-import { Dictionary } from "lodash";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
-import { StringProperty, StringPatterns } from "../../cms-property-types";
-import qs from "qs";
+import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthProperties, OAuthRestClient, OAuthRestClientInterface, Product, Image } from '../../../common'
+import _ from 'lodash'
+import { Dictionary } from 'lodash'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../..'
+import { StringProperty, StringPatterns } from '../../cms-property-types'
+import qs from 'qs'
 import Moltin, { gateway as MoltinGateway, Moltin as MoltinApi, PriceBookPriceBase } from '@moltin/sdk'
-import slugify from "slugify";
-import { formatMoneyString } from "../../../common/util";
+import slugify from 'slugify'
+import { formatMoneyString } from '../../../common/util'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     pcm_url: StringProperty
@@ -14,216 +14,216 @@ type CodecConfig = ClientCredentialsConfiguration & {
 }
 
 export class ElasticPathCommerceCodecType extends CommerceCodecType {
-    get vendor(): string {
-        return 'elasticpath'
-    }
+	get vendor(): string {
+		return 'elasticpath'
+	}
 
-    get properties(): CodecConfig {
-        return {
-            ...OAuthProperties,
-            ...ClientCredentialProperties,
-            pcm_url: {
-                title: "PCM URL",
-                type: "string",
-                pattern: StringPatterns.httpUrl
-            },
-            catalog_name: {
-                title: "Catalog name",
-                type: "string",
-                minLength: 1
-            }
-        }
-    }
+	get properties(): CodecConfig {
+		return {
+			...OAuthProperties,
+			...ClientCredentialProperties,
+			pcm_url: {
+				title: 'PCM URL',
+				type: 'string',
+				pattern: StringPatterns.httpUrl
+			},
+			catalog_name: {
+				title: 'Catalog name',
+				type: 'string',
+				minLength: 1
+			}
+		}
+	}
 
-    async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-        return await new ElasticPathCommerceCodec(config).init(this)
-    }
+	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
+		return await new ElasticPathCommerceCodec(config).init(this)
+	}
 }
 
 export class ElasticPathCommerceCodec extends CommerceCodec {
-    declare config: CodecPropertyConfig<CodecConfig>
+	declare config: CodecPropertyConfig<CodecConfig>
 
-    // instance variables
-    rest: OAuthRestClientInterface
-    moltin: MoltinApi
-    catalog: Moltin.Catalog
-    pricebooks: Moltin.PriceBook[]
+	// instance variables
+	rest: OAuthRestClientInterface
+	moltin: MoltinApi
+	catalog: Moltin.Catalog
+	pricebooks: Moltin.PriceBook[]
 
-    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
-        this.moltin = MoltinGateway({
-            client_id: this.config.client_id,
-            client_secret: this.config.client_secret
-        })
+	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
+		this.moltin = MoltinGateway({
+			client_id: this.config.client_id,
+			client_secret: this.config.client_secret
+		})
 
-        this.rest = OAuthRestClient(this.config, qs.stringify({
-            grant_type: 'client_credentials',
-            client_id: this.config.client_id,
-            client_secret: this.config.client_secret
-        }))
-        return await super.init(codecType)
-    }
+		this.rest = OAuthRestClient(this.config, qs.stringify({
+			grant_type: 'client_credentials',
+			client_id: this.config.client_id,
+			client_secret: this.config.client_secret
+		}))
+		return await super.init(codecType)
+	}
 
-    async fetch(url: string): Promise<any> {
-        let response = await this.rest.get({ url })
-        return response && response.data
-    }
+	async fetch(url: string): Promise<any> {
+		const response = await this.rest.get({ url })
+		return response && response.data
+	}
 
-    getHierarchyRootNode(category: Category): Category {
-        if (category.parent) {
-            const parent = this.findCategory(category.parent.slug)
-            return this.getHierarchyRootNode(parent)
-        }
-        return category    
-    }
+	getHierarchyRootNode(category: Category): Category {
+		if (category.parent) {
+			const parent = this.findCategory(category.parent.slug)
+			return this.getHierarchyRootNode(parent)
+		}
+		return category    
+	}
 
-    async getFileById(id: string): Promise<Moltin.File> { 
-        return await this.fetch(`/v2/files/${id}`) 
-    }
+	async getFileById(id: string): Promise<Moltin.File> { 
+		return await this.fetch(`/v2/files/${id}`) 
+	}
 
-    async mapProduct(product: any): Promise<Product> {
-        let attributes: Dictionary<string> = {}
-        let images: Image[] = []
+	async mapProduct(product: any): Promise<Product> {
+		const attributes: Dictionary<string> = {}
+		const images: Image[] = []
     
-        if (product.relationships.main_image?.data?.id) {
-            let mainImage = await this.getFileById(product.relationships.main_image?.data?.id)
-            images.push({ url: mainImage?.link?.href })
-        }
+		if (product.relationships.main_image?.data?.id) {
+			const mainImage = await this.getFileById(product.relationships.main_image?.data?.id)
+			images.push({ url: mainImage?.link?.href })
+		}
     
-        let price = await this.getPriceForSku(product.attributes.sku)
-        let productPrice = formatMoneyString(price.amount / 100, { currency: 'USD' })
+		const price = await this.getPriceForSku(product.attributes.sku)
+		const productPrice = formatMoneyString(price.amount / 100, { currency: 'USD' })
     
-        _.each(product.attributes?.extensions, (extension, key) => {
-            _.each(extension, (v, k) => {
-                if (k.indexOf('image') > -1) {
-                    images.push({ url: v })
-                }
-                else if (v) {
-                    attributes[k] = v
-                }
-            })
-        })
+		_.each(product.attributes?.extensions, (extension, key) => {
+			_.each(extension, (v, k) => {
+				if (k.indexOf('image') > -1) {
+					images.push({ url: v })
+				}
+				else if (v) {
+					attributes[k] = v
+				}
+			})
+		})
     
-        let variants = [{
-            sku: product.attributes.sku,
-            prices: {
-                list: productPrice,
-            },
-            listPrice: productPrice,
-            salePrice: productPrice,
-            images,
-            attributes,
-            key: product.attributes.slug,
-            id: product.id
-        }]
+		const variants = [{
+			sku: product.attributes.sku,
+			prices: {
+				list: productPrice,
+			},
+			listPrice: productPrice,
+			salePrice: productPrice,
+			images,
+			attributes,
+			key: product.attributes.slug,
+			id: product.id
+		}]
     
-        // variants
-        if (!_.isEmpty((product.meta as any).variation_matrix)) {
-            let variationMatrix: Dictionary<Dictionary<string>> = (product.meta as any).variation_matrix
-            let x = _.flatMap(Object.keys(variationMatrix).map(key => {
-                let variation = variationMatrix[key]
-                let z = _.map
+		// variants
+		if (!_.isEmpty((product.meta as any).variation_matrix)) {
+			const variationMatrix: Dictionary<Dictionary<string>> = (product.meta as any).variation_matrix
+			const x = _.flatMap(Object.keys(variationMatrix).map(key => {
+				const variation = variationMatrix[key]
+				const z = _.map
     
-                return {
+				return {
     
-                }
-            }))
-        }
+				}
+			}))
+		}
     
-        return {
-            id: product.id,
-            slug: product.attributes.slug,
-            name: product.attributes.name,
-            shortDescription: product.attributes.description,
-            longDescription: product.attributes.description,
-            categories: [],
-            variants
-        }
-    }
+		return {
+			id: product.id,
+			slug: product.attributes.slug,
+			name: product.attributes.name,
+			shortDescription: product.attributes.description,
+			longDescription: product.attributes.description,
+			categories: [],
+			variants
+		}
+	}
 
-    async getPriceForSkuInPricebook(sku: string, pricebookId: string): Promise<PriceBookPriceBase> {
-        return _.first(await this.fetch(`/pcm/pricebooks/${pricebookId}/prices?filter=eq(sku,string:${sku})`))
-    }
+	async getPriceForSkuInPricebook(sku: string, pricebookId: string): Promise<PriceBookPriceBase> {
+		return _.first(await this.fetch(`/pcm/pricebooks/${pricebookId}/prices?filter=eq(sku,string:${sku})`))
+	}
 
-    async getPriceForSku(sku: string): Promise<{ amount: number }> {
-        let base: PriceBookPriceBase = await this.getPriceForSkuInPricebook(sku, this.catalog.attributes.pricebook_id)
-        if (!base) {
-            let prices = await Promise.all(this.pricebooks.map(async pricebook => await this.getPriceForSkuInPricebook.bind(this)(sku, pricebook.id)))
-            base = _.find(prices, x => x)
-        }
+	async getPriceForSku(sku: string): Promise<{ amount: number }> {
+		let base: PriceBookPriceBase = await this.getPriceForSkuInPricebook(sku, this.catalog.attributes.pricebook_id)
+		if (!base) {
+			const prices = await Promise.all(this.pricebooks.map(async pricebook => await this.getPriceForSkuInPricebook.bind(this)(sku, pricebook.id)))
+			base = _.find(prices, x => x)
+		}
 
-        return base ? {
-            amount: base.attributes.currencies['USD'].amount
-        } : { amount: 0 }
-    }
+		return base ? {
+			amount: base.attributes.currencies['USD'].amount
+		} : { amount: 0 }
+	}
 
-    async getProductsForHierarchy(hierarchyId: string): Promise<Moltin.Product[]> {
-        return await this.fetch(`/catalog/hierarchies/${hierarchyId}/products`)
-    }
+	async getProductsForHierarchy(hierarchyId: string): Promise<Moltin.Product[]> {
+		return await this.fetch(`/catalog/hierarchies/${hierarchyId}/products`)
+	}
 
-    async getProductsForNode(nodeId: string): Promise<Moltin.Product[]> {
-        return await this.fetch(`/catalog/nodes/${nodeId}/relationships/products`)
-    }
+	async getProductsForNode(nodeId: string): Promise<Moltin.Product[]> {
+		return await this.fetch(`/catalog/nodes/${nodeId}/relationships/products`)
+	}
 
-    async getHierarchy(hierarchyId: string): Promise<Category> {
-        const hierarchy = await (await this.moltin.Hierarchies.Get(hierarchyId)).data
-        const children = await this.fetch(`/pcm/hierarchies/${hierarchyId}/children`)
+	async getHierarchy(hierarchyId: string): Promise<Category> {
+		const hierarchy = await (await this.moltin.Hierarchies.Get(hierarchyId)).data
+		const children = await this.fetch(`/pcm/hierarchies/${hierarchyId}/children`)
 
-        return {
-            id: hierarchy.id,
-            name: hierarchy.attributes.name,
-            slug: hierarchy.attributes.slug || slugify(hierarchy.attributes.name, { lower: true }),
-            children: await Promise.all(children.map(async child => await this.getNode.bind(this)(hierarchy.id, child.id))),
-            products: []
-        }
-    }
+		return {
+			id: hierarchy.id,
+			name: hierarchy.attributes.name,
+			slug: hierarchy.attributes.slug || slugify(hierarchy.attributes.name, { lower: true }),
+			children: await Promise.all(children.map(async child => await this.getNode.bind(this)(hierarchy.id, child.id))),
+			products: []
+		}
+	}
 
-    async getNode(hierarchyId: string, nodeId: string): Promise<Category> {
-        const node = await this.fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}`)        
-        const children = await this.fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
+	async getNode(hierarchyId: string, nodeId: string): Promise<Category> {
+		const node = await this.fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}`)        
+		const children = await this.fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`)
 
-        return {
-            id: node.id,
-            name: node.attributes.name,
-            slug: node.attributes.slug || slugify(node.attributes.name, { lower: true }),
-            children: await Promise.all(children.map(async child => await this.getNode.bind(this)(hierarchyId, child.id))),
-            products: []
-        }
-    }
+		return {
+			id: node.id,
+			name: node.attributes.name,
+			slug: node.attributes.slug || slugify(node.attributes.name, { lower: true }),
+			children: await Promise.all(children.map(async child => await this.getNode.bind(this)(hierarchyId, child.id))),
+			products: []
+		}
+	}
 
-    async cacheMegaMenu(): Promise<void> {
-        this.catalog = _.find(await (await this.moltin.Catalogs.All()).data, cat => cat.attributes?.name === this.config.catalog_name)
-        this.megaMenu = await Promise.all(this.catalog.attributes.hierarchy_ids.map(this.getHierarchy.bind(this)))
-        this.pricebooks = await this.fetch(`/pcm/pricebooks`)
-    }
+	async cacheMegaMenu(): Promise<void> {
+		this.catalog = _.find(await (await this.moltin.Catalogs.All()).data, cat => cat.attributes?.name === this.config.catalog_name)
+		this.megaMenu = await Promise.all(this.catalog.attributes.hierarchy_ids.map(this.getHierarchy.bind(this)))
+		this.pricebooks = await this.fetch('/pcm/pricebooks')
+	}
 
-    async getProductById(productId: string): Promise<Moltin.Product> {
-        return await this.fetch(`/pcm/products/${productId}`)
-    }
+	async getProductById(productId: string): Promise<Moltin.Product> {
+		return await this.fetch(`/pcm/products/${productId}`)
+	}
 
-    async getProducts(args: GetProductsArgs): Promise<Product[]> {
-        let products: any[] = []
+	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		let products: any[] = []
 
-        if (args.productIds) {
-            products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
-        }   
-        else if (args.keyword) {
-            products = await this.fetch(`/pcm/products?filter=eq(sku,${args.keyword})`)
-        }
-        else if (args.category) {
-            let hierarchyRoot = this.getHierarchyRootNode(args.category)
-            if (hierarchyRoot.id === args.category.id) {
-                products = await this.getProductsForHierarchy(args.category.id)                
-            }
-            else {
-                products = await this.getProductsForNode(args.category.id)
-            }
-        }
-        return await Promise.all(products.map(this.mapProduct.bind(this)))
-    }
+		if (args.productIds) {
+			products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
+		}   
+		else if (args.keyword) {
+			products = await this.fetch(`/pcm/products?filter=eq(sku,${args.keyword})`)
+		}
+		else if (args.category) {
+			const hierarchyRoot = this.getHierarchyRootNode(args.category)
+			if (hierarchyRoot.id === args.category.id) {
+				products = await this.getProductsForHierarchy(args.category.id)                
+			}
+			else {
+				products = await this.getProductsForNode(args.category.id)
+			}
+		}
+		return await Promise.all(products.map(this.mapProduct.bind(this)))
+	}
 
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        return this.fetch(`/v2/flows/customer-group/entries`)
-    }
+	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+		return this.fetch('/v2/flows/customer-group/entries')
+	}
 }
 
 export default ElasticPathCommerceCodecType

@@ -1,6 +1,6 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '..';
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types';
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../common/types';
 export declare enum CodecTypes {
     commerce = 0
 }
@@ -52,6 +52,7 @@ export declare class CommerceCodec implements CommerceAPI {
     getCategory(args: GetCommerceObjectArgs): Promise<Category>;
     getMegaMenu(args: CommonArgs): Promise<Category[]>;
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+    getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
     testIntegration(): Promise<CodecTestResult[]>;
 }
 export declare const getRandom: <T>(array: T[]) => T;
@@ -64,4 +65,5 @@ import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringC
 export declare const getCodec: (config: any, type: CodecTypes) => Promise<API>;
 export declare const defaultArgs: CommonArgs;
 export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;
+import { SFCCProduct } from './codecs/sfcc/types';
 export * from './codecs/common';

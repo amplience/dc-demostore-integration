@@ -1,7 +1,7 @@
 import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI, CONSTANTS, findInMegaMenu, flattenCategories } from '..'
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../common/types'
 import { IntegrationError } from '../common/errors'
 
 export enum CodecTypes {
@@ -11,58 +11,58 @@ export enum CodecTypes {
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
 export class CodecType {
-    _type:          CodecTypes
-    _properties:    Dictionary<AnyProperty>
-    _vendor:        string
+	_type:          CodecTypes
+	_properties:    Dictionary<AnyProperty>
+	_vendor:        string
 
-    get type(): CodecTypes {
-        return this._type
-    }
+	get type(): CodecTypes {
+		return this._type
+	}
 
-    get vendor(): string {
-        return this._vendor
-    }
+	get vendor(): string {
+		return this._vendor
+	}
 
-    get schemaUri(): string {
-        return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
-    }
+	get schemaUri(): string {
+		return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
+	}
 
-    get label(): string {
-        return `${this.vendor} integration`
-    }
+	get label(): string {
+		return `${this.vendor} integration`
+	}
 
-    get iconUrl(): string {
-        return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
-    }
+	get iconUrl(): string {
+		return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
+	}
 
-    get schema(): any {
-        return {
-            properties: this.properties
-        }
-    }
+	get schema(): any {
+		return {
+			properties: this.properties
+		}
+	}
 
-    get properties(): Dictionary<AnyProperty> {
-        return this._properties
-    }
+	get properties(): Dictionary<AnyProperty> {
+		return this._properties
+	}
 
-    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API> {
-        throw new Error('must implement getCodec')
-    }
+	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API> {
+		throw new Error('must implement getCodec')
+	}
 
-    // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
-    async postProcess(config: any): Promise<any> {
-        return config
-    }
+	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+	async postProcess(config: any): Promise<any> {
+		return config
+	}
 }
 
 export class CommerceCodecType extends CodecType {
-    get type() {
-        return CodecTypes.commerce
-    }
+	get type() {
+		return CodecTypes.commerce
+	}
 
-    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI> {
-        throw new Error('must implement getCodec')
-    }
+	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI> {
+		throw new Error('must implement getCodec')
+	}
 }
 
 export enum CodecTestOperationType {
@@ -83,138 +83,142 @@ export interface CodecTestResult {
 }
 
 export class CommerceCodec implements CommerceAPI {
-    config: CodecPropertyConfig<Dictionary<AnyProperty>>
-    megaMenu: Category[] = []
-    codecType: CommerceCodecType
-    initDuration: number
+	config: CodecPropertyConfig<Dictionary<AnyProperty>>
+	megaMenu: Category[] = []
+	codecType: CommerceCodecType
+	initDuration: number
     
-    constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>) {
-        this.config = config
-    }
+	constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>) {
+		this.config = config
+	}
 
-    async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
-        const startInit = new Date().valueOf()
-        await this.cacheMegaMenu()
-        this.initDuration = new Date().valueOf() - startInit
-        this.codecType = codecType
+	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
+		const startInit = new Date().valueOf()
+		await this.cacheMegaMenu()
+		this.initDuration = new Date().valueOf() - startInit
+		this.codecType = codecType
 
-        if (this.megaMenu.length === 0) {
-            throw new IntegrationError({
-                message: 'megaMenu has no categories, cannot build navigation',
-                helpUrl: ``
-            })
-        }
-        return this
-    }
+		if (this.megaMenu.length === 0) {
+			throw new IntegrationError({
+				message: 'megaMenu has no categories, cannot build navigation',
+				helpUrl: ''
+			})
+		}
+		return this
+	}
 
-    findCategory(slug: string) {
-        return findInMegaMenu(this.megaMenu, slug)
-    }    
+	findCategory(slug: string) {
+		return findInMegaMenu(this.megaMenu, slug)
+	}    
 
-    async cacheMegaMenu(): Promise<void> {
-        this.megaMenu = []
-    }
+	async cacheMegaMenu(): Promise<void> {
+		this.megaMenu = []
+	}
 
-    // defined in terms of getProducts()
-    async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
-        return _.first(await this.getProducts({ ...args, productIds: args.id }))
-    }
+	// defined in terms of getProducts()
+	async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
+		return _.first(await this.getProducts({ ...args, productIds: args.id }))
+	}
 
-    async getProducts(args: GetProductsArgs): Promise<Product[]> {
-        console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`)
-        return []
-    }
+	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`)
+		return []
+	}
 
-    // defined in terms of getMegaMenu, effectively
-    async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
-        let category = this.findCategory(args.slug)
-        category.products = await this.getProducts({ ...args, category })
-        return category
-    }
+	// defined in terms of getMegaMenu, effectively
+	async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
+		const category = this.findCategory(args.slug)
+		category.products = await this.getProducts({ ...args, category })
+		return category
+	}
 
-    async getMegaMenu(args: CommonArgs): Promise<Category[]> {
-        return this.megaMenu
-    }
+	async getMegaMenu(args: CommonArgs): Promise<Category[]> {
+		return this.megaMenu
+	}
 
-    async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-        console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`)
-        return []
-    }
+	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+		console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`)
+		return []
+	}
 
-    async testIntegration(): Promise<CodecTestResult[]> {
-        let results: CodecTestResult[] = [{
-            operationType: CodecTestOperationType.megaMenu,
-            description: 'cache the megamenu',
-            arguments: '',
-            duration: this.initDuration,
-            results: this.megaMenu
-        }]
+	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
+		return await this.getVariants(args)
+	}
 
-        // 2: get a category by slug, which is done implicitly for all categories here
-        let categories: Category[] = await Promise.all(flattenCategories(this.megaMenu).map(async c => {
-            let categoryStart = new Date().valueOf()
-            let category = await this.getCategory(c)
-            results.push({
-                operationType: CodecTestOperationType.getCategory,
-                description: `get category by slug`,
-                arguments: category.slug,
-                duration: new Date().valueOf() - categoryStart,
-                results: category
-            })
-            return category
-        }))
+	async testIntegration(): Promise<CodecTestResult[]> {
+		const results: CodecTestResult[] = [{
+			operationType: CodecTestOperationType.megaMenu,
+			description: 'cache the megamenu',
+			arguments: '',
+			duration: this.initDuration,
+			results: this.megaMenu
+		}]
 
-        let productCategory = categories.find(cat => cat.products.length > 0)
+		// 2: get a category by slug, which is done implicitly for all categories here
+		const categories: Category[] = await Promise.all(flattenCategories(this.megaMenu).map(async c => {
+			const categoryStart = new Date().valueOf()
+			const category = await this.getCategory(c)
+			results.push({
+				operationType: CodecTestOperationType.getCategory,
+				description: 'get category by slug',
+				arguments: category.slug,
+				duration: new Date().valueOf() - categoryStart,
+				results: category
+			})
+			return category
+		}))
 
-        // 3: get a single product by id
-        let singleProductStart = new Date().valueOf()
-        let singleProductById = await this.getProduct(getRandom<Product>(productCategory.products))
-        results.push({
-            operationType: CodecTestOperationType.getProductById,
-            description: `get product by id`,
-            arguments: singleProductById.id,
-            duration: new Date().valueOf() - singleProductStart,
-            results: singleProductById
-        })
+		const productCategory = categories.find(cat => cat.products.length > 0)
 
-        // 4: search for a product
-        let keywordStart = new Date().valueOf()
-        let keyword = singleProductById.name.split(' ').pop()
-        let searchResults = await this.getProducts({ keyword })
-        results.push({
-            operationType: CodecTestOperationType.getProductsByKeyword,
-            description: `get products by search keyword`,
-            arguments: keyword,
-            duration: new Date().valueOf() - keywordStart,
-            results: searchResults
-        })
+		// 3: get a single product by id
+		const singleProductStart = new Date().valueOf()
+		const singleProductById = await this.getProduct(getRandom<Product>(productCategory.products))
+		results.push({
+			operationType: CodecTestOperationType.getProductById,
+			description: 'get product by id',
+			arguments: singleProductById.id,
+			duration: new Date().valueOf() - singleProductStart,
+			results: singleProductById
+		})
 
-        // 5: get a list of products given a list of product ids
-        let prodsStart = new Date().valueOf()
-        let prods = [singleProductById, ..._.take(searchResults, 1)]
-        let productIds: string = prods.map(product => product.id).join(',')
-        let productsByProductId = await this.getProducts({ productIds })
-        results.push({
-            operationType: CodecTestOperationType.getProductsByProductIds,
-            description: `get products by product ids`,
-            arguments: productIds,
-            duration: new Date().valueOf() - prodsStart,
-            results: productsByProductId
-        })
+		// 4: search for a product
+		const keywordStart = new Date().valueOf()
+		const keyword = singleProductById.name.split(' ').pop()
+		const searchResults = await this.getProducts({ keyword })
+		results.push({
+			operationType: CodecTestOperationType.getProductsByKeyword,
+			description: 'get products by search keyword',
+			arguments: keyword,
+			duration: new Date().valueOf() - keywordStart,
+			results: searchResults
+		})
 
-        // 6: get a list of customer groups
-        let customerGroupStart = new Date().valueOf()
-        let customerGroups = await this.getCustomerGroups({})
-        results.push({
-            operationType: CodecTestOperationType.getCustomerGroups,
-            description: `get customer groups`,
-            arguments: '',
-            duration: new Date().valueOf() - customerGroupStart,
-            results: customerGroups
-        })
+		// 5: get a list of products given a list of product ids
+		const prodsStart = new Date().valueOf()
+		const prods = [singleProductById, ..._.take(searchResults, 1)]
+		const productIds: string = prods.map(product => product.id).join(',')
+		const productsByProductId = await this.getProducts({ productIds })
+		results.push({
+			operationType: CodecTestOperationType.getProductsByProductIds,
+			description: 'get products by product ids',
+			arguments: productIds,
+			duration: new Date().valueOf() - prodsStart,
+			results: productsByProductId
+		})
 
-        return results
-    }
+		// 6: get a list of customer groups
+		const customerGroupStart = new Date().valueOf()
+		const customerGroups = await this.getCustomerGroups({})
+		results.push({
+			operationType: CodecTestOperationType.getCustomerGroups,
+			description: 'get customer groups',
+			arguments: '',
+			duration: new Date().valueOf() - customerGroupStart,
+			results: customerGroups
+		})
+
+		return results
+	}
 }
 
 export const getRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * (array.length - 1))]
@@ -232,13 +236,13 @@ codecs[CodecTypes.commerce] = []
 
 // public interface
 export const getCodecs = (type?: CodecTypes): CodecType[] => {
-    return type ? codecs[type] : _.flatMap(codecs)
+	return type ? codecs[type] : _.flatMap(codecs)
 }
 
 export const registerCodec = (codec: CodecType) => {
-    if (!codecs[codec.type].includes(codec)) {
-        codecs[codec.type].push(codec)
-    }
+	if (!codecs[codec.type].includes(codec)) {
+		codecs[codec.type].push(codec)
+	}
 }
 
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
@@ -247,63 +251,63 @@ const apis = new Map<any, API>()
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types'
 
 const maskSensitiveData = (obj: any) => {
-    return {
-        ...obj,
-        client_secret: obj.client_secret && `**** redacted ****`,
-        api_token: obj.api_token && `**** redacted ****`,
-        password: obj.password && `**** redacted ****`,
-    }
+	return {
+		...obj,
+		client_secret: obj.client_secret && '**** redacted ****',
+		api_token: obj.api_token && '**** redacted ****',
+		password: obj.password && '**** redacted ****',
+	}
 }
 
 export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
-    let codecs = getCodecs(type)
-    let codec: CodecType
+	const codecs = getCodecs(type)
+	let codec: CodecType
     
-    // novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
-    if ('vendor' in config) {
-        let vendorCodec = codecs.find(codec => codec.vendor === config.vendor)
-        if (!vendorCodec) {
-            throw new IntegrationError({
-                message: `codec not found for vendor [ ${config.vendor} ]`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
-            })
-        }
+	// novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
+	if ('vendor' in config) {
+		const vendorCodec = codecs.find(codec => codec.vendor === config.vendor)
+		if (!vendorCodec) {
+			throw new IntegrationError({
+				message: `codec not found for vendor [ ${config.vendor} ]`,
+				helpUrl: 'https://help.dc-demostore.com/codec-error'
+			})
+		}
 
-        // check that all required properties are there
-        let difference = _.difference(Object.keys(vendorCodec.properties), Object.keys(config))
-        if (difference.length > 0) {
-            throw new IntegrationError({
-                message: `configuration missing properties required for vendor [ ${config.vendor} ]: [ ${difference.join(', ')} ]`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
-            })
-        }
+		// check that all required properties are there
+		const difference = _.difference(Object.keys(vendorCodec.properties), Object.keys(config))
+		if (difference.length > 0) {
+			throw new IntegrationError({
+				message: `configuration missing properties required for vendor [ ${config.vendor} ]: [ ${difference.join(', ')} ]`,
+				helpUrl: 'https://help.dc-demostore.com/codec-error'
+			})
+		}
 
-        codec = vendorCodec
-    }
-    // end novadev-450
+		codec = vendorCodec
+	}
+	// end novadev-450
 
-    else {
-        let codecsMatchingConfig: CodecType[] = codecs.filter(c => _.difference(Object.keys(c.properties), Object.keys(config)).length === 0)
-        if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-            throw new IntegrationError({
-                message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
-            })
-        }
-        codec = codecsMatchingConfig.pop()
-    }
+	else {
+		const codecsMatchingConfig: CodecType[] = codecs.filter(c => _.difference(Object.keys(c.properties), Object.keys(config)).length === 0)
+		if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
+			throw new IntegrationError({
+				message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
+				helpUrl: 'https://help.dc-demostore.com/codec-error'
+			})
+		}
+		codec = codecsMatchingConfig.pop()
+	}
 
-    let configHash = _.values(config).join('')
-    console.log(`[ demostore ] creating codec: ${codec.vendor}...`)
-    return apis[configHash] = apis[configHash] || await codec.getApi(config)
+	const configHash = _.values(config).join('')
+	console.log(`[ demostore ] creating codec: ${codec.vendor}...`)
+	return apis[configHash] = apis[configHash] || await codec.getApi(config)
 }
 
 export const defaultArgs: CommonArgs = {
-    locale:     'en-US',
-    language:   'en',
-    country:    'US',
-    currency:   'USD',
-    segment:    ''
+	locale:     'en-US',
+	language:   'en',
+	country:    'US',
+	currency:   'USD',
+	segment:    ''
 }
 
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
@@ -334,6 +338,7 @@ import RestCodecType from './codecs/rest'
 registerCodec(new RestCodecType())
 
 import SFCCCodecType from './codecs/sfcc'
+import { SFCCProduct } from './codecs/sfcc/types'
 registerCodec(new SFCCCodecType())
 
 // reexport codec common functions

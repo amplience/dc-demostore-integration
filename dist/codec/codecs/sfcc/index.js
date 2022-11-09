@@ -25,12 +25,12 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
     }
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { api_token: {
-                title: "Shopper API Token",
-                type: "string",
+                title: 'Shopper API Token',
+                type: 'string',
                 maxLength: 100
             }, site_id: {
-                title: "Site ID",
-                type: "string"
+                title: 'Site ID',
+                type: 'string'
             } });
     }
     getApi(config) {
@@ -115,7 +115,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     }
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            let categories = (yield this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories;
+            const categories = (yield this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories;
             this.megaMenu = categories.filter(cat => cat.parent_category_id === 'root').map(mapCategory);
         });
     }
@@ -141,13 +141,18 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     }
     search(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            let searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}`)).hits;
+            const searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}`)).hits;
             if (searchResults) {
                 return yield Promise.all(searchResults.map((searchResult) => __awaiter(this, void 0, void 0, function* () {
                     return yield this.getProductById.bind(this)(searchResult.product_id);
                 })));
             }
             return [];
+        });
+    }
+    getVariants(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.fetch(`${this.shopApi}/products/${args.productId}/variants`);
         });
     }
     getProducts(args) {

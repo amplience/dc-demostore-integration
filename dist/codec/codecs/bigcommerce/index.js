@@ -23,12 +23,12 @@ class BigCommerceCommerceCodecType extends __1.CommerceCodecType {
     }
     get properties() {
         return Object.assign(Object.assign({}, common_1.APIProperties), { api_token: {
-                title: "API Token",
-                type: "string",
+                title: 'API Token',
+                type: 'string',
                 minLength: 1
             }, store_hash: {
-                title: "Store hash",
-                type: "string",
+                title: 'Store hash',
+                type: 'string',
                 minLength: 1
             } });
     }
@@ -42,19 +42,19 @@ exports.BigCommerceCommerceCodecType = BigCommerceCommerceCodecType;
 class BigCommerceCommerceCodec extends __1.CommerceCodec {
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.megaMenu = (yield this.fetch(`/v3/catalog/categories/tree`)).map(mappers_1.mapCategory);
+            this.megaMenu = (yield this.fetch('/v3/catalog/categories/tree')).map(mappers_1.mapCategory);
         });
     }
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield axios_1.default.request({
+            const response = yield axios_1.default.request({
                 method: 'get',
                 url,
                 baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
                 headers: {
                     'X-Auth-Token': this.config.api_token,
-                    'Accept': `application/json`,
-                    'Content-Type': `application/json`
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             });
             if (url.indexOf('customer_groups') > -1) {
@@ -80,7 +80,7 @@ class BigCommerceCommerceCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.fetch(`/v2/customer_groups`)).map(mappers_1.mapCustomerGroup);
+            return (yield this.fetch('/v2/customer_groups')).map(mappers_1.mapCustomerGroup);
         });
     }
 }

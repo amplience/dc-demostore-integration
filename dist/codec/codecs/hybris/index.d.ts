@@ -1,8 +1,8 @@
-import { APIConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
-import { HybrisProduct } from "./types";
-import { AxiosInstance } from "axios";
+import { APIConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { StringProperty } from '../../cms-property-types';
+import { HybrisProduct } from './types';
+import { AxiosInstance } from 'axios';
 declare type CodecConfig = APIConfiguration & {
     catalog_id: StringProperty;
 };

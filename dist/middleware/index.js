@@ -31,7 +31,7 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
-    let matchingCodec = (0, index_1.getCodecs)().find(c => { var _a; return c.vendor === config.vendor || c.schemaUri === ((_a = config._meta) === null || _a === void 0 ? void 0 : _a.schema); });
+    const matchingCodec = (0, index_1.getCodecs)().find(c => { var _a; return c.vendor === config.vendor || c.schemaUri === ((_a = config._meta) === null || _a === void 0 ? void 0 : _a.schema); });
     if (matchingCodec) {
         config = yield matchingCodec.postProcess(config);
     }
@@ -45,7 +45,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     }
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
-            const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+            const apiUrl = window.isStorybook ? 'https://core.dc-demostore.com/api' : '/api';
             return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {
@@ -53,7 +53,8 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             getProducts: getResponse('getProducts'),
             getCategory: getResponse('getCategory'),
             getMegaMenu: getResponse('getMegaMenu'),
-            getCustomerGroups: getResponse('getCustomerGroups')
+            getCustomerGroups: getResponse('getCustomerGroups'),
+            getVariants: getResponse('getVariants')
         };
     }
 });
@@ -64,8 +65,8 @@ const middleware = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
-    let config = req.body || req.query;
-    let commerceAPI = yield (0, exports.getCommerceAPI)(config);
+    const config = req.body || req.query;
+    const commerceAPI = yield (0, exports.getCommerceAPI)(config);
     switch (req.method.toLowerCase()) {
         case 'get':
         case 'post':

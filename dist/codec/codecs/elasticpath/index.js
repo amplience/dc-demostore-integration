@@ -27,12 +27,12 @@ class ElasticPathCommerceCodecType extends __1.CommerceCodecType {
     }
     get properties() {
         return Object.assign(Object.assign(Object.assign({}, common_1.OAuthProperties), common_1.ClientCredentialProperties), { pcm_url: {
-                title: "PCM URL",
-                type: "string",
+                title: 'PCM URL',
+                type: 'string',
                 pattern: cms_property_types_1.StringPatterns.httpUrl
             }, catalog_name: {
-                title: "Catalog name",
-                type: "string",
+                title: 'Catalog name',
+                type: 'string',
                 minLength: 1
             } });
     }
@@ -63,7 +63,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
     }
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield this.rest.get({ url });
+            const response = yield this.rest.get({ url });
             return response && response.data;
         });
     }
@@ -82,14 +82,14 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
     mapProduct(product) {
         var _a, _b, _c, _d, _e, _f;
         return __awaiter(this, void 0, void 0, function* () {
-            let attributes = {};
-            let images = [];
+            const attributes = {};
+            const images = [];
             if ((_b = (_a = product.relationships.main_image) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.id) {
-                let mainImage = yield this.getFileById((_d = (_c = product.relationships.main_image) === null || _c === void 0 ? void 0 : _c.data) === null || _d === void 0 ? void 0 : _d.id);
+                const mainImage = yield this.getFileById((_d = (_c = product.relationships.main_image) === null || _c === void 0 ? void 0 : _c.data) === null || _d === void 0 ? void 0 : _d.id);
                 images.push({ url: (_e = mainImage === null || mainImage === void 0 ? void 0 : mainImage.link) === null || _e === void 0 ? void 0 : _e.href });
             }
-            let price = yield this.getPriceForSku(product.attributes.sku);
-            let productPrice = (0, util_1.formatMoneyString)(price.amount / 100, { currency: 'USD' });
+            const price = yield this.getPriceForSku(product.attributes.sku);
+            const productPrice = (0, util_1.formatMoneyString)(price.amount / 100, { currency: 'USD' });
             lodash_1.default.each((_f = product.attributes) === null || _f === void 0 ? void 0 : _f.extensions, (extension, key) => {
                 lodash_1.default.each(extension, (v, k) => {
                     if (k.indexOf('image') > -1) {
@@ -100,7 +100,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
                     }
                 });
             });
-            let variants = [{
+            const variants = [{
                     sku: product.attributes.sku,
                     prices: {
                         list: productPrice,
@@ -114,10 +114,10 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
                 }];
             // variants
             if (!lodash_1.default.isEmpty(product.meta.variation_matrix)) {
-                let variationMatrix = product.meta.variation_matrix;
-                let x = lodash_1.default.flatMap(Object.keys(variationMatrix).map(key => {
-                    let variation = variationMatrix[key];
-                    let z = lodash_1.default.map;
+                const variationMatrix = product.meta.variation_matrix;
+                const x = lodash_1.default.flatMap(Object.keys(variationMatrix).map(key => {
+                    const variation = variationMatrix[key];
+                    const z = lodash_1.default.map;
                     return {};
                 }));
             }
@@ -141,7 +141,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
         return __awaiter(this, void 0, void 0, function* () {
             let base = yield this.getPriceForSkuInPricebook(sku, this.catalog.attributes.pricebook_id);
             if (!base) {
-                let prices = yield Promise.all(this.pricebooks.map((pricebook) => __awaiter(this, void 0, void 0, function* () { return yield this.getPriceForSkuInPricebook.bind(this)(sku, pricebook.id); })));
+                const prices = yield Promise.all(this.pricebooks.map((pricebook) => __awaiter(this, void 0, void 0, function* () { return yield this.getPriceForSkuInPricebook.bind(this)(sku, pricebook.id); })));
                 base = lodash_1.default.find(prices, x => x);
             }
             return base ? {
@@ -189,7 +189,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
         return __awaiter(this, void 0, void 0, function* () {
             this.catalog = lodash_1.default.find(yield (yield this.moltin.Catalogs.All()).data, cat => { var _a; return ((_a = cat.attributes) === null || _a === void 0 ? void 0 : _a.name) === this.config.catalog_name; });
             this.megaMenu = yield Promise.all(this.catalog.attributes.hierarchy_ids.map(this.getHierarchy.bind(this)));
-            this.pricebooks = yield this.fetch(`/pcm/pricebooks`);
+            this.pricebooks = yield this.fetch('/pcm/pricebooks');
         });
     }
     getProductById(productId) {
@@ -207,7 +207,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
                 products = yield this.fetch(`/pcm/products?filter=eq(sku,${args.keyword})`);
             }
             else if (args.category) {
-                let hierarchyRoot = this.getHierarchyRootNode(args.category);
+                const hierarchyRoot = this.getHierarchyRootNode(args.category);
                 if (hierarchyRoot.id === args.category.id) {
                     products = yield this.getProductsForHierarchy(args.category.id);
                 }
@@ -220,7 +220,7 @@ class ElasticPathCommerceCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return this.fetch(`/v2/flows/customer-group/entries`);
+            return this.fetch('/v2/flows/customer-group/entries');
         });
     }
 }

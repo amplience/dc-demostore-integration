@@ -46,13 +46,16 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
     }
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
+            // eslint-disable-next-line no-empty
             if (args.productIds) {
             }
+            // eslint-disable-next-line no-empty
             else if (args.keyword) {
             }
+            // eslint-disable-next-line no-empty
             else if (args.category) {
             }
-            throw new Error(`getProducts() requires either: productIds, keyword, or category reference`);
+            throw new Error('getProducts() requires either: productIds, keyword, or category reference');
         });
     }
     getCustomerGroups(args) {

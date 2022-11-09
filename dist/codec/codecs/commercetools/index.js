@@ -24,12 +24,12 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
     }
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { project: {
-                title: "project key",
-                type: "string",
+                title: 'project key',
+                type: 'string',
                 minLength: 1
             }, scope: {
-                title: "scope",
-                type: "string",
+                title: 'scope',
+                type: 'string',
                 maxLength: 1000
             } });
     }
@@ -58,7 +58,7 @@ const getAttributeValue = (args) => (attribute) => {
     }
 };
 const findPrice = (variant, args) => {
-    let price = variant.prices &&
+    const price = variant.prices &&
         (variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
             variant.prices.find(price => price.value.currencyCode === args.currency) ||
             lodash_1.default.first(variant.prices));
@@ -117,7 +117,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
     }
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            const categories = yield this.fetch(`/categories?limit=500`);
+            const categories = yield this.fetch('/categories?limit=500');
             const mapped = categories.map(cat => mapCategory(cat, categories, {}));
             this.megaMenu = mapped.filter(cat => cats.includes(cat.slug));
         });
@@ -144,7 +144,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
     }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch(`/customer-groups`);
+            return yield this.fetch('/customer-groups');
         });
     }
 }

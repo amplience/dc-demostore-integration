@@ -34,8 +34,8 @@ const mapProduct = (product, megaMenu) => {
         categories: product.group_ids.map(gid => (0, __1.findInMegaMenu)(megaMenu, gid)),
         imageSetId: (_b = (_a = product.variations[0]) === null || _a === void 0 ? void 0 : _a.metadata['attribute-articleNumberMax']) === null || _b === void 0 ? void 0 : _b.padStart(6, '0'),
         variants: product.variations.map(variation => {
-            let attributes = {};
-            let images = [];
+            const attributes = {};
+            const images = [];
             lodash_1.default.each(variation.metadata, (value, key) => {
                 if (key.startsWith('attribute-')) {
                     attributes[key.replace('attribute-', '')] = value;
@@ -61,13 +61,13 @@ class ConstructorIOCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return {
             api_key: {
-                title: "API Key",
-                type: "string",
+                title: 'API Key',
+                type: 'string',
                 minLength: 1
             },
             api_token: {
-                title: "API Token",
-                type: "string",
+                title: 'API Token',
+                type: 'string',
                 minLength: 1
             }
         };
@@ -93,7 +93,7 @@ class ConstructorIOCommerceCodec extends __1.CommerceCodec {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 return (yield axios_1.default.get(url, {
-                    baseURL: `https://ac.cnstrc.com`,
+                    baseURL: 'https://ac.cnstrc.com',
                     headers: {
                         Authorization: `Basic ${btoa(`${this.config.api_token}:`)}`
                     },
@@ -112,7 +112,7 @@ class ConstructorIOCommerceCodec extends __1.CommerceCodec {
     }
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            let categories = yield this.fetch(`/v1/item_groups`);
+            const categories = yield this.fetch('/v1/item_groups');
             this.megaMenu = categories.filter(cat => cat.parent === 'master').map(mapCategory(categories));
         });
     }
@@ -126,7 +126,7 @@ class ConstructorIOCommerceCodec extends __1.CommerceCodec {
                 products = yield this.fetch(`/search/${args.keyword}`);
             }
             else if (args.category) {
-                let browseResults = (yield this.fetch(`/browse/group_id/${args.category.slug}`)).response.results;
+                const browseResults = (yield this.fetch(`/browse/group_id/${args.category.slug}`)).response.results;
                 return yield this.getProducts({ productIds: lodash_1.default.map(lodash_1.default.take(browseResults, 10), 'data.id').join(',') });
             }
             return products.map(prod => mapProduct(prod, this.megaMenu));

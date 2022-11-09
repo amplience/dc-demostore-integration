@@ -52,6 +52,9 @@ export declare type GetCommerceObjectArgs = CommonArgs & {
     id?: string;
     slug?: string;
 };
+export declare type GetVariantsArgs = CommonArgs & {
+    productId: string;
+};
 export declare type GetProductsArgs = CommonArgs & {
     keyword?: string;
     productIds?: string;

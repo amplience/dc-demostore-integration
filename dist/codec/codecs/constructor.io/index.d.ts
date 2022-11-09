@@ -1,6 +1,6 @@
-import { CommerceAPI, GetProductsArgs, Product } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
+import { CommerceAPI, GetProductsArgs, Product } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { StringProperty } from '../../cms-property-types';
 declare type CodecConfig = {
     api_key: StringProperty;
     api_token: StringProperty;

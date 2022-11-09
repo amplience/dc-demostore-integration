@@ -101,7 +101,7 @@ class CommerceCodec {
             if (this.megaMenu.length === 0) {
                 throw new errors_1.IntegrationError({
                     message: 'megaMenu has no categories, cannot build navigation',
-                    helpUrl: ``
+                    helpUrl: ''
                 });
             }
             return this;
@@ -130,7 +130,7 @@ class CommerceCodec {
     // defined in terms of getMegaMenu, effectively
     getCategory(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            let category = this.findCategory(args.slug);
+            const category = this.findCategory(args.slug);
             category.products = yield this.getProducts(Object.assign(Object.assign({}, args), { category }));
             return category;
         });
@@ -146,9 +146,14 @@ class CommerceCodec {
             return [];
         });
     }
+    getVariants(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.getVariants(args);
+        });
+    }
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
-            let results = [{
+            const results = [{
                     operationType: CodecTestOperationType.megaMenu,
                     description: 'cache the megamenu',
                     arguments: '',
@@ -156,58 +161,58 @@ class CommerceCodec {
                     results: this.megaMenu
                 }];
             // 2: get a category by slug, which is done implicitly for all categories here
-            let categories = yield Promise.all((0, __1.flattenCategories)(this.megaMenu).map((c) => __awaiter(this, void 0, void 0, function* () {
-                let categoryStart = new Date().valueOf();
-                let category = yield this.getCategory(c);
+            const categories = yield Promise.all((0, __1.flattenCategories)(this.megaMenu).map((c) => __awaiter(this, void 0, void 0, function* () {
+                const categoryStart = new Date().valueOf();
+                const category = yield this.getCategory(c);
                 results.push({
                     operationType: CodecTestOperationType.getCategory,
-                    description: `get category by slug`,
+                    description: 'get category by slug',
                     arguments: category.slug,
                     duration: new Date().valueOf() - categoryStart,
                     results: category
                 });
                 return category;
             })));
-            let productCategory = categories.find(cat => cat.products.length > 0);
+            const productCategory = categories.find(cat => cat.products.length > 0);
             // 3: get a single product by id
-            let singleProductStart = new Date().valueOf();
-            let singleProductById = yield this.getProduct((0, exports.getRandom)(productCategory.products));
+            const singleProductStart = new Date().valueOf();
+            const singleProductById = yield this.getProduct((0, exports.getRandom)(productCategory.products));
             results.push({
                 operationType: CodecTestOperationType.getProductById,
-                description: `get product by id`,
+                description: 'get product by id',
                 arguments: singleProductById.id,
                 duration: new Date().valueOf() - singleProductStart,
                 results: singleProductById
             });
             // 4: search for a product
-            let keywordStart = new Date().valueOf();
-            let keyword = singleProductById.name.split(' ').pop();
-            let searchResults = yield this.getProducts({ keyword });
+            const keywordStart = new Date().valueOf();
+            const keyword = singleProductById.name.split(' ').pop();
+            const searchResults = yield this.getProducts({ keyword });
             results.push({
                 operationType: CodecTestOperationType.getProductsByKeyword,
-                description: `get products by search keyword`,
+                description: 'get products by search keyword',
                 arguments: keyword,
                 duration: new Date().valueOf() - keywordStart,
                 results: searchResults
             });
             // 5: get a list of products given a list of product ids
-            let prodsStart = new Date().valueOf();
-            let prods = [singleProductById, ...lodash_1.default.take(searchResults, 1)];
-            let productIds = prods.map(product => product.id).join(',');
-            let productsByProductId = yield this.getProducts({ productIds });
+            const prodsStart = new Date().valueOf();
+            const prods = [singleProductById, ...lodash_1.default.take(searchResults, 1)];
+            const productIds = prods.map(product => product.id).join(',');
+            const productsByProductId = yield this.getProducts({ productIds });
             results.push({
                 operationType: CodecTestOperationType.getProductsByProductIds,
-                description: `get products by product ids`,
+                description: 'get products by product ids',
                 arguments: productIds,
                 duration: new Date().valueOf() - prodsStart,
                 results: productsByProductId
             });
             // 6: get a list of customer groups
-            let customerGroupStart = new Date().valueOf();
-            let customerGroups = yield this.getCustomerGroups({});
+            const customerGroupStart = new Date().valueOf();
+            const customerGroups = yield this.getCustomerGroups({});
             results.push({
                 operationType: CodecTestOperationType.getCustomerGroups,
-                description: `get customer groups`,
+                description: 'get customer groups',
                 arguments: '',
                 duration: new Date().valueOf() - customerGroupStart,
                 results: customerGroups
@@ -235,42 +240,42 @@ exports.registerCodec = registerCodec;
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map();
 const maskSensitiveData = (obj) => {
-    return Object.assign(Object.assign({}, obj), { client_secret: obj.client_secret && `**** redacted ****`, api_token: obj.api_token && `**** redacted ****`, password: obj.password && `**** redacted ****` });
+    return Object.assign(Object.assign({}, obj), { client_secret: obj.client_secret && '**** redacted ****', api_token: obj.api_token && '**** redacted ****', password: obj.password && '**** redacted ****' });
 };
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
-    let codecs = (0, exports.getCodecs)(type);
+    const codecs = (0, exports.getCodecs)(type);
     let codec;
     // novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
     if ('vendor' in config) {
-        let vendorCodec = codecs.find(codec => codec.vendor === config.vendor);
+        const vendorCodec = codecs.find(codec => codec.vendor === config.vendor);
         if (!vendorCodec) {
             throw new errors_1.IntegrationError({
                 message: `codec not found for vendor [ ${config.vendor} ]`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
+                helpUrl: 'https://help.dc-demostore.com/codec-error'
             });
         }
         // check that all required properties are there
-        let difference = lodash_1.default.difference(Object.keys(vendorCodec.properties), Object.keys(config));
+        const difference = lodash_1.default.difference(Object.keys(vendorCodec.properties), Object.keys(config));
         if (difference.length > 0) {
             throw new errors_1.IntegrationError({
                 message: `configuration missing properties required for vendor [ ${config.vendor} ]: [ ${difference.join(', ')} ]`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
+                helpUrl: 'https://help.dc-demostore.com/codec-error'
             });
         }
         codec = vendorCodec;
     }
     // end novadev-450
     else {
-        let codecsMatchingConfig = codecs.filter(c => lodash_1.default.difference(Object.keys(c.properties), Object.keys(config)).length === 0);
+        const codecsMatchingConfig = codecs.filter(c => lodash_1.default.difference(Object.keys(c.properties), Object.keys(config)).length === 0);
         if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
             throw new errors_1.IntegrationError({
                 message: `[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(maskSensitiveData(config), undefined, 4)}`,
-                helpUrl: `https://help.dc-demostore.com/codec-error`
+                helpUrl: 'https://help.dc-demostore.com/codec-error'
             });
         }
         codec = codecsMatchingConfig.pop();
     }
-    let configHash = lodash_1.default.values(config).join('');
+    const configHash = lodash_1.default.values(config).join('');
     console.log(`[ demostore ] creating codec: ${codec.vendor}...`);
     return apis[configHash] = apis[configHash] || (yield codec.getApi(config));
 });

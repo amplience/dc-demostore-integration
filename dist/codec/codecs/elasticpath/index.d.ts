@@ -1,6 +1,6 @@
-import { Category, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
+import { Category, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { StringProperty } from '../../cms-property-types';
 import Moltin, { Moltin as MoltinApi, PriceBookPriceBase } from '@moltin/sdk';
 declare type CodecConfig = ClientCredentialsConfiguration & {
     pcm_url: StringProperty;

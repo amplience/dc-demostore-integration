@@ -10,6 +10,7 @@ export type Identifiable = {
     name:               string
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type CustomerGroup = Identifiable & {}
 
 export type CommerceObject = Identifiable & {
@@ -62,6 +63,10 @@ export type CommonArgs = {
 export type GetCommerceObjectArgs = CommonArgs & {
     id?:                string
     slug?:              string
+}
+
+export type GetVariantsArgs = CommonArgs & {
+    productId:        string
 }
 
 export type GetProductsArgs = CommonArgs & {

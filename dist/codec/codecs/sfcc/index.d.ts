@@ -1,7 +1,7 @@
-import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, OAuthRestClientInterface, Product, CustomerGroup } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
-import { SFCCProduct } from "./types";
+import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, OAuthRestClientInterface, Product, CustomerGroup, GetVariantsArgs } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { StringProperty } from '../../cms-property-types';
+import { SFCCProduct } from './types';
 declare type CodecConfig = ClientCredentialsConfiguration & {
     api_token: StringProperty;
     site_id: StringProperty;
@@ -23,6 +23,7 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     authenticatedFetch(url: string): Promise<any>;
     getProductById(productId: string): Promise<SFCCProduct>;
     search(query: string): Promise<SFCCProduct[]>;
+    getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]>;
 }

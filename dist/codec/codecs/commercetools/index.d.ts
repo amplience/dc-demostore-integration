@@ -1,6 +1,6 @@
-import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../../";
-import { StringProperty } from "../../cms-property-types";
+import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
+import { StringProperty } from '../../cms-property-types';
 declare type CodecConfig = ClientCredentialsConfiguration & {
     project: StringProperty;
     scope: StringProperty;
