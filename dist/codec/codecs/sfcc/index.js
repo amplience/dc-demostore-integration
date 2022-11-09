@@ -27,10 +27,10 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { api_token: {
                 title: 'Shopper API Token',
                 type: 'string',
-                maxLength: 100
+                maxLength: 100,
             }, site_id: {
                 title: 'Site ID',
-                type: 'string'
+                type: 'string',
             } });
     }
     getApi(config) {
@@ -54,7 +54,7 @@ const mapCategory = (category) => {
         slug: category.id,
         name: category.name,
         children: ((_a = category.categories) === null || _a === void 0 ? void 0 : _a.map(mapCategory)) || [],
-        products: []
+        products: [],
     };
 };
 /*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
@@ -63,15 +63,15 @@ const mapCategory = (category) => {
     return group
 
 }*/
-const mapCustomerGroup = (group) => group && (Object.assign(Object.assign({}, group), { name: group.id }));
+const mapCustomerGroup = (group) => group && Object.assign(Object.assign({}, group), { name: group.id });
+// TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product) => {
     var _a;
     if (!product) {
         return null;
     }
-    console.log('SFCC Product: ', product);
-    const largeImages = product.image_groups.find(group => group.view_type === 'large');
-    const images = largeImages.images.map(image => ({ url: image.link }));
+    const largeImages = product.image_groups.find((group) => group.view_type === 'large');
+    const images = largeImages.images.map((image) => ({ url: image.dis_base_link }));
     return {
         id: product.id,
         name: product.name,
@@ -79,19 +79,29 @@ const mapProduct = (product) => {
         shortDescription: product.short_description,
         longDescription: product.long_description,
         categories: [],
-        variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => ({
+        variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map((variant) => ({
             sku: variant.product_id,
-            listPrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency }),
-            salePrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency }),
+            listPrice: (0, util_1.formatMoneyString)(variant.price, {
+                currency: product.currency,
+            }),
+            salePrice: (0, util_1.formatMoneyString)(variant.price, {
+                currency: product.currency,
+            }),
             images,
-            attributes: variant.variation_values
-        }))) || [{
+            attributes: variant.variation_values,
+        }))) || [
+            {
                 sku: product.id,
-                listPrice: (0, util_1.formatMoneyString)(product.price, { currency: product.currency }),
-                salePrice: (0, util_1.formatMoneyString)(product.price, { currency: product.currency }),
+                listPrice: (0, util_1.formatMoneyString)(product.price, {
+                    currency: product.currency,
+                }),
+                salePrice: (0, util_1.formatMoneyString)(product.price, {
+                    currency: product.currency,
+                }),
                 images,
-                attributes: {}
-            }]
+                attributes: {},
+            },
+        ],
     };
 };
 class SFCCCommerceCodec extends __1.CommerceCodec {
@@ -105,11 +115,11 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             this.rest = (0, common_1.OAuthRestClient)(Object.assign(Object.assign({}, this.config), { auth_url: `${this.config.auth_url.replace('oauth/access', 'oauth2/access')}?grant_type=client_credentials` }), {}, {
                 headers: {
                     Authorization: 'Basic ' + this.config.api_token,
-                    'Content-Type': 'application/x-www-form-urlencoded'
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 params: {
-                    client_id: this.config.client_id
-                }
+                    client_id: this.config.client_id,
+                },
             });
             return yield _super.init.call(this, codecType);
         });
@@ -117,7 +127,9 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = (yield this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories;
-            this.megaMenu = categories.filter(cat => cat.parent_category_id === 'root').map(mapCategory);
+            this.megaMenu = categories
+                .filter((cat) => cat.parent_category_id === 'root')
+                .map(mapCategory);
         });
     }
     fetch(url) {
@@ -125,8 +137,8 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return (yield axios_1.default.get(url, {
                 baseURL: this.config.api_url,
                 params: {
-                    client_id: this.config.client_id
-                }
+                    client_id: this.config.client_id,
+                },
             })).data;
         });
     }
@@ -137,12 +149,12 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
     }
     getProductById(productId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations`);
+            return yield this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`);
         });
     }
     search(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}`)).hits;
+            const searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}&count=200`)).hits;
             if (searchResults) {
                 return yield Promise.all(searchResults.map((searchResult) => __awaiter(this, void 0, void 0, function* () {
                     return yield this.getProductById.bind(this)(searchResult.product_id);

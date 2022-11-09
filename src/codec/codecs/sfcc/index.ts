@@ -1,6 +1,24 @@
-import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClient, OAuthRestClientInterface, Product, CustomerGroup, GetVariantsArgs } from '../../../common'
+import {
+	Category,
+	ClientCredentialProperties,
+	ClientCredentialsConfiguration,
+	CommerceAPI,
+	CommonArgs,
+	GetProductsArgs,
+	Identifiable,
+	OAuthRestClient,
+	OAuthRestClientInterface,
+	Product,
+	CustomerGroup,
+	GetVariantsArgs,
+} from '../../../common'
 import _ from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../..'
+import {
+	CodecPropertyConfig,
+	CommerceCodecType,
+	CommerceCodec,
+	registerCodec,
+} from '../..'
 import { StringProperty } from '../../cms-property-types'
 import axios from 'axios'
 import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from './types'
@@ -9,9 +27,9 @@ import slugify from 'slugify'
 import btoa from 'btoa'
 
 type CodecConfig = ClientCredentialsConfiguration & {
-    api_token: StringProperty
-    site_id: StringProperty
-}
+  api_token: StringProperty;
+  site_id: StringProperty;
+};
 
 export class SFCCCommerceCodecType extends CommerceCodecType {
 	get vendor(): string {
@@ -24,12 +42,12 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 			api_token: {
 				title: 'Shopper API Token',
 				type: 'string',
-				maxLength: 100
+				maxLength: 100,
 			},
 			site_id: {
 				title: 'Site ID',
-				type: 'string'
-			}
+				type: 'string',
+			},
 		}
 	}
 
@@ -42,7 +60,7 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 		// apply any postprocessing required
 		return {
 			api_token: btoa(`${config.client_id}:${config.client_secret}`),
-			...config
+			...config,
 		}
 	}
 }
@@ -53,7 +71,7 @@ const mapCategory = (category: SFCCCategory): Category => {
 		slug: category.id,
 		name: category.name,
 		children: category.categories?.map(mapCategory) || [],
-		products: []
+		products: [],
 	}
 }
 
@@ -64,17 +82,21 @@ const mapCategory = (category: SFCCCategory): Category => {
 
 }*/
 
-const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup => group && ({
-	...group,
-	name: group.id
-})
+const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
+	group && {
+		...group,
+		name: group.id,
+	}
 
-
+// TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product: SFCCProduct): Product => {
-	if (!product) { return null }
-    console.log('SFCC Product: ', product)
-	const largeImages = product.image_groups.find(group => group.view_type === 'large')
-	const images = largeImages.images.map(image => ({ url: image.link }))
+	if (!product) {
+		return null
+	}
+	const largeImages = product.image_groups.find(
+		(group) => group.view_type === 'large'
+	)
+	const images = largeImages.images.map((image) => ({ url: image.dis_base_link }))
 	return {
 		id: product.id,
 		name: product.name,
@@ -82,19 +104,29 @@ const mapProduct = (product: SFCCProduct): Product => {
 		shortDescription: product.short_description,
 		longDescription: product.long_description,
 		categories: [],
-		variants: product.variants?.map(variant => ({
+		variants: product.variants?.map((variant) => ({
 			sku: variant.product_id,
-			listPrice: formatMoneyString(variant.price, { currency: product.currency }),
-			salePrice: formatMoneyString(variant.price, { currency: product.currency }),
+			listPrice: formatMoneyString(variant.price, {
+				currency: product.currency,
+			}),
+			salePrice: formatMoneyString(variant.price, {
+				currency: product.currency,
+			}),
 			images,
-			attributes: variant.variation_values
-		})) || [{
-			sku: product.id,
-			listPrice: formatMoneyString(product.price, { currency: product.currency }),
-			salePrice: formatMoneyString(product.price, { currency: product.currency }),
-			images,
-			attributes: {}
-		}]
+			attributes: variant.variation_values,
+		})) || [
+			{
+				sku: product.id,
+				listPrice: formatMoneyString(product.price, {
+					currency: product.currency,
+				}),
+				salePrice: formatMoneyString(product.price, {
+					currency: product.currency,
+				}),
+				images,
+				attributes: {},
+			},
+		],
 	}
 }
 
@@ -109,33 +141,46 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		this.shopApi = `/s/${this.config.site_id}/dw/shop/v22_4`
 		this.sitesApi = `/s/-/dw/data/v22_4/sites/${this.config.site_id}`
-		this.rest = OAuthRestClient({
-			...this.config,
-			auth_url: `${this.config.auth_url.replace('oauth/access', 'oauth2/access')}?grant_type=client_credentials`
-		}, {}, {
-			headers: {
-				Authorization: 'Basic ' + this.config.api_token,
-				'Content-Type': 'application/x-www-form-urlencoded'
+		this.rest = OAuthRestClient(
+			{
+				...this.config,
+				auth_url: `${this.config.auth_url.replace(
+					'oauth/access',
+					'oauth2/access'
+				)}?grant_type=client_credentials`,
 			},
-			params: {
-				client_id: this.config.client_id
+			{},
+			{
+				headers: {
+					Authorization: 'Basic ' + this.config.api_token,
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				params: {
+					client_id: this.config.client_id,
+				},
 			}
-		})
+		)
 		return await super.init(codecType)
 	}
 
 	async cacheMegaMenu(): Promise<void> {
-		const categories = (await this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories
-		this.megaMenu = categories.filter(cat => cat.parent_category_id === 'root').map(mapCategory)
+		const categories = (
+			await this.fetch(`${this.shopApi}/categories/root?levels=4`)
+		).categories
+		this.megaMenu = categories
+			.filter((cat) => cat.parent_category_id === 'root')
+			.map(mapCategory)
 	}
 
 	async fetch(url: string): Promise<any> {
-		return (await axios.get(url, {
-			baseURL: this.config.api_url,
-			params: {
-				client_id: this.config.client_id
-			}
-		})).data
+		return (
+			await axios.get(url, {
+				baseURL: this.config.api_url,
+				params: {
+					client_id: this.config.client_id,
+				},
+			})
+		).data
 	}
 
 	async authenticatedFetch(url: string): Promise<any> {
@@ -143,32 +188,40 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	async getProductById(productId: string): Promise<SFCCProduct> {
-		return await this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations`)
+		return await this.fetch(
+			`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`
+		)
 	}
 
 	async search(query: string): Promise<SFCCProduct[]> {
-		const searchResults = (await this.fetch(`${this.shopApi}/product_search?${query}`)).hits
+		const searchResults = (
+			await this.fetch(`${this.shopApi}/product_search?${query}&count=200`)
+		).hits
 		if (searchResults) {
-			return await Promise.all(searchResults.map(async searchResult => {
-				return await this.getProductById.bind(this)(searchResult.product_id)
-			}))
+			return await Promise.all(
+				searchResults.map(async (searchResult) => {
+					return await this.getProductById.bind(this)(searchResult.product_id)
+				})
+			)
 		}
 		return []
 	}
 
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		return await this.fetch(`${this.shopApi}/products/${args.productId}/variants`)
+		return await this.fetch(
+			`${this.shopApi}/products/${args.productId}/variants`
+		)
 	}
 
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: SFCCProduct[] = []
 		if (args.productIds) {
-			products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
-		}
-		else if (args.keyword) {
+			products = await Promise.all(
+				args.productIds.split(',').map(this.getProductById.bind(this))
+			)
+		} else if (args.keyword) {
 			products = await this.search(`q=${args.keyword}`)
-		}
-		else if (args.category) {
+		} else if (args.category) {
 			products = await this.search(`refine_1=cgid=${args.category.id}`)
 		}
 		return products.map(mapProduct)
@@ -177,19 +230,23 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		let products: SFCCProduct[] = []
 		if (args.productIds) {
-			products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
-		}
-		else if (args.keyword) {
+			products = await Promise.all(
+				args.productIds.split(',').map(this.getProductById.bind(this))
+			)
+		} else if (args.keyword) {
 			products = await this.search(`q=${args.keyword}`)
-		}
-		else if (args.category) {
+		} else if (args.category) {
 			products = await this.search(`refine_1=cgid=${args.category.id}`)
 		}
 		return products
 	}
 
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
-		return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup)
+		return (
+			await this.authenticatedFetch(
+				`${this.sitesApi}/customer_groups?count=1000`
+			)
+		).map(mapCustomerGroup)
 		//return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
 	}
 }

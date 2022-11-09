@@ -1,4 +1,4 @@
-import _, { Dictionary } from 'lodash'
+import { Dictionary } from 'lodash'
 
 export type Image = {
     url:                string

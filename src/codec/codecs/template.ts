@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { Dictionary } from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../..'
 import { StringProperty } from '../cms-property-types'
+import { SFCCProduct } from './sfcc/types'
 
 type CodecConfig = {
     // productURL:         StringProperty
@@ -41,6 +42,19 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	}
 
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		// eslint-disable-next-line no-empty
+		if (args.productIds) {
+		}
+		// eslint-disable-next-line no-empty
+		else if (args.keyword) {
+		}
+		// eslint-disable-next-line no-empty
+		else if (args.category) {
+		}
+		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
+	}
+
+	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		// eslint-disable-next-line no-empty
 		if (args.productIds) {
 		}

@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { Dictionary } from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../../'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
+import { SFCCProduct } from '../sfcc/types'
 
 type CodecConfig = {
     productURL:         StringProperty
