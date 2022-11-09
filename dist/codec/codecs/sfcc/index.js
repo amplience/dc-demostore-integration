@@ -170,6 +170,21 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return products.map(mapProduct);
         });
     }
+    getRawProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let products = [];
+            if (args.productIds) {
+                products = yield Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)));
+            }
+            else if (args.keyword) {
+                products = yield this.search(`q=${args.keyword}`);
+            }
+            else if (args.category) {
+                products = yield this.search(`refine_1=cgid=${args.category.id}`);
+            }
+            return products;
+        });
+    }
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup);

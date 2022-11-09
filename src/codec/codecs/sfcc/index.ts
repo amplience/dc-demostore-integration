@@ -173,6 +173,20 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		return products.map(mapProduct)
 	}
 
+	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
+		let products: SFCCProduct[] = []
+		if (args.productIds) {
+			products = await Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)))
+		}
+		else if (args.keyword) {
+			products = await this.search(`q=${args.keyword}`)
+		}
+		else if (args.category) {
+			products = await this.search(`refine_1=cgid=${args.category.id}`)
+		}
+		return products
+	}
+
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
 		return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup)
 		//return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)

@@ -25,6 +25,7 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     search(query: string): Promise<SFCCProduct[]>;
     getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
     getProducts(args: GetProductsArgs): Promise<Product[]>;
+    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
     getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]>;
 }
 export default SFCCCommerceCodecType;
