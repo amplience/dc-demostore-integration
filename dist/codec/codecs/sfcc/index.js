@@ -69,6 +69,7 @@ const mapProduct = (product) => {
     if (!product) {
         return null;
     }
+    console.log('SFCC Product: ', product);
     const largeImages = product.image_groups.find(group => group.view_type === 'large');
     const images = largeImages.images.map(image => ({ url: image.link }));
     return {
