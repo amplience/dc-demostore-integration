@@ -30,8 +30,8 @@ const wrappedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 // define a route handler for the default home page
-app.post("/api", wrappedMiddleware);
-app.get("/api", wrappedMiddleware);
+app.post('/api', wrappedMiddleware);
+app.get('/api', wrappedMiddleware);
 // start the express server
 app.listen(port, () => {
     // tslint:disable-next-line:no-console
