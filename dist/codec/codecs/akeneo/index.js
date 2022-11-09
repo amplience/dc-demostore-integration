@@ -35,7 +35,7 @@ const akeneoCodec = {
             }, {
                 username: config.username,
                 password: config.password,
-                grant_type: "password"
+                grant_type: 'password'
             }, {
                 headers: {
                     Authorization: `Basic ${(0, btoa_1.default)(`${config.client_id}:${config.client_secret}`)}`
@@ -45,7 +45,7 @@ const akeneoCodec = {
             }));
             const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    let result = yield rest.get({ url });
+                    const result = yield rest.get({ url });
                     return result._embedded ? result._embedded.items : result;
                 }
                 catch (error) {
@@ -67,7 +67,7 @@ const akeneoCodec = {
                 const prices = findValue(product.values.price);
                 let price = '--';
                 if (prices) {
-                    let locationPrice = prices.find(p => p.currency === args.currency);
+                    const locationPrice = prices.find(p => p.currency === args.currency);
                     if (locationPrice) {
                         price = (0, util_1.formatMoneyString)(locationPrice.amount, args);
                     }
@@ -98,7 +98,7 @@ const akeneoCodec = {
                 }
                 else {
                     // try to find in the megamenu
-                    let parent = (0, common_1.findInMegaMenu)(megaMenu, cat.parent);
+                    const parent = (0, common_1.findInMegaMenu)(megaMenu, cat.parent);
                     if (parent) {
                         parent.children.push(mapCategory(cat));
                     }
@@ -117,11 +117,11 @@ const akeneoCodec = {
                         return yield Promise.all(args.productIds.split(',').map(api.getProductById(args)));
                     }
                     else if (args.keyword) {
-                        let searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
+                        const searchResults = yield fetch(`/products?search={"name":[{"operator":"CONTAINS","value":"${args.keyword}","locale":"en_US"}]}`);
                         return searchResults.map(mapProduct(args));
                     }
                     else if (args.category) {
-                        let products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`);
+                        const products = yield fetch(`/products?search={"categories":[{"operator":"IN","value":["${args.category.id}"]}]}`);
                         return products.map(mapProduct(args));
                     }
                 }),
@@ -136,6 +136,9 @@ const akeneoCodec = {
                 }),
                 getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
                     return [];
+                }),
+                getVariants: () => __awaiter(this, void 0, void 0, function* () {
+                    return;
                 })
             };
             return api;

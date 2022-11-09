@@ -7,7 +7,7 @@ exports.IntegrationError = IntegrationError;
 class CodecNotFoundError extends IntegrationError {
     constructor(message) {
         super(`[ demostore ] ${message}`);
-        this.errorUrl = `https://github.com/amplience/dc-demostore-core/blob/main/docs/FAQ.md#error---error--demostore--no-codecs-found-matching-schema`;
+        this.errorUrl = 'https://github.com/amplience/dc-demostore-core/blob/main/docs/FAQ.md#error---error--demostore--no-codecs-found-matching-schema';
     }
 }
 exports.CodecNotFoundError = CodecNotFoundError;

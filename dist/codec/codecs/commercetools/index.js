@@ -46,11 +46,11 @@ const commerceToolsCodec = {
         type: __1.CodecType.commerce,
         vendor: 'commercetools',
         properties: Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { project: {
-                title: "project key",
-                type: "string"
+                title: 'project key',
+                type: 'string'
             }, scope: {
-                title: "scope",
-                type: "string",
+                title: 'scope',
+                type: 'string',
                 maxLength: 1000
             } })
     },
@@ -66,10 +66,10 @@ const commerceToolsCodec = {
         });
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () { return (yield rest.get({ url })).results; });
         // caching the categories in CT as recommended here: https://docs.commercetools.com/tutorials/product-modeling/categories#best-practices-categories
-        const categories = yield fetch(`/categories?limit=500`);
+        const categories = yield fetch('/categories?limit=500');
         const getMapper = (args) => {
             const findPrice = (variant) => {
-                let price = variant.prices &&
+                const price = variant.prices &&
                     (variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
                         variant.prices.find(price => price.value.currencyCode === args.currency) ||
                         lodash_1.default.first(variant.prices));
@@ -137,7 +137,7 @@ const commerceToolsCodec = {
         const getProducts = (args) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             if (args.productIds) {
-                let queryIds = args.productIds.split(',').map(quote).join(',');
+                const queryIds = args.productIds.split(',').map(quote).join(',');
                 products = yield fetch(`/product-projections/search?filter=id:${queryIds}`);
             }
             else if (args.keyword) {
@@ -152,14 +152,18 @@ const commerceToolsCodec = {
             return categories.filter(cat => cats.includes(cat.slug.en)).map(getMapper(args).mapCategory);
         });
         const getCustomerGroups = () => __awaiter(void 0, void 0, void 0, function* () {
-            return yield fetch(`/customer-groups`);
+            return yield fetch('/customer-groups');
+        });
+        const getVariants = () => __awaiter(void 0, void 0, void 0, function* () {
+            return;
         });
         // end CommerceAPI
         return {
             getProduct,
             getProducts,
             getMegaMenu,
-            getCustomerGroups
+            getCustomerGroups,
+            getVariants
         };
     })
 };

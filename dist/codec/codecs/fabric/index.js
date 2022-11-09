@@ -42,14 +42,14 @@ const rest_client_1 = __importStar(require("../../../common/rest-client"));
 const slugify_1 = __importDefault(require("slugify"));
 const common_1 = require("../common");
 const properties = Object.assign(Object.assign(Object.assign({}, rest_client_1.OAuthProperties), __2.UsernamePasswordProperties), { accountId: {
-        title: "Account ID",
-        type: "string"
+        title: 'Account ID',
+        type: 'string'
     }, accountKey: {
-        title: "Account Key",
-        type: "string"
+        title: 'Account Key',
+        type: 'string'
     }, stage: {
-        title: "Stage",
-        type: "string"
+        title: 'Stage',
+        type: 'string'
     } });
 const fabricCodec = {
     metadata: {
@@ -83,7 +83,7 @@ const fabricCodec = {
         };
         const getProductsForCategory = function (category) {
             return __awaiter(this, void 0, void 0, function* () {
-                let skus = lodash_1.default.take(lodash_1.default.get(yield fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 20);
+                const skus = lodash_1.default.take(lodash_1.default.get(yield fetch(`/api-category/v1/category/sku?id=${category.id}`), 'skus'), 20);
                 return lodash_1.default.isEmpty(skus) ? [] : yield getProducts({ productIds: skus.join(',') });
             });
         };
@@ -95,9 +95,9 @@ const fabricCodec = {
             products: []
         });
         const mapProduct = (product) => __awaiter(void 0, void 0, void 0, function* () {
-            let attributes = yield getProductAttributes(product.sku);
+            const attributes = yield getProductAttributes(product.sku);
             const getAttributeValue = name => attributes.find(att => att.name === name).value;
-            let name = getAttributeValue('title');
+            const name = getAttributeValue('title');
             return {
                 id: product._id,
                 name,
@@ -117,7 +117,7 @@ const fabricCodec = {
             };
         });
         // the 'categories[0].children' of the node returned from this URL are the top level categories
-        let categories = lodash_1.default.get(yield fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children');
+        const categories = lodash_1.default.get(yield fetch('/api-category/v1/category?page=1&size=1&type=ALL'), 'categories[0].children');
         if (!categories) {
             throw new Error('megaMenu node not found');
         }
@@ -130,14 +130,14 @@ const fabricCodec = {
         };
         const getProducts = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
-                let url = args.productIds ? `/api-product/v1/product/search?size=${args.productIds.split(',').length}&page=1&query=${args.productIds}` : `/api-product/v1/product/search?size=12&page=1&query=${args.keyword}`;
-                let products = lodash_1.default.get(yield fetch(url), 'products');
+                const url = args.productIds ? `/api-product/v1/product/search?size=${args.productIds.split(',').length}&page=1&query=${args.productIds}` : `/api-product/v1/product/search?size=12&page=1&query=${args.keyword}`;
+                const products = lodash_1.default.get(yield fetch(url), 'products');
                 return yield Promise.all(products.map(mapProduct));
             });
         };
         const getCategory = function (args) {
             return __awaiter(this, void 0, void 0, function* () {
-                let category = (0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug);
+                const category = (0, common_1.findInMegaMenu)(yield getMegaMenu(args), args.slug);
                 return Object.assign(Object.assign({}, category), { products: yield getProductsForCategory(category) });
             });
         };
@@ -152,13 +152,17 @@ const fabricCodec = {
                 return [];
             });
         };
+        const getVariants = () => __awaiter(void 0, void 0, void 0, function* () {
+            return;
+        });
         // end CommerceAPI implementation
         return {
             getProduct,
             getProducts,
             getCategory,
             getMegaMenu,
-            getCustomerGroups
+            getCustomerGroups,
+            getVariants
         };
     })
 };

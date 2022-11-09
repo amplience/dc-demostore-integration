@@ -24,16 +24,16 @@ const flattenCategories = (categories) => {
 };
 exports.flattenCategories = flattenCategories;
 const getContentTypeSchema = (codec) => {
-    let schema = new dc_management_sdk_js_1.ContentTypeSchema();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
+    const schema = new dc_management_sdk_js_1.ContentTypeSchema();
+    const schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
     schema.schemaId = schemaUri;
     schema.validationLevel = dc_management_sdk_js_1.ValidationLevel.CONTENT_TYPE;
     schema.body = JSON.stringify({
         id: schemaUri,
         title: `${codec.metadata.vendor} integration`,
         description: `${codec.metadata.vendor} integration`,
-        allOf: [{ "$ref": "http://bigcontent.io/cms/schema/v1/core#/definitions/content" }],
-        type: "object",
+        allOf: [{ '$ref': 'http://bigcontent.io/cms/schema/v1/core#/definitions/content' }],
+        type: 'object',
         properties: Object.assign(Object.assign({}, codec.metadata.properties), { vendor: {
                 type: 'string',
                 title: 'vendor',
@@ -45,8 +45,8 @@ const getContentTypeSchema = (codec) => {
 };
 exports.getContentTypeSchema = getContentTypeSchema;
 const getContentType = (codec) => {
-    let contentType = new dc_management_sdk_js_1.ContentType();
-    let schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
+    const contentType = new dc_management_sdk_js_1.ContentType();
+    const schemaUri = `${index_1.CONSTANTS.demostoreIntegrationUri}/${codec.metadata.vendor}`;
     contentType.contentTypeUri = schemaUri;
     contentType.settings = {
         label: `${codec.metadata.vendor} integration`,

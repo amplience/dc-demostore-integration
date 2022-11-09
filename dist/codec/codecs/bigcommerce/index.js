@@ -22,23 +22,23 @@ const bigCommerceCodec = {
         vendor: 'bigcommerce',
         type: __1.CodecType.commerce,
         properties: Object.assign(Object.assign({}, rest_client_1.APIProperties), { api_token: {
-                title: "API Token",
-                type: "string"
+                title: 'API Token',
+                type: 'string'
             }, store_hash: {
-                title: "Store hash",
-                type: "string"
+                title: 'Store hash',
+                type: 'string'
             } })
     },
     getAPI: (config) => __awaiter(void 0, void 0, void 0, function* () {
         const fetch = (url) => __awaiter(void 0, void 0, void 0, function* () {
-            let response = yield axios_1.default.request({
+            const response = yield axios_1.default.request({
                 method: 'get',
                 url,
                 baseURL: `${config.api_url}/stores/${config.store_hash}`,
                 headers: {
                     'X-Auth-Token': config.api_token,
-                    'Accept': `application/json`,
-                    'Content-Type': `application/json`
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
                 }
             });
             if (url.indexOf('customer_groups') > -1) {
@@ -47,12 +47,12 @@ const bigCommerceCodec = {
             return response.data.data;
         });
         const api = {
-            getCategoryTree: () => fetch(`/v3/catalog/categories/tree`),
-            getProducts: () => fetch(`/v3/catalog/products`),
+            getCategoryTree: () => fetch('/v3/catalog/categories/tree'),
+            getProducts: () => fetch('/v3/catalog/products'),
             searchProducts: keyword => fetch(`/v3/catalog/products?keyword=${keyword}`),
             getProductById: id => fetch(`/v3/catalog/products/${id}?include=images,variants`),
             getProductsForCategory: cat => fetch(`/v3/catalog/products?categories:in=${cat.id}`),
-            getCustomerGroups: () => fetch(`/v2/customer_groups`)
+            getCustomerGroups: () => fetch('/v2/customer_groups')
         };
         const megaMenu = (yield api.getCategoryTree()).map(mappers_1.mapCategory);
         return {
@@ -61,7 +61,7 @@ const bigCommerceCodec = {
                     if (args.id) {
                         return (0, mappers_1.mapProduct)(yield api.getProductById(args.id));
                     }
-                    throw new Error(`getProduct(): must specify id`);
+                    throw new Error('getProduct(): must specify id');
                 });
             },
             getProducts: function (args) {
@@ -75,15 +75,15 @@ const bigCommerceCodec = {
                     else if (args.category) {
                         return (yield api.getProductsForCategory(args.category)).map(mappers_1.mapProduct);
                     }
-                    throw new Error(`getProducts(): must specify either productIds or keyword`);
+                    throw new Error('getProducts(): must specify either productIds or keyword');
                 });
             },
             getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     if (!args.slug) {
-                        throw new Error(`getCategory(): must specify slug`);
+                        throw new Error('getCategory(): must specify slug');
                     }
-                    let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
+                    const category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
                     return Object.assign(Object.assign({}, category), { products: (yield api.getProductsForCategory(category)).map(mappers_1.mapProduct) });
                 });
             },
@@ -96,7 +96,10 @@ const bigCommerceCodec = {
                 return __awaiter(this, void 0, void 0, function* () {
                     return (yield api.getCustomerGroups()).map(mappers_1.mapCustomerGroup);
                 });
-            }
+            },
+            getVariants: () => __awaiter(void 0, void 0, void 0, function* () {
+                return;
+            })
         };
     })
 };

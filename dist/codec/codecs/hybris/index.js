@@ -19,8 +19,8 @@ const axios_1 = __importDefault(require("axios"));
 const slugify_1 = __importDefault(require("slugify"));
 const rest_client_1 = require("../../../common/rest-client");
 const properties = Object.assign(Object.assign({}, rest_client_1.APIProperties), { catalog_id: {
-        title: "Catalog ID",
-        type: "string"
+        title: 'Catalog ID',
+        type: 'string'
     } });
 const mapCategory = (category) => (Object.assign(Object.assign({}, category), { slug: (0, slugify_1.default)(category.name, { lower: true }), children: category.subcategories.map(mapCategory), products: [] }));
 const mapProduct = (product) => (Object.assign(Object.assign({}, product), { id: product.code, slug: (0, slugify_1.default)(product.name, { lower: true }), longDescription: product.description, categories: [], variants: [{
@@ -77,13 +77,17 @@ const hybrisCodec = {
                 return [];
             });
         };
+        const getVariants = () => __awaiter(void 0, void 0, void 0, function* () {
+            return;
+        });
         // end CommerceAPI implementation
         return {
             getProduct,
             getProducts,
             getCategory,
             getMegaMenu,
-            getCustomerGroups
+            getCustomerGroups,
+            getVariants
         };
     })
 };

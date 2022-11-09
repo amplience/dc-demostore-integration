@@ -22,12 +22,12 @@ const btoa_1 = __importDefault(require("btoa"));
 const util_1 = require("../../../common/util");
 const properties = {
     api_key: {
-        title: "API Key",
-        type: "string"
+        title: 'API Key',
+        type: 'string'
     },
     api_token: {
-        title: "API Token",
-        type: "string"
+        title: 'API Token',
+        type: 'string'
     }
 };
 const constructorIOCodec = {
@@ -41,7 +41,7 @@ const constructorIOCodec = {
             const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
                 try {
                     return (yield axios_1.default.get(url, {
-                        baseURL: `https://ac.cnstrc.com`,
+                        baseURL: 'https://ac.cnstrc.com',
                         headers: {
                             Authorization: `Basic ${(0, btoa_1.default)(`${config.api_token}:`)}`
                         },
@@ -64,7 +64,7 @@ const constructorIOCodec = {
                         return lodash_1.default.first((_a = (yield fetch(`/v1/item?section=${section}&id=${id}`))) === null || _a === void 0 ? void 0 : _a.items);
                     }),
                     getItemGroups: (networkParameters) => __awaiter(this, void 0, void 0, function* () {
-                        return yield fetch(`/v1/item_groups`);
+                        return yield fetch('/v1/item_groups');
                     })
                 },
                 search: {
@@ -94,8 +94,8 @@ const constructorIOCodec = {
                     categories: product.group_ids.map(gid => (0, common_1.findInMegaMenu)(megaMenu, gid)),
                     imageSetId: (_b = (_a = product.variations[0]) === null || _a === void 0 ? void 0 : _a.metadata['attribute-articleNumberMax']) === null || _b === void 0 ? void 0 : _b.padStart(6, '0'),
                     variants: product.variations.map(variation => {
-                        let attributes = {};
-                        let images = [];
+                        const attributes = {};
+                        const images = [];
                         lodash_1.default.each(variation.metadata, (value, key) => {
                             if (key.startsWith('attribute-')) {
                                 attributes[key.replace('attribute-', '')] = value;
@@ -114,8 +114,8 @@ const constructorIOCodec = {
                     })
                 };
             };
-            let categories = yield constructorio.catalog.getItemGroups();
-            let megaMenu = categories.item_groups.map(mapCategory);
+            const categories = yield constructorio.catalog.getItemGroups();
+            const megaMenu = categories.item_groups.map(mapCategory);
             const api = {
                 getProductById: (productId) => __awaiter(this, void 0, void 0, function* () {
                     return mapProduct(yield constructorio.catalog.getItem({ id: productId, section: 'Products' }));
@@ -129,7 +129,7 @@ const constructorIOCodec = {
                         productIds = args.productIds.split(',');
                     }
                     else if (args.keyword) {
-                        let raw = (yield constructorio.search.getSearchResults(args.keyword)).response.results;
+                        const raw = (yield constructorio.search.getSearchResults(args.keyword)).response.results;
                         productIds = raw.map(r => r.data.id);
                     }
                     return yield Promise.all(productIds.map(api.getProductById));
@@ -141,7 +141,7 @@ const constructorIOCodec = {
                     if (!category) {
                         return;
                     }
-                    let browseResults = (yield constructorio.browse.getBrowseResults('group_id', category.slug)).response.results;
+                    const browseResults = (yield constructorio.browse.getBrowseResults('group_id', category.slug)).response.results;
                     return Object.assign(Object.assign({}, category), { products: yield api.getProducts({ productIds: lodash_1.default.map(lodash_1.default.take(browseResults, 10), 'data.id').join(',') }) });
                 }),
                 getMegaMenu: () => __awaiter(this, void 0, void 0, function* () {
@@ -149,6 +149,9 @@ const constructorIOCodec = {
                 }),
                 getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
                     return [];
+                }),
+                getVariants: () => __awaiter(this, void 0, void 0, function* () {
+                    return;
                 })
             };
             return api;

@@ -1,6 +1,6 @@
-import { ContentType, ContentTypeSchema } from "dc-management-sdk-js";
-import { GenericCodec } from "..";
-import { Category } from "../../common/types";
+import { ContentType, ContentTypeSchema } from 'dc-management-sdk-js';
+import { GenericCodec } from '..';
+import { Category } from '../../common/types';
 /**
  * @deprecated The method should not be used
  */

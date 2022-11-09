@@ -62,15 +62,15 @@ exports.registerCodec = registerCodec;
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map();
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
-    let codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0);
+    const codecsMatchingConfig = (0, exports.getCodecs)(type).filter(c => lodash_1.default.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0);
     if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
         throw new errors_1.CodecNotFoundError(`[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`);
     }
-    let configHash = lodash_1.default.values(config).join('');
+    const configHash = lodash_1.default.values(config).join('');
     if (!apis[configHash]) {
-        let codec = lodash_1.default.first(codecsMatchingConfig);
+        const codec = lodash_1.default.first(codecsMatchingConfig);
         console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`);
-        let api = yield codec.getAPI(config);
+        const api = yield codec.getAPI(config);
         apis[configHash] = wrappedCommerceApi(api);
     }
     return apis[configHash];
@@ -79,8 +79,8 @@ exports.getCodec = getCodec;
 const defaultArgs = (args) => (Object.assign({ locale: 'en-US', language: 'en', country: 'US', currency: 'USD', segment: '' }, args));
 const wrappedCommerceApi = (api) => __awaiter(void 0, void 0, void 0, function* () {
     // cache the mega menu
-    let megaMenu = yield api.getMegaMenu(defaultArgs({}));
-    let flattenedCategories = [];
+    const megaMenu = yield api.getMegaMenu(defaultArgs({}));
+    const flattenedCategories = [];
     const bulldozeCategories = cat => {
         flattenedCategories.push(cat);
         cat.children && cat.children.forEach(bulldozeCategories);
@@ -89,17 +89,20 @@ const wrappedCommerceApi = (api) => __awaiter(void 0, void 0, void 0, function* 
     const findCategory = (slug) => {
         return flattenedCategories.find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
     };
-    let wrapped = {
+    const wrapped = {
         getProduct: (args) => __awaiter(void 0, void 0, void 0, function* () {
             // current thinking: point to wrapped.getProducts() as getProduct() is really a subset of getProducts()
             return lodash_1.default.first(yield wrapped.getProducts(Object.assign(Object.assign({}, args), { productIds: args.id })));
+        }),
+        getVariants: (args) => __awaiter(void 0, void 0, void 0, function* () {
+            return yield api.getVariants(args);
         }),
         getProducts: (args) => __awaiter(void 0, void 0, void 0, function* () {
             return yield api.getProducts(defaultArgs(args));
         }),
         getCategory: (args) => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
-            let category = findCategory(args.slug);
+            const category = findCategory(args.slug);
             if (category) {
                 // populate products into category
                 category.products = ((_a = category.products) === null || _a === void 0 ? void 0 : _a.length) > 0 ? category.products : yield wrapped.getProducts({ category });

@@ -17,11 +17,11 @@ const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
-exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || `amprsaprod:default` };
+exports.baseConfigLocator = { config_locator: process.env.NEXT_PUBLIC_DEMOSTORE_COMMERCE_LOCATOR || process.env.NEXT_PUBLIC_DEMOSTORE_CONFIG_LOCATOR || 'amprsaprod:default' };
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     if ('config_locator' in config) {
-        let configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
+        const configItem = yield (0, amplience_1.getContentItemFromConfigLocator)(config.config_locator);
         if (((_a = configItem === null || configItem === void 0 ? void 0 : configItem._meta) === null || _a === void 0 ? void 0 : _a.schema) === index_1.CONSTANTS.demostoreConfigUri) {
             config = yield (0, amplience_1.getContentItem)(config.config_locator.split(':')[0], { id: configItem.commerce.id });
         }
@@ -38,7 +38,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     }
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
-            const apiUrl = window.isStorybook ? `https://core.dc-demostore.com/api` : `/api`;
+            const apiUrl = window.isStorybook ? 'https://core.dc-demostore.com/api' : '/api';
             return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
         });
         return {
@@ -46,7 +46,8 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             getProducts: getResponse('getProducts'),
             getCategory: getResponse('getCategory'),
             getMegaMenu: getResponse('getMegaMenu'),
-            getCustomerGroups: getResponse('getCustomerGroups')
+            getCustomerGroups: getResponse('getCustomerGroups'),
+            getVariants: getResponse('getVariants')
         };
     }
 });
@@ -57,8 +58,8 @@ const apiRouteHandler = (req, res) => __awaiter(void 0, void 0, void 0, function
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     res.setHeader('Access-Control-Allow-Methods', '*');
-    let config = req.body || req.query;
-    let commerceAPI = yield (0, exports.getCommerceAPI)(config);
+    const config = req.body || req.query;
+    const commerceAPI = yield (0, exports.getCommerceAPI)(config);
     switch (req.method.toLowerCase()) {
         case 'get':
         case 'post':

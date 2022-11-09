@@ -42,12 +42,12 @@ const slugify_1 = __importDefault(require("slugify"));
 const util_1 = require("../../../common/util");
 const common_1 = require("../common");
 const properties = Object.assign(Object.assign({}, rest_client_1.ClientCredentialProperties), { api_token: {
-        title: "Shopper API Token",
-        type: "string",
+        title: 'Shopper API Token',
+        type: 'string',
         maxLength: 100
     }, site_id: {
-        title: "Site ID",
-        type: "string"
+        title: 'Site ID',
+        type: 'string'
     } });
 const sfccCodec = {
     metadata: {
@@ -77,7 +77,7 @@ const sfccCodec = {
             }
         });
         // authenticated fetch based on oauth creds passed in (not needed for store apis)
-        let rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
+        const rest = (0, rest_client_1.default)(Object.assign(Object.assign({}, config), { auth_url: `${config.auth_url}?grant_type=client_credentials` }), {}, {
             headers: {
                 Authorization: 'Basic ' + config.api_token,
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -98,7 +98,7 @@ const sfccCodec = {
                 return yield Promise.all(productIds.map(api(args).getProductById));
             }),
             search: (query) => __awaiter(void 0, void 0, void 0, function* () {
-                let searchResults = (yield fetch(`${shopApi}/product_search?${query}`)).hits;
+                const searchResults = (yield fetch(`${shopApi}/product_search?${query}`)).hits;
                 if (searchResults) {
                     return yield api(args).getProducts(searchResults.map(sr => sr.product_id));
                 }
@@ -113,6 +113,9 @@ const sfccCodec = {
             getProductById: (id) => __awaiter(void 0, void 0, void 0, function* () {
                 return api(args).mapProduct(yield fetch(`${shopApi}/products/${id}?expand=prices,options,images,variations`));
             }),
+            getVariants: (id) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield fetch(`${shopApi}/products/${id}/variations`);
+            }),
             mapProduct: (product) => {
                 var _a;
                 if (!product) {
@@ -120,14 +123,7 @@ const sfccCodec = {
                 }
                 const largeImages = product.image_groups.find(group => group.view_type === 'large');
                 const images = largeImages.images.map(image => ({ url: image.link }));
-                return {
-                    id: product.id,
-                    name: product.name,
-                    slug: (0, slugify_1.default)(product.name, { lower: true }),
-                    shortDescription: product.short_description,
-                    longDescription: product.long_description,
-                    categories: [],
-                    variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => ({
+                return Object.assign(Object.assign({}, product), { slug: (0, slugify_1.default)(product.name, { lower: true }), categories: [], variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => ({
                         sku: variant.product_id,
                         listPrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency, locale: args.locale }),
                         salePrice: (0, util_1.formatMoneyString)(variant.price, { currency: product.currency, locale: args.locale }),
@@ -139,8 +135,7 @@ const sfccCodec = {
                             salePrice: (0, util_1.formatMoneyString)(product.price, { currency: product.currency, locale: args.locale }),
                             images,
                             attributes: {}
-                        }]
-                };
+                        }] });
             },
             mapCustomerGroup: (group) => group && (Object.assign(Object.assign({}, group), { name: group.id })),
             mapCategory: (cat) => {
@@ -174,10 +169,15 @@ const sfccCodec = {
                     }
                 });
             },
+            getVariants: function (args) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    return yield api(args).getVariants(args.productId);
+                });
+            },
             getCategory: function (args) {
                 return __awaiter(this, void 0, void 0, function* () {
                     // let category = await api(args).getCategory(args.slug)
-                    let category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
+                    const category = (0, common_1.findInMegaMenu)(megaMenu, args.slug);
                     if (category) {
                         return Object.assign(Object.assign({}, category), { products: yield api(args).getProductsForCategory(category) });
                     }

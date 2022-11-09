@@ -8,6 +8,7 @@ import mappers from './mappers'
 import { findInMegaMenu } from '../common'
 import qs from 'qs'
 import { EPCustomerGroup } from './types'
+import { SFCCProduct } from '../sfcc/types'
 
 type CodecConfig = ClientCredentialsConfiguration & {
     pcm_url:        StringProperty
@@ -15,16 +16,16 @@ type CodecConfig = ClientCredentialsConfiguration & {
 }
 
 const properties: CodecConfig = {
-    ...OAuthProperties,
-    ...ClientCredentialProperties,
-    pcm_url: {
-        title: "PCM URL",
-        type: "string"
-    },
-    catalog_name: {
-        title: "Catalog name",
-        type: "string"
-    }
+	...OAuthProperties,
+	...ClientCredentialProperties,
+	pcm_url: {
+		title: 'PCM URL',
+		type: 'string'
+	},
+	catalog_name: {
+		title: 'Catalog name',
+		type: 'string'
+	}
 }
 
 export interface AttributedProduct extends Moltin.Product {
@@ -46,153 +47,158 @@ export interface PriceBookPrice extends PriceBookPriceBase {
 }
 
 const epCodec: CommerceCodec = {
-    metadata: {
-        type:   CodecType.commerce,
-        vendor: 'elasticpath',
-        properties
-    },
-    getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
-        const rest = OAuthRestClient(config, qs.stringify({
-            grant_type: 'client_credentials',
-            client_id: config.client_id,
-            client_secret: config.client_secret
-        }))
+	metadata: {
+		type:   CodecType.commerce,
+		vendor: 'elasticpath',
+		properties
+	},
+	getAPI: async (config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> => {
+		const rest = OAuthRestClient(config, qs.stringify({
+			grant_type: 'client_credentials',
+			client_id: config.client_id,
+			client_secret: config.client_secret
+		}))
 
-        const fetch = async url => (await rest.get({ url })).data
+		const fetch = async url => (await rest.get({ url })).data
         
-        const api = {
-            getProductById: (id: string): Promise<AttributedProduct> => fetch(`/pcm/products/${id}`),
-            getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first(await fetch(`/pcm/products/?filter=like(sku,string:${sku})`)),
-            getFileById: (id: string): Promise<File> => fetch(`/v2/files/${id}`),
-            getPricebooks: (): Promise<PriceBook[]> => fetch(`/pcm/pricebooks`),
-            getPricebookById: (id: string): Promise<PriceBook> => fetch(`/pcm/pricebooks/${id}`),
-            getHierarchyById: (id: string): Promise<Hierarchy> => fetch(`/pcm/hierarchies/${id}`),
-            getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first(await fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)),
-            getPriceForSku: async (sku: string): Promise<Price> => {
-                let cat = await api.getCatalog()
-                let prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
-                let priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === cat.attributes.pricebook_id && !!price.attributes?.currencies) ||
+		const api = {
+			getProductById: (id: string): Promise<AttributedProduct> => fetch(`/pcm/products/${id}`),
+			getProductBySku: async (sku: string): Promise<AttributedProduct> => _.first(await fetch(`/pcm/products/?filter=like(sku,string:${sku})`)),
+			getFileById: (id: string): Promise<File> => fetch(`/v2/files/${id}`),
+			getPricebooks: (): Promise<PriceBook[]> => fetch('/pcm/pricebooks'),
+			getPricebookById: (id: string): Promise<PriceBook> => fetch(`/pcm/pricebooks/${id}`),
+			getHierarchyById: (id: string): Promise<Hierarchy> => fetch(`/pcm/hierarchies/${id}`),
+			getPriceForSkuInPricebook: async (sku: string, pricebook: PriceBook): Promise<PriceBookPriceBase> => _.first(await fetch(`/pcm/pricebooks/${pricebook.id}/prices?filter=eq(sku,string:${sku})`)),
+			getPriceForSku: async (sku: string): Promise<Price> => {
+				const cat = await api.getCatalog()
+				const prices: PriceBookPriceBase[] = await api.getPricesForSku(sku)
+				const priceBookPrice: PriceBookPriceBase = _.find(prices, (price: PriceBookPrice) => price.pricebook.id === cat.attributes.pricebook_id && !!price.attributes?.currencies) ||
                 _.find(prices, price => !!price.attributes?.currencies)
-                return {
-                    ...priceBookPrice?.attributes.currencies['USD'],
-                    currency: 'USD'
-                }
-            },
-            getPricesForSku: async (sku: string): Promise<PriceBookPriceBase[]> => await Promise.all((await api.getPricebooks()).map(async pricebook => ({
-                ...await api.getPriceForSkuInPricebook(sku, pricebook),
-                pricebook
-            }))),
-            getCatalog: async (): Promise<Catalog> => {
-                return catalog
-            },
-            getMegaMenu: async (): Promise<Hierarchy[]> => {
-                return await Promise.all((await api.getCatalog()).attributes.hierarchy_ids.map(await api.getHierarchyById))
-            },
-            getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
-            getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
-            getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
-            getCustomerGroups: (): Promise<EPCustomerGroup[]> => fetch(`/v2/flows/customer-group/entries`)
-        }
+				return {
+					...priceBookPrice?.attributes.currencies['USD'],
+					currency: 'USD'
+				}
+			},
+			getPricesForSku: async (sku: string): Promise<PriceBookPriceBase[]> => await Promise.all((await api.getPricebooks()).map(async pricebook => ({
+				...await api.getPriceForSkuInPricebook(sku, pricebook),
+				pricebook
+			}))),
+			getCatalog: async (): Promise<Catalog> => {
+				return catalog
+			},
+			getMegaMenu: async (): Promise<Hierarchy[]> => {
+				return await Promise.all((await api.getCatalog()).attributes.hierarchy_ids.map(await api.getHierarchyById))
+			},
+			getProductsByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Product[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/products`),
+			getChildrenByHierarchyId: (id: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${id}/children`),
+			getChildrenByNodeId: (hierarchyId: string, nodeId: string): Promise<Moltin.Node[]> => fetch(`/pcm/hierarchies/${hierarchyId}/nodes/${nodeId}/children`),
+			getCustomerGroups: (): Promise<EPCustomerGroup[]> => fetch('/v2/flows/customer-group/entries')
+		}
         
-        // _.each(Object.keys(api), key => {
-        //     let method = api[key]
-        //     api[key] = async (...args) => {
-        //         let start = new Date().valueOf()
-        //         let result = await method(...args)
-        //         console.log(`${key}: ${new Date().valueOf() - start}ms`)
-        //         return result
-        //     }
-        // })
+		// _.each(Object.keys(api), key => {
+		//     let method = api[key]
+		//     api[key] = async (...args) => {
+		//         let start = new Date().valueOf()
+		//         let result = await method(...args)
+		//         console.log(`${key}: ${new Date().valueOf() - start}ms`)
+		//         return result
+		//     }
+		// })
         
-        const mapper = mappers(api)
-        const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
-            ...category,
-            products: await getProductsFromCategory(category)
-        })
+		const mapper = mappers(api)
+		const populateCategory = async (category: ElasticPathCategory): Promise<ElasticPathCategory> => ({
+			...category,
+			products: await getProductsFromCategory(category)
+		})
         
-        const getProductsFromEPCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
-            let products: Moltin.Product[] = []
-            if (category.id === category.hierarchyId) {
-                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
-            }
-            else if (category.hierarchyId) {
-                products = await api.getProductsByNodeId(category.hierarchyId, category.id)
-            }
-            return await Promise.all(products.map(await mapper.mapProduct))
-        }
+		const getProductsFromEPCategory = async (category: ElasticPathCategory): Promise<Product[]> => {
+			let products: Moltin.Product[] = []
+			if (category.id === category.hierarchyId) {
+				products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.hierarchyId, child.id))), 1)), x => x.id)
+			}
+			else if (category.hierarchyId) {
+				products = await api.getProductsByNodeId(category.hierarchyId, category.id)
+			}
+			return await Promise.all(products.map(await mapper.mapProduct))
+		}
 
-        const getHierarchyRootNode = (category: Category): Category => {
-            if (category.parent) {
-                const parent = findInMegaMenu(megaMenu, category.parent.slug)
-                return getHierarchyRootNode(parent)
-            }
-            return category
-        }
+		const getHierarchyRootNode = (category: Category): Category => {
+			if (category.parent) {
+				const parent = findInMegaMenu(megaMenu, category.parent.slug)
+				return getHierarchyRootNode(parent)
+			}
+			return category
+		}
 
-        const getProductsFromCategory = async (category: Category): Promise<Product[]> => {
-            let products: Moltin.Product[] = []
+		const getProductsFromCategory = async (category: Category): Promise<Product[]> => {
+			let products: Moltin.Product[] = []
 
-            if (category.parent) {
-                // find hierarchy root
-                const rootNode = getHierarchyRootNode(category)
-                products = await api.getProductsByNodeId(rootNode.id, category.id)
-            }
-            else {
-                products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.id, child.id))), 1)), x => x.id)
-            }
-            return await Promise.all(products.map(await mapper.mapProduct))
-        }
+			if (category.parent) {
+				// find hierarchy root
+				const rootNode = getHierarchyRootNode(category)
+				products = await api.getProductsByNodeId(rootNode.id, category.id)
+			}
+			else {
+				products = _.uniqBy(_.flatten(_.take(await Promise.all(category.children.map(async child => await api.getProductsByNodeId(category.id, child.id))), 1)), x => x.id)
+			}
+			return await Promise.all(products.map(await mapper.mapProduct))
+		}
 
-        const catalog = _.find((await fetch(`catalogs`)), cat => cat.attributes?.name === config.catalog_name)
-        const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
+		const catalog = _.find((await fetch('catalogs')), cat => cat.attributes?.name === config.catalog_name)
+		const megaMenu = await Promise.all((await api.getMegaMenu()).map(await mapper.mapHierarchy))
 
-        // CommerceAPI
-        const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
-            if (args.id) {
-                return mapper.mapProduct(await api.getProductById(args.id))
-            }
-            throw new Error(`getProduct(): must specify id`)
-        }
+		// CommerceAPI
+		const getProduct = async function (args: GetCommerceObjectArgs): Promise<Product> {
+			if (args.id) {
+				return mapper.mapProduct(await api.getProductById(args.id))
+			}
+			throw new Error('getProduct(): must specify id')
+		}
 
-        const getProducts = async function (args: GetProductsArgs): Promise<Product[]> {
-            if (args.productIds) {
-                return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
-            }
-            else if (args.keyword) {
-                // ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
-                return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
-            }
-            else if (args.category) {
-                return await getProductsFromCategory(args.category)
-            }
-            throw new Error(`getProducts(): must specify either productIds or keyword`)
-        }
+		const getProducts = async function (args: GetProductsArgs): Promise<Product[]> {
+			if (args.productIds) {
+				return await Promise.all(args.productIds.split(',').map(async id => await getProduct({ id })))
+			}
+			else if (args.keyword) {
+				// ep does not yet have keyword search enabled. so for the time being, we are emulating it with sku search
+				return [await mapper.mapProduct(await api.getProductBySku(args.keyword))]
+			}
+			else if (args.category) {
+				return await getProductsFromCategory(args.category)
+			}
+			throw new Error('getProducts(): must specify either productIds or keyword')
+		}
 
-        const getCategory = async function (args: GetCommerceObjectArgs): Promise<Category> {
-            if (!args.slug) {
-                throw new Error(`getCategory(): must specify slug`)
-            }
-            let category = findInMegaMenu(await getMegaMenu(), args.slug) as ElasticPathCategory
-            let populated = await populateCategory(category)
-            return populated
-        }
+		const getCategory = async function (args: GetCommerceObjectArgs): Promise<Category> {
+			if (!args.slug) {
+				throw new Error('getCategory(): must specify slug')
+			}
+			const category = findInMegaMenu(await getMegaMenu(), args.slug) as ElasticPathCategory
+			const populated = await populateCategory(category)
+			return populated
+		}
 
-        const getMegaMenu = async function (): Promise<Category[]> {
-            return megaMenu
-        }
+		const getMegaMenu = async function (): Promise<Category[]> {
+			return megaMenu
+		}
 
-        const getCustomerGroups = async function (): Promise<CustomerGroup[]> {
-            return (await api.getCustomerGroups()).map(mapper.mapCustomerGroup)
-        }
-        // end CommerceAPI
+		const getCustomerGroups = async function (): Promise<CustomerGroup[]> {
+			return (await api.getCustomerGroups()).map(mapper.mapCustomerGroup)
+		}
 
-        return {
-            getProduct,
-            getProducts,
-            getCategory,
-            getMegaMenu,
-            getCustomerGroups
-        }
-    }
+		const getVariants = async (): Promise<SFCCProduct> => {
+			return
+		}
+		// end CommerceAPI
+
+		return {
+			getProduct,
+			getProducts,
+			getCategory,
+			getMegaMenu,
+			getCustomerGroups,
+			getVariants
+		}
+	}
 }
 registerCodec(epCodec)

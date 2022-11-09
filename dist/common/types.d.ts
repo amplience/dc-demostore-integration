@@ -57,6 +57,9 @@ export declare type GetProductsArgs = CommonArgs & {
     productIds?: string;
     category?: Category;
 };
+export declare type GetProductVariantsArgs = CommonArgs & {
+    productId: string;
+};
 export declare type AlgoliaConfig = {
     appId: string;
     apiKey: string;

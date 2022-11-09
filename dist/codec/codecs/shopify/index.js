@@ -33,7 +33,7 @@ const shopifyCodec = {
             }, {
                 username: config.username,
                 password: config.password,
-                grant_type: "password"
+                grant_type: 'password'
             }, {
                 headers: {
                     Authorization: `Basic ${(0, btoa_1.default)(`${config.client_id}:${config.client_secret}`)}`
@@ -43,7 +43,7 @@ const shopifyCodec = {
             }));
             const fetch = (url) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    let result = yield rest.get({ url });
+                    const result = yield rest.get({ url });
                     return result._embedded ? result._embedded.items : result;
                 }
                 catch (error) {
@@ -92,6 +92,9 @@ const shopifyCodec = {
                 }),
                 getCustomerGroups: () => __awaiter(this, void 0, void 0, function* () {
                     return [];
+                }),
+                getVariants: () => __awaiter(this, void 0, void 0, function* () {
+                    return;
                 })
             };
             return api;

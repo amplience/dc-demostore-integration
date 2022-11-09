@@ -18,20 +18,20 @@ const mappers_1 = __importDefault(require("./mappers"));
 const index_1 = require("../../index");
 const properties = {
     productURL: {
-        title: "Product file URL",
-        type: "string"
+        title: 'Product file URL',
+        type: 'string'
     },
     categoryURL: {
-        title: "Category file URL",
-        type: "string"
+        title: 'Category file URL',
+        type: 'string'
     },
     customerGroupURL: {
-        title: "Customer group file URL",
-        type: "string"
+        title: 'Customer group file URL',
+        type: 'string'
     },
     translationsURL: {
-        title: "Translations file URL",
-        type: "string"
+        title: 'Translations file URL',
+        type: 'string'
     }
 };
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
@@ -60,12 +60,12 @@ const restCodec = {
                 },
                 getProducts: (args) => {
                     var _a;
-                    let productIds = (_a = args.productIds) === null || _a === void 0 ? void 0 : _a.split(',');
+                    const productIds = (_a = args.productIds) === null || _a === void 0 ? void 0 : _a.split(',');
                     return productIds && lodash_1.default.filter(products, prod => productIds.includes(prod.id)) ||
                         args.keyword && lodash_1.default.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1);
                 },
                 getCategory: (args) => {
-                    let category = categories.find(cat => cat.slug === args.slug);
+                    const category = categories.find(cat => cat.slug === args.slug);
                     if (category) {
                         return api.populateCategory(category, args);
                     }
@@ -79,7 +79,7 @@ const restCodec = {
             return {
                 getProduct: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let product = api.getProduct(args);
+                        const product = api.getProduct(args);
                         if (product) {
                             return mappers_1.default.mapProduct(product, args);
                         }
@@ -87,7 +87,7 @@ const restCodec = {
                 },
                 getProducts: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let filtered = api.getProducts(args);
+                        const filtered = api.getProducts(args);
                         if (filtered) {
                             return filtered.map(prod => mappers_1.default.mapProduct(prod, args));
                         }
@@ -96,7 +96,7 @@ const restCodec = {
                 },
                 getCategory: function (args) {
                     return __awaiter(this, void 0, void 0, function* () {
-                        let category = api.getCategory(args);
+                        const category = api.getCategory(args);
                         if (category) {
                             return mappers_1.default.mapCategory(api.populateCategory(category, args));
                         }
@@ -112,7 +112,10 @@ const restCodec = {
                     return __awaiter(this, void 0, void 0, function* () {
                         return api.getCustomerGroups();
                     });
-                }
+                },
+                getVariants: () => __awaiter(this, void 0, void 0, function* () {
+                    return;
+                })
             };
         });
     }
