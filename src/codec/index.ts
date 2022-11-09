@@ -1,7 +1,8 @@
 import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
 import { API, CommerceAPI } from '..'
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../common/types'
+import { SFCCProduct } from './codecs/sfcc/types'
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetProductVariantsArgs, Identifiable, Product } from '../common/types'
 import { CodecNotFoundError } from '../common/errors'
 
 export type Property = {
@@ -71,85 +72,88 @@ codecs[CodecType.commerce] = []
 
 // public interface
 export const getCodecs = (type: CodecType): GenericCodec[] => {
-    return codecs[type]
+	return codecs[type]
 }
 
 export const registerCodec = (codec: GenericCodec) => {
-    if (!codecs[codec.metadata.type].includes(codec)) {
-        codecs[codec.metadata.type].push(codec)
-    }
+	if (!codecs[codec.metadata.type].includes(codec)) {
+		codecs[codec.metadata.type].push(codec)
+	}
 }
 
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map<any, API>()
 
 export const getCodec = async (config: any, type: CodecType): Promise<API> => {
-    let codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0)
+	const codecsMatchingConfig: GenericCodec[] = getCodecs(type).filter(c => _.difference(Object.keys(c.metadata.properties), Object.keys(config)).length === 0)
 
-    if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
-        throw new CodecNotFoundError(`[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`)
-    }
+	if (codecsMatchingConfig.length === 0 || codecsMatchingConfig.length > 1) {
+		throw new CodecNotFoundError(`[ ${codecsMatchingConfig.length} ] codecs found (expecting 1) matching schema:\n${JSON.stringify(config, undefined, 4)}`)
+	}
 
-    let configHash = _.values(config).join('')
-    if (!apis[configHash]) {
-        let codec = _.first(codecsMatchingConfig)
-        console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`)
-        let api = await codec.getAPI(config)
-        apis[configHash] = wrappedCommerceApi(api as CommerceAPI)
-    }
-    return apis[configHash]
+	const configHash = _.values(config).join('')
+	if (!apis[configHash]) {
+		const codec = _.first(codecsMatchingConfig)
+		console.log(`[ demostore ] creating codec: ${codec.metadata.vendor}...`)
+		const api = await codec.getAPI(config)
+		apis[configHash] = wrappedCommerceApi(api as CommerceAPI)
+	}
+	return apis[configHash]
 }
 
 const defaultArgs = (args: CommonArgs): CommonArgs => ({
-    locale:     'en-US',
-    language:   'en',
-    country:    'US',
-    currency:   'USD',
-    segment:    '',
-    ...args
+	locale:     'en-US',
+	language:   'en',
+	country:    'US',
+	currency:   'USD',
+	segment:    '',
+	...args
 })
 
 const wrappedCommerceApi = async (api: Partial<CommerceAPI>): Promise<Partial<CommerceAPI>> => {
-    // cache the mega menu
-    let megaMenu: Category[] = await api.getMegaMenu(defaultArgs({}))
+	// cache the mega menu
+	const megaMenu: Category[] = await api.getMegaMenu(defaultArgs({}))
 
-    let flattenedCategories: Category[] = []
-    const bulldozeCategories = cat => {
-        flattenedCategories.push(cat)
-        cat.children && cat.children.forEach(bulldozeCategories)
-    }
-    megaMenu.forEach(bulldozeCategories)
- 
-    const findCategory = (slug: string) => {
-        return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
-    }
+	const flattenedCategories: Category[] = []
+	const bulldozeCategories = cat => {
+		flattenedCategories.push(cat)
+		cat.children && cat.children.forEach(bulldozeCategories)
+	}
+	megaMenu.forEach(bulldozeCategories)
+
+	const findCategory = (slug: string) => {
+		return flattenedCategories.find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
+	}
     
-    let wrapped: CommerceAPI = {
-        getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
-            // current thinking: point to wrapped.getProducts() as getProduct() is really a subset of getProducts()
-            return _.first(await wrapped.getProducts({ ...args, productIds: args.id }))
-        },
-        getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
-            return await api.getProducts(defaultArgs(args))
-        },
-        getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
-            let category = findCategory(args.slug)
-            if (category) {
-                // populate products into category
-                category.products = category.products?.length > 0 ? category.products : await wrapped.getProducts({ category })
-            }
-            return category
-        },
-        getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
-            return megaMenu
-        },
-        getCustomerGroups: async (args: CommonArgs): Promise<Identifiable[]> => {
-            // pass through
-            return await api.getCustomerGroups(defaultArgs(args))
-        }
-    }
+	const wrapped: CommerceAPI = {
+		getProduct: async (args: GetCommerceObjectArgs): Promise<Product> => {
+			// current thinking: point to wrapped.getProducts() as getProduct() is really a subset of getProducts()
+			return _.first(await wrapped.getProducts({ ...args, productIds: args.id }))
+		},
+		getVariants: async (args: GetProductVariantsArgs): Promise<SFCCProduct> => {
+			return await api.getVariants(args)
+		},
+		getProducts: async (args: GetProductsArgs): Promise<Product[]> => {
+			return await api.getProducts(defaultArgs(args))
+		},
+		getCategory: async (args: GetCommerceObjectArgs): Promise<Category> => {
+			const category = findCategory(args.slug)
+			if (category) {
+				// populate products into category
+				category.products = category.products?.length > 0 ? category.products : await wrapped.getProducts({ category })
+			}
+			return category
+		},
+		getMegaMenu: async (args: CommonArgs): Promise<Category[]> => {
+			return megaMenu
+		},
+		getCustomerGroups: async (args: CommonArgs): Promise<Identifiable[]> => {
+			// pass through
+			return await api.getCustomerGroups(defaultArgs(args))
+		}
+	}
 
-    return wrapped
+	return wrapped
 }
 
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecType.commerce) as CommerceAPI
@@ -157,15 +161,15 @@ export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => awa
 
 // register codecs
 if (isServer()) {
-    import('./codecs/akeneo')
-    import('./codecs/bigcommerce')
-    import('./codecs/commercetools')
-    import('./codecs/constructor.io')
-    import('./codecs/elasticpath')
-    import('./codecs/fabric')
-    import('./codecs/hybris')
-    import('./codecs/rest')
-    import('./codecs/sfcc')
+	import('./codecs/akeneo')
+	import('./codecs/bigcommerce')
+	import('./codecs/commercetools')
+	import('./codecs/constructor.io')
+	import('./codecs/elasticpath')
+	import('./codecs/fabric')
+	import('./codecs/hybris')
+	import('./codecs/rest')
+	import('./codecs/sfcc')
 }
 
 // reexport codec common functions

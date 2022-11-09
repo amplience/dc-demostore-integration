@@ -1,4 +1,4 @@
-import _, { Dictionary } from 'lodash'
+import { Dictionary } from 'lodash'
 
 export type Image = {
     url:                string
@@ -10,6 +10,7 @@ export type Identifiable = {
     name:               string
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 export type CustomerGroup = Identifiable & {}
 
 export type CommerceObject = Identifiable & {
@@ -68,6 +69,10 @@ export type GetProductsArgs = CommonArgs & {
     keyword?:           string
     productIds?:        string
     category?:          Category
+}
+
+export type GetProductVariantsArgs = CommonArgs & {
+    productId:           string
 }
 
 export type AlgoliaConfig = {
