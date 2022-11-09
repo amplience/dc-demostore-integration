@@ -1,5 +1,5 @@
-import { ClientCredentialsConfiguration, CommerceAPI, GetProductsArgs, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
+import { ClientCredentialsConfiguration, CommerceAPI, GetProductsArgs, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
 declare type CodecConfig = UsernamePasswordConfiguration & ClientCredentialsConfiguration;
 export declare class AkeneoCommerceCodecType extends CommerceCodecType {
     get vendor(): string;

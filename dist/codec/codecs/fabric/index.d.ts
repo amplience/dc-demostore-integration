@@ -1,6 +1,6 @@
-import { CommerceAPI, GetProductsArgs, OAuthCodecConfiguration, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from "../../../common";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../..";
-import { StringProperty } from "../../cms-property-types";
+import { CommerceAPI, GetProductsArgs, OAuthCodecConfiguration, OAuthRestClientInterface, Product, UsernamePasswordConfiguration } from '../../../common';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { StringProperty } from '../../cms-property-types';
 declare type CodecConfig = OAuthCodecConfiguration & UsernamePasswordConfiguration & {
     accountId: StringProperty;
     accountKey: StringProperty;

@@ -28,7 +28,7 @@ const getAPI = async (config: any): Promise<CommerceAPI> => {
 	return await getCommerceCodec(config)
 }
 
-export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getVariants'
+export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getVariants' | 'getRawProducts'
 
 // getCommerceAPI is the main client interaction point with the integration layer
 export const getCommerceAPI = async (params: any = undefined): Promise<CommerceAPI> => {
@@ -47,7 +47,8 @@ export const getCommerceAPI = async (params: any = undefined): Promise<CommerceA
 			getCategory: getResponse('getCategory'),
 			getMegaMenu: getResponse('getMegaMenu'),
 			getCustomerGroups: getResponse('getCustomerGroups'),
-			getVariants: getResponse('getVariants')
+			getVariants: getResponse('getVariants'),
+			getRawProducts: getResponse('getRawProducts')
 		}
 	}
 }

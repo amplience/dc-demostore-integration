@@ -53,6 +53,7 @@ export declare class CommerceCodec implements CommerceAPI {
     getMegaMenu(args: CommonArgs): Promise<Category[]>;
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
     getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
+    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
     testIntegration(): Promise<CodecTestResult[]>;
 }
 export declare const getRandom: <T>(array: T[]) => T;

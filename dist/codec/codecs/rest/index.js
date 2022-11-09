@@ -24,23 +24,23 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
     get properties() {
         return {
             productURL: {
-                title: "Product file URL",
-                type: "string",
+                title: 'Product file URL',
+                type: 'string',
                 pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             categoryURL: {
-                title: "Category file URL",
-                type: "string",
+                title: 'Category file URL',
+                type: 'string',
                 pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             customerGroupURL: {
-                title: "Customer group file URL",
-                type: "string",
+                title: 'Customer group file URL',
+                type: 'string',
                 pattern: cms_property_types_1.StringPatterns.anyUrl
             },
             translationsURL: {
-                title: "Translations file URL",
-                type: "string",
+                title: 'Translations file URL',
+                type: 'string',
                 pattern: cms_property_types_1.StringPatterns.anyUrl
             }
         };
@@ -75,7 +75,7 @@ class RestCommerceCodec extends __1.CommerceCodec {
                     ...lodash_1.default.filter(this.products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), args.category.id))
                 ];
             }
-            throw new Error(`getProducts() requires either: productIds, keyword, or category reference`);
+            throw new Error('getProducts() requires either: productIds, keyword, or category reference');
         });
     }
     getCustomerGroups(args) {

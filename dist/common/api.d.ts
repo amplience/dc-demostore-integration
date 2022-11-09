@@ -11,4 +11,5 @@ export declare type CommerceAPI = API & {
     getMegaMenu: (args: CommonArgs) => Promise<Category[]>;
     getCustomerGroups: (args: CommonArgs) => Promise<CustomerGroup[]>;
     getVariants: (args: GetVariantsArgs) => Promise<SFCCProduct>;
+    getRawProducts: (args: GetProductsArgs) => Promise<SFCCProduct[]>;
 };

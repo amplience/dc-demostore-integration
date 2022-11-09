@@ -45,7 +45,7 @@ class AkeneoCommerceCodec extends __1.CommerceCodec {
             }, {
                 username: this.config.username,
                 password: this.config.password,
-                grant_type: "password"
+                grant_type: 'password'
             }, {
                 headers: {
                     Authorization: `Basic ${(0, btoa_1.default)(`${this.config.client_id}:${this.config.client_secret}`)}`
@@ -67,7 +67,7 @@ class AkeneoCommerceCodec extends __1.CommerceCodec {
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let result = yield this.rest.get({ url });
+                const result = yield this.rest.get({ url });
                 return result._embedded ? result._embedded.items : result;
             }
             catch (error) {

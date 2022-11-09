@@ -23,16 +23,16 @@ class FabricCommerceCodecType extends __1.CommerceCodecType {
     }
     get properties() {
         return Object.assign(Object.assign(Object.assign({}, common_1.OAuthProperties), common_1.UsernamePasswordProperties), { accountId: {
-                title: "Account ID",
-                type: "string",
+                title: 'Account ID',
+                type: 'string',
                 minLength: 1
             }, accountKey: {
-                title: "Account Key",
-                type: "string",
+                title: 'Account Key',
+                type: 'string',
                 minLength: 1
             }, stage: {
-                title: "Stage",
-                type: "string",
+                title: 'Stage',
+                type: 'string',
                 minLength: 1
             } });
     }
@@ -80,7 +80,7 @@ class FabricCommerceCodec extends __1.CommerceCodec {
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             // the 'categories[0].children' of the node returned from this URL are the top level categories
-            let categories = lodash_1.default.get(yield this.fetch(`/api-category/v1/category?page=1&size=1&type=ALL`), 'categories[0].children');
+            const categories = lodash_1.default.get(yield this.fetch('/api-category/v1/category?page=1&size=1&type=ALL'), 'categories[0].children');
             if (!categories) {
                 throw new Error('megaMenu node not found');
             }
@@ -97,7 +97,7 @@ class FabricCommerceCodec extends __1.CommerceCodec {
                 products = (yield this.fetch(`/api-product/v1/product/search?query=${args.keyword}`)).products;
             }
             else if (args.category) {
-                let skus = lodash_1.default.take(lodash_1.default.get(yield this.fetch(`/api-category/v1/category/sku?id=${args.category.id}`), 'skus'), 20);
+                const skus = lodash_1.default.take(lodash_1.default.get(yield this.fetch(`/api-category/v1/category/sku?id=${args.category.id}`), 'skus'), 20);
                 products = (yield this.fetch(`/api-product/v1/product/search?query=[${skus.join(',')}]`)).products;
             }
             yield Promise.all(products.map((product) => __awaiter(this, void 0, void 0, function* () {

@@ -1,7 +1,7 @@
-import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, Product } from "../../../common";
-import { Dictionary } from "lodash";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from "../../";
-import { StringProperty } from "../../cms-property-types";
+import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, Product } from '../../../common';
+import { Dictionary } from 'lodash';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
+import { StringProperty } from '../../cms-property-types';
 declare type CodecConfig = {
     productURL: StringProperty;
     categoryURL: StringProperty;

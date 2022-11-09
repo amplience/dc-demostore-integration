@@ -151,6 +151,12 @@ class CommerceCodec {
             return yield this.getVariants(args);
         });
     }
+    getRawProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`);
+            return [];
+        });
+    }
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
             const results = [{

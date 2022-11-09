@@ -145,6 +145,11 @@ export class CommerceCodec implements CommerceAPI {
 		return await this.getVariants(args)
 	}
 
+	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
+		console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`)
+		return []
+	}
+
 	async testIntegration(): Promise<CodecTestResult[]> {
 		const results: CodecTestResult[] = [{
 			operationType: CodecTestOperationType.megaMenu,
