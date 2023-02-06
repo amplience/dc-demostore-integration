@@ -1,7 +1,20 @@
-import { isServer } from '../common/util'
 import _, { Dictionary } from 'lodash'
-import { API, CommerceAPI, CONSTANTS, findInMegaMenu, flattenCategories } from '..'
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../common/types'
+import { 
+	API, 
+	CommerceAPI, 
+	CONSTANTS, 
+	findInMegaMenu, 
+	flattenCategories 
+} from '..'
+import { 
+	Category, 
+	CommonArgs, 
+	GetCommerceObjectArgs, 
+	GetProductsArgs, 
+	GetVariantsArgs,
+	Identifiable, 
+	Product 
+} from '../common/types'
 import { IntegrationError } from '../common/errors'
 
 /**

@@ -1,7 +1,18 @@
-import { Category, ClientCredentialProperties, ClientCredentialsConfiguration, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, OAuthRestClient, OAuthRestClientInterface, Product } from '../../../common'
+import { 
+	Category, 
+	ClientCredentialProperties, 
+	ClientCredentialsConfiguration, 
+	CommerceAPI, 
+	CommonArgs, 
+	GetProductsArgs, 
+	Identifiable, 
+	OAuthRestClient, 
+	OAuthRestClientInterface, 
+	Product 
+} from '../../../common'
 import _ from 'lodash'
 import { Dictionary } from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../../'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../'
 import { StringProperty } from '../../cms-property-types'
 import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { formatMoneyString, quoteProductIdString } from '../../../common/util'

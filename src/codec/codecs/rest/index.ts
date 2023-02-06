@@ -1,9 +1,16 @@
-import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, Product } from '../../../common'
+import { 
+	Category, 
+	CommerceAPI, 
+	CommonArgs, 
+	CustomerGroup, 
+	GetProductsArgs, 
+	Identifiable, 
+	Product 
+} from '../../../common'
 import _ from 'lodash'
 import { Dictionary } from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from '../../'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
-import { SFCCProduct } from '../sfcc/types'
 
 /**
  * TODO

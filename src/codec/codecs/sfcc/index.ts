@@ -5,19 +5,17 @@ import {
 	CommerceAPI,
 	CommonArgs,
 	GetProductsArgs,
-	Identifiable,
 	OAuthRestClient,
 	OAuthRestClientInterface,
 	Product,
 	CustomerGroup,
-	GetVariantsArgs,
+	GetVariantsArgs
 } from '../../../common'
 import _ from 'lodash'
 import {
 	CodecPropertyConfig,
 	CommerceCodecType,
-	CommerceCodec,
-	registerCodec,
+	CommerceCodec
 } from '../..'
 import { StringProperty } from '../../cms-property-types'
 import axios from 'axios'

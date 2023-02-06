@@ -4,7 +4,6 @@ import _ from 'lodash'
 import { CodecPropertyConfig } from '..'
 import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
-import { stringify } from 'querystring'
 
 /**
  * TODO
