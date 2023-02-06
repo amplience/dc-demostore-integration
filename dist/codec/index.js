@@ -296,20 +296,8 @@ exports.defaultArgs = {
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecTypes.commerce); });
 exports.getCommerceCodec = getCommerceCodec;
 // end public interface
-const akeneo_1 = __importDefault(require("./codecs/akeneo"));
-(0, exports.registerCodec)(new akeneo_1.default());
-const bigcommerce_1 = __importDefault(require("./codecs/bigcommerce"));
-(0, exports.registerCodec)(new bigcommerce_1.default());
 const commercetools_1 = __importDefault(require("./codecs/commercetools"));
 (0, exports.registerCodec)(new commercetools_1.default());
-const constructor_io_1 = __importDefault(require("./codecs/constructor.io"));
-(0, exports.registerCodec)(new constructor_io_1.default());
-const elasticpath_1 = __importDefault(require("./codecs/elasticpath"));
-(0, exports.registerCodec)(new elasticpath_1.default());
-const fabric_1 = __importDefault(require("./codecs/fabric"));
-(0, exports.registerCodec)(new fabric_1.default());
-const hybris_1 = __importDefault(require("./codecs/hybris"));
-(0, exports.registerCodec)(new hybris_1.default());
 const rest_1 = __importDefault(require("./codecs/rest"));
 (0, exports.registerCodec)(new rest_1.default());
 const sfcc_1 = __importDefault(require("./codecs/sfcc"));
