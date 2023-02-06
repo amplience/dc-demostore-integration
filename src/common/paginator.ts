@@ -1,4 +1,14 @@
-import { HalResource, Page, Pageable, Sortable, Hub, SearchIndex, FacetsResponse, FacetQuery, FacetedContentItem } from 'dc-management-sdk-js'
+import {
+	HalResource,
+	Page, 
+	Pageable, 
+	Sortable, 
+	Hub, 
+	SearchIndex, 
+	FacetsResponse, 
+	FacetQuery, 
+	FacetedContentItem
+} from 'dc-management-sdk-js'
 
 export const DEFAULT_SIZE = 100
 
@@ -6,7 +16,7 @@ export const DEFAULT_SIZE = 100
  * TOOD
  */
 export interface StatusQuery {
-    status?: 'ARCHIVED' | 'ACTIVE' | 'DELETED';
+	status?: 'ARCHIVED' | 'ACTIVE' | 'DELETED';
 }
 
 /**
@@ -22,9 +32,9 @@ export const paginator = async <T extends HalResource>(
 	const currentPage = await pagableFn({ ...options, size: DEFAULT_SIZE })
 	if (
 		currentPage.page &&
-        currentPage.page.number !== undefined &&
-        currentPage.page.totalPages !== undefined &&
-        currentPage.page.number + 1 < currentPage.page.totalPages
+		currentPage.page.number !== undefined &&
+		currentPage.page.totalPages !== undefined &&
+		currentPage.page.number + 1 < currentPage.page.totalPages
 	) {
 		return [
 			...currentPage.getItems(),
