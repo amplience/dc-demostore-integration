@@ -1,7 +1,13 @@
+/**
+ * TODO
+ */
 export type Property = {
     title: string;
 };
 
+/**
+ * TODO
+ */
 export type StringProperty = Property & {
     type: 'string';
     minLength?: number;
@@ -9,10 +15,16 @@ export type StringProperty = Property & {
     pattern?: string;
 };
 
+/**
+ * TODO
+ */
 export type StringConstProperty = StringProperty & {
     const: string;
 };
 
+/**
+ * TODO
+ */
 export type NumberProperty = Property & {
     type: 'number';
     multipleOf?: number;
@@ -22,10 +34,16 @@ export type NumberProperty = Property & {
     exclusiveMaximum?: number;
 };
 
+/**
+ * TODO
+ */
 export type IntegerProperty = NumberProperty & {
     type: 'integer';
 };
 
+/**
+ * TODO
+ */
 export type ArrayProperty = Property & {
     type: 'array';
     items?: number;
@@ -35,6 +53,9 @@ export type ArrayProperty = Property & {
     uniqueItems?: boolean;
 };
 
+/**
+ * TODO
+ */
 export const StringPatterns = {
     anyUrl: ".+://.+",
     httpUrl: "https?://.+"

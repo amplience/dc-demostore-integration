@@ -4,67 +4,120 @@ import { API, CommerceAPI, CONSTANTS, findInMegaMenu, flattenCategories } from '
 import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../common/types'
 import { IntegrationError } from '../common/errors'
 
+/**
+ * TODO
+ */
 export enum CodecTypes {
     commerce
 }
 
+/**
+ * TODO
+ */
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
+/**
+ * TODO
+ */
 export class CodecType {
 	_type:          CodecTypes
 	_properties:    Dictionary<AnyProperty>
 	_vendor:        string
 
+	/**
+	 * TODO
+	 */
 	get type(): CodecTypes {
 		return this._type
 	}
 
+	/**
+	 * TODO
+	 */
 	get vendor(): string {
 		return this._vendor
 	}
 
+	/**
+	 * TODO
+	 */
 	get schemaUri(): string {
 		return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
 	}
 
+	/**
+	 * TODO
+	 */
 	get label(): string {
 		return `${this.vendor} integration`
 	}
 
+	/**
+	 * TODO
+	 */
 	get iconUrl(): string {
 		return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
 	}
 
+	/**
+	 * TODO
+	 */
 	get schema(): any {
 		return {
 			properties: this.properties
 		}
 	}
 
+	/**
+	 * TODO
+	 */
 	get properties(): Dictionary<AnyProperty> {
 		return this._properties
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 */
 	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API> {
 		throw new Error('must implement getCodec')
 	}
 
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	async postProcess(config: any): Promise<any> {
 		return config
 	}
 }
 
+/**
+ * TODO
+ */
 export class CommerceCodecType extends CodecType {
+	
+	/**
+	 * TODO
+	 */
 	get type() {
 		return CodecTypes.commerce
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 */
 	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI> {
 		throw new Error('must implement getCodec')
 	}
 }
 
+/**
+ * TODO
+ */
 export enum CodecTestOperationType {
     megaMenu,
     getCategory,
@@ -74,6 +127,9 @@ export enum CodecTestOperationType {
     getCustomerGroups
 }
 
+/**
+ * TODO
+ */
 export interface CodecTestResult {
     operationType: CodecTestOperationType
     description: string
@@ -82,16 +138,28 @@ export interface CodecTestResult {
     results: any
 }
 
+/**
+ * TODO
+ */
 export class CommerceCodec implements CommerceAPI {
 	config: CodecPropertyConfig<Dictionary<AnyProperty>>
 	megaMenu: Category[] = []
 	codecType: CommerceCodecType
 	initDuration: number
     
+	/**
+	 * TODO
+	 * @param config 
+	 */
 	constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>) {
 		this.config = config
 	}
 
+	/**
+	 * TODO
+	 * @param codecType 
+	 * @returns 
+	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		const startInit = new Date().valueOf()
 		await this.cacheMegaMenu()
@@ -107,24 +175,47 @@ export class CommerceCodec implements CommerceAPI {
 		return this
 	}
 
+	/**
+	 * TODO
+	 * @param slug 
+	 * @returns 
+	 */
 	findCategory(slug: string) {
 		return findInMegaMenu(this.megaMenu, slug)
 	}    
 
+	/**
+	 * TODO
+	 */
 	async cacheMegaMenu(): Promise<void> {
 		this.megaMenu = []
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	// defined in terms of getProducts()
 	async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
 		return _.first(await this.getProducts({ ...args, productIds: args.id }))
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`)
 		return []
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	// defined in terms of getMegaMenu, effectively
 	async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
 		const category = this.findCategory(args.slug)
@@ -132,24 +223,48 @@ export class CommerceCodec implements CommerceAPI {
 		return category
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getMegaMenu(args: CommonArgs): Promise<Category[]> {
 		return this.megaMenu
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`)
 		return []
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
 		return await this.getVariants(args)
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`)
 		return []
 	}
 
+	/**
+	 * TODO
+	 * @returns 
+	 */
 	async testIntegration(): Promise<CodecTestResult[]> {
 		const results: CodecTestResult[] = [{
 			operationType: CodecTestOperationType.megaMenu,
@@ -226,8 +341,16 @@ export class CommerceCodec implements CommerceAPI {
 	}
 }
 
+/**
+ * TODO
+ * @param array 
+ * @returns 
+ */
 export const getRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * (array.length - 1))]
 
+/**
+ * TODO
+ */
 export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string 
                     : T[K] extends StringConstProperty ? string 
@@ -239,11 +362,20 @@ export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
 const codecs = new Map<CodecTypes, CodecType[]>()
 codecs[CodecTypes.commerce] = []
 
+/**
+ * TODO
+ * @param type 
+ * @returns 
+ */
 // public interface
 export const getCodecs = (type?: CodecTypes): CodecType[] => {
 	return type ? codecs[type] : _.flatMap(codecs)
 }
 
+/**
+ * TODO
+ * @param codec 
+ */
 export const registerCodec = (codec: CodecType) => {
 	if (!codecs[codec.type].includes(codec)) {
 		codecs[codec.type].push(codec)
@@ -255,6 +387,11 @@ const apis = new Map<any, API>()
 
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types'
 
+/**
+ * TODO
+ * @param obj 
+ * @returns 
+ */
 const maskSensitiveData = (obj: any) => {
 	return {
 		...obj,
@@ -264,6 +401,12 @@ const maskSensitiveData = (obj: any) => {
 	}
 }
 
+/**
+ * TODO
+ * @param config 
+ * @param type 
+ * @returns 
+ */
 export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
 	const codecs = getCodecs(type)
 	let codec: CodecType
@@ -315,6 +458,11 @@ export const defaultArgs: CommonArgs = {
 	segment:    ''
 }
 
+/**
+ * TODO
+ * @param config 
+ * @returns 
+ */
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
 

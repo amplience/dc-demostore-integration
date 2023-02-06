@@ -3,10 +3,21 @@ import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-s
 import _, { Dictionary } from 'lodash'
 import { Category } from '../../common/types'
 
+/**
+ * TODO
+ * @param categories 
+ * @param slug 
+ * @returns 
+ */
 export const findInMegaMenu = (categories: Category[], slug: string) => {
 	return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 
+/**
+ * TODO
+ * @param categories 
+ * @returns 
+ */
 export const flattenCategories = (categories: Category[]) => {
 	const allCategories: Category[] = []
 	const bulldozeCategories = cat => {
@@ -17,11 +28,17 @@ export const flattenCategories = (categories: Category[]) => {
 	return allCategories
 }
 
+/**
+ * TODO
+ */
 export interface CTypeSchema {
     definitions?: any
     properties: any
 }
 
+/**
+ * TODO
+ */
 export interface CType {
     label: string
     schemaUri: string
@@ -29,6 +46,9 @@ export interface CType {
     schema: CTypeSchema
 }
 
+/**
+ * TODO
+ */
 export const CTypes: Dictionary<CType> = {
 	demostoreconfig: {
 		label: 'demostore config',
@@ -84,6 +104,11 @@ export const CTypes: Dictionary<CType> = {
 	}
 }
 
+/**
+ * TODO
+ * @param ctype 
+ * @returns 
+ */
 export const getContentType = (ctype: CType): ContentType => {
 	const contentType = new ContentType()
 	contentType.contentTypeUri = ctype.schemaUri
@@ -97,6 +122,11 @@ export const getContentType = (ctype: CType): ContentType => {
 	return contentType
 }
 
+/**
+ * TODO
+ * @param ctype 
+ * @returns 
+ */
 export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
 	const schema = new ContentTypeSchema()
 	schema.schemaId = schema.id = ctype.schemaUri

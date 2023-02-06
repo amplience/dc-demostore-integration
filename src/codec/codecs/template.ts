@@ -5,15 +5,28 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } 
 import { StringProperty } from '../cms-property-types'
 import { SFCCProduct } from './sfcc/types'
 
+/**
+ * TODO
+ */
 type CodecConfig = {
     // productURL:         StringProperty
 }
 
+/**
+ * TODO
+ */
 export class TemplateCommerceCodecType extends CommerceCodecType {
+
+	/**
+	 * TODO
+	 */
 	get vendor(): string {
 		return 'template'
 	}
 
+	/**
+	 * TODO
+	 */
 	get properties(): CodecConfig {
 		return {
 			// productURL: {
@@ -23,11 +36,19 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 		}
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new TemplateCommerceCodec(config).init(this)
 	}
 }
 
+/**
+ * TODO
+ */
 export class TemplateCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 
@@ -35,12 +56,21 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	// products: Product[]
 	// categories: Category[]
 
+	/**
+	 * TODO
+	 * @param codecType 
+	 * @returns 
+	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		// this.products = await fetchFromURL(this.config.productURL, [])
 		// this.megaMenu = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		// eslint-disable-next-line no-empty
 		if (args.productIds) {
@@ -54,6 +84,10 @@ export class TemplateCommerceCodec extends CommerceCodec {
 		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		// eslint-disable-next-line no-empty
 		if (args.productIds) {
@@ -67,6 +101,11 @@ export class TemplateCommerceCodec extends CommerceCodec {
 		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		return []
 	}
