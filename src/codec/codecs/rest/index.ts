@@ -5,6 +5,9 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } 
 import { StringProperty, StringPatterns } from '../../cms-property-types'
 import { SFCCProduct } from '../sfcc/types'
 
+/**
+ * TODO
+ */
 type CodecConfig = {
     productURL:         StringProperty
     categoryURL:        StringProperty
@@ -12,12 +15,25 @@ type CodecConfig = {
     translationsURL:    StringProperty
 }
 
+/**
+ * TODO
+ * @param url 
+ * @param defaultValue 
+ * @returns 
+ */
 const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
 export class RestCommerceCodecType extends CommerceCodecType {
+
+	/**
+	 * TODO
+	 */
 	get vendor(): string {
 		return 'rest'
 	}
 
+	/**
+	 * TODO
+	 */
 	get properties(): CodecConfig {
 		return {
 			productURL: {
@@ -43,11 +59,19 @@ export class RestCommerceCodecType extends CommerceCodecType {
 		}
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new RestCommerceCodec(config).init(this)
 	}
 }
 
+/**
+ * TODO
+ */
 export class RestCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 
@@ -56,6 +80,9 @@ export class RestCommerceCodec extends CommerceCodec {
 	customerGroups: CustomerGroup[]
 	translations: Dictionary<Dictionary<string>>
 
+	/**
+	 * TODO
+	 */
 	async cacheMegaMenu(): Promise<void> {
 		this.categories = await fetchFromURL(this.config.categoryURL, [])
 		this.products = await fetchFromURL(this.config.productURL, [])
@@ -64,6 +91,11 @@ export class RestCommerceCodec extends CommerceCodec {
 		this.megaMenu = this.categories.filter(cat => !cat.parent)
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		if (args.productIds) {
 			return this.products.filter(prod => args.productIds.split(',').includes(prod.id))

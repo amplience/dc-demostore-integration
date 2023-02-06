@@ -26,16 +26,29 @@ import { formatMoneyString } from '../../../common/util'
 import slugify from 'slugify'
 import btoa from 'btoa'
 
+/**
+ * TODO
+ */
 type CodecConfig = ClientCredentialsConfiguration & {
   api_token: StringProperty;
   site_id: StringProperty;
 };
 
+/**
+ * TODO
+ */
 export class SFCCCommerceCodecType extends CommerceCodecType {
+
+	/**
+	 * TODO
+	 */
 	get vendor(): string {
 		return 'sfcc'
 	}
 
+	/**
+	 * TODO
+	 */
 	get properties(): CodecConfig {
 		return {
 			...ClientCredentialProperties,
@@ -51,10 +64,20 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 		}
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new SFCCCommerceCodec(config).init(this)
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	async postProcess(config: CodecConfig): Promise<CodecConfig> {
 		// apply any postprocessing required
@@ -65,6 +88,11 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 	}
 }
 
+/**
+ * TODO
+ * @param category 
+ * @returns 
+ */
 const mapCategory = (category: SFCCCategory): Category => {
 	return {
 		id: category.id,
@@ -75,19 +103,22 @@ const mapCategory = (category: SFCCCategory): Category => {
 	}
 }
 
-/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
-    group.name = group.id + 'XXXX'
-    group.id += 'XXXXX'
-    return group
-
-}*/
-
+/**
+ * TODO
+ * @param group 
+ * @returns 
+ */
 const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
 	group && {
 		...group,
 		name: group.id,
 	}
 
+/**
+ * TODO
+ * @param product 
+ * @returns 
+ */
 // TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product: SFCCProduct): Product => {
 	if (!product) {
@@ -130,6 +161,9 @@ const mapProduct = (product: SFCCProduct): Product => {
 	}
 }
 
+/**
+ * TODO
+ */
 export class SFCCCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 
@@ -138,6 +172,11 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	shopApi: string
 	sitesApi: string
 
+	/**
+	 * TODO
+	 * @param codecType 
+	 * @returns 
+	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		this.shopApi = `/s/${this.config.site_id}/dw/shop/v22_4`
 		this.sitesApi = `/s/-/dw/data/v22_4/sites/${this.config.site_id}`
@@ -163,6 +202,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		return await super.init(codecType)
 	}
 
+	/**
+	 * TODO
+	 */
 	async cacheMegaMenu(): Promise<void> {
 		const categories = (
 			await this.fetch(`${this.shopApi}/categories/root?levels=4`)
@@ -172,6 +214,11 @@ export class SFCCCommerceCodec extends CommerceCodec {
 			.map(mapCategory)
 	}
 
+	/**
+	 * TODO
+	 * @param url 
+	 * @returns 
+	 */
 	async fetch(url: string): Promise<any> {
 		return (
 			await axios.get(url, {
@@ -183,16 +230,31 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		).data
 	}
 
+	/**
+	 * TODO
+	 * @param url 
+	 * @returns 
+	 */
 	async authenticatedFetch(url: string): Promise<any> {
 		return (await this.rest.get({ url })).data
 	}
 
+	/**
+	 * TODO
+	 * @param productId 
+	 * @returns 
+	 */
 	async getProductById(productId: string): Promise<SFCCProduct> {
 		return await this.fetch(
 			`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`
 		)
 	}
 
+	/**
+	 * TODO
+	 * @param query 
+	 * @returns 
+	 */
 	async search(query: string): Promise<SFCCProduct[]> {
 		const searchResults = (
 			await this.fetch(`${this.shopApi}/product_search?${query}&count=200`)
@@ -207,12 +269,22 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		return []
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
 		return await this.fetch(
 			`${this.shopApi}/products/${args.productId}/variants`
 		)
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: SFCCProduct[] = []
 		if (args.productIds) {
@@ -227,6 +299,11 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		return products.map(mapProduct)
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		let products: SFCCProduct[] = []
 		if (args.productIds) {
@@ -241,6 +318,11 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		return products
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
 		return (
 			await this.authenticatedFetch(
