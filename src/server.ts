@@ -5,6 +5,12 @@ import 'isomorphic-unfetch'
 const app = express()
 const port = 3000 // default port to listen
 
+/**
+ * TODO
+ * @param req 
+ * @param res 
+ * @param next 
+ */
 const wrappedMiddleware = async (req: Request, res: Response, next: any) => {
 	try {
 		await middleware(req, res)

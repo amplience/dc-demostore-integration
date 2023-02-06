@@ -3,6 +3,11 @@ import axios from 'axios'
 import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
 import { isServer } from '../common/util'
 
+/**
+ * TODO
+ * @param config 
+ * @returns 
+ */
 const getAPI = async (config: any): Promise<CommerceAPI> => {
 	// we are passed in an object here
 	//   - if it does not the key 'config_locator', it is assumed to be the config block for a codec
@@ -28,8 +33,16 @@ const getAPI = async (config: any): Promise<CommerceAPI> => {
 	return await getCommerceCodec(config)
 }
 
+/**
+ * TODO
+ */
 export type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getVariants' | 'getRawProducts'
 
+/**
+ * TODO
+ * @param params 
+ * @returns 
+ */
 // getCommerceAPI is the main client interaction point with the integration layer
 export const getCommerceAPI = async (params: any = undefined): Promise<CommerceAPI> => {
 	if (isServer()) {
@@ -53,6 +66,12 @@ export const getCommerceAPI = async (params: any = undefined): Promise<CommerceA
 	}
 }
 
+/**
+ * TODO
+ * @param req 
+ * @param res 
+ * @returns 
+ */
 // handler for /api route
 export const middleware = async (req, res) => {
 	// CORS support
@@ -74,4 +93,5 @@ export const middleware = async (req, res) => {
 		break
 	}
 }
+
 export default middleware

@@ -1,22 +1,37 @@
 import { Dictionary } from 'lodash'
 
+/**
+ * TODO
+ */
 export type Image = {
     url:                string
     thumb?:             string
 }
 
+/**
+ * TODO
+ */
 export type Identifiable = {
     id:                 string
     name:               string
 }
 
+/**
+ * TODO
+ */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type CustomerGroup = Identifiable & {}
 
+/**
+ * TODO
+ */
 export type CommerceObject = Identifiable & {
     slug:               string
 }
 
+/**
+ * TODO
+ */
 export type Product = CommerceObject & {
     shortDescription?:  string
     longDescription?:   string
@@ -25,6 +40,9 @@ export type Product = CommerceObject & {
     variants:           Variant[]
 }
 
+/**
+ * TODO
+ */
 export type Variant = {
     sku:                string
     listPrice:          string
@@ -34,6 +52,9 @@ export type Variant = {
     attributes:         Dictionary<string>
 }
 
+/**
+ * TODO
+ */
 export type Category = CommerceObject & {
     parent?:            Category
     image?:             Image
@@ -41,6 +62,9 @@ export type Category = CommerceObject & {
     products:           Product[]
 }
 
+/**
+ * TODO
+ */
 export type Promotion = Identifiable & {
     description:        string
     promoCode?:         string
@@ -48,10 +72,16 @@ export type Promotion = Identifiable & {
     image?:             Image
 }
 
+/**
+ * TODO
+ */
 export type GetAttributeArgs = {
     name:               string
 }
 
+/**
+ * TODO
+ */
 export type CommonArgs = {
     locale?:            string
     language?:          string
@@ -60,26 +90,41 @@ export type CommonArgs = {
     segment?:           string
 }
 
+/**
+ * TODO
+ */
 export type GetCommerceObjectArgs = CommonArgs & {
     id?:                string
     slug?:              string
 }
 
+/**
+ * TODO
+ */
 export type GetVariantsArgs = CommonArgs & {
     productId:        string
 }
 
+/**
+ * TODO
+ */
 export type GetProductsArgs = CommonArgs & {
     keyword?:           string
     productIds?:        string
     category?:          Category
 }
 
+/**
+ * TODO
+ */
 export type AlgoliaConfig = {
     appId:              string
     apiKey:             string
 }
 
+/**
+ * TODO
+ */
 export type AmplienceConfig = {
     hub:                string
     hubId:              string
@@ -87,6 +132,9 @@ export type AmplienceConfig = {
     imageHub?:          string
 }
 
+/**
+ * TODO
+ */
 export type DemoStoreConfiguration = {
     algolia:            AlgoliaConfig
     url?:               string

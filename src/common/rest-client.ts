@@ -6,19 +6,31 @@ import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
 import { stringify } from 'querystring'
 
+/**
+ * TODO
+ */
 export type APIConfiguration = {
     api_url:        StringProperty
 }
 
+/**
+ * TODO
+ */
 export type OAuthCodecConfiguration = APIConfiguration & {
     auth_url:       StringProperty
 }
 
+/**
+ * TODO
+ */
 export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
     client_id:      StringProperty
     client_secret:  StringProperty
 }
 
+/**
+ * TODO
+ */
 export type UsernamePasswordConfiguration = {
     username:   StringProperty
     password:   StringProperty
@@ -68,15 +80,26 @@ export const ClientCredentialProperties: ClientCredentialsConfiguration = {
 	}
 }
 
+/**
+ * TODO
+ */
 export type OAuthRestClientInterface = {
     [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
 }
 
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
+
+/**
+ * TODO
+ */
 export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any): OAuthRestClientInterface => {
 	let authenticatedAxios: AxiosInstance
 	let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
+	/**
+	 * TODO
+	 * @returns 
+	 */
 	const authenticate = async (): Promise<AxiosInstance> => {
 		// console.log(`authenticating to ${config.auth_url}`)
 
@@ -100,6 +123,11 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 		return authenticatedAxios
 	}
 
+	/**
+	 * TODO
+	 * @param method 
+	 * @returns 
+	 */
 	const request = (method: HttpMethod) => async (config: AxiosRequestConfig | string): Promise<any> => {
 		if (typeof config === 'string') {
 			config = { url: config }
