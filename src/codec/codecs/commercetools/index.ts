@@ -8,16 +8,29 @@ import { formatMoneyString, quoteProductIdString } from '../../../common/util'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
+/**
+ * TODO
+ */
 type CodecConfig = ClientCredentialsConfiguration & {
     project: StringProperty
     scope: StringProperty
 }
 
+/**
+ * TODO
+ */
 export class CommercetoolsCodecType extends CommerceCodecType {
+
+	/**
+	 * TODO
+	 */
 	get vendor(): string {
 		return 'commercetools'
 	}
 
+	/**
+	 * TODO
+	 */
 	get properties(): CodecConfig {
 		return {
 			...ClientCredentialProperties,
@@ -34,15 +47,28 @@ export class CommercetoolsCodecType extends CommerceCodecType {
 		}
 	}
 
+	/**
+	 * TODO
+	 * @param config 
+	 * @returns 
+	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new CommercetoolsCodec(config).init(this)
 	}
 }
 
+/**
+ * TODO
+ */
 const localize = (localizable: Localizable, args: CommonArgs): string => {
 	return localizable[args.language] || localizable.en
 }
 
+/**
+ * TODO
+ * @param args 
+ * @returns 
+ */
 const getAttributeValue = (args: CommonArgs) => (attribute: Attribute): string => {
 	if (typeof attribute.value === 'string') {
 		return attribute.value
@@ -58,6 +84,12 @@ const getAttributeValue = (args: CommonArgs) => (attribute: Attribute): string =
 	}
 }
 
+/**
+ * TODO
+ * @param variant 
+ * @param args 
+ * @returns 
+ */
 const findPrice = (variant: CTVariant, args: CommonArgs): string => {
 	const price = variant.prices &&
         (variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
@@ -72,6 +104,13 @@ const findPrice = (variant: CTVariant, args: CommonArgs): string => {
 	}
 }
 
+/**
+ * TODO
+ * @param category 
+ * @param categories 
+ * @param args 
+ * @returns 
+ */
 const mapCategory = (category: CTCategory, categories: CTCategory[], args: CommonArgs): Category => {
 	return {
 		id: category.id,
@@ -82,6 +121,11 @@ const mapCategory = (category: CTCategory, categories: CTCategory[], args: Commo
 	}
 }
 
+/**
+ * TODO
+ * @param args 
+ * @returns 
+ */
 const mapProduct = (args: CommonArgs) => (product: CTProduct) => {
 	return {
 		id: product.id,
@@ -92,6 +136,11 @@ const mapProduct = (args: CommonArgs) => (product: CTProduct) => {
 	}
 }
 
+/**
+ * TODO
+ * @param args 
+ * @returns 
+ */
 const mapVariant = (args: CommonArgs) => (variant: CTVariant) => {
 	return {
 		sku: variant.sku,
@@ -104,10 +153,18 @@ const mapVariant = (args: CommonArgs) => (variant: CTVariant) => {
 	}
 }
 
+/**
+ * TODO
+ */
 export class CommercetoolsCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 	rest: OAuthRestClientInterface
 
+	/**
+	 * TODO
+	 * @param codecType 
+	 * @returns 
+	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		this.rest = OAuthRestClient({
 			api_url: `${this.config.api_url}/${this.config.project}`,
@@ -123,16 +180,29 @@ export class CommercetoolsCodec extends CommerceCodec {
 		return await super.init(codecType)
 	}
 
+	/**
+	 * TODO
+	 */
 	async cacheMegaMenu(): Promise<void> {
 		const categories: CTCategory[] = await this.fetch('/categories?limit=500')
 		const mapped: Category[] = categories.map(cat => mapCategory(cat, categories, {}))
 		this.megaMenu = mapped.filter(cat => cats.includes(cat.slug))
 	}
 
+	/**
+	 * TODO
+	 * @param url 
+	 * @returns 
+	 */
 	async fetch(url: string) {
 		return (await this.rest.get({ url })).results
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: CTProduct[] = []
 		if (args.productIds) {
@@ -147,6 +217,11 @@ export class CommercetoolsCodec extends CommerceCodec {
 		return products.map(mapProduct(args))
 	}
 
+	/**
+	 * TODO
+	 * @param args 
+	 * @returns 
+	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		return await this.fetch('/customer-groups')
 	}
