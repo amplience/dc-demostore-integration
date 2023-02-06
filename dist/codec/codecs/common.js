@@ -3,10 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.flattenCategories = exports.findInMegaMenu = void 0;
 const __1 = require("../..");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
+/**
+ * TODO
+ * @param categories
+ * @param slug
+ * @returns
+ */
 const findInMegaMenu = (categories, slug) => {
     return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
 exports.findInMegaMenu = findInMegaMenu;
+/**
+ * TODO
+ * @param categories
+ * @returns
+ */
 const flattenCategories = (categories) => {
     const allCategories = [];
     const bulldozeCategories = cat => {
@@ -18,6 +29,9 @@ const flattenCategories = (categories) => {
     return allCategories;
 };
 exports.flattenCategories = flattenCategories;
+/**
+ * TODO
+ */
 exports.CTypes = {
     demostoreconfig: {
         label: 'demostore config',
@@ -72,6 +86,11 @@ exports.CTypes = {
         schema: { properties: {} }
     }
 };
+/**
+ * TODO
+ * @param ctype
+ * @returns
+ */
 const getContentType = (ctype) => {
     const contentType = new dc_management_sdk_js_1.ContentType();
     contentType.contentTypeUri = ctype.schemaUri;
@@ -85,6 +104,11 @@ const getContentType = (ctype) => {
     return contentType;
 };
 exports.getContentType = getContentType;
+/**
+ * TODO
+ * @param ctype
+ * @returns
+ */
 const getContentTypeSchema = (ctype) => {
     const schema = new dc_management_sdk_js_1.ContentTypeSchema();
     schema.schemaId = schema.id = ctype.schemaUri;

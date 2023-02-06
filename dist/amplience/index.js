@@ -16,12 +16,23 @@ exports.getConfig = exports.getDemoStoreConfig = exports.getContentItemFromConfi
 const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const errors_1 = require("../common/errors");
+/**
+ * TODO
+ * @param hub
+ * @param args
+ * @returns
+ */
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
     let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
     return response.status === 200 ? (0, crypt_keeper_1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });
 exports.getContentItem = getContentItem;
+/**
+ * TODO
+ * @param configLocator
+ * @returns
+ */
 const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
     let [hub, lookup] = configLocator.split(':');
     let contentItem = yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
@@ -35,6 +46,11 @@ const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, voi
     return contentItem;
 });
 exports.getContentItemFromConfigLocator = getContentItemFromConfigLocator;
+/**
+ * TODO
+ * @param key
+ * @returns
+ */
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
     let obj = yield (0, exports.getContentItemFromConfigLocator)(key);
     return Object.assign(Object.assign({}, obj), { algolia: {

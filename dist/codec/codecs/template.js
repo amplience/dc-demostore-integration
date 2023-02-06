@@ -11,10 +11,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateCommerceCodec = exports.TemplateCommerceCodecType = void 0;
 const __1 = require("../..");
+/**
+ * TODO
+ */
 class TemplateCommerceCodecType extends __1.CommerceCodecType {
+    /**
+     * TODO
+     */
     get vendor() {
         return 'template';
     }
+    /**
+     * TODO
+     */
     get properties() {
         return {
         // productURL: {
@@ -23,6 +32,11 @@ class TemplateCommerceCodecType extends __1.CommerceCodecType {
         // }
         };
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new TemplateCommerceCodec(config).init(this);
@@ -30,10 +44,18 @@ class TemplateCommerceCodecType extends __1.CommerceCodecType {
     }
 }
 exports.TemplateCommerceCodecType = TemplateCommerceCodecType;
+/**
+ * TODO
+ */
 class TemplateCommerceCodec extends __1.CommerceCodec {
     // instance variables
     // products: Product[]
     // categories: Category[]
+    /**
+     * TODO
+     * @param codecType
+     * @returns
+     */
     init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
@@ -44,6 +66,10 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
             return yield _super.init.call(this, codecType);
         });
     }
+    /**
+     * TODO
+     * @param args
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             // eslint-disable-next-line no-empty
@@ -58,6 +84,10 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
             throw new Error('getProducts() requires either: productIds, keyword, or category reference');
         });
     }
+    /**
+     * TODO
+     * @param args
+     */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             // eslint-disable-next-line no-empty
@@ -72,6 +102,11 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
             throw new Error('getProducts() requires either: productIds, keyword, or category reference');
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return [];

@@ -18,10 +18,19 @@ const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../../");
 const util_1 = require("../../../common/util");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
+/**
+ * TODO
+ */
 class CommercetoolsCodecType extends __1.CommerceCodecType {
+    /**
+     * TODO
+     */
     get vendor() {
         return 'commercetools';
     }
+    /**
+     * TODO
+     */
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { project: {
                 title: 'project key',
@@ -33,6 +42,11 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
                 maxLength: 1000
             } });
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new CommercetoolsCodec(config).init(this);
@@ -40,9 +54,17 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
     }
 }
 exports.CommercetoolsCodecType = CommercetoolsCodecType;
+/**
+ * TODO
+ */
 const localize = (localizable, args) => {
     return localizable[args.language] || localizable.en;
 };
+/**
+ * TODO
+ * @param args
+ * @returns
+ */
 const getAttributeValue = (args) => (attribute) => {
     if (typeof attribute.value === 'string') {
         return attribute.value;
@@ -57,6 +79,12 @@ const getAttributeValue = (args) => (attribute) => {
         return localize(attribute.value, args);
     }
 };
+/**
+ * TODO
+ * @param variant
+ * @param args
+ * @returns
+ */
 const findPrice = (variant, args) => {
     const price = variant.prices &&
         (variant.prices.find(price => price.country === args.country && price.value.currencyCode === args.currency) ||
@@ -69,6 +97,13 @@ const findPrice = (variant, args) => {
         return (0, util_1.formatMoneyString)((price.value.centAmount / Math.pow(10, price.value.fractionDigits)), args);
     }
 };
+/**
+ * TODO
+ * @param category
+ * @param categories
+ * @param args
+ * @returns
+ */
 const mapCategory = (category, categories, args) => {
     return {
         id: category.id,
@@ -78,6 +113,11 @@ const mapCategory = (category, categories, args) => {
         products: []
     };
 };
+/**
+ * TODO
+ * @param args
+ * @returns
+ */
 const mapProduct = (args) => (product) => {
     return {
         id: product.id,
@@ -87,6 +127,11 @@ const mapProduct = (args) => (product) => {
         categories: []
     };
 };
+/**
+ * TODO
+ * @param args
+ * @returns
+ */
 const mapVariant = (args) => (variant) => {
     return {
         sku: variant.sku,
@@ -97,7 +142,15 @@ const mapVariant = (args) => (variant) => {
         attributes: lodash_1.default.zipObject(variant.attributes.map(a => a.name), variant.attributes.map(getAttributeValue(args)))
     };
 };
+/**
+ * TODO
+ */
 class CommercetoolsCodec extends __1.CommerceCodec {
+    /**
+     * TODO
+     * @param codecType
+     * @returns
+     */
     init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
@@ -115,6 +168,9 @@ class CommercetoolsCodec extends __1.CommerceCodec {
             return yield _super.init.call(this, codecType);
         });
     }
+    /**
+     * TODO
+     */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = yield this.fetch('/categories?limit=500');
@@ -122,11 +178,21 @@ class CommercetoolsCodec extends __1.CommerceCodec {
             this.megaMenu = mapped.filter(cat => cats.includes(cat.slug));
         });
     }
+    /**
+     * TODO
+     * @param url
+     * @returns
+     */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield this.rest.get({ url })).results;
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
@@ -142,6 +208,11 @@ class CommercetoolsCodec extends __1.CommerceCodec {
             return products.map(mapProduct(args));
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.fetch('/customer-groups');

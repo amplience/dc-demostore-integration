@@ -19,10 +19,19 @@ const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
+/**
+ * TODO
+ */
 class SFCCCommerceCodecType extends __1.CommerceCodecType {
+    /**
+     * TODO
+     */
     get vendor() {
         return 'sfcc';
     }
+    /**
+     * TODO
+     */
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { api_token: {
                 title: 'Shopper API Token',
@@ -33,11 +42,21 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
                 type: 'string',
             } });
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new SFCCCommerceCodec(config).init(this);
         });
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
     postProcess(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -47,6 +66,11 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
     }
 }
 exports.SFCCCommerceCodecType = SFCCCommerceCodecType;
+/**
+ * TODO
+ * @param category
+ * @returns
+ */
 const mapCategory = (category) => {
     var _a;
     return {
@@ -57,13 +81,17 @@ const mapCategory = (category) => {
         products: [],
     };
 };
-/*const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>{
-    group.name = group.id + 'XXXX'
-    group.id += 'XXXXX'
-    return group
-
-}*/
+/**
+ * TODO
+ * @param group
+ * @returns
+ */
 const mapCustomerGroup = (group) => group && Object.assign(Object.assign({}, group), { name: group.id });
+/**
+ * TODO
+ * @param product
+ * @returns
+ */
 // TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product) => {
     var _a;
@@ -104,7 +132,15 @@ const mapProduct = (product) => {
         ],
     };
 };
+/**
+ * TODO
+ */
 class SFCCCommerceCodec extends __1.CommerceCodec {
+    /**
+     * TODO
+     * @param codecType
+     * @returns
+     */
     init(codecType) {
         const _super = Object.create(null, {
             init: { get: () => super.init }
@@ -124,6 +160,9 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return yield _super.init.call(this, codecType);
         });
     }
+    /**
+     * TODO
+     */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = (yield this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories;
@@ -132,6 +171,11 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
                 .map(mapCategory);
         });
     }
+    /**
+     * TODO
+     * @param url
+     * @returns
+     */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield axios_1.default.get(url, {
@@ -142,16 +186,31 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             })).data;
         });
     }
+    /**
+     * TODO
+     * @param url
+     * @returns
+     */
     authenticatedFetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield this.rest.get({ url })).data;
         });
     }
+    /**
+     * TODO
+     * @param productId
+     * @returns
+     */
     getProductById(productId) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`);
         });
     }
+    /**
+     * TODO
+     * @param query
+     * @returns
+     */
     search(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}&count=200`)).hits;
@@ -163,11 +222,21 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return [];
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.fetch(`${this.shopApi}/products/${args.productId}/variants`);
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
@@ -183,6 +252,11 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return products.map(mapProduct);
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
@@ -198,6 +272,11 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return products;
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup);

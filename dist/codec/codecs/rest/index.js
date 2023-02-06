@@ -16,11 +16,23 @@ exports.RestCommerceCodec = exports.RestCommerceCodecType = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../../");
 const cms_property_types_1 = require("../../cms-property-types");
+/**
+ * TODO
+ * @param url
+ * @param defaultValue
+ * @returns
+ */
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
 class RestCommerceCodecType extends __1.CommerceCodecType {
+    /**
+     * TODO
+     */
     get vendor() {
         return 'rest';
     }
+    /**
+     * TODO
+     */
     get properties() {
         return {
             productURL: {
@@ -45,6 +57,11 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
             }
         };
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new RestCommerceCodec(config).init(this);
@@ -52,7 +69,13 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
     }
 }
 exports.RestCommerceCodecType = RestCommerceCodecType;
+/**
+ * TODO
+ */
 class RestCommerceCodec extends __1.CommerceCodec {
+    /**
+     * TODO
+     */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             this.categories = yield fetchFromURL(this.config.categoryURL, []);
@@ -62,6 +85,11 @@ class RestCommerceCodec extends __1.CommerceCodec {
             this.megaMenu = this.categories.filter(cat => !cat.parent);
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             if (args.productIds) {

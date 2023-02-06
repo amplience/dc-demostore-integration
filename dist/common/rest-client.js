@@ -50,9 +50,16 @@ exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAu
         type: 'string',
         minLength: 1
     } });
+/**
+ * TODO
+ */
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
+    /**
+     * TODO
+     * @returns
+     */
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         // console.log(`authenticating to ${config.auth_url}`)
         if (!authenticatedAxios) {
@@ -71,6 +78,11 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
         }
         return authenticatedAxios;
     });
+    /**
+     * TODO
+     * @param method
+     * @returns
+     */
     const request = (method) => (config) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
         if (typeof config === 'string') {

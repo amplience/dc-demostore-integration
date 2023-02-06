@@ -11,6 +11,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.replicaPaginator = exports.searchIndexPaginator = exports.facetPaginator = exports.paginator = exports.DEFAULT_SIZE = void 0;
 exports.DEFAULT_SIZE = 100;
+/**
+ * TODO
+ * @param pagableFn
+ * @param options
+ * @returns
+ */
 const paginator = (pagableFn, options = {}) => __awaiter(void 0, void 0, void 0, function* () {
     const currentPage = yield pagableFn(Object.assign(Object.assign({}, options), { size: exports.DEFAULT_SIZE }));
     if (currentPage.page &&
@@ -25,9 +31,25 @@ const paginator = (pagableFn, options = {}) => __awaiter(void 0, void 0, void 0,
     return currentPage.getItems();
 });
 exports.paginator = paginator;
+/**
+ * TODO
+ * @param query
+ * @param hub
+ * @returns
+ */
 const facetPaginator = (query, hub) => (options) => hub.related.contentItems.facet(query, options);
 exports.facetPaginator = facetPaginator;
+/**
+ * TODO
+ * @param hub
+ * @returns
+ */
 const searchIndexPaginator = (hub) => (options) => hub.related.searchIndexes.list(undefined, undefined, options);
 exports.searchIndexPaginator = searchIndexPaginator;
+/**
+ * TODO
+ * @param index
+ * @returns
+ */
 const replicaPaginator = (index) => (options) => index.related.replicas.list(undefined, options);
 exports.replicaPaginator = replicaPaginator;

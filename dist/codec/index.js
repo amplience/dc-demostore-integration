@@ -30,37 +30,73 @@ exports.getCommerceCodec = exports.defaultArgs = exports.getCodec = exports.regi
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("..");
 const errors_1 = require("../common/errors");
+/**
+ * TODO
+ */
 var CodecTypes;
 (function (CodecTypes) {
     CodecTypes[CodecTypes["commerce"] = 0] = "commerce";
 })(CodecTypes = exports.CodecTypes || (exports.CodecTypes = {}));
+/**
+ * TODO
+ */
 class CodecType {
+    /**
+     * TODO
+     */
     get type() {
         return this._type;
     }
+    /**
+     * TODO
+     */
     get vendor() {
         return this._vendor;
     }
+    /**
+     * TODO
+     */
     get schemaUri() {
         return `${__1.CONSTANTS.demostoreIntegrationUri}/${this.vendor}`;
     }
+    /**
+     * TODO
+     */
     get label() {
         return `${this.vendor} integration`;
     }
+    /**
+     * TODO
+     */
     get iconUrl() {
         return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`;
     }
+    /**
+     * TODO
+     */
     get schema() {
         return {
             properties: this.properties
         };
     }
+    /**
+     * TODO
+     */
     get properties() {
         return this._properties;
     }
+    /**
+     * TODO
+     * @param config
+     */
     getApi(config) {
         throw new Error('must implement getCodec');
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
     postProcess(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -69,15 +105,28 @@ class CodecType {
     }
 }
 exports.CodecType = CodecType;
+/**
+ * TODO
+ */
 class CommerceCodecType extends CodecType {
+    /**
+     * TODO
+     */
     get type() {
         return CodecTypes.commerce;
     }
+    /**
+     * TODO
+     * @param config
+     */
     getApi(config) {
         throw new Error('must implement getCodec');
     }
 }
 exports.CommerceCodecType = CommerceCodecType;
+/**
+ * TODO
+ */
 var CodecTestOperationType;
 (function (CodecTestOperationType) {
     CodecTestOperationType[CodecTestOperationType["megaMenu"] = 0] = "megaMenu";
@@ -87,11 +136,23 @@ var CodecTestOperationType;
     CodecTestOperationType[CodecTestOperationType["getProductsByProductIds"] = 4] = "getProductsByProductIds";
     CodecTestOperationType[CodecTestOperationType["getCustomerGroups"] = 5] = "getCustomerGroups";
 })(CodecTestOperationType = exports.CodecTestOperationType || (exports.CodecTestOperationType = {}));
+/**
+ * TODO
+ */
 class CommerceCodec {
+    /**
+     * TODO
+     * @param config
+     */
     constructor(config) {
         this.megaMenu = [];
         this.config = config;
     }
+    /**
+     * TODO
+     * @param codecType
+     * @returns
+     */
     init(codecType) {
         return __awaiter(this, void 0, void 0, function* () {
             const startInit = new Date().valueOf();
@@ -107,26 +168,49 @@ class CommerceCodec {
             return this;
         });
     }
+    /**
+     * TODO
+     * @param slug
+     * @returns
+     */
     findCategory(slug) {
         return (0, __1.findInMegaMenu)(this.megaMenu, slug);
     }
+    /**
+     * TODO
+     */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             this.megaMenu = [];
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     // defined in terms of getProducts()
     getProduct(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return lodash_1.default.first(yield this.getProducts(Object.assign(Object.assign({}, args), { productIds: args.id })));
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`);
             return [];
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     // defined in terms of getMegaMenu, effectively
     getCategory(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -135,28 +219,52 @@ class CommerceCodec {
             return category;
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getMegaMenu(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.megaMenu;
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`);
             return [];
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.getVariants(args);
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`);
             return [];
         });
     }
+    /**
+     * TODO
+     * @returns
+     */
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
             const results = [{
@@ -228,15 +336,29 @@ class CommerceCodec {
     }
 }
 exports.CommerceCodec = CommerceCodec;
+/**
+ * TODO
+ * @param array
+ * @returns
+ */
 const getRandom = (array) => array[Math.floor(Math.random() * (array.length - 1))];
 exports.getRandom = getRandom;
 const codecs = new Map();
 codecs[CodecTypes.commerce] = [];
+/**
+ * TODO
+ * @param type
+ * @returns
+ */
 // public interface
 const getCodecs = (type) => {
     return type ? codecs[type] : lodash_1.default.flatMap(codecs);
 };
 exports.getCodecs = getCodecs;
+/**
+ * TODO
+ * @param codec
+ */
 const registerCodec = (codec) => {
     if (!codecs[codec.type].includes(codec)) {
         codecs[codec.type].push(codec);
@@ -245,9 +367,20 @@ const registerCodec = (codec) => {
 exports.registerCodec = registerCodec;
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map();
+/**
+ * TODO
+ * @param obj
+ * @returns
+ */
 const maskSensitiveData = (obj) => {
     return Object.assign(Object.assign({}, obj), { client_secret: obj.client_secret && '**** redacted ****', api_token: obj.api_token && '**** redacted ****', password: obj.password && '**** redacted ****' });
 };
+/**
+ * TODO
+ * @param config
+ * @param type
+ * @returns
+ */
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
     const codecs = (0, exports.getCodecs)(type);
     let codec;
@@ -293,6 +426,11 @@ exports.defaultArgs = {
     currency: 'USD',
     segment: ''
 };
+/**
+ * TODO
+ * @param config
+ * @returns
+ */
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecTypes.commerce); });
 exports.getCommerceCodec = getCommerceCodec;
 // end public interface

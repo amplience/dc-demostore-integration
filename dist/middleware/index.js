@@ -17,6 +17,11 @@ const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
+/**
+ * TODO
+ * @param config
+ * @returns
+ */
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     // we are passed in an object here
     //   - if it does not the key 'config_locator', it is assumed to be the config block for a codec
@@ -38,6 +43,11 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     // end novadev-582
     return yield (0, index_1.getCommerceCodec)(config);
 });
+/**
+ * TODO
+ * @param params
+ * @returns
+ */
 // getCommerceAPI is the main client interaction point with the integration layer
 const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {
     if ((0, util_1.isServer)()) {
@@ -60,6 +70,12 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.getCommerceAPI = getCommerceAPI;
+/**
+ * TODO
+ * @param req
+ * @param res
+ * @returns
+ */
 // handler for /api route
 const middleware = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     // CORS support
