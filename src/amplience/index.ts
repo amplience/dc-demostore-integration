@@ -3,12 +3,23 @@ import { DemoStoreConfiguration } from '../common/types'
 import { CryptKeeper } from '../common/crypt-keeper'
 import { IntegrationError } from '../common/errors'
 
+/**
+ * TODO
+ * @param hub 
+ * @param args 
+ * @returns 
+ */
 export const getContentItem = async (hub: string, args: any): Promise<any> => {
     let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`
     let response = await fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`)
     return response.status === 200 ? CryptKeeper((await response.json()).content, hub).decryptAll() : null
 }
 
+/**
+ * TODO
+ * @param configLocator 
+ * @returns 
+ */
 export const getContentItemFromConfigLocator = async (configLocator: string): Promise<any> => {
     let [hub, lookup] = configLocator.split(':')
     let contentItem = await getContentItem(hub, { key: `demostore/${lookup}` })
@@ -23,6 +34,11 @@ export const getContentItemFromConfigLocator = async (configLocator: string): Pr
     return contentItem
 }
 
+/**
+ * TODO
+ * @param key 
+ * @returns 
+ */
 export const getDemoStoreConfig = async (key: string): Promise<DemoStoreConfiguration> => {
     let obj: any = await getContentItemFromConfigLocator(key)
     return {
