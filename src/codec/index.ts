@@ -318,26 +318,8 @@ export const defaultArgs: CommonArgs = {
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
 
-import AkeneoCodecType from './codecs/akeneo'
-registerCodec(new AkeneoCodecType())
-
-import BigCommerceCommerceCodecType from './codecs/bigcommerce'
-registerCodec(new BigCommerceCommerceCodecType())
-
 import CommerceToolsCodecType from './codecs/commercetools'
 registerCodec(new CommerceToolsCodecType())
-
-import ConstructorIOCodecType from './codecs/constructor.io'
-registerCodec(new ConstructorIOCodecType())
-
-import ElasticPathCommerceCodecType from './codecs/elasticpath'
-registerCodec(new ElasticPathCommerceCodecType())
-
-import FabricCodecType from './codecs/fabric'
-registerCodec(new FabricCodecType())
-
-import HybrisCodecType from './codecs/hybris'
-registerCodec(new HybrisCodecType())
 
 import RestCodecType from './codecs/rest'
 registerCodec(new RestCodecType())
