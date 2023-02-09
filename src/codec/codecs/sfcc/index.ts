@@ -14,11 +14,12 @@ import {
 import _ from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..'
 import { StringProperty } from '../../cms-property-types'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from './types'
 import { formatMoneyString } from '../../../common/util'
 import slugify from 'slugify'
 import btoa from 'btoa'
+import { getPageByQuery, getPageByQueryAxios, paginate } from '../pagination'
 
 /**
  * TODO
@@ -164,6 +165,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	shopApi: string
 	sitesApi: string
 
+	getPage = getPageByQuery('start', 'count', 'total', 'data')
+	getPageAxios = getPageByQueryAxios('start', 'count', 'total', 'hits')
+
 	/**
 	 * TODO
 	 * @param codecType
@@ -203,6 +207,19 @@ export class SFCCCommerceCodec extends CommerceCodec {
 		this.megaMenu = categories
 			.filter((cat) => cat.parent_category_id === 'root')
 			.map(mapCategory)
+	}
+
+	/**
+	 * Gets the request config based off of the configuration parameters
+	 * @returns Axios request config
+	 */
+	axiosConfig(): AxiosRequestConfig {
+		return {
+			baseURL: this.config.api_url,
+			params: {
+				client_id: this.config.client_id,
+			},
+		}
 	}
 
 	/**
@@ -247,9 +264,8 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @returns
 	 */
 	async search(query: string): Promise<SFCCProduct[]> {
-		const searchResults = (
-			await this.fetch(`${this.shopApi}/product_search?${query}&count=200`)
-		).hits
+		const searchResults = await paginate<any>(this.getPageAxios(axios, `${this.shopApi}/product_search?${query}`, this.axiosConfig(), {}), 200)
+
 		if (searchResults) {
 			return await Promise.all(
 				searchResults.map(async (searchResult) => {
@@ -313,10 +329,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @returns
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
-		return (await this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(
-			mapCustomerGroup
-		)
-		//return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
+		return (
+			await paginate<SFCCCustomerGroup>(this.getPage(this.rest, `${this.sitesApi}/customer_groups`), 1000)
+		).map(mapCustomerGroup)
 	}
 }
 

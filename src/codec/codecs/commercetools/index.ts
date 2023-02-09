@@ -16,6 +16,7 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../'
 import { StringProperty } from '../../cms-property-types'
 import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { formatMoneyString, quoteProductIdString } from '../../../common/util'
+import { getPageByQuery, paginate } from '../pagination'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
@@ -171,6 +172,8 @@ export class CommercetoolsCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 	rest: OAuthRestClientInterface
 
+	getPage = getPageByQuery('offset', 'limit', 'total', 'results')
+
 	/**
 	 * TODO
 	 * @param codecType 
@@ -195,7 +198,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	 * TODO
 	 */
 	async cacheMegaMenu(): Promise<void> {
-		const categories: CTCategory[] = await this.fetch('/categories?limit=500')
+		const categories: CTCategory[] = await paginate(this.getPage(this.rest, '/categories'), 500)
 		const mapped: Category[] = categories.map(cat => mapCategory(cat, categories, {}))
 		this.megaMenu = mapped.filter(cat => cats.includes(cat.slug))
 	}
@@ -217,13 +220,13 @@ export class CommercetoolsCodec extends CommerceCodec {
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: CTProduct[] = []
 		if (args.productIds) {
-			products = await this.fetch(`/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`)
+			products = await paginate(this.getPage(this.rest, `/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`))
 		}
 		else if (args.keyword) {
-			products = await this.fetch(`/product-projections/search?text.en="${args.keyword}"`)
+			products = await paginate(this.getPage(this.rest, `/product-projections/search?text.en="${args.keyword}"`))
 		}
 		else if (args.category) {
-			products = await this.fetch(`/product-projections/search?filter=categories.id: subtree("${args.category.id}")`)
+			products = await paginate(this.getPage(this.rest, `/product-projections/search?filter=categories.id: subtree("${args.category.id}")`))
 		}
 		return products.map(mapProduct(args))
 	}
@@ -234,7 +237,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	 * @returns 
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-		return await this.fetch('/customer-groups')
+		return await paginate(this.getPage(this.rest, '/customer-groups'))
 	}
 }
 
