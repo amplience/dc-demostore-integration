@@ -1,12 +1,12 @@
 /**
- * TODO
+ * Common JSON schema fields.
  */
 export type Property = {
     title: string;
 };
 
 /**
- * TODO
+ * JSON schema fields for a string property.
  */
 export type StringProperty = Property & {
     type: 'string';
@@ -16,14 +16,14 @@ export type StringProperty = Property & {
 };
 
 /**
- * TODO
+ * JSON schema fields for a const string property.
  */
 export type StringConstProperty = StringProperty & {
     const: string;
 };
 
 /**
- * TODO
+ * JSON schema fields for a numeric property.
  */
 export type NumberProperty = Property & {
     type: 'number';
@@ -35,14 +35,14 @@ export type NumberProperty = Property & {
 };
 
 /**
- * TODO
+ * JSON schema fields for an integer property.
  */
 export type IntegerProperty = NumberProperty & {
     type: 'integer';
 };
 
 /**
- * TODO
+ * JSON schema fields for an array property.
  */
 export type ArrayProperty = Property & {
     type: 'array';
@@ -54,7 +54,7 @@ export type ArrayProperty = Property & {
 };
 
 /**
- * TODO
+ * Common string validation patterns.
  */
 export const StringPatterns = {
     anyUrl: ".+://.+",

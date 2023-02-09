@@ -18,19 +18,19 @@ import {
 import { IntegrationError } from '../common/errors'
 
 /**
- * TODO
+ * Types of codec.
  */
 export enum CodecTypes {
     commerce
 }
 
 /**
- * TODO
+ * Any JSON schema property object.
  */
 export type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty
 
 /**
- * TODO
+ * Codec base class. Defines methods and fields a codec must have.
  */
 export class CodecType {
 	_type:          CodecTypes
@@ -38,42 +38,42 @@ export class CodecType {
 	_vendor:        string
 
 	/**
-	 * TODO
+	 * The type of this codec.
 	 */
 	get type(): CodecTypes {
 		return this._type
 	}
 
 	/**
-	 * TODO
+	 * The vendor associated with this codec.
 	 */
 	get vendor(): string {
 		return this._vendor
 	}
 
 	/**
-	 * TODO
+	 * The schema URI for this codec.
 	 */
 	get schemaUri(): string {
 		return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
 	}
 
 	/**
-	 * TODO
+	 * The label for this codec.
 	 */
 	get label(): string {
 		return `${this.vendor} integration`
 	}
 
 	/**
-	 * TODO
+	 * The Icon URL that represents this codec.
 	 */
 	get iconUrl(): string {
 		return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
 	}
 
 	/**
-	 * TODO
+	 * The schema that represents the codec's configuration
 	 */
 	get schema(): any {
 		return {
@@ -82,24 +82,24 @@ export class CodecType {
 	}
 
 	/**
-	 * TODO
+	 * The properties that represent the codec configuration
 	 */
 	get properties(): Dictionary<AnyProperty> {
 		return this._properties
 	}
 
 	/**
-	 * TODO
-	 * @param config 
+	 * Get an API for this codec with the given configuration.
+	 * @param config Configuration for the API.
 	 */
 	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API> {
 		throw new Error('must implement getCodec')
 	}
 
 	/**
-	 * TODO
-	 * @param config 
-	 * @returns 
+	 * Process the config in a codec specific way.
+	 * @param config Input configuration.
+	 * @returns Processed configuration.
 	 */
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	async postProcess(config: any): Promise<any> {
@@ -108,20 +108,20 @@ export class CodecType {
 }
 
 /**
- * TODO
+ * Commerce type codec base class. Defines methods and fields a commerce codec must have.
  */
 export class CommerceCodecType extends CodecType {
 	
 	/**
-	 * TODO
+	 * The type of this codec. (commerce)
 	 */
 	get type() {
 		return CodecTypes.commerce
 	}
 
 	/**
-	 * TODO
-	 * @param config 
+	 * Get an API for this codec with the given configuration.
+	 * @param config Configuration for the API.
 	 */
 	getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI> {
 		throw new Error('must implement getCodec')
@@ -129,7 +129,7 @@ export class CommerceCodecType extends CodecType {
 }
 
 /**
- * TODO
+ * Codec operations for testing.
  */
 export enum CodecTestOperationType {
     megaMenu,
@@ -141,7 +141,7 @@ export enum CodecTestOperationType {
 }
 
 /**
- * TODO
+ * Codec testing results.
  */
 export interface CodecTestResult {
     operationType: CodecTestOperationType
@@ -152,7 +152,7 @@ export interface CodecTestResult {
 }
 
 /**
- * TODO
+ * Base class for an implementation of a Commerce API.
  */
 export class CommerceCodec implements CommerceAPI {
 	config: CodecPropertyConfig<Dictionary<AnyProperty>>
@@ -161,8 +161,8 @@ export class CommerceCodec implements CommerceAPI {
 	initDuration: number
     
 	/**
-	 * TODO
-	 * @param config 
+	 * Create a new Commerce API implementation, given an input configuration.
+	 * @param config API configuration
 	 */
 	constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>) {
 		this.config = config
@@ -170,7 +170,7 @@ export class CommerceCodec implements CommerceAPI {
 
 	/**
 	 * TODO
-	 * @param codecType 
+	 * @param codecType The codec type for this API.
 	 * @returns 
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
@@ -198,7 +198,7 @@ export class CommerceCodec implements CommerceAPI {
 	}    
 
 	/**
-	 * TODO
+	 * Cache the mega menu.
 	 */
 	async cacheMegaMenu(): Promise<void> {
 		this.megaMenu = []
@@ -356,9 +356,9 @@ export class CommerceCodec implements CommerceAPI {
 }
 
 /**
- * TODO
- * @param array 
- * @returns 
+ * Get a random element from the given array
+ * @param array Array of choices
+ * @returns A random item from the array
  */
 export const getRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * (array.length - 1))]
 
@@ -377,9 +377,9 @@ const codecs = new Map<CodecTypes, CodecType[]>()
 codecs[CodecTypes.commerce] = []
 
 /**
- * TODO
- * @param type 
- * @returns 
+ * Get all the codecs with a given type
+ * @param type Codec type
+ * @returns All registered codecs that match the type
  */
 // public interface
 export const getCodecs = (type?: CodecTypes): CodecType[] => {
@@ -387,8 +387,8 @@ export const getCodecs = (type?: CodecTypes): CodecType[] => {
 }
 
 /**
- * TODO
- * @param codec 
+ * Register a codec type object.
+ * @param codec Codec type object
  */
 export const registerCodec = (codec: CodecType) => {
 	if (!codecs[codec.type].includes(codec)) {
@@ -402,9 +402,10 @@ const apis = new Map<any, API>()
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types'
 
 /**
- * TODO
- * @param obj 
- * @returns 
+ * Mask sensitive data in an object.
+ * Note: only affects fields called `client_secret`, `api_token`, `password`.
+ * @param obj Object to copy with sensitive fields removed.
+ * @returns The object with any sensitive fields removed.
  */
 const maskSensitiveData = (obj: any) => {
 	return {
@@ -416,10 +417,12 @@ const maskSensitiveData = (obj: any) => {
 }
 
 /**
- * TODO
- * @param config 
- * @param type 
- * @returns 
+ * Get an API given a configuration object and a codec type.
+ * It attempts to match a registered codec by the `vendor` property first, if present.
+ * If not, it attempts to match based on the shape of the codec object.
+ * @param config API configuration
+ * @param type Type of codec to find
+ * @returns A new API for the given configuration.
  */
 export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
 	const codecs = getCodecs(type)
@@ -464,6 +467,9 @@ export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
 	return apis[configHash] = apis[configHash] || await codec.getApi(config)
 }
 
+/**
+ * Default arguments for commerce codec methods.
+ */
 export const defaultArgs: CommonArgs = {
 	locale:     'en-US',
 	language:   'en',
@@ -473,9 +479,11 @@ export const defaultArgs: CommonArgs = {
 }
 
 /**
- * TODO
- * @param config 
- * @returns 
+ * Get a commerce API given a configuration object.
+ * It attempts to match a registered codec by the `vendor` property first, if present.
+ * If not, it attempts to match based on the shape of the codec object.
+ * @param config Configuration object for the commerce API
+ * @returns A new commerce API for the given configuration
  */
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
