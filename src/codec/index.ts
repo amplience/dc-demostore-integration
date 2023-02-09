@@ -261,7 +261,8 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns 
 	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		return await this.getVariants(args)
+		console.warn(`getVariants is not supported on platform [ ${this.codecType.vendor} ]`)
+		return null
 	}
 
 	/**
