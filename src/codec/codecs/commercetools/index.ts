@@ -21,7 +21,7 @@ import { getPageByQuery, paginate } from '../pagination'
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
 /**
- * TODO
+ * Commercetools Codec config properties
  */
 type CodecConfig = ClientCredentialsConfiguration & {
     project: StringProperty
@@ -29,19 +29,19 @@ type CodecConfig = ClientCredentialsConfiguration & {
 }
 
 /**
- * TODO
+ * Commerce Codec Type that integrates with Commercetools.
  */
 export class CommercetoolsCodecType extends CommerceCodecType {
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get vendor(): string {
 		return 'commercetools'
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get properties(): CodecConfig {
 		return {
@@ -60,9 +60,7 @@ export class CommercetoolsCodecType extends CommerceCodecType {
 	}
 
 	/**
-	 * TODO
-	 * @param config 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new CommercetoolsCodec(config).init(this)
@@ -70,16 +68,18 @@ export class CommercetoolsCodecType extends CommerceCodecType {
 }
 
 /**
- * TODO
+ * Convert a localized string using the locale in args.
+ * @param localizable Localizable string object
+ * @param args Method arguments that contain the language
  */
 const localize = (localizable: Localizable, args: CommonArgs): string => {
 	return localizable[args.language] || localizable.en
 }
 
 /**
- * TODO
- * @param args 
- * @returns 
+ * Generates a method to get an attribute's value using the method arguments.
+ * @param args Method arguments
+ * @returns Method to get an attribute's value
  */
 const getAttributeValue = (args: CommonArgs) => (attribute: Attribute): string => {
 	if (typeof attribute.value === 'string') {
@@ -97,10 +97,10 @@ const getAttributeValue = (args: CommonArgs) => (attribute: Attribute): string =
 }
 
 /**
- * TODO
- * @param variant 
- * @param args 
- * @returns 
+ * Find the local price of a variant from the method arguments.
+ * @param variant Commercetools variant
+ * @param args Method arguments
+ * @returns The price of a variant
  */
 const findPrice = (variant: CTVariant, args: CommonArgs): string => {
 	const price = variant.prices &&
@@ -117,11 +117,11 @@ const findPrice = (variant: CTVariant, args: CommonArgs): string => {
 }
 
 /**
- * TODO
- * @param category 
- * @param categories 
- * @param args 
- * @returns 
+ * Map a Commercetools category to a common category.
+ * @param category Commercetools category
+ * @param categories All Commercetools categories
+ * @param args Method arguments
+ * @returns Category
  */
 const mapCategory = (category: CTCategory, categories: CTCategory[], args: CommonArgs): Category => {
 	return {
@@ -134,9 +134,9 @@ const mapCategory = (category: CTCategory, categories: CTCategory[], args: Commo
 }
 
 /**
- * TODO
- * @param args 
- * @returns 
+ * Generates a method to map a Commercetools product to the common product type.
+ * @param args Commercetools product
+ * @returns Method to map a Commercetools product to a common one
  */
 const mapProduct = (args: CommonArgs) => (product: CTProduct) => {
 	return {
@@ -149,9 +149,9 @@ const mapProduct = (args: CommonArgs) => (product: CTProduct) => {
 }
 
 /**
- * TODO
- * @param args 
- * @returns 
+ * Generates a method to map a Commercetools variant to the common variant type.
+ * @param args Commercetools variant
+ * @returns Method to map a Commercetools variant to a common one
  */
 const mapVariant = (args: CommonArgs) => (variant: CTVariant) => {
 	return {
@@ -166,7 +166,7 @@ const mapVariant = (args: CommonArgs) => (variant: CTVariant) => {
 }
 
 /**
- * TODO
+ * Commerce Codec that integrates with Commercetools.
  */
 export class CommercetoolsCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
@@ -175,9 +175,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	getPage = getPageByQuery('offset', 'limit', 'total', 'results')
 
 	/**
-	 * TODO
-	 * @param codecType 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		this.rest = OAuthRestClient({
@@ -195,7 +193,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	async cacheMegaMenu(): Promise<void> {
 		const categories: CTCategory[] = await paginate(this.getPage(this.rest, '/categories'), 500)
@@ -204,18 +202,16 @@ export class CommercetoolsCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param url 
-	 * @returns 
+	 * Fetches data from the OAuth authenticated client.
+	 * @param url URL to fetch data from
+	 * @returns Response data
 	 */
 	async fetch(url: string) {
 		return (await this.rest.get({ url })).results
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: CTProduct[] = []
@@ -232,9 +228,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		return await paginate(this.getPage(this.rest, '/customer-groups'))

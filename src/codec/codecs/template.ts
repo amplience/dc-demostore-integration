@@ -10,26 +10,26 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..'
 import { SFCCProduct } from './sfcc/types'
 
 /**
- * TODO
+ * Common codec configuration.
  */
 type CodecConfig = {
     // productURL:         StringProperty
 }
 
 /**
- * TODO
+ * A template commerce codec type, useful as a starting point for a new integration.
  */
 export class TemplateCommerceCodecType extends CommerceCodecType {
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get vendor(): string {
 		return 'template'
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get properties(): CodecConfig {
 		return {
@@ -41,9 +41,7 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 	}
 
 	/**
-	 * TODO
-	 * @param config 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new TemplateCommerceCodec(config).init(this)
@@ -51,7 +49,7 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 }
 
 /**
- * TODO
+ * A template commerce codec, useful as a starting point for a new integration.
  */
 export class TemplateCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
@@ -61,9 +59,7 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	// categories: Category[]
 
 	/**
-	 * TODO
-	 * @param codecType 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		// this.products = await fetchFromURL(this.config.productURL, [])
@@ -72,8 +68,7 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
+	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		// eslint-disable-next-line no-empty
@@ -89,8 +84,7 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
+	 * @inheritdoc
 	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		// eslint-disable-next-line no-empty
@@ -106,9 +100,7 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		return []

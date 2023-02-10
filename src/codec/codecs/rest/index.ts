@@ -13,7 +13,7 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
 
 /**
- * TODO
+ * REST Codec config properties.
  */
 type CodecConfig = {
     productURL:         StringProperty
@@ -23,23 +23,27 @@ type CodecConfig = {
 }
 
 /**
- * TODO
- * @param url 
- * @param defaultValue 
- * @returns 
+ * Fetch JSON from a given URL.
+ * @param url URL to fetch from
+ * @param defaultValue Default value if URL is empty
+ * @returns Response data
  */
 const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
+
+/**
+ * Commerce Codec Type that integrates with REST.
+ */
 export class RestCommerceCodecType extends CommerceCodecType {
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get vendor(): string {
 		return 'rest'
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get properties(): CodecConfig {
 		return {
@@ -67,9 +71,7 @@ export class RestCommerceCodecType extends CommerceCodecType {
 	}
 
 	/**
-	 * TODO
-	 * @param config 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new RestCommerceCodec(config).init(this)
@@ -77,7 +79,7 @@ export class RestCommerceCodecType extends CommerceCodecType {
 }
 
 /**
- * TODO
+ * Commerce Codec that integrates with REST.
  */
 export class RestCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
@@ -88,7 +90,7 @@ export class RestCommerceCodec extends CommerceCodec {
 	translations: Dictionary<Dictionary<string>>
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	async cacheMegaMenu(): Promise<void> {
 		this.categories = await fetchFromURL(this.config.categoryURL, [])
@@ -99,9 +101,7 @@ export class RestCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		if (args.productIds) {
@@ -118,6 +118,9 @@ export class RestCommerceCodec extends CommerceCodec {
 		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		return this.customerGroups
 	}

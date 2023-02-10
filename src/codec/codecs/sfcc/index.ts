@@ -22,7 +22,7 @@ import btoa from 'btoa'
 import { getPageByQuery, getPageByQueryAxios, paginate } from '../pagination'
 
 /**
- * TODO
+ * SFCC Codec config properties.
  */
 type CodecConfig = ClientCredentialsConfiguration & {
 	api_token: StringProperty
@@ -31,18 +31,18 @@ type CodecConfig = ClientCredentialsConfiguration & {
 }
 
 /**
- * TODO
+ * Commerce Codec Type that integrates with SFCC.
  */
 export class SFCCCommerceCodecType extends CommerceCodecType {
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get vendor(): string {
 		return 'sfcc'
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	get properties(): CodecConfig {
 		return {
@@ -60,18 +60,14 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 	}
 
 	/**
-	 * TODO
-	 * @param config
-	 * @returns
+	 * @inheritdoc
 	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
 		return await new SFCCCommerceCodec(config).init(this)
 	}
 
 	/**
-	 * TODO
-	 * @param config
-	 * @returns
+	 * @inheritdoc
 	 */
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	async postProcess(config: CodecConfig): Promise<CodecConfig> {
@@ -84,9 +80,9 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 }
 
 /**
- * TODO
- * @param category
- * @returns
+ * Map an SFCC category to the common category type.
+ * @param category SFCC category
+ * @returns Category
  */
 const mapCategory = (category: SFCCCategory): Category => {
 	return {
@@ -99,9 +95,9 @@ const mapCategory = (category: SFCCCategory): Category => {
 }
 
 /**
- * TODO
- * @param group
- * @returns
+ * Map an SFCC customer group to the common customer group type.
+ * @param group SFCC customer group
+ * @returns Customer group
  */
 const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
 	group && {
@@ -110,9 +106,9 @@ const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
 	}
 
 /**
- * TODO
- * @param product
- * @returns
+ * Map an SFCC product to the common product type.
+ * @param product SFCC product
+ * @returns Product
  */
 // TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product: SFCCProduct): Product => {
@@ -155,7 +151,7 @@ const mapProduct = (product: SFCCProduct): Product => {
 }
 
 /**
- * TODO
+ * Commerce Codec that integrates with SFCC.
  */
 export class SFCCCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
@@ -169,9 +165,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	getPageAxios = getPageByQueryAxios('start', 'count', 'total', 'hits')
 
 	/**
-	 * TODO
-	 * @param codecType
-	 * @returns
+	 * @inheritdoc
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		const version = this.config.version ?? 'v22_4'
@@ -200,7 +194,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
+	 * @inheritdoc
 	 */
 	async cacheMegaMenu(): Promise<void> {
 		const categories = (await this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories
@@ -223,9 +217,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param url
-	 * @returns
+	 * Fetches data from the unauthenticated axios client.
+	 * @param url URL to fetch data from
+	 * @returns Response data
 	 */
 	async fetch(url: string): Promise<any> {
 		return (
@@ -239,18 +233,18 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param url
-	 * @returns
+	 * Fetches data from the OAuth authenticated client.
+	 * @param url URL to fetch data from
+	 * @returns Response data
 	 */
 	async authenticatedFetch(url: string): Promise<any> {
 		return (await this.rest.get({ url })).data
 	}
 
 	/**
-	 * TODO
-	 * @param productId
-	 * @returns
+	 * Gets an SFCC product by ID.
+	 * @param productId Product ID to fetch
+	 * @returns SFCC product
 	 */
 	async getProductById(productId: string): Promise<SFCCProduct> {
 		return await this.fetch(
@@ -259,9 +253,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param query
-	 * @returns
+	 * Lists SFCC products for a given search query.
+	 * @param query Search query
+	 * @returns List of SFCC products
 	 */
 	async search(query: string): Promise<SFCCProduct[]> {
 		const searchResults = await paginate<any>(this.getPageAxios(axios, `${this.shopApi}/product_search?${query}`, this.axiosConfig(), {}), 200)
@@ -277,18 +271,14 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args
-	 * @returns
+	 * @inheritdoc
 	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
 		return await this.fetch(`${this.shopApi}/products/${args.productId}/variants`)
 	}
 
 	/**
-	 * TODO
-	 * @param args
-	 * @returns
+	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: SFCCProduct[] = []
@@ -305,9 +295,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args
-	 * @returns
+	 * @inheritdoc
 	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		let products: SFCCProduct[] = []
@@ -324,9 +312,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param args
-	 * @returns
+	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
 		return (

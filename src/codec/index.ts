@@ -73,7 +73,7 @@ export class CodecType {
 	}
 
 	/**
-	 * The schema that represents the codec's configuration
+	 * The JSON schema that represents the codec's configuration.
 	 */
 	get schema(): any {
 		return {
@@ -82,7 +82,7 @@ export class CodecType {
 	}
 
 	/**
-	 * The properties that represent the codec configuration
+	 * The properties that represent the codec configuration in JSON schema format.
 	 */
 	get properties(): Dictionary<AnyProperty> {
 		return this._properties
@@ -169,9 +169,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
+	 * Initilize the commerce codec.
 	 * @param codecType The codec type for this API.
-	 * @returns 
+	 * @returns The commerce codec
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		const startInit = new Date().valueOf()
@@ -189,11 +189,11 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param slug 
-	 * @returns 
+	 * Find a category with a given slug.
+	 * @param slug Slug to locate a category for
+	 * @returns Category matching the slug
 	 */
-	findCategory(slug: string) {
+	findCategory(slug: string): Category {
 		return findInMegaMenu(this.megaMenu, slug)
 	}    
 
@@ -205,9 +205,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Get a single product by ID.
+	 * @param args Arguments object
+	 * @returns Single product
 	 */
 	// defined in terms of getProducts()
 	async getProduct(args: GetCommerceObjectArgs): Promise<Product> {
@@ -215,9 +215,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets products by a list of IDs or a filter.
+	 * @param args Arguments object
+	 * @returns List of products
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`)
@@ -225,9 +225,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets a category that matches the given slug, with contained products.
+	 * @param args Arguments object
+	 * @returns Category object
 	 */
 	// defined in terms of getMegaMenu, effectively
 	async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
@@ -237,18 +237,18 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets the mega menu for the current configuration.
+	 * @param args Arguments object
+	 * @returns Mega Menu
 	 */
 	async getMegaMenu(args: CommonArgs): Promise<Category[]> {
 		return this.megaMenu
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets customer groups for the current configuration.
+	 * @param args Arguments object
+	 * @returns List of customer groups
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`)
@@ -256,9 +256,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets variants for the given product, by ID.
+	 * @param args Arguments object
+	 * @returns Product with variants
 	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
 		console.warn(`getVariants is not supported on platform [ ${this.codecType.vendor} ]`)
@@ -266,9 +266,9 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @param args 
-	 * @returns 
+	 * Gets products by a list of IDs or a filter, in their original format.
+	 * @param args Arguments object
+	 * @returns List of products in their original format
 	 */
 	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
 		console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`)
@@ -276,8 +276,8 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * TODO
-	 * @returns 
+	 * Test the various methods of this integration and provide a report.
+	 * @returns A report of all test results.
 	 */
 	async testIntegration(): Promise<CodecTestResult[]> {
 		const results: CodecTestResult[] = [{
@@ -363,7 +363,7 @@ export class CommerceCodec implements CommerceAPI {
 export const getRandom = <T>(array: T[]): T => array[Math.floor(Math.random() * (array.length - 1))]
 
 /**
- * TODO
+ * Top level JSON schema properties for a codec's configuration.
  */
 export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string 

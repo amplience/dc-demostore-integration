@@ -4,9 +4,9 @@ import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
 import { isServer } from '../common/util'
 
 /**
- * TODO
- * @param config
- * @returns
+ * Get an API for the given configuration.
+ * @param config Configuration object
+ * @returns API matching the configuration.
  */
 const getAPI = async (config: any): Promise<CommerceAPI> => {
 	// we are passed in an object here
@@ -36,7 +36,7 @@ const getAPI = async (config: any): Promise<CommerceAPI> => {
 }
 
 /**
- * TODO
+ * Commerce API method names.
  */
 export type CommerceOperation =
 	| 'getProduct'
@@ -48,9 +48,9 @@ export type CommerceOperation =
 	| 'getRawProducts'
 
 /**
- * TODO
- * @param params
- * @returns
+ * Get a Commerce API for the given configuration.
+ * @param params Configuration object and vendor
+ * @returns Commerce API matching the configuration.
  */
 // getCommerceAPI is the main client interaction point with the integration layer
 export const getCommerceAPI = async (params: any = undefined): Promise<CommerceAPI> => {
@@ -92,10 +92,10 @@ export const getCommerceAPI = async (params: any = undefined): Promise<CommerceA
 }
 
 /**
- * TODO
- * @param req
- * @param res
- * @returns
+ * Integration middleware request handler. Provides access to commerce api methods.
+ * @param req Request object
+ * @param res Response object
+ * @returns Response
  */
 // handler for /api route
 export const middleware = async (req, res) => {

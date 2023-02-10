@@ -4,19 +4,19 @@ import _, { Dictionary } from 'lodash'
 import { Category } from '../../common/types'
 
 /**
- * TODO
- * @param categories 
- * @param slug 
- * @returns 
+ * Find a category in the mega menu by slug.
+ * @param categories Root categories in mega menu
+ * @param slug Category slug
+ * @returns Found category, if present
  */
 export const findInMegaMenu = (categories: Category[], slug: string) => {
 	return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 
 /**
- * TODO
- * @param categories 
- * @returns 
+ * Flattens categories to a single dimensional array, rather than a tree
+ * @param categories Root categories
+ * @returns Flattened list of categories
  */
 export const flattenCategories = (categories: Category[]) => {
 	const allCategories: Category[] = []
@@ -29,7 +29,7 @@ export const flattenCategories = (categories: Category[]) => {
 }
 
 /**
- * TODO
+ * Amplience Content Type Schema Template
  */
 export interface CTypeSchema {
     definitions?: any
@@ -37,7 +37,7 @@ export interface CTypeSchema {
 }
 
 /**
- * TODO
+ * Amplience Content Type Template
  */
 export interface CType {
     label: string
@@ -47,7 +47,7 @@ export interface CType {
 }
 
 /**
- * TODO
+ * Demostore Content Types for Amplience
  */
 export const CTypes: Dictionary<CType> = {
 	demostoreconfig: {
@@ -105,9 +105,9 @@ export const CTypes: Dictionary<CType> = {
 }
 
 /**
- * TODO
- * @param ctype 
- * @returns 
+ * Get an Amplience Content Type representing the given CType.
+ * @param ctype Content Type Template
+ * @returns Amplience Content Type
  */
 export const getContentType = (ctype: CType): ContentType => {
 	const contentType = new ContentType()
@@ -123,9 +123,9 @@ export const getContentType = (ctype: CType): ContentType => {
 }
 
 /**
- * TODO
- * @param ctype 
- * @returns 
+ * Get an Amplience Content Type Schema representing the given CType.
+ * @param ctype Content Type Template
+ * @returns Amplience Content Type Schema
  */
 export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
 	const schema = new ContentTypeSchema()
