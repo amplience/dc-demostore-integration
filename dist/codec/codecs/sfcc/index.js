@@ -19,6 +19,7 @@ const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
+const pagination_1 = require("../pagination");
 /**
  * TODO
  */
@@ -36,10 +37,10 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { api_token: {
                 title: 'Shopper API Token',
                 type: 'string',
-                maxLength: 100,
+                maxLength: 100
             }, site_id: {
                 title: 'Site ID',
-                type: 'string',
+                type: 'string'
             } });
     }
     /**
@@ -78,7 +79,7 @@ const mapCategory = (category) => {
         slug: category.id,
         name: category.name,
         children: ((_a = category.categories) === null || _a === void 0 ? void 0 : _a.map(mapCategory)) || [],
-        products: [],
+        products: []
     };
 };
 /**
@@ -110,32 +111,37 @@ const mapProduct = (product) => {
         variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map((variant) => ({
             sku: variant.product_id,
             listPrice: (0, util_1.formatMoneyString)(variant.price, {
-                currency: product.currency,
+                currency: product.currency
             }),
             salePrice: (0, util_1.formatMoneyString)(variant.price, {
-                currency: product.currency,
+                currency: product.currency
             }),
             images,
-            attributes: variant.variation_values,
+            attributes: variant.variation_values
         }))) || [
             {
                 sku: product.id,
                 listPrice: (0, util_1.formatMoneyString)(product.price, {
-                    currency: product.currency,
+                    currency: product.currency
                 }),
                 salePrice: (0, util_1.formatMoneyString)(product.price, {
-                    currency: product.currency,
+                    currency: product.currency
                 }),
                 images,
-                attributes: {},
-            },
-        ],
+                attributes: {}
+            }
+        ]
     };
 };
 /**
  * TODO
  */
 class SFCCCommerceCodec extends __1.CommerceCodec {
+    constructor() {
+        super(...arguments);
+        this.getPage = (0, pagination_1.getPageByQuery)('start', 'count', 'total', 'data');
+        this.getPageAxios = (0, pagination_1.getPageByQueryAxios)('start', 'count', 'total', 'data');
+    }
     /**
      * TODO
      * @param codecType
@@ -145,17 +151,19 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         const _super = Object.create(null, {
             init: { get: () => super.init }
         });
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            this.shopApi = `/s/${this.config.site_id}/dw/shop/v22_4`;
-            this.sitesApi = `/s/-/dw/data/v22_4/sites/${this.config.site_id}`;
+            const version = (_a = this.config.version) !== null && _a !== void 0 ? _a : 'v22_4';
+            this.shopApi = `/s/${this.config.site_id}/dw/shop/${version}`;
+            this.sitesApi = `/s/-/dw/data/${version}/sites/${this.config.site_id}`;
             this.rest = (0, common_1.OAuthRestClient)(Object.assign(Object.assign({}, this.config), { auth_url: `${this.config.auth_url.replace('oauth/access', 'oauth2/access')}?grant_type=client_credentials` }), {}, {
                 headers: {
                     Authorization: 'Basic ' + this.config.api_token,
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 },
                 params: {
-                    client_id: this.config.client_id,
-                },
+                    client_id: this.config.client_id
+                }
             });
             return yield _super.init.call(this, codecType);
         });
@@ -172,6 +180,18 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
+     * Gets the request config based off of the configuration parameters
+     * @returns Axios request config
+     */
+    axiosConfig() {
+        return {
+            baseURL: this.config.api_url,
+            params: {
+                client_id: this.config.client_id,
+            },
+        };
+    }
+    /**
      * TODO
      * @param url
      * @returns
@@ -181,8 +201,8 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
             return (yield axios_1.default.get(url, {
                 baseURL: this.config.api_url,
                 params: {
-                    client_id: this.config.client_id,
-                },
+                    client_id: this.config.client_id
+                }
             })).data;
         });
     }
@@ -213,7 +233,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
      */
     search(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const searchResults = (yield this.fetch(`${this.shopApi}/product_search?${query}&count=200`)).hits;
+            const searchResults = yield (0, pagination_1.paginate)(this.getPageAxios(axios_1.default, `${this.shopApi}/product_search?${query}`, this.axiosConfig(), {}, (data) => data.hits), 200);
             if (searchResults) {
                 return yield Promise.all(searchResults.map((searchResult) => __awaiter(this, void 0, void 0, function* () {
                     return yield this.getProductById.bind(this)(searchResult.product_id);
@@ -279,8 +299,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.authenticatedFetch(`${this.sitesApi}/customer_groups?count=1000`)).map(mapCustomerGroup);
-            //return await this.authenticatedFetch(`${this.sitesApi}/customer_groups`)
+            return (yield (0, pagination_1.paginate)(this.getPage(this.rest, `${this.sitesApi}/customer_groups`), 1000)).map(mapCustomerGroup);
         });
     }
 }

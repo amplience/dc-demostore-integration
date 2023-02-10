@@ -6,21 +6,21 @@ import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
 
 /**
- * TODO
+ * Configuration interface with an API url.
  */
 export type APIConfiguration = {
     api_url:        StringProperty
 }
 
 /**
- * TODO
+ * Configuration interface with an API and Auth url.
  */
 export type OAuthCodecConfiguration = APIConfiguration & {
     auth_url:       StringProperty
 }
 
 /**
- * TODO
+ * Configuration interface with an API, Auth and credentials.
  */
 export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
     client_id:      StringProperty
@@ -28,13 +28,16 @@ export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
 }
 
 /**
- * TODO
+ * Configuration interface with a username and password.
  */
 export type UsernamePasswordConfiguration = {
     username:   StringProperty
     password:   StringProperty
 }
 
+/**
+ * JSON schema properties describing UsernamePasswordConfiguration.
+ */
 export const UsernamePasswordProperties: UsernamePasswordConfiguration = {
 	username: {
 		title: 'Username',
@@ -48,6 +51,9 @@ export const UsernamePasswordProperties: UsernamePasswordConfiguration = {
 	}
 }
 
+/**
+ * JSON schema properties describing APIConfiguration.
+ */
 export const APIProperties: APIConfiguration = {
 	api_url: {
 		title: 'Base API URL',
@@ -56,6 +62,9 @@ export const APIProperties: APIConfiguration = {
 	}
 }
 
+/**
+ * JSON schema properties describing OAuthCodecConfiguration.
+ */
 export const OAuthProperties: OAuthCodecConfiguration = {
 	...APIProperties,
 	auth_url: {
@@ -65,6 +74,9 @@ export const OAuthProperties: OAuthCodecConfiguration = {
 	}
 }
 
+/**
+ * JSON schema properties describing APIConfiguration.
+ */
 export const ClientCredentialProperties: ClientCredentialsConfiguration = {
 	...OAuthProperties,
 	client_id: {
@@ -80,7 +92,7 @@ export const ClientCredentialProperties: ClientCredentialsConfiguration = {
 }
 
 /**
- * TODO
+ * Interface for a REST client with all HTTP methods.
  */
 export type OAuthRestClientInterface = {
     [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
@@ -89,15 +101,17 @@ export type OAuthRestClientInterface = {
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
 
 /**
- * TODO
+ * A REST client with OAuth authentication and methods for each request type.
  */
 export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any): OAuthRestClientInterface => {
 	let authenticatedAxios: AxiosInstance
 	let status: AuthenticationStatus = 'NOT_LOGGED_IN'
 
 	/**
-	 * TODO
-	 * @returns 
+	 * Get an authenticated axios client.
+	 * If not created yet, create and authenticate an axios instance using OAuth.
+	 * Automatically re-authenticates this client when the token is about to expire.
+	 * @returns An authenticated axios client.
 	 */
 	const authenticate = async (): Promise<AxiosInstance> => {
 		// console.log(`authenticating to ${config.auth_url}`)
@@ -117,15 +131,17 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 				headers: getHeaders(auth)
 			})
 
+			// TODO: This should probably be done on demand rather than periodically.
+			// Right now, this can stop the program from terminating.
 			setTimeout(() => { authenticate() }, auth.expires_in * 999)
 		}
 		return authenticatedAxios
 	}
 
 	/**
-	 * TODO
-	 * @param method 
-	 * @returns 
+	 * Create an HTTP request function using the given HTTP method.
+	 * @param method HTTP method
+	 * @returns HTTP request function, takes axios config or an URL.
 	 */
 	const request = (method: HttpMethod) => async (config: AxiosRequestConfig | string): Promise<any> => {
 		if (typeof config === 'string') {

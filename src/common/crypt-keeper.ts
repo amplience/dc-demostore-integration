@@ -3,44 +3,44 @@ import rot47 from 'rot47'
 import _ from 'lodash'
 
 /**
- * TODO
+ * Reverses a string
  * @param str 
  * @returns 
  */
 const reverseString = str => str.split('').reverse().join('')
 
 /**
- * TODO
- * @param config 
- * @param hub 
- * @returns 
+ * Cryptography helper methods with a hash based off of config delivery ID and hub ID.
+ * @param config Codec config with _meta.deliveryId
+ * @param hub Hub ID string
+ * @returns Encryption methods
  */
 const CryptKeeper = (config: any, hub?: string) => {
 	const hash = `${reverseString(_.last(config._meta.deliveryId.split('-')))}${hub}${_.last(config._meta.schema.split('/'))}${reverseString(_.first(config._meta.deliveryId.split('-')))}`
 	
 	/**
-	 * TODO
+	 * Encrypt a string with AES using the generated hash.
 	 * @param text 
 	 * @returns 
 	 */
 	const encryptAES = (text: string): string => CryptoJS.AES.encrypt(text, hash).toString()
 
 	/**
-	 * TODO
+	 * Decrypt a string with AES using the generated hash.
 	 * @param text 
 	 * @returns 
 	 */
 	const decryptAES = (text: string): string => CryptoJS.AES.decrypt(text, hash).toString(CryptoJS.enc.Utf8)
 
 	/**
-	 * TODO
+	 * Encrypt a string using the generated hash and some additional transforms.
 	 * @param text 
 	 * @returns 
 	 */
 	const encrypt = (text: string): string => text.startsWith('===') && text.endsWith('===') ? text : `===${rot47(reverseString(encryptAES(text)))}===`
 
 	/**
-	 * TODO
+	 * Decrypt a string using the generated hash and some additional transforms.
 	 * @param text 
 	 * @returns 
 	 */

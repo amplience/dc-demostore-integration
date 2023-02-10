@@ -17,6 +17,7 @@ const common_1 = require("../../../common");
 const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../../");
 const util_1 = require("../../../common/util");
+const pagination_1 = require("../pagination");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 /**
  * TODO
@@ -146,6 +147,10 @@ const mapVariant = (args) => (variant) => {
  * TODO
  */
 class CommercetoolsCodec extends __1.CommerceCodec {
+    constructor() {
+        super(...arguments);
+        this.getPage = (0, pagination_1.getPageByQuery)('offset', 'limit', 'total', 'results');
+    }
     /**
      * TODO
      * @param codecType
@@ -173,7 +178,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            const categories = yield this.fetch('/categories?limit=500');
+            const categories = yield (0, pagination_1.paginate)(this.getPage(this.rest, '/categories'), 500);
             const mapped = categories.map(cat => mapCategory(cat, categories, {}));
             this.megaMenu = mapped.filter(cat => cats.includes(cat.slug));
         });
@@ -197,13 +202,13 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
             if (args.productIds) {
-                products = yield this.fetch(`/product-projections/search?filter=id:${(0, util_1.quoteProductIdString)(args.productIds)}`);
+                products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=id:${(0, util_1.quoteProductIdString)(args.productIds)}`));
             }
             else if (args.keyword) {
-                products = yield this.fetch(`/product-projections/search?text.en="${args.keyword}"`);
+                products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?text.en="${args.keyword}"`));
             }
             else if (args.category) {
-                products = yield this.fetch(`/product-projections/search?filter=categories.id: subtree("${args.category.id}")`);
+                products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=categories.id: subtree("${args.category.id}")`));
             }
             return products.map(mapProduct(args));
         });
@@ -215,7 +220,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch('/customer-groups');
+            return yield (0, pagination_1.paginate)(this.getPage(this.rest, '/customer-groups'));
         });
     }
 }

@@ -33,6 +33,10 @@ export declare class CommercetoolsCodecType extends CommerceCodecType {
 export declare class CommercetoolsCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     rest: OAuthRestClientInterface;
+    getPage: <T>(client: OAuthRestClientInterface, url: string, params?: any) => (page: number, pageSize: number) => Promise<{
+        data: T[];
+        total: number;
+    }>;
     /**
      * TODO
      * @param codecType

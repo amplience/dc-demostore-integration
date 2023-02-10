@@ -10,20 +10,20 @@ import {
 } from './types'
 
 /**
- * TODO
+ * Common exception type, with a string message.
  */
 export class Exception {
 	exception: string
 }
 
 /**
- * TODO
+ * Interface for a generic API.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type API = { }
 
 /**
- * TODO
+ * Interface for a Commerce API.
  */
 export type CommerceAPI = API & {
     getProduct:         (args: GetCommerceObjectArgs)       => Promise<Product>

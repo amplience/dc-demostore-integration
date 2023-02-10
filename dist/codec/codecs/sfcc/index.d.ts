@@ -1,6 +1,7 @@
 import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, OAuthRestClientInterface, Product, CustomerGroup, GetVariantsArgs } from '../../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
 import { StringProperty } from '../../cms-property-types';
+import { AxiosRequestConfig } from 'axios';
 import { SFCCProduct } from './types';
 /**
  * TODO
@@ -8,6 +9,7 @@ import { SFCCProduct } from './types';
 declare type CodecConfig = ClientCredentialsConfiguration & {
     api_token: StringProperty;
     site_id: StringProperty;
+    version?: StringProperty;
 };
 /**
  * TODO
@@ -42,6 +44,14 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     rest: OAuthRestClientInterface;
     shopApi: string;
     sitesApi: string;
+    getPage: <T>(client: OAuthRestClientInterface, url: string, params?: any) => (page: number, pageSize: number) => Promise<{
+        data: T[];
+        total: number;
+    }>;
+    getPageAxios: <T>(axios: import("axios").AxiosStatic, url: string, config: AxiosRequestConfig<any>, params?: any, dataMutator?: (data: any) => T[]) => (page: number, pageSize: number) => Promise<{
+        data: T[];
+        total: number;
+    }>;
     /**
      * TODO
      * @param codecType
@@ -52,6 +62,11 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
      * TODO
      */
     cacheMegaMenu(): Promise<void>;
+    /**
+     * Gets the request config based off of the configuration parameters
+     * @returns Axios request config
+     */
+    axiosConfig(): AxiosRequestConfig;
     /**
      * TODO
      * @param url

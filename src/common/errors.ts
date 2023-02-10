@@ -1,13 +1,14 @@
 /**
- * TODO
+ * Error type thrown by integrations.
  */
 export class IntegrationError {
 	message: string
 	helpUrl: string
 
 	/**
-	 * TODO
-	 * @param param0 
+	 * Create a new IntegrationError.
+	 * @param param0.message Error message
+	 * @param param0.helpUrl URL for any helpful documentation
 	 */
 	constructor({ message, helpUrl }) {
 		this.message = message
@@ -15,8 +16,8 @@ export class IntegrationError {
 	}
 	
 	/**
-	 * TODO
-	 * @returns 
+	 * Get a formatted message combining both the message property and the help URL.
+	 * @returns A formatted message
 	 */
 	getMessage(): string {
 		return `[ demostore ] ${this.message}\nsee: ${this.helpUrl}`

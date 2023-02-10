@@ -21,9 +21,29 @@ const reverseString = str => str.split('').reverse().join('');
  */
 const CryptKeeper = (config, hub) => {
     const hash = `${reverseString(lodash_1.default.last(config._meta.deliveryId.split('-')))}${hub}${lodash_1.default.last(config._meta.schema.split('/'))}${reverseString(lodash_1.default.first(config._meta.deliveryId.split('-')))}`;
+    /**
+     * TODO
+     * @param text
+     * @returns
+     */
     const encryptAES = (text) => crypto_js_1.default.AES.encrypt(text, hash).toString();
+    /**
+     * TODO
+     * @param text
+     * @returns
+     */
     const decryptAES = (text) => crypto_js_1.default.AES.decrypt(text, hash).toString(crypto_js_1.default.enc.Utf8);
+    /**
+     * TODO
+     * @param text
+     * @returns
+     */
     const encrypt = (text) => text.startsWith('===') && text.endsWith('===') ? text : `===${(0, rot47_1.default)(reverseString(encryptAES(text)))}===`;
+    /**
+     * TODO
+     * @param text
+     * @returns
+     */
     const decrypt = (text) => text.startsWith('===') && text.endsWith('===') ? decryptAES(reverseString((0, rot47_1.default)(text.substring(3, text.length - 3)))) : text;
     return {
         encrypt,

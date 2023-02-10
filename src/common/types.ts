@@ -1,7 +1,7 @@
 import { Dictionary } from 'lodash'
 
 /**
- * TODO
+ * Simple image type with an URL and thumbnail URL.
  */
 export type Image = {
     url:                string
@@ -9,7 +9,7 @@ export type Image = {
 }
 
 /**
- * TODO
+ * Base resource type with identifiable ID and Name.
  */
 export type Identifiable = {
     id:                 string
@@ -17,20 +17,20 @@ export type Identifiable = {
 }
 
 /**
- * TODO
+ * Customer Group
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export type CustomerGroup = Identifiable & {}
 
 /**
- * TODO
+ * Commerce Object with a slug
  */
 export type CommerceObject = Identifiable & {
     slug:               string
 }
 
 /**
- * TODO
+ * Product with descriptions, images, categories and variants.
  */
 export type Product = CommerceObject & {
     shortDescription?:  string
@@ -41,7 +41,7 @@ export type Product = CommerceObject & {
 }
 
 /**
- * TODO
+ * Variant identified by SKU, with price, images and attributes.
  */
 export type Variant = {
     sku:                string
@@ -53,7 +53,7 @@ export type Variant = {
 }
 
 /**
- * TODO
+ * Category with images, products, children and a parent.
  */
 export type Category = CommerceObject & {
     parent?:            Category
@@ -63,7 +63,7 @@ export type Category = CommerceObject & {
 }
 
 /**
- * TODO
+ * Promotion with description, code, an image and activity status.
  */
 export type Promotion = Identifiable & {
     description:        string
@@ -73,14 +73,14 @@ export type Promotion = Identifiable & {
 }
 
 /**
- * TODO
+ * Get Attribute method arguments.
  */
 export type GetAttributeArgs = {
     name:               string
 }
 
 /**
- * TODO
+ * Common method arguments.
  */
 export type CommonArgs = {
     locale?:            string
@@ -91,7 +91,7 @@ export type CommonArgs = {
 }
 
 /**
- * TODO
+ * Common method arguments for fetching a commerce object.
  */
 export type GetCommerceObjectArgs = CommonArgs & {
     id?:                string
@@ -99,14 +99,14 @@ export type GetCommerceObjectArgs = CommonArgs & {
 }
 
 /**
- * TODO
+ * Method arguments for fetching variants.
  */
 export type GetVariantsArgs = CommonArgs & {
     productId:        string
 }
 
 /**
- * TODO
+ * Method arguments for fetching products.
  */
 export type GetProductsArgs = CommonArgs & {
     keyword?:           string
@@ -115,7 +115,7 @@ export type GetProductsArgs = CommonArgs & {
 }
 
 /**
- * TODO
+ * Algolia configuration properties.
  */
 export type AlgoliaConfig = {
     appId:              string
@@ -123,7 +123,7 @@ export type AlgoliaConfig = {
 }
 
 /**
- * TODO
+ * Amplience configuration properties.
  */
 export type AmplienceConfig = {
     hub:                string
@@ -133,7 +133,7 @@ export type AmplienceConfig = {
 }
 
 /**
- * TODO
+ * Demostore configuration properties.
  */
 export type DemoStoreConfiguration = {
     algolia:            AlgoliaConfig
