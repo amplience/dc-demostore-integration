@@ -17,21 +17,24 @@ const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("../../");
 const cms_property_types_1 = require("../../cms-property-types");
 /**
- * TODO
- * @param url
- * @param defaultValue
- * @returns
+ * Fetch JSON from a given URL.
+ * @param url URL to fetch from
+ * @param defaultValue Default value if URL is empty
+ * @returns Response data
  */
 const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
+/**
+ * Commerce Codec Type that integrates with REST.
+ */
 class RestCommerceCodecType extends __1.CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor() {
         return 'rest';
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties() {
         return {
@@ -58,9 +61,7 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
         };
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -70,11 +71,11 @@ class RestCommerceCodecType extends __1.CommerceCodecType {
 }
 exports.RestCommerceCodecType = RestCommerceCodecType;
 /**
- * TODO
+ * Commerce Codec that integrates with REST.
  */
 class RestCommerceCodec extends __1.CommerceCodec {
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -86,9 +87,7 @@ class RestCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -106,6 +105,9 @@ class RestCommerceCodec extends __1.CommerceCodec {
             throw new Error('getProducts() requires either: productIds, keyword, or category reference');
         });
     }
+    /**
+     * @inheritdoc
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return this.customerGroups;

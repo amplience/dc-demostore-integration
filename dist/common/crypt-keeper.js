@@ -8,39 +8,39 @@ const crypto_js_1 = __importDefault(require("crypto-js"));
 const rot47_1 = __importDefault(require("rot47"));
 const lodash_1 = __importDefault(require("lodash"));
 /**
- * TODO
+ * Reverses a string
  * @param str
  * @returns
  */
 const reverseString = str => str.split('').reverse().join('');
 /**
- * TODO
- * @param config
- * @param hub
- * @returns
+ * Cryptography helper methods with a hash based off of config delivery ID and hub ID.
+ * @param config Codec config with _meta.deliveryId
+ * @param hub Hub ID string
+ * @returns Encryption methods
  */
 const CryptKeeper = (config, hub) => {
     const hash = `${reverseString(lodash_1.default.last(config._meta.deliveryId.split('-')))}${hub}${lodash_1.default.last(config._meta.schema.split('/'))}${reverseString(lodash_1.default.first(config._meta.deliveryId.split('-')))}`;
     /**
-     * TODO
+     * Encrypt a string with AES using the generated hash.
      * @param text
      * @returns
      */
     const encryptAES = (text) => crypto_js_1.default.AES.encrypt(text, hash).toString();
     /**
-     * TODO
+     * Decrypt a string with AES using the generated hash.
      * @param text
      * @returns
      */
     const decryptAES = (text) => crypto_js_1.default.AES.decrypt(text, hash).toString(crypto_js_1.default.enc.Utf8);
     /**
-     * TODO
+     * Encrypt a string using the generated hash and some additional transforms.
      * @param text
      * @returns
      */
     const encrypt = (text) => text.startsWith('===') && text.endsWith('===') ? text : `===${(0, rot47_1.default)(reverseString(encryptAES(text)))}===`;
     /**
-     * TODO
+     * Decrypt a string using the generated hash and some additional transforms.
      * @param text
      * @returns
      */

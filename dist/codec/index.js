@@ -31,48 +31,48 @@ const lodash_1 = __importDefault(require("lodash"));
 const __1 = require("..");
 const errors_1 = require("../common/errors");
 /**
- * TODO
+ * Types of codec.
  */
 var CodecTypes;
 (function (CodecTypes) {
     CodecTypes[CodecTypes["commerce"] = 0] = "commerce";
 })(CodecTypes = exports.CodecTypes || (exports.CodecTypes = {}));
 /**
- * TODO
+ * Codec base class. Defines methods and fields a codec must have.
  */
 class CodecType {
     /**
-     * TODO
+     * The type of this codec.
      */
     get type() {
         return this._type;
     }
     /**
-     * TODO
+     * The vendor associated with this codec.
      */
     get vendor() {
         return this._vendor;
     }
     /**
-     * TODO
+     * The schema URI for this codec.
      */
     get schemaUri() {
         return `${__1.CONSTANTS.demostoreIntegrationUri}/${this.vendor}`;
     }
     /**
-     * TODO
+     * The label for this codec.
      */
     get label() {
         return `${this.vendor} integration`;
     }
     /**
-     * TODO
+     * The Icon URL that represents this codec.
      */
     get iconUrl() {
         return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`;
     }
     /**
-     * TODO
+     * The JSON schema that represents the codec's configuration.
      */
     get schema() {
         return {
@@ -80,22 +80,22 @@ class CodecType {
         };
     }
     /**
-     * TODO
+     * The properties that represent the codec configuration in JSON schema format.
      */
     get properties() {
         return this._properties;
     }
     /**
-     * TODO
-     * @param config
+     * Get an API for this codec with the given configuration.
+     * @param config Configuration for the API.
      */
     getApi(config) {
         throw new Error('must implement getCodec');
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * Process the config in a codec specific way.
+     * @param config Input configuration.
+     * @returns Processed configuration.
      */
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
     postProcess(config) {
@@ -106,18 +106,18 @@ class CodecType {
 }
 exports.CodecType = CodecType;
 /**
- * TODO
+ * Commerce type codec base class. Defines methods and fields a commerce codec must have.
  */
 class CommerceCodecType extends CodecType {
     /**
-     * TODO
+     * The type of this codec. (commerce)
      */
     get type() {
         return CodecTypes.commerce;
     }
     /**
-     * TODO
-     * @param config
+     * Get an API for this codec with the given configuration.
+     * @param config Configuration for the API.
      */
     getApi(config) {
         throw new Error('must implement getCodec');
@@ -125,7 +125,7 @@ class CommerceCodecType extends CodecType {
 }
 exports.CommerceCodecType = CommerceCodecType;
 /**
- * TODO
+ * Codec operations for testing.
  */
 var CodecTestOperationType;
 (function (CodecTestOperationType) {
@@ -137,21 +137,21 @@ var CodecTestOperationType;
     CodecTestOperationType[CodecTestOperationType["getCustomerGroups"] = 5] = "getCustomerGroups";
 })(CodecTestOperationType = exports.CodecTestOperationType || (exports.CodecTestOperationType = {}));
 /**
- * TODO
+ * Base class for an implementation of a Commerce API.
  */
 class CommerceCodec {
     /**
-     * TODO
-     * @param config
+     * Create a new Commerce API implementation, given an input configuration.
+     * @param config API configuration
      */
     constructor(config) {
         this.megaMenu = [];
         this.config = config;
     }
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * Initilize the commerce codec.
+     * @param codecType The codec type for this API.
+     * @returns The commerce codec
      */
     init(codecType) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -169,15 +169,15 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param slug
-     * @returns
+     * Find a category with a given slug.
+     * @param slug Slug to locate a category for
+     * @returns Category matching the slug
      */
     findCategory(slug) {
         return (0, __1.findInMegaMenu)(this.megaMenu, slug);
     }
     /**
-     * TODO
+     * Cache the mega menu.
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -185,9 +185,9 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Get a single product by ID.
+     * @param args Arguments object
+     * @returns Single product
      */
     // defined in terms of getProducts()
     getProduct(args) {
@@ -196,9 +196,9 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets products by a list of IDs or a filter.
+     * @param args Arguments object
+     * @returns List of products
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -207,9 +207,9 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets a category that matches the given slug, with contained products.
+     * @param args Arguments object
+     * @returns Category object
      */
     // defined in terms of getMegaMenu, effectively
     getCategory(args) {
@@ -220,9 +220,9 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets the mega menu for the current configuration.
+     * @param args Arguments object
+     * @returns Mega Menu
      */
     getMegaMenu(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -230,9 +230,9 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets customer groups for the current configuration.
+     * @param args Arguments object
+     * @returns List of customer groups
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -241,19 +241,20 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets variants for the given product, by ID.
+     * @param args Arguments object
+     * @returns Product with variants
      */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.getVariants(args);
+            console.warn(`getVariants is not supported on platform [ ${this.codecType.vendor} ]`);
+            return null;
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * Gets products by a list of IDs or a filter, in their original format.
+     * @param args Arguments object
+     * @returns List of products in their original format
      */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -262,8 +263,8 @@ class CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @returns
+     * Test the various methods of this integration and provide a report.
+     * @returns A report of all test results.
      */
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -337,18 +338,18 @@ class CommerceCodec {
 }
 exports.CommerceCodec = CommerceCodec;
 /**
- * TODO
- * @param array
- * @returns
+ * Get a random element from the given array
+ * @param array Array of choices
+ * @returns A random item from the array
  */
 const getRandom = (array) => array[Math.floor(Math.random() * (array.length - 1))];
 exports.getRandom = getRandom;
 const codecs = new Map();
 codecs[CodecTypes.commerce] = [];
 /**
- * TODO
- * @param type
- * @returns
+ * Get all the codecs with a given type
+ * @param type Codec type
+ * @returns All registered codecs that match the type
  */
 // public interface
 const getCodecs = (type) => {
@@ -356,8 +357,8 @@ const getCodecs = (type) => {
 };
 exports.getCodecs = getCodecs;
 /**
- * TODO
- * @param codec
+ * Register a codec type object.
+ * @param codec Codec type object
  */
 const registerCodec = (codec) => {
     if (!codecs[codec.type].includes(codec)) {
@@ -368,18 +369,21 @@ exports.registerCodec = registerCodec;
 // create a cache of apis so we can init them once only, assuming some initial load time (catalog etc)
 const apis = new Map();
 /**
- * TODO
- * @param obj
- * @returns
+ * Mask sensitive data in an object.
+ * Note: only affects fields called `client_secret`, `api_token`, `password`.
+ * @param obj Object to copy with sensitive fields removed.
+ * @returns The object with any sensitive fields removed.
  */
 const maskSensitiveData = (obj) => {
     return Object.assign(Object.assign({}, obj), { client_secret: obj.client_secret && '**** redacted ****', api_token: obj.api_token && '**** redacted ****', password: obj.password && '**** redacted ****' });
 };
 /**
- * TODO
- * @param config
- * @param type
- * @returns
+ * Get an API given a configuration object and a codec type.
+ * It attempts to match a registered codec by the `vendor` property first, if present.
+ * If not, it attempts to match based on the shape of the codec object.
+ * @param config API configuration
+ * @param type Type of codec to find
+ * @returns A new API for the given configuration.
  */
 const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* () {
     const codecs = (0, exports.getCodecs)(type);
@@ -419,6 +423,9 @@ const getCodec = (config, type) => __awaiter(void 0, void 0, void 0, function* (
     return apis[configHash] = apis[configHash] || (yield codec.getApi(config));
 });
 exports.getCodec = getCodec;
+/**
+ * Default arguments for commerce codec methods.
+ */
 exports.defaultArgs = {
     locale: 'en-US',
     language: 'en',
@@ -427,9 +434,11 @@ exports.defaultArgs = {
     segment: ''
 };
 /**
- * TODO
- * @param config
- * @returns
+ * Get a commerce API given a configuration object.
+ * It attempts to match a registered codec by the `vendor` property first, if present.
+ * If not, it attempts to match based on the shape of the codec object.
+ * @param config Configuration object for the commerce API
+ * @returns A new commerce API for the given configuration
  */
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, CodecTypes.commerce); });
 exports.getCommerceCodec = getCommerceCodec;

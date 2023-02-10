@@ -20,17 +20,17 @@ const util_1 = require("../../../common/util");
 const pagination_1 = require("../pagination");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 /**
- * TODO
+ * Commerce Codec Type that integrates with Commercetools.
  */
 class CommercetoolsCodecType extends __1.CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor() {
         return 'commercetools';
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { project: {
@@ -44,9 +44,7 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
             } });
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -56,15 +54,17 @@ class CommercetoolsCodecType extends __1.CommerceCodecType {
 }
 exports.CommercetoolsCodecType = CommercetoolsCodecType;
 /**
- * TODO
+ * Convert a localized string using the locale in args.
+ * @param localizable Localizable string object
+ * @param args Method arguments that contain the language
  */
 const localize = (localizable, args) => {
     return localizable[args.language] || localizable.en;
 };
 /**
- * TODO
- * @param args
- * @returns
+ * Generates a method to get an attribute's value using the method arguments.
+ * @param args Method arguments
+ * @returns Method to get an attribute's value
  */
 const getAttributeValue = (args) => (attribute) => {
     if (typeof attribute.value === 'string') {
@@ -81,10 +81,10 @@ const getAttributeValue = (args) => (attribute) => {
     }
 };
 /**
- * TODO
- * @param variant
- * @param args
- * @returns
+ * Find the local price of a variant from the method arguments.
+ * @param variant Commercetools variant
+ * @param args Method arguments
+ * @returns The price of a variant
  */
 const findPrice = (variant, args) => {
     const price = variant.prices &&
@@ -99,11 +99,11 @@ const findPrice = (variant, args) => {
     }
 };
 /**
- * TODO
- * @param category
- * @param categories
- * @param args
- * @returns
+ * Map a Commercetools category to a common category.
+ * @param category Commercetools category
+ * @param categories All Commercetools categories
+ * @param args Method arguments
+ * @returns Category
  */
 const mapCategory = (category, categories, args) => {
     return {
@@ -115,9 +115,9 @@ const mapCategory = (category, categories, args) => {
     };
 };
 /**
- * TODO
- * @param args
- * @returns
+ * Generates a method to map a Commercetools product to the common product type.
+ * @param args Commercetools product
+ * @returns Method to map a Commercetools product to a common one
  */
 const mapProduct = (args) => (product) => {
     return {
@@ -129,9 +129,9 @@ const mapProduct = (args) => (product) => {
     };
 };
 /**
- * TODO
- * @param args
- * @returns
+ * Generates a method to map a Commercetools variant to the common variant type.
+ * @param args Commercetools variant
+ * @returns Method to map a Commercetools variant to a common one
  */
 const mapVariant = (args) => (variant) => {
     return {
@@ -144,7 +144,7 @@ const mapVariant = (args) => (variant) => {
     };
 };
 /**
- * TODO
+ * Commerce Codec that integrates with Commercetools.
  */
 class CommercetoolsCodec extends __1.CommerceCodec {
     constructor() {
@@ -152,9 +152,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         this.getPage = (0, pagination_1.getPageByQuery)('offset', 'limit', 'total', 'results');
     }
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType) {
         const _super = Object.create(null, {
@@ -174,7 +172,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -184,9 +182,9 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the OAuth authenticated client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -194,9 +192,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -214,9 +210,7 @@ class CommercetoolsCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {

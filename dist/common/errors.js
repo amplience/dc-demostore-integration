@@ -2,20 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IntegrationError = void 0;
 /**
- * TODO
+ * Error type thrown by integrations.
  */
 class IntegrationError {
     /**
-     * TODO
-     * @param param0
+     * Create a new IntegrationError.
+     * @param param0.message Error message
+     * @param param0.helpUrl URL for any helpful documentation
      */
     constructor({ message, helpUrl }) {
         this.message = message;
         this.helpUrl = helpUrl;
     }
     /**
-     * TODO
-     * @returns
+     * Get a formatted message combining both the message property and the help URL.
+     * @returns A formatted message
      */
     getMessage() {
         return `[ demostore ] ${this.message}\nsee: ${this.helpUrl}`;

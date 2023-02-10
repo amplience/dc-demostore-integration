@@ -4,7 +4,7 @@ import { StringProperty } from '../../cms-property-types';
 import { AxiosRequestConfig } from 'axios';
 import { SFCCProduct } from './types';
 /**
- * TODO
+ * SFCC Codec config properties.
  */
 declare type CodecConfig = ClientCredentialsConfiguration & {
     api_token: StringProperty;
@@ -12,32 +12,28 @@ declare type CodecConfig = ClientCredentialsConfiguration & {
     version?: StringProperty;
 };
 /**
- * TODO
+ * Commerce Codec Type that integrates with SFCC.
  */
 export declare class SFCCCommerceCodecType extends CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor(): string;
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties(): CodecConfig;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     postProcess(config: CodecConfig): Promise<CodecConfig>;
 }
 /**
- * TODO
+ * Commerce Codec that integrates with SFCC.
  */
 export declare class SFCCCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
@@ -48,18 +44,16 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
         data: T[];
         total: number;
     }>;
-    getPageAxios: <T>(axios: import("axios").AxiosStatic, url: string, config: AxiosRequestConfig<any>, params?: any, dataMutator?: (data: any) => T[]) => (page: number, pageSize: number) => Promise<{
+    getPageAxios: <T>(axios: import("axios").AxiosStatic, url: string, config: AxiosRequestConfig<any>, params?: any) => (page: number, pageSize: number) => Promise<{
         data: T[];
         total: number;
     }>;
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu(): Promise<void>;
     /**
@@ -68,51 +62,43 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
      */
     axiosConfig(): AxiosRequestConfig;
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the unauthenticated axios client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     fetch(url: string): Promise<any>;
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the OAuth authenticated client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     authenticatedFetch(url: string): Promise<any>;
     /**
-     * TODO
-     * @param productId
-     * @returns
+     * Gets an SFCC product by ID.
+     * @param productId Product ID to fetch
+     * @returns SFCC product
      */
     getProductById(productId: string): Promise<SFCCProduct>;
     /**
-     * TODO
-     * @param query
-     * @returns
+     * Lists SFCC products for a given search query.
+     * @param query Search query
+     * @returns List of SFCC products
      */
     search(query: string): Promise<SFCCProduct[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]>;
 }

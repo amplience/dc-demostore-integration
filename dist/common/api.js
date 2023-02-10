@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Exception = void 0;
 /**
- * TODO
+ * Common exception type, with a string message.
  */
 class Exception {
 }

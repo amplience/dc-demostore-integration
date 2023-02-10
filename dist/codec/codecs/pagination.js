@@ -10,9 +10,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paginate = exports.getPageByQueryAxios = exports.getPageByQuery = void 0;
+/**
+ * Get an URL with added params from the given object.
+ * @param url The original URL
+ * @param params The params to append to the URL
+ * @returns The URL with the added params
+ */
 function applyParams(url, params) {
     const isRelative = url.startsWith('/');
     if (isRelative) {
+        // TODO: better solution?
         url = 'http://a' + url;
     }
     const urlObj = new URL(url);
@@ -25,35 +32,69 @@ function applyParams(url, params) {
     }
     return url;
 }
+/**
+ * Return a method that maps from an object to a property within it defined by the given string, if a custom one is not provided.
+ * @param mapper Mapping string or method
+ * @returns Mapping method
+ */
+function getPropMapper(mapper) {
+    if (typeof mapper === 'string') {
+        return (data) => data[mapper];
+    }
+    return mapper;
+}
+/**
+ * Return a generator for a function that gets a page from an oauth endpoint with query parameters.
+ * @param offsetQuery Query key to use for item offset
+ * @param countQuery Query key to use for page size
+ * @param totalProp Property to extract total assets from
+ * @param resultProp Property to extract result items from
+ * @returns A generator that takes a client, url and base params and generates a function that gets a page.
+ */
 function getPageByQuery(offsetQuery, countQuery, totalProp, resultProp) {
+    const totalPropMap = getPropMapper(totalProp);
+    const resultPropMap = getPropMapper(resultProp);
     return (client, url, params = {}) => (page, pageSize) => __awaiter(this, void 0, void 0, function* () {
         const allParams = Object.assign(Object.assign({}, params), { [offsetQuery]: page * pageSize, [countQuery]: pageSize });
         const newUrl = applyParams(url, allParams);
-        console.log(newUrl);
         const response = yield client.get({ url: newUrl });
         return {
-            data: response[resultProp],
-            total: response[totalProp]
+            data: resultPropMap(response),
+            total: totalPropMap(response)
         };
     });
 }
 exports.getPageByQuery = getPageByQuery;
+/**
+ * Return a generator for a function that gets a page using an axios client with query parameters.
+ * @param offsetQuery Query key to use for item offset
+ * @param countQuery Query key to use for page size
+ * @param totalProp Property to extract total assets from
+ * @param resultProp Property to extract result items from
+ * @returns A generator that takes a client, url and base params and generates a function that gets a page.
+ */
 function getPageByQueryAxios(offsetQuery, countQuery, totalProp, resultProp) {
-    return (axios, url, config, params = {}, dataMutator) => (page, pageSize) => __awaiter(this, void 0, void 0, function* () {
+    const totalPropMap = getPropMapper(totalProp);
+    const resultPropMap = getPropMapper(resultProp);
+    return (axios, url, config, params = {}) => (page, pageSize) => __awaiter(this, void 0, void 0, function* () {
         const allParams = Object.assign(Object.assign({}, params), { [offsetQuery]: page * pageSize, [countQuery]: pageSize });
-        url = applyParams(url, allParams);
-        const response = yield axios.get(url, config);
-        let data = response[resultProp];
-        if (dataMutator) {
-            data = dataMutator(data);
-        }
+        const newUrl = applyParams(url, allParams);
+        const response = yield axios.get(newUrl, config);
         return {
-            data,
-            total: response[totalProp]
+            data: resultPropMap(response.data),
+            total: totalPropMap(response.data)
         };
     });
 }
 exports.getPageByQueryAxios = getPageByQueryAxios;
+/**
+ * Iterate through fetching pages and build an array out of the results.
+ * @param requestPage Method to use to request pages. Takes page number and size. Must return at least one page-size worth of items if the total allows it.
+ * @param pageSize Page size (default: 20)
+ * @param pageNum Page number to start at (default: 0)
+ * @param pageCount Number of pages to fetch (default: all)
+ * @returns List of items fetched from the paginated endpoint
+ */
 function paginate(requestPage, pageSize = 20, pageNum = 0, pageCount) {
     return __awaiter(this, void 0, void 0, function* () {
         const result = [];

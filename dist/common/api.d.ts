@@ -1,17 +1,17 @@
 import { SFCCProduct } from '@/codec/codecs/sfcc/types';
 import { GetCommerceObjectArgs, Product, GetProductsArgs, Category, CommonArgs, CustomerGroup, GetVariantsArgs } from './types';
 /**
- * TODO
+ * Common exception type, with a string message.
  */
 export declare class Exception {
     exception: string;
 }
 /**
- * TODO
+ * Interface for a generic API.
  */
 export declare type API = {};
 /**
- * TODO
+ * Interface for a Commerce API.
  */
 export declare type CommerceAPI = API & {
     getProduct: (args: GetCommerceObjectArgs) => Promise<Product>;

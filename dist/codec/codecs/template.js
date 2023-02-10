@@ -12,17 +12,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateCommerceCodec = exports.TemplateCommerceCodecType = void 0;
 const __1 = require("../..");
 /**
- * TODO
+ * A template commerce codec type, useful as a starting point for a new integration.
  */
 class TemplateCommerceCodecType extends __1.CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor() {
         return 'template';
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties() {
         return {
@@ -33,9 +33,7 @@ class TemplateCommerceCodecType extends __1.CommerceCodecType {
         };
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -45,16 +43,14 @@ class TemplateCommerceCodecType extends __1.CommerceCodecType {
 }
 exports.TemplateCommerceCodecType = TemplateCommerceCodecType;
 /**
- * TODO
+ * A template commerce codec, useful as a starting point for a new integration.
  */
 class TemplateCommerceCodec extends __1.CommerceCodec {
     // instance variables
     // products: Product[]
     // categories: Category[]
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType) {
         const _super = Object.create(null, {
@@ -67,8 +63,7 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
+     * @inheritdoc
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -85,8 +80,7 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
+     * @inheritdoc
      */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -103,9 +97,7 @@ class TemplateCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {

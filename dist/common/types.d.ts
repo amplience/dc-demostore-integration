@@ -1,30 +1,30 @@
 import { Dictionary } from 'lodash';
 /**
- * TODO
+ * Simple image type with an URL and thumbnail URL.
  */
 export declare type Image = {
     url: string;
     thumb?: string;
 };
 /**
- * TODO
+ * Base resource type with identifiable ID and Name.
  */
 export declare type Identifiable = {
     id: string;
     name: string;
 };
 /**
- * TODO
+ * Customer Group
  */
 export declare type CustomerGroup = Identifiable & {};
 /**
- * TODO
+ * Commerce Object with a slug
  */
 export declare type CommerceObject = Identifiable & {
     slug: string;
 };
 /**
- * TODO
+ * Product with descriptions, images, categories and variants.
  */
 export declare type Product = CommerceObject & {
     shortDescription?: string;
@@ -34,7 +34,7 @@ export declare type Product = CommerceObject & {
     variants: Variant[];
 };
 /**
- * TODO
+ * Variant identified by SKU, with price, images and attributes.
  */
 export declare type Variant = {
     sku: string;
@@ -45,7 +45,7 @@ export declare type Variant = {
     attributes: Dictionary<string>;
 };
 /**
- * TODO
+ * Category with images, products, children and a parent.
  */
 export declare type Category = CommerceObject & {
     parent?: Category;
@@ -54,7 +54,7 @@ export declare type Category = CommerceObject & {
     products: Product[];
 };
 /**
- * TODO
+ * Promotion with description, code, an image and activity status.
  */
 export declare type Promotion = Identifiable & {
     description: string;
@@ -63,13 +63,13 @@ export declare type Promotion = Identifiable & {
     image?: Image;
 };
 /**
- * TODO
+ * Get Attribute method arguments.
  */
 export declare type GetAttributeArgs = {
     name: string;
 };
 /**
- * TODO
+ * Common method arguments.
  */
 export declare type CommonArgs = {
     locale?: string;
@@ -79,20 +79,20 @@ export declare type CommonArgs = {
     segment?: string;
 };
 /**
- * TODO
+ * Common method arguments for fetching a commerce object.
  */
 export declare type GetCommerceObjectArgs = CommonArgs & {
     id?: string;
     slug?: string;
 };
 /**
- * TODO
+ * Method arguments for fetching variants.
  */
 export declare type GetVariantsArgs = CommonArgs & {
     productId: string;
 };
 /**
- * TODO
+ * Method arguments for fetching products.
  */
 export declare type GetProductsArgs = CommonArgs & {
     keyword?: string;
@@ -100,14 +100,14 @@ export declare type GetProductsArgs = CommonArgs & {
     category?: Category;
 };
 /**
- * TODO
+ * Algolia configuration properties.
  */
 export declare type AlgoliaConfig = {
     appId: string;
     apiKey: string;
 };
 /**
- * TODO
+ * Amplience configuration properties.
  */
 export declare type AmplienceConfig = {
     hub: string;
@@ -116,7 +116,7 @@ export declare type AmplienceConfig = {
     imageHub?: string;
 };
 /**
- * TODO
+ * Demostore configuration properties.
  */
 export declare type DemoStoreConfiguration = {
     algolia: AlgoliaConfig;

@@ -21,17 +21,17 @@ const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
 const pagination_1 = require("../pagination");
 /**
- * TODO
+ * Commerce Codec Type that integrates with SFCC.
  */
 class SFCCCommerceCodecType extends __1.CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor() {
         return 'sfcc';
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties() {
         return Object.assign(Object.assign({}, common_1.ClientCredentialProperties), { api_token: {
@@ -44,9 +44,7 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
             } });
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -54,9 +52,7 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
         });
     }
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
     postProcess(config) {
@@ -68,9 +64,9 @@ class SFCCCommerceCodecType extends __1.CommerceCodecType {
 }
 exports.SFCCCommerceCodecType = SFCCCommerceCodecType;
 /**
- * TODO
- * @param category
- * @returns
+ * Map an SFCC category to the common category type.
+ * @param category SFCC category
+ * @returns Category
  */
 const mapCategory = (category) => {
     var _a;
@@ -83,15 +79,15 @@ const mapCategory = (category) => {
     };
 };
 /**
- * TODO
- * @param group
- * @returns
+ * Map an SFCC customer group to the common customer group type.
+ * @param group SFCC customer group
+ * @returns Customer group
  */
 const mapCustomerGroup = (group) => group && Object.assign(Object.assign({}, group), { name: group.id });
 /**
- * TODO
- * @param product
- * @returns
+ * Map an SFCC product to the common product type.
+ * @param product SFCC product
+ * @returns Product
  */
 // TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product) => {
@@ -134,18 +130,16 @@ const mapProduct = (product) => {
     };
 };
 /**
- * TODO
+ * Commerce Codec that integrates with SFCC.
  */
 class SFCCCommerceCodec extends __1.CommerceCodec {
     constructor() {
         super(...arguments);
         this.getPage = (0, pagination_1.getPageByQuery)('start', 'count', 'total', 'data');
-        this.getPageAxios = (0, pagination_1.getPageByQueryAxios)('start', 'count', 'total', 'data');
+        this.getPageAxios = (0, pagination_1.getPageByQueryAxios)('start', 'count', 'total', 'hits');
     }
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType) {
         const _super = Object.create(null, {
@@ -169,7 +163,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -192,9 +186,9 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         };
     }
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the unauthenticated axios client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -207,9 +201,9 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the OAuth authenticated client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     authenticatedFetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -217,9 +211,9 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param productId
-     * @returns
+     * Gets an SFCC product by ID.
+     * @param productId Product ID to fetch
+     * @returns SFCC product
      */
     getProductById(productId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -227,13 +221,13 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param query
-     * @returns
+     * Lists SFCC products for a given search query.
+     * @param query Search query
+     * @returns List of SFCC products
      */
     search(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const searchResults = yield (0, pagination_1.paginate)(this.getPageAxios(axios_1.default, `${this.shopApi}/product_search?${query}`, this.axiosConfig(), {}, (data) => data.hits), 200);
+            const searchResults = yield (0, pagination_1.paginate)(this.getPageAxios(axios_1.default, `${this.shopApi}/product_search?${query}`, this.axiosConfig(), {}), 200);
             if (searchResults) {
                 return yield Promise.all(searchResults.map((searchResult) => __awaiter(this, void 0, void 0, function* () {
                     return yield this.getProductById.bind(this)(searchResult.product_id);
@@ -243,9 +237,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -253,9 +245,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -273,9 +263,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -293,9 +281,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {

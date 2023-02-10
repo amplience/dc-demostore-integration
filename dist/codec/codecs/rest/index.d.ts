@@ -3,7 +3,7 @@ import { Dictionary } from 'lodash';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
 import { StringProperty } from '../../cms-property-types';
 /**
- * TODO
+ * REST Codec config properties.
  */
 declare type CodecConfig = {
     productURL: StringProperty;
@@ -11,24 +11,25 @@ declare type CodecConfig = {
     customerGroupURL: StringProperty;
     translationsURL: StringProperty;
 };
+/**
+ * Commerce Codec Type that integrates with REST.
+ */
 export declare class RestCommerceCodecType extends CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor(): string;
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties(): CodecConfig;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * TODO
+ * Commerce Codec that integrates with REST.
  */
 export declare class RestCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
@@ -37,15 +38,16 @@ export declare class RestCommerceCodec extends CommerceCodec {
     customerGroups: CustomerGroup[];
     translations: Dictionary<Dictionary<string>>;
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu(): Promise<void>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
+    /**
+     * @inheritdoc
+     */
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }
 export default RestCommerceCodecType;

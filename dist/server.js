@@ -18,10 +18,10 @@ require("isomorphic-unfetch");
 const app = (0, express_1.default)();
 const port = 3000; // default port to listen
 /**
- * TODO
- * @param req
- * @param res
- * @param next
+ * Wraps middleware in an express handler.
+ * @param req Request object
+ * @param res Response object
+ * @param next Next handler
  */
 const wrappedMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {

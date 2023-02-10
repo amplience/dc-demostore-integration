@@ -4,19 +4,19 @@ exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports
 const __1 = require("../..");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 /**
- * TODO
- * @param categories
- * @param slug
- * @returns
+ * Find a category in the mega menu by slug.
+ * @param categories Root categories in mega menu
+ * @param slug Category slug
+ * @returns Found category, if present
  */
 const findInMegaMenu = (categories, slug) => {
     return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
 exports.findInMegaMenu = findInMegaMenu;
 /**
- * TODO
- * @param categories
- * @returns
+ * Flattens categories to a single dimensional array, rather than a tree
+ * @param categories Root categories
+ * @returns Flattened list of categories
  */
 const flattenCategories = (categories) => {
     const allCategories = [];
@@ -30,7 +30,7 @@ const flattenCategories = (categories) => {
 };
 exports.flattenCategories = flattenCategories;
 /**
- * TODO
+ * Demostore Content Types for Amplience
  */
 exports.CTypes = {
     demostoreconfig: {
@@ -87,9 +87,9 @@ exports.CTypes = {
     }
 };
 /**
- * TODO
- * @param ctype
- * @returns
+ * Get an Amplience Content Type representing the given CType.
+ * @param ctype Content Type Template
+ * @returns Amplience Content Type
  */
 const getContentType = (ctype) => {
     const contentType = new dc_management_sdk_js_1.ContentType();
@@ -105,9 +105,9 @@ const getContentType = (ctype) => {
 };
 exports.getContentType = getContentType;
 /**
- * TODO
- * @param ctype
- * @returns
+ * Get an Amplience Content Type Schema representing the given CType.
+ * @param ctype Content Type Template
+ * @returns Amplience Content Type Schema
  */
 const getContentTypeSchema = (ctype) => {
     const schema = new dc_management_sdk_js_1.ContentTypeSchema();

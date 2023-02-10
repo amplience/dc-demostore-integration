@@ -2,33 +2,31 @@ import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArg
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
 import { StringProperty } from '../../cms-property-types';
 /**
- * TODO
+ * Commercetools Codec config properties
  */
 declare type CodecConfig = ClientCredentialsConfiguration & {
     project: StringProperty;
     scope: StringProperty;
 };
 /**
- * TODO
+ * Commerce Codec Type that integrates with Commercetools.
  */
 export declare class CommercetoolsCodecType extends CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor(): string;
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties(): CodecConfig;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * TODO
+ * Commerce Codec that integrates with Commercetools.
  */
 export declare class CommercetoolsCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
@@ -38,31 +36,25 @@ export declare class CommercetoolsCodec extends CommerceCodec {
         total: number;
     }>;
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu(): Promise<void>;
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data from the OAuth authenticated client.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     fetch(url: string): Promise<any>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }

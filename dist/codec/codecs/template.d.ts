@@ -2,53 +2,45 @@ import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from 
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
 import { SFCCProduct } from './sfcc/types';
 /**
- * TODO
+ * Common codec configuration.
  */
 declare type CodecConfig = {};
 /**
- * TODO
+ * A template commerce codec type, useful as a starting point for a new integration.
  */
 export declare class TemplateCommerceCodecType extends CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor(): string;
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties(): CodecConfig;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * TODO
+ * A template commerce codec, useful as a starting point for a new integration.
  */
 export declare class TemplateCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     /**
-     * TODO
-     * @param codecType
-     * @returns
+     * @inheritdoc
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     /**
-     * TODO
-     * @param args
+     * @inheritdoc
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
-     * TODO
-     * @param args
+     * @inheritdoc
      */
     getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }

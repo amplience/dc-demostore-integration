@@ -17,6 +17,9 @@ const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../common/util");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const cms_property_types_1 = require("../codec/cms-property-types");
+/**
+ * JSON schema properties describing UsernamePasswordConfiguration.
+ */
 exports.UsernamePasswordProperties = {
     username: {
         title: 'Username',
@@ -29,6 +32,9 @@ exports.UsernamePasswordProperties = {
         minLength: 1
     }
 };
+/**
+ * JSON schema properties describing APIConfiguration.
+ */
 exports.APIProperties = {
     api_url: {
         title: 'Base API URL',
@@ -36,11 +42,17 @@ exports.APIProperties = {
         pattern: cms_property_types_1.StringPatterns.httpUrl
     }
 };
+/**
+ * JSON schema properties describing OAuthCodecConfiguration.
+ */
 exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties), { auth_url: {
         title: 'Oauth URL',
         type: 'string',
         pattern: cms_property_types_1.StringPatterns.httpUrl
     } });
+/**
+ * JSON schema properties describing APIConfiguration.
+ */
 exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAuthProperties), { client_id: {
         title: 'Client ID',
         type: 'string',
@@ -51,14 +63,16 @@ exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAu
         minLength: 1
     } });
 /**
- * TODO
+ * A REST client with OAuth authentication and methods for each request type.
  */
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
     /**
-     * TODO
-     * @returns
+     * Get an authenticated axios client.
+     * If not created yet, create and authenticate an axios instance using OAuth.
+     * Automatically re-authenticates this client when the token is about to expire.
+     * @returns An authenticated axios client.
      */
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         // console.log(`authenticating to ${config.auth_url}`)
@@ -74,14 +88,16 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
                 baseURL: config.api_url,
                 headers: getHeaders(auth)
             });
+            // TODO: This should probably be done on demand rather than periodically.
+            // Right now, this can stop the program from terminating.
             setTimeout(() => { authenticate(); }, auth.expires_in * 999);
         }
         return authenticatedAxios;
     });
     /**
-     * TODO
-     * @param method
-     * @returns
+     * Create an HTTP request function using the given HTTP method.
+     * @param method HTTP method
+     * @returns HTTP request function, takes axios config or an URL.
      */
     const request = (method) => (config) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;

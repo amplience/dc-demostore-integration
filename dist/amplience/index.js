@@ -17,42 +17,42 @@ const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const errors_1 = require("../common/errors");
 /**
- * TODO
- * @param hub
- * @param args
+ * Get a content item from a Dynamic Content hub.
+ * @param hub Dynamic Content hub
+ * @param args ID or key of the content item
  * @returns
  */
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
-    let path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
-    let response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
+    const path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;
+    const response = yield fetch(`https://${hub}.cdn.content.amplience.net/content/${path}?depth=all&format=inlined`);
     return response.status === 200 ? (0, crypt_keeper_1.CryptKeeper)((yield response.json()).content, hub).decryptAll() : null;
 });
 exports.getContentItem = getContentItem;
 /**
- * TODO
- * @param configLocator
- * @returns
+ * Gets the demostore config content item given a configLocator string.
+ * @param configLocator Locator to use as part of the delivery key
+ * @returns Demostore config content item
  */
 const getContentItemFromConfigLocator = (configLocator) => __awaiter(void 0, void 0, void 0, function* () {
-    let [hub, lookup] = configLocator.split(':');
-    let contentItem = yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
+    const [hub, lookup] = configLocator.split(':');
+    const contentItem = yield (0, exports.getContentItem)(hub, { key: `demostore/${lookup}` });
     if (!contentItem) {
         // todo: add help url
         throw new errors_1.IntegrationError({
             message: `no content item found for config_locator ${configLocator}`,
-            helpUrl: ``
+            helpUrl: ''
         });
     }
     return contentItem;
 });
 exports.getContentItemFromConfigLocator = getContentItemFromConfigLocator;
 /**
- * TODO
- * @param key
- * @returns
+ * Gets the demostore config given a key string.
+ * @param key Locator to use as part of the delivery key
+ * @returns Demostore config object
  */
 const getDemoStoreConfig = (key) => __awaiter(void 0, void 0, void 0, function* () {
-    let obj = yield (0, exports.getContentItemFromConfigLocator)(key);
+    const obj = yield (0, exports.getContentItemFromConfigLocator)(key);
     return Object.assign(Object.assign({}, obj), { algolia: {
             credentials: lodash_1.default.keyBy(obj.algolia.credentials, 'key'),
             indexes: lodash_1.default.keyBy(obj.algolia.indexes, 'key')

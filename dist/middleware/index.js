@@ -18,9 +18,9 @@ const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
 /**
- * TODO
- * @param config
- * @returns
+ * Get an API for the given configuration.
+ * @param config Configuration object
+ * @returns API matching the configuration.
  */
 const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     // we are passed in an object here
@@ -36,7 +36,7 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
     // novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
-    const matchingCodec = (0, index_1.getCodecs)().find(c => { var _a; return c.vendor === config.vendor || c.schemaUri === ((_a = config._meta) === null || _a === void 0 ? void 0 : _a.schema); });
+    const matchingCodec = (0, index_1.getCodecs)().find((c) => { var _a; return c.vendor === config.vendor || c.schemaUri === ((_a = config._meta) === null || _a === void 0 ? void 0 : _a.schema); });
     if (matchingCodec) {
         config = yield matchingCodec.postProcess(config);
     }
@@ -44,19 +44,26 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     return yield (0, index_1.getCommerceCodec)(config);
 });
 /**
- * TODO
- * @param params
- * @returns
+ * Get a Commerce API for the given configuration.
+ * @param params Configuration object and vendor
+ * @returns Commerce API matching the configuration.
  */
 // getCommerceAPI is the main client interaction point with the integration layer
 const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {
+    let codec = params;
+    if (params.codec_params) {
+        codec = Object.assign(Object.assign({}, params.codec_params), { vendor: params.vendor });
+    }
+    //const codec = params.codec_params ?? params // merge in vendor with params
     if ((0, util_1.isServer)()) {
-        return yield getAPI(params);
+        return yield getAPI(codec);
     }
     else {
         const getResponse = (operation) => (args) => __awaiter(void 0, void 0, void 0, function* () {
-            const apiUrl = window.isStorybook ? 'https://core.dc-demostore.com/api' : '/api';
-            return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), params), { operation }) })).data;
+            const apiUrl = window.isStorybook
+                ? 'https://core.dc-demostore.com/api'
+                : '/api';
+            return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), codec), { operation }) })).data;
         });
         return {
             getProduct: getResponse('getProduct'),
@@ -66,15 +73,16 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             getCustomerGroups: getResponse('getCustomerGroups'),
             getVariants: getResponse('getVariants'),
             getRawProducts: getResponse('getRawProducts')
+            //getPromotions: getResponse('getPromotions')
         };
     }
 });
 exports.getCommerceAPI = getCommerceAPI;
 /**
- * TODO
- * @param req
- * @param res
- * @returns
+ * Integration middleware request handler. Provides access to commerce api methods.
+ * @param req Request object
+ * @param res Response object
+ * @returns Response
  */
 // handler for /api route
 const middleware = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
