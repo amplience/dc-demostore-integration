@@ -77,7 +77,6 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
      */
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!authenticatedAxios || Date.now() > expiryTime) {
-            console.log(`authenticating to ${config.auth_url}`);
             const response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
             const auth = response.data;
             if (!getHeaders) {
