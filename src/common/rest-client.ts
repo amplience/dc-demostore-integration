@@ -106,6 +106,7 @@ type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
 export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfiguration>, payload: any, requestConfig: AxiosRequestConfig = {}, getHeaders?: (auth: any) => any): OAuthRestClientInterface => {
 	let authenticatedAxios: AxiosInstance
 	let status: AuthenticationStatus = 'NOT_LOGGED_IN'
+	let expiryTime = 0
 
 	/**
 	 * Get an authenticated axios client.
@@ -114,9 +115,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 	 * @returns An authenticated axios client.
 	 */
 	const authenticate = async (): Promise<AxiosInstance> => {
-		// console.log(`authenticating to ${config.auth_url}`)
-
-		if (!authenticatedAxios) {
+		if (!authenticatedAxios || Date.now() > expiryTime) {
 			const response = await axios.post(config.auth_url, payload, requestConfig)
 			const auth = response.data
 
@@ -131,9 +130,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 				headers: getHeaders(auth)
 			})
 
-			// TODO: This should probably be done on demand rather than periodically.
-			// Right now, this can stop the program from terminating.
-			setTimeout(() => { authenticate() }, auth.expires_in * 999)
+			expiryTime = Date.now() + auth.expires_in * 999
 		}
 		return authenticatedAxios
 	}

@@ -68,6 +68,7 @@ exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAu
 const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     let authenticatedAxios;
     let status = 'NOT_LOGGED_IN';
+    let expiryTime = 0;
     /**
      * Get an authenticated axios client.
      * If not created yet, create and authenticate an axios instance using OAuth.
@@ -75,8 +76,8 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
      * @returns An authenticated axios client.
      */
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
-        // console.log(`authenticating to ${config.auth_url}`)
-        if (!authenticatedAxios) {
+        if (!authenticatedAxios || Date.now() > expiryTime) {
+            console.log(`authenticating to ${config.auth_url}`);
             const response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
             const auth = response.data;
             if (!getHeaders) {
@@ -88,9 +89,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
                 baseURL: config.api_url,
                 headers: getHeaders(auth)
             });
-            // TODO: This should probably be done on demand rather than periodically.
-            // Right now, this can stop the program from terminating.
-            setTimeout(() => { authenticate(); }, auth.expires_in * 999);
+            expiryTime = Date.now() + auth.expires_in * 999;
         }
         return authenticatedAxios;
     });
