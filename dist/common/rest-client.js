@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.OAuthRestClient = exports.ClientCredentialProperties = exports.OAuthProperties = exports.APIProperties = exports.UsernamePasswordProperties = void 0;
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../common/util");
+const common_1 = require("../codec/codecs/common");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const cms_property_types_1 = require("../codec/cms-property-types");
 /**
@@ -78,7 +79,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!authenticatedAxios || Date.now() > expiryTime) {
             const response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
-            const auth = response.data;
+            const auth = (0, common_1.logResponse)('post', config.auth_url, response.data);
             if (!getHeaders) {
                 getHeaders = (auth) => ({
                     Authorization: `${auth.token_type || 'Bearer'} ${auth.access_token}`
@@ -119,7 +120,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
         }
         try {
             // console.log(`[ rest ] get ${config.url}`)
-            return yield (yield authenticatedAxios.request(Object.assign({ method }, config))).data;
+            return (0, common_1.logResponse)(method, config.url, yield (yield authenticatedAxios.request(Object.assign({ method }, config))).data);
         }
         catch (error) {
             if (((_a = error.response) === null || _a === void 0 ? void 0 : _a.status) === 429) {

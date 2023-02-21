@@ -1,187 +1,5 @@
-import { Dictionary } from 'lodash';
-import { API, CommerceAPI } from '..';
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../common/types';
-/**
- * Types of codec.
- */
-export declare enum CodecTypes {
-    commerce = 0
-}
-/**
- * Any JSON schema property object.
- */
-export declare type AnyProperty = StringProperty | NumberProperty | IntegerProperty | ArrayProperty;
-/**
- * Codec base class. Defines methods and fields a codec must have.
- */
-export declare class CodecType {
-    _type: CodecTypes;
-    _properties: Dictionary<AnyProperty>;
-    _vendor: string;
-    /**
-     * The type of this codec.
-     */
-    get type(): CodecTypes;
-    /**
-     * The vendor associated with this codec.
-     */
-    get vendor(): string;
-    /**
-     * The schema URI for this codec.
-     */
-    get schemaUri(): string;
-    /**
-     * The label for this codec.
-     */
-    get label(): string;
-    /**
-     * The Icon URL that represents this codec.
-     */
-    get iconUrl(): string;
-    /**
-     * The JSON schema that represents the codec's configuration.
-     */
-    get schema(): any;
-    /**
-     * The properties that represent the codec configuration in JSON schema format.
-     */
-    get properties(): Dictionary<AnyProperty>;
-    /**
-     * Get an API for this codec with the given configuration.
-     * @param config Configuration for the API.
-     */
-    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<API>;
-    /**
-     * Process the config in a codec specific way.
-     * @param config Input configuration.
-     * @returns Processed configuration.
-     */
-    postProcess(config: any): Promise<any>;
-}
-/**
- * Commerce type codec base class. Defines methods and fields a commerce codec must have.
- */
-export declare class CommerceCodecType extends CodecType {
-    /**
-     * The type of this codec. (commerce)
-     */
-    get type(): CodecTypes;
-    /**
-     * Get an API for this codec with the given configuration.
-     * @param config Configuration for the API.
-     */
-    getApi(config: CodecPropertyConfig<Dictionary<AnyProperty>>): Promise<CommerceAPI>;
-}
-/**
- * Codec operations for testing.
- */
-export declare enum CodecTestOperationType {
-    megaMenu = 0,
-    getCategory = 1,
-    getProductById = 2,
-    getProductsByKeyword = 3,
-    getProductsByProductIds = 4,
-    getCustomerGroups = 5
-}
-/**
- * Codec testing results.
- */
-export interface CodecTestResult {
-    operationType: CodecTestOperationType;
-    description: string;
-    arguments: string;
-    duration: number;
-    results: any;
-}
-/**
- * Base class for an implementation of a Commerce API.
- */
-export declare class CommerceCodec implements CommerceAPI {
-    config: CodecPropertyConfig<Dictionary<AnyProperty>>;
-    megaMenu: Category[];
-    codecType: CommerceCodecType;
-    initDuration: number;
-    /**
-     * Create a new Commerce API implementation, given an input configuration.
-     * @param config API configuration
-     */
-    constructor(config: CodecPropertyConfig<Dictionary<AnyProperty>>);
-    /**
-     * Initilize the commerce codec.
-     * @param codecType The codec type for this API.
-     * @returns The commerce codec
-     */
-    init(codecType: CommerceCodecType): Promise<CommerceCodec>;
-    /**
-     * Find a category with a given slug.
-     * @param slug Slug to locate a category for
-     * @returns Category matching the slug
-     */
-    findCategory(slug: string): Category;
-    /**
-     * Cache the mega menu.
-     */
-    cacheMegaMenu(): Promise<void>;
-    /**
-     * Get a single product by ID.
-     * @param args Arguments object
-     * @returns Single product
-     */
-    getProduct(args: GetCommerceObjectArgs): Promise<Product>;
-    /**
-     * Gets products by a list of IDs or a filter.
-     * @param args Arguments object
-     * @returns List of products
-     */
-    getProducts(args: GetProductsArgs): Promise<Product[]>;
-    /**
-     * Gets a category that matches the given slug, with contained products.
-     * @param args Arguments object
-     * @returns Category object
-     */
-    getCategory(args: GetCommerceObjectArgs): Promise<Category>;
-    /**
-     * Gets the mega menu for the current configuration.
-     * @param args Arguments object
-     * @returns Mega Menu
-     */
-    getMegaMenu(args: CommonArgs): Promise<Category[]>;
-    /**
-     * Gets customer groups for the current configuration.
-     * @param args Arguments object
-     * @returns List of customer groups
-     */
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
-    /**
-     * Gets variants for the given product, by ID.
-     * @param args Arguments object
-     * @returns Product with variants
-     */
-    getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
-    /**
-     * Gets products by a list of IDs or a filter, in their original format.
-     * @param args Arguments object
-     * @returns List of products in their original format
-     */
-    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
-    /**
-     * Test the various methods of this integration and provide a report.
-     * @returns A report of all test results.
-     */
-    testIntegration(): Promise<CodecTestResult[]>;
-}
-/**
- * Get a random element from the given array
- * @param array Array of choices
- * @returns A random item from the array
- */
-export declare const getRandom: <T>(array: T[]) => T;
-/**
- * Top level JSON schema properties for a codec's configuration.
- */
-export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
-    [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
-};
+import { CodecTypes, CodecType } from './codecs/core';
+import { API, CommerceAPI } from '../common';
 /**
  * Get all the codecs with a given type
  * @param type Codec type
@@ -193,7 +11,6 @@ export declare const getCodecs: (type?: CodecTypes) => CodecType[];
  * @param codec Codec type object
  */
 export declare const registerCodec: (codec: CodecType) => void;
-import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from './cms-property-types';
 /**
  * Get an API given a configuration object and a codec type.
  * It attempts to match a registered codec by the `vendor` property first, if present.
@@ -204,10 +21,6 @@ import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringC
  */
 export declare const getCodec: (config: any, type: CodecTypes) => Promise<API>;
 /**
- * Default arguments for commerce codec methods.
- */
-export declare const defaultArgs: CommonArgs;
-/**
  * Get a commerce API given a configuration object.
  * It attempts to match a registered codec by the `vendor` property first, if present.
  * If not, it attempts to match based on the shape of the codec object.
@@ -215,5 +28,5 @@ export declare const defaultArgs: CommonArgs;
  * @returns A new commerce API for the given configuration
  */
 export declare const getCommerceCodec: (config: any) => Promise<CommerceAPI>;
-import { SFCCProduct } from './codecs/sfcc/types';
 export * from './codecs/common';
+export * from './codecs/core';

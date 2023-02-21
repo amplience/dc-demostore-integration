@@ -6,7 +6,7 @@ import {
 	Product 
 } from '../../common'
 import _ from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from './core'
 import { SFCCProduct } from './sfcc/types'
 
 /**

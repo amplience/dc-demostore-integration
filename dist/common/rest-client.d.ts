@@ -1,5 +1,5 @@
 import { AxiosRequestConfig } from 'axios';
-import { CodecPropertyConfig } from '..';
+import { CodecPropertyConfig } from '../codec/codecs/core';
 import { HttpMethod } from 'dc-management-sdk-js';
 import { StringProperty } from '../codec/cms-property-types';
 /**

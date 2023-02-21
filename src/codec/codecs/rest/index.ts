@@ -9,8 +9,9 @@ import {
 } from '../../../common'
 import _ from 'lodash'
 import { Dictionary } from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
+import axios from 'axios'
 
 /**
  * REST Codec config properties.
@@ -28,7 +29,7 @@ type CodecConfig = {
  * @param defaultValue Default value if URL is empty
  * @returns Response data
  */
-const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await (await fetch(url)).json()
+const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : (await axios.get(url)).data
 
 /**
  * Commerce Codec Type that integrates with REST.

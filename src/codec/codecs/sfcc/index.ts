@@ -12,7 +12,7 @@ import {
 	GetVariantsArgs
 } from '../../../common'
 import _ from 'lodash'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..'
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
 import { StringProperty } from '../../cms-property-types'
 import axios, { AxiosRequestConfig } from 'axios'
 import { SFCCCategory, SFCCCustomerGroup, SFCCProduct } from './types'
@@ -20,6 +20,7 @@ import { formatMoneyString } from '../../../common/util'
 import slugify from 'slugify'
 import btoa from 'btoa'
 import { getPageByQuery, getPageByQueryAxios, paginate } from '../pagination'
+import { logResponse } from '../common'
 
 /**
  * SFCC Codec config properties.
@@ -222,14 +223,14 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @returns Response data
 	 */
 	async fetch(url: string): Promise<any> {
-		return (
+		return logResponse('get', url, (
 			await axios.get(url, {
 				baseURL: this.config.api_url,
 				params: {
 					client_id: this.config.client_id
 				}
 			})
-		).data
+		).data)
 	}
 
 	/**
@@ -274,7 +275,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		return await this.fetch(`${this.shopApi}/products/${args.productId}/variants`)
+		return await this.fetch(`${this.shopApi}/products/${args.productId}/variations`)
 	}
 
 	/**

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quoteProductIdString = exports.quote = exports.isServer = exports.formatMoneyString = exports.sleep = void 0;
-const __1 = require("..");
+const default_args_1 = require("./default-args");
 /**
  * Sleep for a period of time in milliseconds.
  * @param delay Delay in milliseconds
@@ -17,7 +17,7 @@ exports.sleep = sleep;
  */
 const formatMoneyString = (money, args) => new Intl.NumberFormat(args.locale, {
     style: 'currency',
-    currency: args.currency || __1.defaultArgs.currency
+    currency: args.currency || default_args_1.defaultArgs.currency
 }).format(money);
 exports.formatMoneyString = formatMoneyString;
 /**

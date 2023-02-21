@@ -1,5 +1,5 @@
 import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from '../../../common';
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
 import { StringProperty } from '../../cms-property-types';
 /**
  * Commercetools Codec config properties

@@ -1,5 +1,5 @@
 import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../common';
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from './core';
 import { SFCCProduct } from './sfcc/types';
 /**
  * Common codec configuration.

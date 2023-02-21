@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.flattenCategories = exports.findInMegaMenu = void 0;
-const __1 = require("../..");
+exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
+const constants_1 = require("../../common/constants");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
+const process_1 = require("process");
 /**
  * Find a category in the mega menu by slug.
  * @param categories Root categories in mega menu
@@ -30,12 +31,26 @@ const flattenCategories = (categories) => {
 };
 exports.flattenCategories = flattenCategories;
 /**
+ * Helper method for logging requests/responses when the LOG_INTEGRATION environment variable is set.
+ * @param response Response
+ */
+const logResponse = (method, request, response) => {
+    if (process_1.env.LOG_INTEGRATION) {
+        console.log('============== REQUEST ==============');
+        console.log(`${method.toUpperCase()} ${request}`);
+        console.log('============== RESPONSE ==============');
+        console.log(JSON.stringify(response, null, 4));
+    }
+    return response;
+};
+exports.logResponse = logResponse;
+/**
  * Demostore Content Types for Amplience
  */
 exports.CTypes = {
     demostoreconfig: {
         label: 'demostore config',
-        schemaUri: __1.CONSTANTS.demostoreConfigUri,
+        schemaUri: constants_1.CONSTANTS.demostoreConfigUri,
         iconUrl: 'https://cdn-icons-png.flaticon.com/512/627/627495.png',
         schema: {
             properties: {
@@ -75,7 +90,7 @@ exports.CTypes = {
     },
     rest: {
         label: 'generic rest commerce configuration',
-        schemaUri: `${__1.CONSTANTS.demostoreIntegrationUri}/rest`,
+        schemaUri: `${constants_1.CONSTANTS.demostoreIntegrationUri}/rest`,
         iconUrl: '',
         schema: { properties: {} }
     },

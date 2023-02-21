@@ -1,4 +1,4 @@
-import { defaultArgs } from '..'
+import { defaultArgs } from './default-args'
 
 /**
  * Sleep for a period of time in milliseconds.

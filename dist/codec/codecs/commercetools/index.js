@@ -15,14 +15,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommercetoolsCodec = exports.CommercetoolsCodecType = void 0;
 const common_1 = require("../../../common");
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("../../");
+const core_1 = require("../core");
 const util_1 = require("../../../common/util");
 const pagination_1 = require("../pagination");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 /**
  * Commerce Codec Type that integrates with Commercetools.
  */
-class CommercetoolsCodecType extends __1.CommerceCodecType {
+class CommercetoolsCodecType extends core_1.CommerceCodecType {
     /**
      * @inheritdoc
      */
@@ -146,7 +146,7 @@ const mapVariant = (args) => (variant) => {
 /**
  * Commerce Codec that integrates with Commercetools.
  */
-class CommercetoolsCodec extends __1.CommerceCodec {
+class CommercetoolsCodec extends core_1.CommerceCodec {
     constructor() {
         super(...arguments);
         this.getPage = (0, pagination_1.getPageByQuery)('offset', 'limit', 'total', 'results');

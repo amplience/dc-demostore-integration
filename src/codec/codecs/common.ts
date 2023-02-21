@@ -1,7 +1,8 @@
-import { CONSTANTS, CodecType } from '../..'
+import { CONSTANTS } from '../../common/constants'
 import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-sdk-js'
 import _, { Dictionary } from 'lodash'
 import { Category } from '../../common/types'
+import { env } from 'process'
 
 /**
  * Find a category in the mega menu by slug.
@@ -26,6 +27,21 @@ export const flattenCategories = (categories: Category[]) => {
 	}
 	categories.forEach(bulldozeCategories)
 	return allCategories
+}
+
+/**
+ * Helper method for logging requests/responses when the LOG_INTEGRATION environment variable is set.
+ * @param response Response
+ */
+export const logResponse = <T>(method: string, request: string, response: T): T => {
+	if (env.LOG_INTEGRATION) {
+		console.log('============== REQUEST ==============')
+		console.log(`${method.toUpperCase()} ${request}`)
+		console.log('============== RESPONSE ==============')
+		console.log(JSON.stringify(response, null, 4))
+	}
+
+	return response
 }
 
 /**

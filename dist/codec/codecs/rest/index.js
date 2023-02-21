@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RestCommerceCodec = exports.RestCommerceCodecType = void 0;
 const lodash_1 = __importDefault(require("lodash"));
-const __1 = require("../../");
+const core_1 = require("../core");
 const cms_property_types_1 = require("../../cms-property-types");
 /**
  * Fetch JSON from a given URL.
@@ -26,7 +26,7 @@ const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, fu
 /**
  * Commerce Codec Type that integrates with REST.
  */
-class RestCommerceCodecType extends __1.CommerceCodecType {
+class RestCommerceCodecType extends core_1.CommerceCodecType {
     /**
      * @inheritdoc
      */
@@ -73,7 +73,7 @@ exports.RestCommerceCodecType = RestCommerceCodecType;
 /**
  * Commerce Codec that integrates with REST.
  */
-class RestCommerceCodec extends __1.CommerceCodec {
+class RestCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */

@@ -1,5 +1,5 @@
 import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, OAuthRestClientInterface, Product, CustomerGroup, GetVariantsArgs } from '../../../common';
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../..';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
 import { StringProperty } from '../../cms-property-types';
 import { AxiosRequestConfig } from 'axios';
 import { SFCCProduct } from './types';

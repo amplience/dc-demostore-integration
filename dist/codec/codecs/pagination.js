@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.paginate = exports.getPageByQueryAxios = exports.getPageByQuery = void 0;
+const common_1 = require("./common");
 /**
  * Get an URL with added params from the given object.
  * @param url The original URL
@@ -58,6 +59,13 @@ function getPageByQuery(offsetQuery, countQuery, totalProp, resultProp) {
         const allParams = Object.assign(Object.assign({}, params), { [offsetQuery]: page * pageSize, [countQuery]: pageSize });
         const newUrl = applyParams(url, allParams);
         const response = yield client.get({ url: newUrl });
+        (0, common_1.logResponse)('get', newUrl, response === null || response === void 0 ? void 0 : response.data);
+        if ((response === null || response === void 0 ? void 0 : response.data) == null) {
+            return {
+                data: [],
+                total: 0
+            };
+        }
         return {
             data: resultPropMap(response),
             total: totalPropMap(response)
@@ -80,6 +88,7 @@ function getPageByQueryAxios(offsetQuery, countQuery, totalProp, resultProp) {
         const allParams = Object.assign(Object.assign({}, params), { [offsetQuery]: page * pageSize, [countQuery]: pageSize });
         const newUrl = applyParams(url, allParams);
         const response = yield axios.get(newUrl, config);
+        (0, common_1.logResponse)('get', newUrl, response.data);
         return {
             data: resultPropMap(response.data),
             total: totalPropMap(response.data)
@@ -107,7 +116,7 @@ function paginate(requestPage, pageSize = 20, pageNum = 0, pageCount) {
             const { data, total } = yield requestPage(pageNum + i, pageSize);
             // There's a possibility that the implementation has returned more than one page.
             // Allow multiple pages to be completed at a time.
-            const pagesReturned = Math.floor(data.length / pageCount);
+            const pagesReturned = Math.floor(data.length / pageSize);
             let dataCount = data.length;
             if (pagesReturned > 0) {
                 dataCount = pagesReturned * pageCount;

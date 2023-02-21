@@ -1,7 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { sleep } from '../common/util'
 import _ from 'lodash'
-import { CodecPropertyConfig } from '..'
+import { logResponse } from '../codec/codecs/common'
+import { CodecPropertyConfig } from '../codec/codecs/core'
 import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
 
@@ -117,7 +118,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 	const authenticate = async (): Promise<AxiosInstance> => {
 		if (!authenticatedAxios || Date.now() > expiryTime) {
 			const response = await axios.post(config.auth_url, payload, requestConfig)
-			const auth = response.data
+			const auth = logResponse('post', config.auth_url, response.data)
 
 			if (!getHeaders) {
 				getHeaders = (auth: any) => ({
@@ -167,7 +168,7 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 
 		try {
 			// console.log(`[ rest ] get ${config.url}`)
-			return await (await authenticatedAxios.request({ method, ...config })).data
+			return logResponse(method, config.url, await (await authenticatedAxios.request({ method, ...config })).data)
 		} catch (error: any) {
 			if (error.response?.status === 429) {
 				await sleep(1000)

@@ -15,6 +15,11 @@ export declare const findInMegaMenu: (categories: Category[], slug: string) => C
  */
 export declare const flattenCategories: (categories: Category[]) => Category[];
 /**
+ * Helper method for logging requests/responses when the LOG_INTEGRATION environment variable is set.
+ * @param response Response
+ */
+export declare const logResponse: <T>(method: string, request: string, response: T) => T;
+/**
  * Amplience Content Type Schema Template
  */
 export interface CTypeSchema {

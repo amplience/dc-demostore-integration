@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateCommerceCodec = exports.TemplateCommerceCodecType = void 0;
-const __1 = require("../..");
+const core_1 = require("./core");
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
-class TemplateCommerceCodecType extends __1.CommerceCodecType {
+class TemplateCommerceCodecType extends core_1.CommerceCodecType {
     /**
      * @inheritdoc
      */
@@ -45,7 +45,7 @@ exports.TemplateCommerceCodecType = TemplateCommerceCodecType;
 /**
  * A template commerce codec, useful as a starting point for a new integration.
  */
-class TemplateCommerceCodec extends __1.CommerceCodec {
+class TemplateCommerceCodec extends core_1.CommerceCodec {
     // instance variables
     // products: Product[]
     // categories: Category[]

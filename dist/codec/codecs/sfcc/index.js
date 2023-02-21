@@ -14,16 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SFCCCommerceCodec = exports.SFCCCommerceCodecType = void 0;
 const common_1 = require("../../../common");
-const __1 = require("../..");
+const core_1 = require("../core");
 const axios_1 = __importDefault(require("axios"));
 const util_1 = require("../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
 const pagination_1 = require("../pagination");
+const common_2 = require("../common");
 /**
  * Commerce Codec Type that integrates with SFCC.
  */
-class SFCCCommerceCodecType extends __1.CommerceCodecType {
+class SFCCCommerceCodecType extends core_1.CommerceCodecType {
     /**
      * @inheritdoc
      */
@@ -132,7 +133,7 @@ const mapProduct = (product) => {
 /**
  * Commerce Codec that integrates with SFCC.
  */
-class SFCCCommerceCodec extends __1.CommerceCodec {
+class SFCCCommerceCodec extends core_1.CommerceCodec {
     constructor() {
         super(...arguments);
         this.getPage = (0, pagination_1.getPageByQuery)('start', 'count', 'total', 'data');
@@ -192,12 +193,12 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield axios_1.default.get(url, {
+            return (0, common_2.logResponse)('get', url, (yield axios_1.default.get(url, {
                 baseURL: this.config.api_url,
                 params: {
                     client_id: this.config.client_id
                 }
-            })).data;
+            })).data);
         });
     }
     /**
@@ -241,7 +242,7 @@ class SFCCCommerceCodec extends __1.CommerceCodec {
      */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch(`${this.shopApi}/products/${args.productId}/variants`);
+            return yield this.fetch(`${this.shopApi}/products/${args.productId}/variations`);
         });
     }
     /**

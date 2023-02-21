@@ -1,5 +1,6 @@
 import { OAuthRestClientInterface } from '@/common'
 import { AxiosRequestConfig, AxiosStatic } from 'axios'
+import { logResponse } from './common'
 
 type GetPageResult<T> = { data: T[], total: number }
 type PropMapper = <T>(data: any) => T
@@ -71,6 +72,15 @@ export function getPageByQuery(offsetQuery: string, countQuery: string, totalPro
 
 			const response = await client.get({url: newUrl})
 
+			logResponse('get', newUrl, response)
+
+			if (response == null) {
+				return {
+					data: [],
+					total: 0
+				}
+			}
+
 			return {
 				data: resultPropMap(response),
 				total: totalPropMap(response)
@@ -101,6 +111,8 @@ export function getPageByQueryAxios(offsetQuery: string, countQuery: string, tot
 			const newUrl = applyParams(url, allParams)
 
 			const response = await axios.get(newUrl, config)
+
+			logResponse('get', newUrl, response.data)
 
 			return {
 				data: resultPropMap(response.data),
@@ -137,7 +149,7 @@ export async function paginate<T>(
 		
 		// There's a possibility that the implementation has returned more than one page.
 		// Allow multiple pages to be completed at a time.
-		const pagesReturned = Math.floor(data.length / pageCount)
+		const pagesReturned = Math.floor(data.length / pageSize)
 
 		let dataCount = data.length
 

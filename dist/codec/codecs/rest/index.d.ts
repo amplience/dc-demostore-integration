@@ -1,6 +1,6 @@
 import { Category, CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Identifiable, Product } from '../../../common';
 import { Dictionary } from 'lodash';
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../';
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
 import { StringProperty } from '../../cms-property-types';
 /**
  * REST Codec config properties.
