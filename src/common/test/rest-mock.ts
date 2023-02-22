@@ -27,11 +27,18 @@ export interface Request {
 
 const methods = ['get', 'put', 'post', 'delete', 'patch']
 
+function combineUrls(baseUrl, relativeUrl) {
+	if (!baseUrl) return relativeUrl
+
+	return relativeUrl ? baseUrl.replace(/\/+$/, '') + '/' + relativeUrl.replace(/^\/+/, '') : baseUrl
+}
+
 function getMockAxios(method: string, methodRequests: MockRequests, requests: Request[], baseConfig: object) {
 	return (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
 		config = { ...baseConfig, ...config, url: url }
 
-		const urlObj = new URL(url, config.baseURL)
+		const urlWithParams = combineUrls(config.baseURL, url)
+		const urlObj = new URL(urlWithParams)
 
 		const keys = Array.from(urlObj.searchParams.keys())
 
@@ -39,7 +46,6 @@ function getMockAxios(method: string, methodRequests: MockRequests, requests: Re
 			urlObj.searchParams.delete(key)
 		}
 
-		const urlWithParams = new URL(url, config.baseURL).toString()
 		const fullUrl = urlObj.toString()
 
 		requests.push({

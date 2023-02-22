@@ -11,28 +11,28 @@ jest.mock('axios')
 
 const commerceRequests: MockFixture = {
 	get: {
-		'https://api.europe-west1.gcp.commercetools.com/categories?offset=0&limit=500': {
+		'https://api.europe-west1.gcp.commercetools.com/test/categories?offset=0&limit=500': {
 			data: ctoolsCategories
 		},
-		'https://api.europe-west1.gcp.commercetools.com/customer-groups?offset=0&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/customer-groups?offset=0&limit=20': {
 			data: ctoolsCustomerGroups
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?filter=id%3A%22ExampleID%22&offset=0&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22&offset=0&limit=20': {
 			data: ctoolsSearchResult(1, 20, 0, ['ExampleID'])
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20': {
 			data: ctoolsSearchResult(2, 20, 0, ['ExampleID', 'ExampleID2'])
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?text.en=%22Hit%22&offset=0&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?text.en=%22Hit%22&offset=0&limit=20': {
 			data: ctoolsSearchResult(30, 20, 0)
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?text.en=%22Hit%22&offset=20&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?text.en=%22Hit%22&offset=20&limit=20': {
 			data: ctoolsSearchResult(30, 20, 1)
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20': {
 			data: ctoolsSearchResult(30, 20, 0)
 		},
-		'https://api.europe-west1.gcp.commercetools.com/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20': {
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20': {
 			data: ctoolsSearchResult(30, 20, 1)
 		}
 	},
