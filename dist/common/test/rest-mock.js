@@ -8,7 +8,6 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
         var _a;
         config = Object.assign(Object.assign(Object.assign({}, baseConfig), config), { url: url });
         const urlObj = new URL(url, config.baseURL);
-        console.log(urlObj.toString());
         const keys = Array.from(urlObj.searchParams.keys());
         for (const key of keys) {
             urlObj.searchParams.delete(key);

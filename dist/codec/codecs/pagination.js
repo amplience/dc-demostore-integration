@@ -59,8 +59,8 @@ function getPageByQuery(offsetQuery, countQuery, totalProp, resultProp) {
         const allParams = Object.assign(Object.assign({}, params), { [offsetQuery]: page * pageSize, [countQuery]: pageSize });
         const newUrl = applyParams(url, allParams);
         const response = yield client.get({ url: newUrl });
-        (0, common_1.logResponse)('get', newUrl, response === null || response === void 0 ? void 0 : response.data);
-        if ((response === null || response === void 0 ? void 0 : response.data) == null) {
+        (0, common_1.logResponse)('get', newUrl, response);
+        if (response == null) {
             return {
                 data: [],
                 total: 0

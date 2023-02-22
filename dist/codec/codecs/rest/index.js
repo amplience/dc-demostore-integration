@@ -16,13 +16,14 @@ exports.RestCommerceCodec = exports.RestCommerceCodecType = void 0;
 const lodash_1 = __importDefault(require("lodash"));
 const core_1 = require("../core");
 const cms_property_types_1 = require("../../cms-property-types");
+const axios_1 = __importDefault(require("axios"));
 /**
  * Fetch JSON from a given URL.
  * @param url URL to fetch from
  * @param defaultValue Default value if URL is empty
  * @returns Response data
  */
-const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (yield fetch(url)).json(); });
+const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : (yield axios_1.default.get(url)).data; });
 /**
  * Commerce Codec Type that integrates with REST.
  */

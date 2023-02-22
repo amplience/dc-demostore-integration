@@ -4,6 +4,7 @@ import axios from 'axios'
 import { sfccCategories, sfccCustomerGroups, sfccProduct, sfccProducts, sfccSearchResult } from './test/responses'
 import { categoryRequest, categorySearch, customerGroupsRequest, keywordSearch, oauthRequest, productIdRequest, productIdRequests } from './test/requests'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
+import { config } from './test/config'
 
 jest.mock('axios')
 
@@ -48,15 +49,6 @@ const sfccRequests: MockFixture = {
 	}
 }
 
-const sfccConfig : any = {
-	vendor: 'sfcc',
-	api_url: 'https://test.sandbox.us03.dx.commercecloud.salesforce.com',
-	auth_url: 'https://account.demandware.com/dwsso/oauth2/access_token',
-	client_id: 'test-client',
-	client_secret: 'test-secret',
-	site_id: 'TestSite'
-}
-
 describe('sfcc integration', function() {
 	let sfccCodec: SFCCCommerceCodec
 	let requests: Request[]
@@ -68,7 +60,7 @@ describe('sfcc integration', function() {
 
 		massMock(axios, requests, sfccRequests)
 
-		sfccCodec = new SFCCCommerceCodec(sfccConfig)
+		sfccCodec = new SFCCCommerceCodec(config)
 		await sfccCodec.init(new SFCCCommerceCodecType())
 	})
 
@@ -142,7 +134,7 @@ describe('sfcc integration', function() {
 	})
 
 	test('getProduct (missing)', async () => {
-		expect(sfccCodec.getProduct({
+		await expect(sfccCodec.getProduct({
 			id: 'MissingID'
 		})).rejects.toMatchInlineSnapshot(`
 {
