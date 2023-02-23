@@ -154,7 +154,7 @@ export async function paginate<T>(
 		let dataCount = data.length
 
 		if (pagesReturned > 0) {
-			dataCount = pagesReturned * pageCount
+			dataCount = pagesReturned * pageSize
 			i += pagesReturned - 1
 		}
 
