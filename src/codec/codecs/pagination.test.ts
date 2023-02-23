@@ -1,4 +1,125 @@
-import { paginate } from './pagination'
+import axios from 'axios'
+import { getPageByQuery, getPageByQueryAxios, paginate } from './pagination'
+
+jest.mock('axios')
+
+describe('getPageByQuery', function() {
+	test('gets function with string total and result prop map', async () => {
+		const sampleData = ['example', 'data']
+
+		const client = {
+			get: jest.fn().mockImplementation(() => Promise.resolve({
+				result: sampleData,
+				number: sampleData.length
+			}))
+		} as any
+
+		const getPage = getPageByQuery('offset', 'count', 'number', 'result')
+		const withClient = await getPage(client, 'https://testMethod', {param1: 1, param2: 2})
+
+		const result = await withClient(0, 20)
+		await withClient(2, 20)
+
+		expect(client.get).toHaveBeenNthCalledWith(1, { url: 'https://testmethod/?param1=1&param2=2&offset=0&count=20' })
+		expect(client.get).toHaveBeenNthCalledWith(2, { url: 'https://testmethod/?param1=1&param2=2&offset=40&count=20' })
+
+		expect(result).toEqual({
+			data: sampleData,
+			total: sampleData.length
+		})
+	})
+
+	test('gets function with function total and result prop map, different query', async () => {
+		const sampleData = ['example', 'data']
+
+		const client = {
+			get: jest.fn().mockImplementation(() => Promise.resolve({
+				result: {
+					edges: sampleData
+				},
+				number: {
+					total: sampleData.length
+				}
+			}))
+		} as any
+
+		const getPage = getPageByQuery('start', 'size', (obj) => obj.number.total, (obj) => obj.result.edges)
+		const withClient = await getPage(client, 'https://testMethod', {param0: 1, start: 2})
+
+		const result = await withClient(0, 20)
+		await withClient(2, 20)
+
+		expect(client.get).toHaveBeenNthCalledWith(1, { url: 'https://testmethod/?param0=1&start=0&size=20' })
+		expect(client.get).toHaveBeenNthCalledWith(2, { url: 'https://testmethod/?param0=1&start=40&size=20' })
+
+		expect(result).toEqual({
+			data: sampleData,
+			total: sampleData.length
+		})
+	})
+})
+
+describe('getPageByQueryAxios', function() {
+	test('gets function with string total and result prop map', async () => {
+		const sampleData = ['example', 'data']
+
+		const mockAxiosGet = (axios.get as jest.Mock)
+		mockAxiosGet.mockImplementation(() => Promise.resolve({
+			data: {
+				result: sampleData,
+				number: sampleData.length
+			}
+		}))
+
+		const config = { example: 'config' } as any
+
+		const getPage = getPageByQueryAxios('offset', 'count', 'number', 'result')
+		const withClient = await getPage(axios, 'https://testMethod', config, {param1: 1, param2: 2})
+
+		const result = await withClient(0, 20)
+		await withClient(2, 20)
+
+		expect(axios.get).toHaveBeenNthCalledWith(1, 'https://testmethod/?param1=1&param2=2&offset=0&count=20', config )
+		expect(axios.get).toHaveBeenNthCalledWith(2, 'https://testmethod/?param1=1&param2=2&offset=40&count=20', config )
+
+		expect(result).toEqual({
+			data: sampleData,
+			total: sampleData.length
+		})
+	})
+
+	test('gets function with function total and result prop map, different query', async () => {
+		const sampleData = ['example', 'data']
+
+		const mockAxiosGet = (axios.get as jest.Mock)
+		mockAxiosGet.mockImplementation(() => Promise.resolve({
+			data: {
+				result: {
+					edges: sampleData
+				},
+				number: {
+					total: sampleData.length
+				}
+			}
+		}))
+
+		const config = { example: 'config' } as any
+
+		const getPage = getPageByQueryAxios('start', 'size', (obj) => obj.number.total, (obj) => obj.result.edges)
+		const withClient = await getPage(axios, 'https://testMethod', config, {param0: 1, start: 2})
+
+		const result = await withClient(0, 20)
+		await withClient(2, 20)
+
+		expect(axios.get).toHaveBeenNthCalledWith(1, 'https://testmethod/?param0=1&start=0&size=20', config )
+		expect(axios.get).toHaveBeenNthCalledWith(2, 'https://testmethod/?param0=1&start=40&size=20', config )
+
+		expect(result).toEqual({
+			data: sampleData,
+			total: sampleData.length
+		})
+	})
+})
 
 describe('paginate', function() {
 
@@ -77,4 +198,4 @@ describe('paginate', function() {
 
 		expect(result).toEqual(Array.from({length: 200}).map((_, index) => index + 200))
 	})
-});
+})

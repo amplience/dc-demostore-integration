@@ -56,7 +56,7 @@ function getPropMapper(mapper: StringPropMapper): PropMapper {
  * @param resultProp Property to extract result items from
  * @returns A generator that takes a client, url and base params and generates a function that gets a page.
  */
-export function getPageByQuery(offsetQuery: string, countQuery: string, totalProp: StringPropMapper, resultProp: string) {
+export function getPageByQuery(offsetQuery: string, countQuery: string, totalProp: StringPropMapper, resultProp: StringPropMapper) {
 	const totalPropMap = getPropMapper(totalProp)
 	const resultPropMap = getPropMapper(resultProp)
 
