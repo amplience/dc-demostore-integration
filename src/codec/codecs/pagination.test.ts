@@ -60,6 +60,10 @@ describe('getPageByQuery', function() {
 })
 
 describe('getPageByQueryAxios', function() {
+	beforeEach(() => {
+		jest.resetAllMocks()
+	})
+
 	test('gets function with string total and result prop map', async () => {
 		const sampleData = ['example', 'data']
 

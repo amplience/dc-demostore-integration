@@ -9,7 +9,7 @@
     "lint": "eslint",
     "build": "eslint && npm run clean && tsc",
     "server": "nodemon src/server.ts",
-    "test": "FORCE_COLOR=1 jest"
+    "test": "FORCE_COLOR=1 jest --silent --verbose"
   },
   "exports": {
     ".": "./dist/index.js"
