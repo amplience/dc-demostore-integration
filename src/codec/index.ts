@@ -114,6 +114,9 @@ registerCodec(new RestCodecType())
 import SFCCCodecType from './codecs/sfcc'
 registerCodec(new SFCCCodecType())
 
+import BigCommerceCommerceCodecType from './codecs/bigcommerce'
+registerCodec(new BigCommerceCommerceCodecType())
+
 // reexport codec common functions
 export * from './codecs/common'
 export * from './codecs/core'
