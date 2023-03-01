@@ -70,7 +70,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('ExampleID')
 		])
 
@@ -84,7 +83,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('ExampleID'),
 			productIdRequest('ExampleID2')
 		])
@@ -101,7 +99,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			keywordSearch(0),
 			keywordSearch(200),
 			...productIdRequests('Hit', 300)
@@ -122,7 +119,6 @@ describe('sfcc integration', function() {
 		}})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			categorySearch(0),
 			categorySearch(200),
 			...productIdRequests('Hit', 300)
@@ -141,7 +137,6 @@ describe('sfcc integration', function() {
 		expect(result).toBeNull()
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('MissingID')
 		])
 	})
@@ -152,7 +147,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('ExampleID'),
 			productIdRequest('NotHere'),
 			productIdRequest('ExampleID2')
@@ -171,7 +165,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('ExampleID')
 		])
 
@@ -184,7 +177,6 @@ describe('sfcc integration', function() {
 		})
 
 		expect(requests).toEqual([
-			categoryRequest,
 			productIdRequest('ExampleID'),
 			productIdRequest('NotHere'),
 			productIdRequest('ExampleID2')
@@ -234,7 +226,6 @@ describe('sfcc integration', function() {
 		expect(customerGroups).toEqual(exampleCustomerGroups)
 
 		expect(requests).toEqual([
-			categoryRequest,
 			oauthRequest,
 			customerGroupsRequest
 		])

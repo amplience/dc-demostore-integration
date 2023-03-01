@@ -107,6 +107,8 @@ export class RestCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs, raw = false): Promise<Product[]> {
+		await this.ensureMegaMenu()
+
 		if (args.productIds) {
 			const ids = args.productIds.split(',')
 			return mapIdentifiers(ids, this.products.filter(prod => ids.includes(prod.id)))
@@ -134,6 +136,8 @@ export class RestCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
+		await this.ensureMegaMenu()
+
 		return this.customerGroups
 	}
 }

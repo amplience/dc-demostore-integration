@@ -76,7 +76,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22ExampleID%22&offset=0&limit=20')
 		])
 
@@ -90,7 +89,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20')
 		])
 
@@ -107,7 +105,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('text.en=%22Hit%22&offset=0&limit=20'),
 			searchRequest('text.en=%22Hit%22&offset=20&limit=20')
 		])
@@ -126,7 +123,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
 			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
 		])
@@ -143,7 +139,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22MissingID%22&offset=0&limit=20')
 		])
 	})
@@ -155,7 +150,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
 		])
 
@@ -173,7 +167,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22ExampleID%22&offset=0&limit=20')
 		])
 
@@ -189,7 +182,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
 		])
 
@@ -239,7 +231,6 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest,
 			customerGroupsRequest
 		])
 	})

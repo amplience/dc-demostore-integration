@@ -158,9 +158,11 @@ export interface CodecTestResult {
  */
 export class CommerceCodec implements CommerceAPI {
 	config: CodecPropertyConfig<Dictionary<AnyProperty>>
-	megaMenu: Category[] = []
+	megaMenu: Category[]
 	codecType: CommerceCodecType
 	initDuration: number
+
+	megaMenuPromise?: Promise<void>
     
 	/**
 	 * Create a new Commerce API implementation, given an input configuration.
@@ -177,16 +179,9 @@ export class CommerceCodec implements CommerceAPI {
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		const startInit = new Date().valueOf()
-		await this.cacheMegaMenu()
 		this.initDuration = new Date().valueOf() - startInit
 		this.codecType = codecType
 
-		if (this.megaMenu.length === 0) {
-			throw new IntegrationError({
-				message: 'megaMenu has no categories, cannot build navigation',
-				helpUrl: ''
-			})
-		}
 		return this
 	}
 
@@ -204,6 +199,22 @@ export class CommerceCodec implements CommerceAPI {
 	 */
 	async cacheMegaMenu(): Promise<void> {
 		this.megaMenu = []
+	}
+
+	/**
+	 * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
+	 * @returns A promise that resolves when the mega menu is avaiable
+	 */
+	async ensureMegaMenu(): Promise<void> {
+		if (this.megaMenu) {
+			return
+		}
+
+		if (!this.megaMenuPromise) {
+			this.megaMenuPromise = this.cacheMegaMenu()
+		}
+
+		await this.megaMenuPromise
 	}
 
 	/**
@@ -233,6 +244,8 @@ export class CommerceCodec implements CommerceAPI {
 	 */
 	// defined in terms of getMegaMenu, effectively
 	async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
+		await this.ensureMegaMenu()
+
 		const category = this.findCategory(args.slug)
 		category.products = await this.getProducts({ ...args, category })
 		return category
@@ -244,6 +257,8 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns Mega Menu
 	 */
 	async getMegaMenu(args: CommonArgs): Promise<Category[]> {
+		await this.ensureMegaMenu()
+
 		return this.megaMenu
 	}
 
@@ -282,6 +297,8 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns A report of all test results.
 	 */
 	async testIntegration(): Promise<CodecTestResult[]> {
+		await this.ensureMegaMenu()
+
 		const results: CodecTestResult[] = [{
 			operationType: CodecTestOperationType.megaMenu,
 			description: 'cache the megamenu',
