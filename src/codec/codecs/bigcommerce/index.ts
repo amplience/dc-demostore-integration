@@ -1,6 +1,6 @@
 import { APIConfiguration, APIProperties, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
 import _ from "lodash";
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec, registerCodec } from "../..";
+import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
 import { StringProperty } from "../../cms-property-types";
 import axios from "axios";
 import { BigCommerceProduct } from "./types";
