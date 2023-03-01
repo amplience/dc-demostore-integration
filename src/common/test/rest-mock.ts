@@ -61,11 +61,14 @@ function getMockAxios(method: string, methodRequests: MockRequests, requests: Re
 
 		if (request == null) {
 			return Promise.reject({
-				status: 404,
-				statusText: 'Not Found',
-				data: {},
-				headers: {},
-				config
+				config,
+				response: {
+					status: 404,
+					statusText: 'Not Found',
+					data: {},
+					headers: {},
+					config
+				}
 			})
 		}
 

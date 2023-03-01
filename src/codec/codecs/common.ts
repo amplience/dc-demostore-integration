@@ -1,7 +1,7 @@
 import { CONSTANTS } from '../../common/constants'
 import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-sdk-js'
 import _, { Dictionary } from 'lodash'
-import { Category } from '../../common/types'
+import { Category, Identifiable } from '../../common/types'
 import { env } from 'process'
 
 /**
@@ -157,4 +157,14 @@ export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
 		propertyOrder: Object.keys(ctype.schema.properties)
 	})
 	return schema
+}
+
+/**
+ * Ensures a given array of identifiable objects has matching position to a list of IDs.
+ * Missing items are replaced with null.
+ * @param ids List of IDs
+ * @param items List of items
+ */
+export const mapIdentifiers = <T extends {id: string}>(ids: string[], items: T[]): (T | null)[] => {
+	return ids.map(id => items.find(item => item.id === id) ?? null)
 }

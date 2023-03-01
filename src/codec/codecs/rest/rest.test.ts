@@ -55,7 +55,6 @@ describe('rest integration', function() {
 		expect(result).toEqual(restProduct('rootProduct', 'A product in the root', rootCategory))
 	})
 
-
 	test('getProducts (multiple)', async () => {
 		const result = await codec.getProducts({
 			productIds: 'rootProduct,catProduct1,cat2Product3'
@@ -113,13 +112,32 @@ describe('rest integration', function() {
 	test('getProduct (missing)', async () => {
 		await expect(codec.getProduct({
 			id: 'MissingID'
-		})).resolves.toBeUndefined()
+		})).resolves.toBeNull()
 
 		expect(requests).toEqual([
 			categoryRequest,
 			productRequest,
 			customerGroupRequest,
 			translationsRequest
+		])
+	})
+
+	test('getProducts (multiple, one missing)', async () => {
+		const result = await codec.getProducts({
+			productIds: 'rootProduct,NotHere,cat2Product3'
+		})
+
+		expect(requests).toEqual([
+			categoryRequest,
+			productRequest,
+			customerGroupRequest,
+			translationsRequest
+		])
+
+		expect(result).toEqual([
+			restProduct('rootProduct', 'A product in the root', rootCategory),
+			null,
+			restProduct('cat2Product3', 'A third product in the second category', childCategories[1])
 		])
 	})
 

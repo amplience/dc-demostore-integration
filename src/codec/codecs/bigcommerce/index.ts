@@ -5,6 +5,7 @@ import { StringProperty } from "../../cms-property-types";
 import axios from "axios";
 import { BigCommerceProduct } from "./types";
 import { mapCategory, mapCustomerGroup, mapProduct } from "./mappers";
+import { catchAxiosErrors } from "../codec-error";
 
 type CodecConfig = APIConfiguration & {
     api_token:  StringProperty
@@ -45,7 +46,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
     }
 
     async fetch(url: string): Promise<any> {
-        let response = await axios.request({
+        let response = await catchAxiosErrors(async () => await axios.request({
             method: 'get',
             url,
             baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
@@ -54,7 +55,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
                 'Accept': `application/json`,
                 'Content-Type': `application/json`
             }
-        })
+        }))
 
         if (url.indexOf('customer_groups') > -1) {
             return response.data

@@ -5,6 +5,7 @@ import { logResponse } from '../codec/codecs/common'
 import { CodecPropertyConfig } from '../codec/codecs/core'
 import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
+import { CodecError, CodecErrorType, catchAxiosErrors } from '../codec/codecs/codec-error'
 
 /**
  * Configuration interface with an API url.
@@ -117,8 +118,10 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 	 */
 	const authenticate = async (): Promise<AxiosInstance> => {
 		if (!authenticatedAxios || Date.now() > expiryTime) {
-			const response = await axios.post(config.auth_url, payload, requestConfig)
-			const auth = logResponse('post', config.auth_url, response.data)
+			const auth = await catchAxiosErrors(async () => {
+				const response = await axios.post(config.auth_url, payload, requestConfig)
+				return logResponse('post', config.auth_url, response.data)
+			}, CodecErrorType.AuthError)
 
 			if (!getHeaders) {
 				getHeaders = (auth: any) => ({
@@ -182,7 +185,11 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 			// if (error.stack) {
 			//     console.log(error.stack)
 			// }
-			console.log(`Error while ${method}ing URL [ ${config.url} ]: ${error.message} ${error.code}`)
+
+			throw new CodecError(CodecErrorType.ApiError, {
+				status: error.response?.status,
+				message: error.response?.data
+			})
 		}
 	}
 

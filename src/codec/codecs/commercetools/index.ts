@@ -17,6 +17,8 @@ import { StringProperty } from '../../cms-property-types'
 import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './types'
 import { formatMoneyString, quoteProductIdString } from '../../../common/util'
 import { getPageByQuery, paginate } from '../pagination'
+import { catchAxiosErrors } from '../codec-error'
+import { mapIdentifiers } from '../common'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
@@ -138,7 +140,11 @@ const mapCategory = (category: CTCategory, categories: CTCategory[], args: Commo
  * @param args Commercetools product
  * @returns Method to map a Commercetools product to a common one
  */
-const mapProduct = (args: CommonArgs) => (product: CTProduct) => {
+const mapProduct = (args: CommonArgs) => (product: CTProduct | null): (Product | null) => {
+	if (!product) {
+		return null
+	}
+
 	return {
 		id: product.id,
 		name: localize(product.name, args),
@@ -207,7 +213,7 @@ export class CommercetoolsCodec extends CommerceCodec {
 	 * @returns Response data
 	 */
 	async fetch(url: string) {
-		return (await this.rest.get({ url })).results
+		return await catchAxiosErrors(async () => (await this.rest.get({ url })).results)
 	}
 
 	/**
@@ -216,7 +222,8 @@ export class CommercetoolsCodec extends CommerceCodec {
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		let products: CTProduct[] = []
 		if (args.productIds) {
-			products = await paginate(this.getPage(this.rest, `/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`))
+			const ids = args.productIds.split(',')
+			products = mapIdentifiers<CTProduct>(ids, await paginate(this.getPage(this.rest, `/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`)))
 		}
 		else if (args.keyword) {
 			products = await paginate(this.getPage(this.rest, `/product-projections/search?text.en="${args.keyword}"`))

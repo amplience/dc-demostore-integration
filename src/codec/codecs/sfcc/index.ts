@@ -21,6 +21,7 @@ import slugify from 'slugify'
 import btoa from 'btoa'
 import { getPageByQuery, getPageByQueryAxios, paginate } from '../pagination'
 import { logResponse } from '../common'
+import { CodecErrorType, catchAxiosErrors } from '../codec-error'
 
 /**
  * SFCC Codec config properties.
@@ -112,7 +113,7 @@ const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
  * @returns Product
  */
 // TODO: [NOVADEV-968] able to choose image size?
-const mapProduct = (product: SFCCProduct): Product => {
+const mapProduct = (product: SFCCProduct | null): Product => {
 	if (!product) {
 		return null
 	}
@@ -223,14 +224,14 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @returns Response data
 	 */
 	async fetch(url: string): Promise<any> {
-		return logResponse('get', url, (
+		return logResponse('get', url, await catchAxiosErrors(async () =>
 			await axios.get(url, {
 				baseURL: this.config.api_url,
 				params: {
 					client_id: this.config.client_id
 				}
 			})
-		).data)
+		)).data
 	}
 
 	/**
@@ -247,10 +248,18 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 * @param productId Product ID to fetch
 	 * @returns SFCC product
 	 */
-	async getProductById(productId: string): Promise<SFCCProduct> {
-		return await this.fetch(
-			`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`
-		)
+	async getProductById(productId: string): Promise<SFCCProduct | null> {
+		try {
+			return await this.fetch(
+				`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`
+			)
+		} catch (e) {
+			if (e.type === CodecErrorType.NotFound) {
+				return null
+			}
+			
+			throw e
+		}
 	}
 
 	/**

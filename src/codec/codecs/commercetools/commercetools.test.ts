@@ -23,6 +23,12 @@ const commerceRequests: MockFixture = {
 		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20': {
 			data: ctoolsSearchResult(2, 20, 0, ['ExampleID', 'ExampleID2'])
 		},
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20': {
+			data: ctoolsSearchResult(2, 20, 0, ['ExampleID', 'ExampleID2'])
+		},
+		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22MissingID%22&offset=0&limit=20': {
+			data: ctoolsSearchResult(0, 20, 0, [])
+		},
 		'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?text.en=%22Hit%22&offset=0&limit=20': {
 			data: ctoolsSearchResult(30, 20, 0)
 		},
@@ -76,7 +82,6 @@ describe('commercetools integration', function() {
 
 		expect(result).toEqual(exampleProduct('ExampleID'))
 	})
-
 
 	test('getProducts (multiple)', async () => {
 		const result = await codec.getProducts({
@@ -134,12 +139,30 @@ describe('commercetools integration', function() {
 	test('getProduct (missing)', async () => {
 		await expect(codec.getProduct({
 			id: 'MissingID'
-		})).resolves.toBeUndefined()
+		})).resolves.toBeNull()
 
 		expect(requests).toEqual([
 			oauthRequest,
 			categoriesRequest,
 			searchRequest('filter=id%3A%22MissingID%22&offset=0&limit=20')
+		])
+	})
+
+	test('getProducts (multiple, one missing)', async () => {
+		const result = await codec.getProducts({
+			productIds: 'ExampleID,NotHere,ExampleID2'
+		})
+
+		expect(requests).toEqual([
+			oauthRequest,
+			categoriesRequest,
+			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+		])
+
+		expect(result).toEqual([
+			exampleProduct('ExampleID'),
+			null,
+			exampleProduct('ExampleID2')
 		])
 	})
 

@@ -12,6 +12,8 @@ import { Dictionary } from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
 import axios from 'axios'
+import { catchAxiosErrors } from '../codec-error'
+import { mapIdentifiers } from '../common'
 
 /**
  * REST Codec config properties.
@@ -29,7 +31,7 @@ type CodecConfig = {
  * @param defaultValue Default value if URL is empty
  * @returns Response data
  */
-const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : (await axios.get(url)).data
+const fetchFromURL = async (url: string, defaultValue: any) => _.isEmpty(url) ? defaultValue : await catchAxiosErrors(async () => (await axios.get(url)).data)
 
 /**
  * Commerce Codec Type that integrates with REST.
@@ -106,7 +108,8 @@ export class RestCommerceCodec extends CommerceCodec {
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		if (args.productIds) {
-			return this.products.filter(prod => args.productIds.split(',').includes(prod.id))
+			const ids = args.productIds.split(',')
+			return mapIdentifiers(ids, this.products.filter(prod => ids.includes(prod.id)))
 		}
 		else if (args.keyword) {
 			return this.products.filter(prod => prod.name.toLowerCase().indexOf(args.keyword.toLowerCase()) > -1)

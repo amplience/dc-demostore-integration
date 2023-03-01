@@ -134,27 +134,34 @@ describe('sfcc integration', function() {
 	})
 
 	test('getProduct (missing)', async () => {
-		await expect(sfccCodec.getProduct({
+		const result = await sfccCodec.getProduct({
 			id: 'MissingID'
-		})).rejects.toMatchInlineSnapshot(`
-{
-  "config": {
-    "baseURL": "https://test.sandbox.us03.dx.commercecloud.salesforce.com",
-    "params": {
-      "client_id": "test-client",
-    },
-    "url": "/s/TestSite/dw/shop/v22_4/products/MissingID?expand=prices,options,images,variations&all_images=true",
-  },
-  "data": {},
-  "headers": {},
-  "status": 404,
-  "statusText": "Not Found",
-}
-`)
+		})
+
+		expect(result).toBeNull()
 
 		expect(requests).toEqual([
 			categoryRequest,
 			productIdRequest('MissingID')
+		])
+	})
+
+	test('getProducts (multiple, one missing)', async () => {
+		const result = await sfccCodec.getProducts({
+			productIds: 'ExampleID,NotHere,ExampleID2'
+		})
+
+		expect(requests).toEqual([
+			categoryRequest,
+			productIdRequest('ExampleID'),
+			productIdRequest('NotHere'),
+			productIdRequest('ExampleID2')
+		])
+
+		expect(result).toEqual([
+			exampleProduct('ExampleID'),
+			null,
+			exampleProduct('ExampleID2')
 		])
 	})
 
@@ -169,6 +176,25 @@ describe('sfcc integration', function() {
 		])
 
 		expect(result).toEqual([sfccProduct('ExampleID')])
+	})
+
+	test('getRawProducts (one missing)', async () => {
+		const result = await sfccCodec.getRawProducts({
+			productIds: 'ExampleID,NotHere,ExampleID2'
+		})
+
+		expect(requests).toEqual([
+			categoryRequest,
+			productIdRequest('ExampleID'),
+			productIdRequest('NotHere'),
+			productIdRequest('ExampleID2')
+		])
+
+		expect(result).toEqual([
+			sfccProduct('ExampleID'),
+			null,
+			sfccProduct('ExampleID2')
+		])
 	})
 
 	test('getCategory', async () => {
