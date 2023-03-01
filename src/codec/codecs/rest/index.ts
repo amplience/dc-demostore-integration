@@ -13,7 +13,7 @@ import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
 import { StringProperty, StringPatterns } from '../../cms-property-types'
 import axios from 'axios'
 import { catchAxiosErrors } from '../codec-error'
-import { mapIdentifiers } from '../common'
+import { getProductsArgError, mapIdentifiers } from '../common'
 
 /**
  * REST Codec config properties.
@@ -106,7 +106,7 @@ export class RestCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+	async getProducts(args: GetProductsArgs, raw = false): Promise<Product[]> {
 		if (args.productIds) {
 			const ids = args.productIds.split(',')
 			return mapIdentifiers(ids, this.products.filter(prod => ids.includes(prod.id)))
@@ -119,7 +119,15 @@ export class RestCommerceCodec extends CommerceCodec {
 				..._.filter(this.products, prod => _.includes(_.map(prod.categories, 'id'), args.category.id))
 			]
 		}
-		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
+
+		throw getProductsArgError(raw ? 'getProductsRaw' : 'getProducts')
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	async getRawProducts(args: GetProductsArgs): Promise<Product[]> {
+		return await this.getProducts(args, true)
 	}
 
 	/**

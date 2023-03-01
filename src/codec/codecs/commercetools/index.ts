@@ -18,7 +18,7 @@ import { Attribute, CTCategory, CTProduct, CTVariant, Localizable } from './type
 import { formatMoneyString, quoteProductIdString } from '../../../common/util'
 import { getPageByQuery, paginate } from '../pagination'
 import { catchAxiosErrors } from '../codec-error'
-import { mapIdentifiers } from '../common'
+import { getProductsArgError, mapIdentifiers } from '../common'
 
 const cats = ['women', 'men', 'new', 'sale', 'accessories']
 
@@ -219,19 +219,28 @@ export class CommercetoolsCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+	async getRawProducts(args: GetProductsArgs, method = 'getRawProducts'): Promise<CTProduct[]> {
 		let products: CTProduct[] = []
+
 		if (args.productIds) {
 			const ids = args.productIds.split(',')
 			products = mapIdentifiers<CTProduct>(ids, await paginate(this.getPage(this.rest, `/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`)))
-		}
-		else if (args.keyword) {
+		} else if (args.keyword) {
 			products = await paginate(this.getPage(this.rest, `/product-projections/search?text.en="${args.keyword}"`))
-		}
-		else if (args.category) {
+		} else if (args.category) {
 			products = await paginate(this.getPage(this.rest, `/product-projections/search?filter=categories.id: subtree("${args.category.id}")`))
+		} else {
+			throw getProductsArgError(method)
 		}
-		return products.map(mapProduct(args))
+
+		return products
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		return (await this.getRawProducts(args, 'getProducts')).map(mapProduct(args))
 	}
 
 	/**

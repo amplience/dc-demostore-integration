@@ -3,6 +3,7 @@ import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-s
 import _, { Dictionary } from 'lodash'
 import { Category, Identifiable } from '../../common/types'
 import { env } from 'process'
+import { CodecError, CodecErrorType } from './codec-error'
 
 /**
  * Find a category in the mega menu by slug.
@@ -167,4 +168,16 @@ export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
  */
 export const mapIdentifiers = <T extends {id: string}>(ids: string[], items: T[]): (T | null)[] => {
 	return ids.map(id => items.find(item => item.id === id) ?? null)
+}
+
+/**
+ * Construct a CodecError for when get products arguments are missing
+ * @param method Method name
+ * @returns Codec error
+ */
+export const getProductsArgError = (method: string) => {
+	return new CodecError(
+		CodecErrorType.IncorrectArguments,
+		{ message: `${method} requires either: productIds, keyword, or category reference.` }
+	)
 }

@@ -6,6 +6,7 @@ import axios from "axios";
 import { BigCommerceProduct } from "./types";
 import { mapCategory, mapCustomerGroup, mapProduct } from "./mappers";
 import { catchAxiosErrors } from "../codec-error";
+import { getProductsArgError } from "../common";
 
 type CodecConfig = APIConfiguration & {
     api_token:  StringProperty
@@ -65,15 +66,17 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 
     async getProducts(args: GetProductsArgs): Promise<Product[]> {
         let products: BigCommerceProduct[] = []
+
         if (args.productIds) {
             products = await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`)
-        }
-        else if (args.keyword) {
+        } else if (args.keyword) {
             products = await this.fetch(`/v3/catalog/products?keyword=${args.keyword}`)
-        }
-        else if (args.category) {
+        } else if (args.category) {
             products = await this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`)
+        } else {
+            throw getProductsArgError('getProducts')
         }
+
         return products.map(mapProduct)
     }
 

@@ -8,6 +8,8 @@ import {
 import _ from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from './core'
 import { SFCCProduct } from './sfcc/types'
+import { CodecError, CodecErrorType } from './codec-error'
+import { getProductsArgError } from './common'
 
 /**
  * Common codec configuration.
@@ -80,13 +82,17 @@ export class TemplateCommerceCodec extends CommerceCodec {
 		// eslint-disable-next-line no-empty
 		else if (args.category) {
 		}
-		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
+		else {
+			throw getProductsArgError('getProducts')
+		}
+
+		return []
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
+	async getRawProducts(args: GetProductsArgs): Promise<any[]> {
 		// eslint-disable-next-line no-empty
 		if (args.productIds) {
 		}
@@ -96,7 +102,11 @@ export class TemplateCommerceCodec extends CommerceCodec {
 		// eslint-disable-next-line no-empty
 		else if (args.category) {
 		}
-		throw new Error('getProducts() requires either: productIds, keyword, or category reference')
+		else {
+			throw getProductsArgError('getRawProducts')
+		}
+
+		return []
 	}
 
 	/**

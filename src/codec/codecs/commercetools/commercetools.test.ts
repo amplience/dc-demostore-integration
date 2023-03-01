@@ -2,7 +2,7 @@ import { Request, MockFixture, massMock } from '../../../common/test/rest-mock'
 import axios from 'axios'
 import { CommerceCodec } from '../core'
 import CommercetoolsCodecType, { CommercetoolsCodec } from '.'
-import { ctoolsCategories, ctoolsCustomerGroups, ctoolsSearchResult } from './test/responses'
+import { ctoolsCategories, ctoolsCustomerGroups, ctoolsProduct, ctoolsSearchResult } from './test/responses'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, oauthRequest, searchRequest } from './test/requests'
 import { config } from './test/config'
@@ -173,10 +173,31 @@ describe('commercetools integration', function() {
 
 		expect(requests).toEqual([
 			oauthRequest,
-			categoriesRequest
+			categoriesRequest,
+			searchRequest('filter=id%3A%22ExampleID%22&offset=0&limit=20')
 		])
 
-		expect(result).toEqual([])
+		expect(result).toEqual([
+			ctoolsProduct('ExampleID')
+		])
+	})
+
+	test('getRawProducts (multiple, one missing)', async () => {
+		const result = await codec.getRawProducts({
+			productIds: 'ExampleID,NotHere,ExampleID2'
+		})
+
+		expect(requests).toEqual([
+			oauthRequest,
+			categoriesRequest,
+			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+		])
+
+		expect(result).toEqual([
+			ctoolsProduct('ExampleID'),
+			null,
+			ctoolsProduct('ExampleID2')
+		])
 	})
 
 	test('getCategory', async () => {

@@ -2,6 +2,8 @@
  * Codec error types.
  */
 export enum CodecErrorType {
+	IncorrectArguments,
+
 	AuthUnreachable,
 	AuthError,
 	ApiUnreachable,
@@ -21,11 +23,19 @@ export interface CodecApiErrorInfo {
 }
 
 /**
+ * Codec error info for a generic error.
+ */
+export interface CodecGenericErrorInfo {
+	message: string;
+}
+
+/**
  * Converts a codec error type to a descriptive string.
  * @param type The codec error type
+ * @param info Optional info for the codec error
  * @returns A descriptive string
  */
-function typeToString(type: CodecErrorType) {
+function typeToString(type: CodecErrorType, info: CodecErrorInfo) {
 	let name = CodecErrorType[type]
 
 	for (let i = 1; i < name.length; i++) {
@@ -33,6 +43,10 @@ function typeToString(type: CodecErrorType) {
 			name = name.substring(0, i) + ' ' + name.substring(i)
 			i++
 		}
+	}
+
+	if (info.message) {
+		return `${name}: ${info.message}`
 	}
 
 	return name + '.'
@@ -63,13 +77,13 @@ export async function catchAxiosErrors<T>(method: () => Promise<T>, errorType = 
 /**
  * Types of information that can be included in a CodecError.
  */
-export type CodecErrorInfo = CodecApiErrorInfo | undefined;
+export type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | undefined;
 
 /**
  * A generic error that can be thrown by a codec, with an error type and optional information.
  */
 export class CodecError extends Error {
 	constructor(public type: CodecErrorType, public info?: CodecErrorInfo) {
-		super(typeToString(type))
+		super(typeToString(type, info))
 	}
 }

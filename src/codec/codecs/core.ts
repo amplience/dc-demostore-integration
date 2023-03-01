@@ -272,7 +272,7 @@ export class CommerceCodec implements CommerceAPI {
 	 * @param args Arguments object
 	 * @returns List of products in their original format
 	 */
-	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
+	async getRawProducts(args: GetProductsArgs): Promise<any[]> {
 		console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`)
 		return []
 	}

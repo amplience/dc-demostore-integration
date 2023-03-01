@@ -20,7 +20,7 @@ import { formatMoneyString } from '../../../common/util'
 import slugify from 'slugify'
 import btoa from 'btoa'
 import { getPageByQuery, getPageByQueryAxios, paginate } from '../pagination'
-import { logResponse } from '../common'
+import { getProductsArgError, logResponse } from '../common'
 import { CodecErrorType, catchAxiosErrors } from '../codec-error'
 
 /**
@@ -290,8 +290,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+	async getRawProducts(args: GetProductsArgs, method = 'getRawProducts'): Promise<SFCCProduct[]> {
 		let products: SFCCProduct[] = []
+
 		if (args.productIds) {
 			products = await Promise.all(
 				args.productIds.split(',').map(this.getProductById.bind(this))
@@ -300,25 +301,18 @@ export class SFCCCommerceCodec extends CommerceCodec {
 			products = await this.search(`q=${args.keyword}`)
 		} else if (args.category) {
 			products = await this.search(`refine_1=cgid=${args.category.id}`)
+		} else {
+			throw getProductsArgError(method)
 		}
-		return products.map(mapProduct)
+
+		return products
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	async getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]> {
-		let products: SFCCProduct[] = []
-		if (args.productIds) {
-			products = await Promise.all(
-				args.productIds.split(',').map(this.getProductById.bind(this))
-			)
-		} else if (args.keyword) {
-			products = await this.search(`q=${args.keyword}`)
-		} else if (args.category) {
-			products = await this.search(`refine_1=cgid=${args.category.id}`)
-		}
-		return products
+	async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		return (await this.getRawProducts(args, 'getProducts')).map(mapProduct)
 	}
 
 	/**
