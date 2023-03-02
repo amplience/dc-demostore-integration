@@ -2,7 +2,7 @@ import { Request, MockFixture, massMock } from '../../../common/test/rest-mock'
 import axios from 'axios'
 import { CommerceCodec } from '../core'
 import BigCommerceCodecType, { BigCommerceCommerceCodec } from '.'
-import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups, bigcommerceSearchResult } from './test/responses'
+import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups } from './test/responses'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest } from './test/requests'
 import { config } from './test/config'
@@ -24,8 +24,23 @@ const commerceRequests: MockFixture = {
 				data: bigcommerceProduct('ExampleID')
 			}
 		},
-	},
-	post: {
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=ExampleID,ExampleID2&include=images,variants': {
+			data: {
+				data: [
+					...bigcommerceProduct('ExampleID'),
+					...bigcommerceProduct('ExampleID2')
+				]
+			}
+		},
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?keyword=keyword': {
+			data: {
+				data: [
+					...bigcommerceProduct('ExampleID1'),
+					...bigcommerceProduct('ExampleID2'),
+					...bigcommerceProduct('ExampleID3')
+				]
+			}
+		}
 	}
 }
 
@@ -42,7 +57,7 @@ describe('bigcommerce integration', function () {
 		await codec.init(new BigCommerceCodecType())
 	})
 
-	// TODO
+	// Get BigCommerce Product
 	test('getProduct', async () => {
 		const result = await codec.getProduct({
 			id: 'ExampleID'
@@ -53,13 +68,13 @@ describe('bigcommerce integration', function () {
 		expect(result).toEqual(exampleProduct('ExampleID'))
 	})
 
-	// TODO
+	// Get BigCommerce Products
 	test('getProducts (multiple)', async () => {
 		const result = await codec.getProducts({
 			productIds: 'ExampleID,ExampleID2'
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20')
+			productRequest('ExampleID,ExampleID2')
 		])
 		expect(result).toEqual([
 			exampleProduct('ExampleID'),
@@ -67,16 +82,15 @@ describe('bigcommerce integration', function () {
 		])
 	})
 
-	// TODO
+	// Get BigCommerce Products (filter by keyword in name or sku)
 	test('getProducts (keyword)', async () => {
 		const result = await codec.getProducts({
-			keyword: 'Hit'
+			keyword: 'keyword'
 		})
 		expect(requests).toEqual([
-			searchRequest('text.en=%22Hit%22&offset=0&limit=20'),
-			searchRequest('text.en=%22Hit%22&offset=20&limit=20')
+			searchRequest('keyword')
 		])
-		expect(result).toEqual(Array.from({ length: 30 }).map((_, index) => exampleProduct('Hit' + index)))
+		expect(result).toEqual(Array.from({ length: 3 }).map((_, index) => exampleProduct(`ExampleID${index + 1}`)))
 	})
 
 	// TODO

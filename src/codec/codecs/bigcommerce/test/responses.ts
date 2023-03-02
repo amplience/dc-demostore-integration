@@ -177,28 +177,6 @@ export const bigcommerceProduct = (id: string) => ([
     }
 ])
 
-// TODO
-export const bigcommerceSearchResult = (
-	total: number,
-	pageSize: number,
-	pageNumber: number,
-	ids?: string[]
-) => {
-	const pageBase = pageNumber * pageSize
-	const count = Math.min(total - pageBase, pageSize)
-
-	return {
-		limit: pageSize,
-		offset: pageBase,
-		count,
-		total,
-		results: Array.from({ length: count }).map((_, index) =>
-			bigcommerceProduct(ids ? ids[index] : 'Hit' + (pageBase + index))
-		),
-		facets: {},
-	}
-}
-
 // BigCommerce Category Hierarchy response
 export const bigcommerceCategories = [
     {
