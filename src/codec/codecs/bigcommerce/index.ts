@@ -47,7 +47,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
     }
 
     async fetch(url: string): Promise<any> {
-        let response = await catchAxiosErrors(async () => await axios.request({
+        const request = {
             method: 'get',
             url,
             baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
@@ -56,11 +56,16 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
                 'Accept': `application/json`,
                 'Content-Type': `application/json`
             }
-        }))
+        }
+        const response = await catchAxiosErrors(async () => await axios.request(request))
+
+        console.log('========= REQUEST ==========', JSON.stringify(request, null, 4))
 
         if (url.indexOf('customer_groups') > -1) {
+            console.log('========= RESPONSE ==========', JSON.stringify(response.data, null, 4))
             return response.data
         }
+        console.log('========= RESPONSE ==========', JSON.stringify(response.data.data, null, 4))
         return response.data.data
     }
 
