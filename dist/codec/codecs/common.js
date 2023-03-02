@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsArgError = exports.mapIdentifiers = exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
+exports.getProductsArgError = exports.mapIdentifiersNumber = exports.mapIdentifiers = exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
 const constants_1 = require("../../common/constants");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const process_1 = require("process");
@@ -151,6 +151,10 @@ const mapIdentifiers = (ids, items) => {
     return ids.map(id => { var _a; return (_a = items.find(item => item.id === id)) !== null && _a !== void 0 ? _a : null; });
 };
 exports.mapIdentifiers = mapIdentifiers;
+const mapIdentifiersNumber = (ids, items) => {
+    return ids.map(id => { var _a; return (_a = items.find(item => item.id === Number(id))) !== null && _a !== void 0 ? _a : null; });
+};
+exports.mapIdentifiersNumber = mapIdentifiersNumber;
 /**
  * Construct a CodecError for when get products arguments are missing
  * @param method Method name

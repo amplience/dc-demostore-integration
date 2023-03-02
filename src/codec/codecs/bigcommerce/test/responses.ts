@@ -1,5 +1,5 @@
 // BigCommerce Product response
-export const bigcommerceProduct = (id: string) => ([
+export const bigcommerceProduct = (id: number) => ([
     {
         id: id,
         name: "[Sample] Cafetière Chemex 3 tasses",

@@ -52,9 +52,43 @@ const commerceRequests = {
             data: {
                 data: responses_1.bigcommerceCategories
             }
-        }
-    },
-    post: {}
+        },
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=1&include=images,variants': {
+            data: {
+                data: (0, responses_1.bigcommerceProduct)(1)
+            }
+        },
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=1,3&include=images,variants': {
+            data: {
+                data: [
+                    ...(0, responses_1.bigcommerceProduct)(1),
+                    ...(0, responses_1.bigcommerceProduct)(3)
+                ]
+            }
+        },
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?keyword=keyword': {
+            data: {
+                data: [
+                    ...(0, responses_1.bigcommerceProduct)(2),
+                    ...(0, responses_1.bigcommerceProduct)(3),
+                    ...(0, responses_1.bigcommerceProduct)(4)
+                ]
+            }
+        },
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?categories:in=CategoryID': {
+            data: {
+                data: [
+                    ...(0, responses_1.bigcommerceProduct)(1),
+                    ...(0, responses_1.bigcommerceProduct)(3)
+                ]
+            }
+        },
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=MissingID&include=images,variants': {
+            data: {
+                data: []
+            }
+        },
+    }
 };
 // BigCommerce Integration tests
 describe('bigcommerce integration', function () {
@@ -67,105 +101,104 @@ describe('bigcommerce integration', function () {
         codec = new _1.BigCommerceCommerceCodec(config_1.config);
         yield codec.init(new _1.default());
     }));
-    // TODO
+    // Get BigCommerce Product
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProduct({
-            id: 'ExampleID'
+            id: "1"
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22&offset=0&limit=20')
+            (0, requests_1.productRequest)("1")
         ]);
-        expect(result).toEqual((0, results_1.exampleProduct)('ExampleID'));
+        expect(result).toEqual((0, results_1.exampleProduct)(1));
     }));
-    // TODO
+    // Get BigCommerce Products
     test('getProducts (multiple)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
-            productIds: 'ExampleID,ExampleID2'
+            productIds: "1,3"
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20')
+            (0, requests_1.productRequest)("1,3")
         ]);
         expect(result).toEqual([
-            (0, results_1.exampleProduct)('ExampleID'),
-            (0, results_1.exampleProduct)('ExampleID2')
+            (0, results_1.exampleProduct)(1),
+            (0, results_1.exampleProduct)(3)
         ]);
     }));
-    // TODO
+    // Get BigCommerce Products (filter by keyword in name or sku)
     test('getProducts (keyword)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
-            keyword: 'Hit'
+            keyword: 'keyword'
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('text.en=%22Hit%22&offset=0&limit=20'),
-            (0, requests_1.searchRequest)('text.en=%22Hit%22&offset=20&limit=20')
+            (0, requests_1.searchRequest)('keyword')
         ]);
-        expect(result).toEqual(Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)));
+        expect(result).toEqual(Array.from({ length: 3 }).map((_, index) => (0, results_1.exampleProduct)(index + 1)));
     }));
-    // TODO
+    // Get BigCommerce Products (from category)
     test('getProducts (category)', () => __awaiter(this, void 0, void 0, function* () {
         const products = yield codec.getProducts({
             category: {
                 children: [],
                 products: [],
-                id: 'men-id',
-                name: 'Men',
-                slug: 'men',
+                id: '1',
+                name: 'Category',
+                slug: 'category',
             }
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
-            (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
+            (0, requests_1.productCategoryRequest)(1)
         ]);
-        expect(products.length).toEqual(30);
-        expect(products).toEqual(Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)));
+        expect(products).toEqual([
+            (0, results_1.exampleProduct)(1),
+            (0, results_1.exampleProduct)(3)
+        ]);
     }));
-    // TODO
+    // Get BigCommerce Product (missing ID)
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
-        yield expect(codec.getProduct({
+        const result = yield codec.getProduct({
             id: 'MissingID'
-        })).resolves.toBeNull();
+        });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22MissingID%22&offset=0&limit=20')
+            (0, requests_1.productRequest)('MissingID')
         ]);
+        expect(result).toBeUndefined();
     }));
     // TODO
     test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
-            productIds: 'ExampleID,NotHere,ExampleID2'
+            productIds: '1,NotHere,3'
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+            (0, requests_1.searchRequest)('filter=id%3A%221%22%2C%22NotHere%22%2C%223%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
-            (0, results_1.exampleProduct)('ExampleID'),
+            (0, results_1.exampleProduct)(1),
             null,
-            (0, results_1.exampleProduct)('ExampleID2')
+            (0, results_1.exampleProduct)(3)
         ]);
     }));
-    // TODO
+    // Get BigCommerce Products (raw, original value)
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getRawProducts({
-            productIds: 'ExampleID'
+            productIds: "1"
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22&offset=0&limit=20')
+            (0, requests_1.productRequest)("1")
         ]);
-        expect(result).toEqual([
-            (0, responses_1.bigcommerceProduct)('ExampleID')
-        ]);
+        expect(result).toEqual((0, responses_1.bigcommerceProduct)(1));
     }));
     // TODO
     test('getRawProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getRawProducts({
-            productIds: 'ExampleID,NotHere,ExampleID2'
+            productIds: "1,-1,3"
         });
         expect(requests).toEqual([
-            (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+            (0, requests_1.searchRequest)('filter=id%3A%221%22%2C%22NotHere%22%2C%223%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
-            (0, responses_1.bigcommerceProduct)('ExampleID'),
+            (0, responses_1.bigcommerceProduct)(1),
             null,
-            (0, responses_1.bigcommerceProduct)('ExampleID2')
+            (0, responses_1.bigcommerceProduct)(3)
         ]);
     }));
     // TODO
@@ -178,7 +211,7 @@ describe('bigcommerce integration', function () {
         expect(category.products.length).toEqual(30);
         expect(category).toEqual({
             children: [],
-            products: Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)),
+            products: Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)(index + 1)),
             id: 'men-id',
             name: 'Men',
             slug: 'men',

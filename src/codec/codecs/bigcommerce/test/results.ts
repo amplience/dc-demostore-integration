@@ -1,17 +1,17 @@
 // BigCommerce Customer Groups result
 export const exampleCustomerGroups = [
 	{
-		id: '1',
-		name: 'High Value'
+		id: "1",
+		name: "High Value"
 	}
 ]
 
 // BigCommerce Category Hierarchy result
 export const exampleMegaMenu = [
 	{
-		id: '1',
-		name: 'Men',
-		slug: 'men',
+		id: "1",
+		name: "Men",
+		slug: "men",
 		children: [],
 		products: [],
 	},
@@ -68,16 +68,16 @@ export const exampleProduct = (id: string) => ({
 	name: "[Sample] Cafetière Chemex 3 tasses",
 	categories: [],
 	variants: [
-	  {
-		sku: "CC3C",
-		listPrice: "$49.50",
-		salePrice: "$0.00",
-		attributes: {},
-		images: [
-		  {
-			url: "https://cdn11.bigcommerce.com/s-85ttsow7dj/products/88/images/292/3cupchemex5.1677080507.386.513.jpg?c=1"
-		  }
-		]
-	  }
+		{
+			sku: "CC3C",
+			listPrice: "$49.50",
+			salePrice: "$0.00",
+			attributes: {},
+			images: [
+				{
+					url: "https://cdn11.bigcommerce.com/s-85ttsow7dj/products/88/images/292/3cupchemex5.1677080507.386.513.jpg?c=1"
+				}
+			]
+		}
 	]
-  })
+})

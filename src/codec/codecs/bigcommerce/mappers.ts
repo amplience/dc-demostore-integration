@@ -45,7 +45,7 @@ export const mapVariantProduct = (product: BigCommerceProduct): Variant => {
 }
 
 export const mapProduct = (product: BigCommerceProduct): Product => {
-    return {
+    return product && {
         id: `${product.id}`,
         shortDescription: product.description,
         longDescription: product.description,

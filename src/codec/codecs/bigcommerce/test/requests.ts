@@ -59,7 +59,7 @@ export const productRequest = (id: string) => ({
 })
 
 // BigCommerce Product (category) request
-export const productCategoryRequest = (id: string) => ({
+export const productCategoryRequest = (id: number) => ({
 	config: {
 		method: 'get',
 		baseURL: 'https://api.bigcommerce.com/stores/store_hash',

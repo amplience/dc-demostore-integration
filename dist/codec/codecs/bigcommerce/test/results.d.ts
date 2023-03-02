@@ -9,8 +9,8 @@ export declare const exampleMegaMenu: {
     children: any[];
     products: any[];
 }[];
-export declare const exampleProduct: (id: string) => {
-    id: string;
+export declare const exampleProduct: (id: number) => {
+    id: number;
     shortDescription: string;
     longDescription: string;
     slug: string;
@@ -21,5 +21,8 @@ export declare const exampleProduct: (id: string) => {
         listPrice: string;
         salePrice: string;
         attributes: {};
+        images: {
+            url: string;
+        }[];
     }[];
 };

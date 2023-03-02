@@ -4,37 +4,44 @@ exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups
 // BigCommerce Customer Groups result
 exports.exampleCustomerGroups = [
     {
-        id: '1',
-        name: 'High Value'
+        id: "1",
+        name: "High Value"
     }
 ];
 // BigCommerce Category Hierarchy result
 exports.exampleMegaMenu = [
     {
+        id: "1",
+        name: "Men",
+        slug: "men",
+        children: [],
+        products: [],
+    },
+    {
         id: "23",
-        name: "Tout parcourir",
-        slug: "tout-parcourir",
+        name: "Browse all",
+        slug: "browse-all",
         children: [],
         products: []
     },
     {
         id: "18",
-        name: "Salle de bain",
-        slug: "salle-de-bain",
+        name: "Bathroom",
+        slug: "bathroom",
         children: [],
         products: []
     },
     {
         id: "19",
-        name: "Jardin",
-        slug: "jardin",
+        name: "Garden",
+        slug: "garden",
         children: [],
         products: []
     },
     {
         id: "21",
-        name: "Cuisine",
-        slug: "cuisine",
+        name: "Kitchen",
+        slug: "kitchen",
         children: [],
         products: []
     },
@@ -47,8 +54,8 @@ exports.exampleMegaMenu = [
     },
     {
         id: "22",
-        name: "Entretien",
-        slug: "entretien",
+        name: "Maintenance",
+        slug: "maintenance",
         children: [],
         products: []
     }
@@ -56,18 +63,23 @@ exports.exampleMegaMenu = [
 // BigCommerce Product result
 const exampleProduct = (id) => ({
     id: id,
-    shortDescription: "<p>Née d'une véritable passion pour le café, la marque Able Brewing s'est mis en tête de créer une machine à café aussi esthétique que fonctionnelle. Pour cela, il a fallu imaginer un produit qui s'intégrerait facilement à la routine matinale de chacun et qui saurait mettre en valeur le filtre Kone, amoureusement perfectionné. Inspiré du design japonais et des années 50, cette cafetière infuse les cafés filtre avec élégance. Sa conception en plusieurs blocs permet de retirer la partie supérieure lorsque l'infusion est terminée et de se servir de la partie inférieure comme d'une verseuse. Le revêtement extérieur en céramique passe au lave-vaisselle.</p>\n<p>Fabriqué aux USA</p>\n<p>Dimensions en cm : 20,3 x 15,2</p>\n<p>Capacité : 946 ml</p>",
-    longDescription: "<p>Née d'une véritable passion pour le café, la marque Able Brewing s'est mis en tête de créer une machine à café aussi esthétique que fonctionnelle. Pour cela, il a fallu imaginer un produit qui s'intégrerait facilement à la routine matinale de chacun et qui saurait mettre en valeur le filtre Kone, amoureusement perfectionné. Inspiré du design japonais et des années 50, cette cafetière infuse les cafés filtre avec élégance. Sa conception en plusieurs blocs permet de retirer la partie supérieure lorsque l'infusion est terminée et de se servir de la partie inférieure comme d'une verseuse. Le revêtement extérieur en céramique passe au lave-vaisselle.</p>\n<p>Fabriqué aux USA</p>\n<p>Dimensions en cm : 20,3 x 15,2</p>\n<p>Capacité : 946 ml</p>",
-    slug: "sample-systeme-able-brewing",
-    name: "[Sample] Système Able Brewing",
+    shortDescription: "<p>La cafetière Chemex a été mise au point en 1939 par son célèbre inventeur, Peter J. Schlumbohm.</p>\n<p>Fort de ses connaissances en filtration et extraction, M. Schlumbohm a créé une cafetière qui touche à la perfection. Les angles de la partie entonnoir, l'épaisseur du filtre papier et le compartiment d'aération permettent au café d'infuser en un temps voulu et de libérer ses arômes, alors qu'ils sont généralement inhibés dans les autres modes de préparation. Le résultat ? Une tasse de café soyeux et sans amertume, en moins de 4 minutes.</p>\n<p>Fabriqué dans du verre borosilicate résistant à la chaleur et équipé d'une simple poignée en bois, le design de la cafetière Chemex fait partie de la collection permanente du Musée d'art moderne.</p>\n<p>Dimensions en cm : 21 (h) × 7,6 (dia)</p>\n<p>Capacité : 473 ml</p>",
+    longDescription: "<p>La cafetière Chemex a été mise au point en 1939 par son célèbre inventeur, Peter J. Schlumbohm.</p>\n<p>Fort de ses connaissances en filtration et extraction, M. Schlumbohm a créé une cafetière qui touche à la perfection. Les angles de la partie entonnoir, l'épaisseur du filtre papier et le compartiment d'aération permettent au café d'infuser en un temps voulu et de libérer ses arômes, alors qu'ils sont généralement inhibés dans les autres modes de préparation. Le résultat ? Une tasse de café soyeux et sans amertume, en moins de 4 minutes.</p>\n<p>Fabriqué dans du verre borosilicate résistant à la chaleur et équipé d'une simple poignée en bois, le design de la cafetière Chemex fait partie de la collection permanente du Musée d'art moderne.</p>\n<p>Dimensions en cm : 21 (h) × 7,6 (dia)</p>\n<p>Capacité : 473 ml</p>",
+    slug: "sample-cafetiere-chemex-3-tasses",
+    name: "[Sample] Cafetière Chemex 3 tasses",
     categories: [],
     variants: [
         {
-            sku: "ABS",
-            listPrice: "$225.00",
+            sku: "CC3C",
+            listPrice: "$49.50",
             salePrice: "$0.00",
-            attributes: {}
+            attributes: {},
+            images: [
+                {
+                    url: "https://cdn11.bigcommerce.com/s-85ttsow7dj/products/88/images/292/3cupchemex5.1677080507.386.513.jpg?c=1"
+                }
+            ]
         }
-    ],
+    ]
 });
 exports.exampleProduct = exampleProduct;

@@ -101,9 +101,20 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
+            return (yield this.getRawProducts(args, 'getProducts')).map(mappers_1.mapProduct);
+        });
+    }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
+    getRawProducts(args, method = 'getRawProducts') {
+        return __awaiter(this, void 0, void 0, function* () {
             let products = [];
             if (args.productIds) {
-                products = yield this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`);
+                const ids = args.productIds.split(',');
+                products = (0, common_2.mapIdentifiersNumber)(ids, yield this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`));
             }
             else if (args.keyword) {
                 products = yield this.fetch(`/v3/catalog/products?keyword=${args.keyword}`);
@@ -112,9 +123,9 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
                 products = yield this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`);
             }
             else {
-                throw (0, common_2.getProductsArgError)('getProducts');
+                throw (0, common_2.getProductsArgError)(method);
             }
-            return products.map(mappers_1.mapProduct);
+            return products;
         });
     }
     /**

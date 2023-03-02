@@ -19,33 +19,47 @@ const commerceRequests: MockFixture = {
 				data: bigcommerceCategories
 			}
 		},
-		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=ExampleID&include=images,variants': {
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=1&include=images,variants': {
 			data: {
-				data: bigcommerceProduct('ExampleID')
+				data: bigcommerceProduct(1)
 			}
 		},
-		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=ExampleID,ExampleID2&include=images,variants': {
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=1,3&include=images,variants': {
 			data: {
 				data: [
-					...bigcommerceProduct('ExampleID'),
-					...bigcommerceProduct('ExampleID2')
+					...bigcommerceProduct(1),
+					...bigcommerceProduct(3)
 				]
 			}
 		},
 		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?keyword=keyword': {
 			data: {
 				data: [
-					...bigcommerceProduct('ExampleID1'),
-					...bigcommerceProduct('ExampleID2'),
-					...bigcommerceProduct('ExampleID3')
+					...bigcommerceProduct(2),
+					...bigcommerceProduct(3),
+					...bigcommerceProduct(4)
 				]
 			}
 		},
-		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?categories:in=CategoryID': {
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?categories:in=1': {
 			data: {
 				data: [
-					...bigcommerceProduct('ExampleID'),
-					...bigcommerceProduct('ExampleID2')
+					...bigcommerceProduct(1),
+					...bigcommerceProduct(3)
+				]
+			}
+		},
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=-1&include=images,variants': {
+			data: {
+				data: []
+			}
+		},
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=1,-1,3&include=images,variants': {
+			data: {
+				data: [
+					...bigcommerceProduct(1),
+					null,
+					...bigcommerceProduct(3)
 				]
 			}
 		},
@@ -68,25 +82,25 @@ describe('bigcommerce integration', function () {
 	// Get BigCommerce Product
 	test('getProduct', async () => {
 		const result = await codec.getProduct({
-			id: 'ExampleID'
+			id: "1"
 		})
 		expect(requests).toEqual([
-			productRequest('ExampleID')
+			productRequest("1")
 		])
-		expect(result).toEqual(exampleProduct('ExampleID'))
+		expect(result).toEqual(exampleProduct("1"))
 	})
 
 	// Get BigCommerce Products
 	test('getProducts (multiple)', async () => {
 		const result = await codec.getProducts({
-			productIds: 'ExampleID,ExampleID2'
+			productIds: "1,3"
 		})
 		expect(requests).toEqual([
-			productRequest('ExampleID,ExampleID2')
+			productRequest("1,3")
 		])
 		expect(result).toEqual([
-			exampleProduct('ExampleID'),
-			exampleProduct('ExampleID2')
+			exampleProduct("1"),
+			exampleProduct("3")
 		])
 	})
 
@@ -98,7 +112,7 @@ describe('bigcommerce integration', function () {
 		expect(requests).toEqual([
 			searchRequest('keyword')
 		])
-		expect(result).toEqual(Array.from({ length: 3 }).map((_, index) => exampleProduct(`ExampleID${index + 1}`)))
+		expect(result).toEqual(Array.from({ length: 3 }).map((_, index) => exampleProduct(`${index + 2}`)))
 	})
 
 	// Get BigCommerce Products (from category)
@@ -107,70 +121,71 @@ describe('bigcommerce integration', function () {
 			category: {
 				children: [],
 				products: [],
-				id: 'CategoryID',
+				id: '1',
 				name: 'Category',
 				slug: 'category',
 			}
 		})
 		expect(requests).toEqual([
-			productCategoryRequest('CategoryID')
+			productCategoryRequest(1)
 		])
 		expect(products).toEqual([
-			exampleProduct('ExampleID'),
-			exampleProduct('ExampleID2')
+			exampleProduct("1"),
+			exampleProduct("3")
 		])
 	})
 
-	// TODO
+	// Get BigCommerce Product (missing ID)
 	test('getProduct (missing)', async () => {
-		await expect(codec.getProduct({
-			id: 'MissingID'
-		})).resolves.toBeNull()
+		const result = await codec.getProduct({
+			id: "-1"
+		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22MissingID%22&offset=0&limit=20')
+			productRequest('-1')
 		])
+		expect(result).toBeNull()
 	})
 
 	// TODO
 	test('getProducts (multiple, one missing)', async () => {
 		const result = await codec.getProducts({
-			productIds: 'ExampleID,NotHere,ExampleID2'
+			productIds: '1,-1,3'
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+			productRequest("1,-1,3")
 		])
 		expect(result).toEqual([
-			exampleProduct('ExampleID'),
+			exampleProduct("1"),
 			null,
-			exampleProduct('ExampleID2')
+			exampleProduct("3")
 		])
 	})
 
 	// Get BigCommerce Products (raw, original value)
 	test('getRawProducts', async () => {
 		const result = await codec.getRawProducts({
-			productIds: 'ExampleID'
+			productIds: "1"
 		})
 		expect(requests).toEqual([
-			productRequest('ExampleID')
+			productRequest("1")
 		])
 		expect(result).toEqual(
-			bigcommerceProduct('ExampleID')
+			bigcommerceProduct(1)
 		)
 	})
 
-	// TODO
+	// Get BigCommerce Products (raw and one missing ID)
 	test('getRawProducts (multiple, one missing)', async () => {
 		const result = await codec.getRawProducts({
-			productIds: 'ExampleID,NotHere,ExampleID2'
+			productIds: "1,-1,3"
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
+			productRequest("1,-1,3")
 		])
 		expect(result).toEqual([
-			bigcommerceProduct('ExampleID'),
+			...bigcommerceProduct(1),
 			null,
-			bigcommerceProduct('ExampleID2')
+			...bigcommerceProduct(3)
 		])
 	})
 
@@ -184,7 +199,7 @@ describe('bigcommerce integration', function () {
 		expect(category.products.length).toEqual(30)
 		expect(category).toEqual({
 			children: [],
-			products: Array.from({ length: 30 }).map((_, index) => exampleProduct('Hit' + index)),
+			products: Array.from({ length: 30 }).map((_, index) => exampleProduct(`${index + 1}`)),
 			id: 'men-id',
 			name: 'Men',
 			slug: 'men',

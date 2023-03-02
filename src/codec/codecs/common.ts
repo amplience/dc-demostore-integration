@@ -170,6 +170,12 @@ export const mapIdentifiers = <T extends {id: string}>(ids: string[], items: T[]
 	return ids.map(id => items.find(item => item.id === id) ?? null)
 }
 
+export const mapIdentifiersNumber = <T extends {id: number}>(ids: string[], items: T[]): (T | null)[] => {
+	console.log('IDS',ids)
+	console.log('ITEMS',items)
+	return ids.map(id => items.find(item => item && item.id === Number(id)) ?? null)
+}
+
 /**
  * Construct a CodecError for when get products arguments are missing
  * @param method Method name

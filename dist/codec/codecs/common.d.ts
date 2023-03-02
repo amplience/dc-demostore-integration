@@ -61,6 +61,9 @@ export declare const getContentTypeSchema: (ctype: CType) => ContentTypeSchema;
 export declare const mapIdentifiers: <T extends {
     id: string;
 }>(ids: string[], items: T[]) => T[];
+export declare const mapIdentifiersNumber: <T extends {
+    id: number;
+}>(ids: string[], items: T[]) => T[];
 /**
  * Construct a CodecError for when get products arguments are missing
  * @param method Method name

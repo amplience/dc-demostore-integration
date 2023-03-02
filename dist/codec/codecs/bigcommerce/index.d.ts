@@ -1,6 +1,7 @@
 import { APIConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
 import { StringProperty } from "../../cms-property-types";
+import { BigCommerceProduct } from "./types";
 /**
  * TODO
  */
@@ -48,6 +49,12 @@ export declare class BigCommerceCommerceCodec extends CommerceCodec {
      * @returns
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
+    getRawProducts(args: GetProductsArgs, method?: string): Promise<BigCommerceProduct[]>;
     /**
      * TODO
      * @param args
