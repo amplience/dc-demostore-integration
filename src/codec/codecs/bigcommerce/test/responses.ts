@@ -79,7 +79,7 @@ export const bigcommerceProduct = (id: number) => ([
         variants: [
             {
                 id: 67,
-                product_id: 88,
+                product_id: id,
                 sku: "CC3C",
                 sku_id: null,
                 price: 49.5,
@@ -110,7 +110,7 @@ export const bigcommerceProduct = (id: number) => ([
         images: [
             {
                 id: 293,
-                product_id: 88,
+                product_id: id,
                 is_thumbnail: false,
                 sort_order: 1,
                 description: "",
@@ -123,7 +123,7 @@ export const bigcommerceProduct = (id: number) => ([
             },
             {
                 id: 294,
-                product_id: 88,
+                product_id: id,
                 is_thumbnail: false,
                 sort_order: 2,
                 description: "",
@@ -136,7 +136,7 @@ export const bigcommerceProduct = (id: number) => ([
             },
             {
                 id: 295,
-                product_id: 88,
+                product_id: id,
                 is_thumbnail: false,
                 sort_order: 3,
                 description: "",
@@ -149,7 +149,7 @@ export const bigcommerceProduct = (id: number) => ([
             },
             {
                 id: 296,
-                product_id: 88,
+                product_id: id,
                 is_thumbnail: false,
                 sort_order: 4,
                 description: "",
@@ -162,7 +162,7 @@ export const bigcommerceProduct = (id: number) => ([
             },
             {
                 id: 292,
-                product_id: 88,
+                product_id: id,
                 is_thumbnail: true,
                 sort_order: 0,
                 description: "",

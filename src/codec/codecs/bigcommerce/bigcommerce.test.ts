@@ -146,7 +146,7 @@ describe('bigcommerce integration', function () {
 		expect(result).toBeNull()
 	})
 
-	// TODO
+	// Get BigCommerce Products (one is missing)
 	test('getProducts (multiple, one missing)', async () => {
 		const result = await codec.getProducts({
 			productIds: '1,-1,3'
@@ -193,14 +193,16 @@ describe('bigcommerce integration', function () {
 	test('getCategory', async () => {
 		const category = await codec.getCategory({ slug: 'men' })
 		expect(requests).toEqual([
-			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
-			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
+			categoriesRequest,
+			productCategoryRequest(1)
 		])
-		expect(category.products.length).toEqual(30)
 		expect(category).toEqual({
 			children: [],
-			products: Array.from({ length: 30 }).map((_, index) => exampleProduct(`${index + 1}`)),
-			id: 'men-id',
+			products: [
+				exampleProduct("1"),
+				exampleProduct("3")
+			],
+			id: '1',
 			name: 'Men',
 			slug: 'men',
 		})
