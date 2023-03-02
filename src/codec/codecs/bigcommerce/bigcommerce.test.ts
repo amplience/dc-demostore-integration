@@ -4,7 +4,7 @@ import { CommerceCodec } from '../core'
 import BigCommerceCodecType, { BigCommerceCommerceCodec } from '.'
 import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups, bigcommerceSearchResult } from './test/responses'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
-import { categoriesRequest, customerGroupsRequest, searchRequest } from './test/requests'
+import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest } from './test/requests'
 import { config } from './test/config'
 
 jest.mock('axios')
@@ -18,7 +18,12 @@ const commerceRequests: MockFixture = {
 			data: {
 				data: bigcommerceCategories
 			}
-		}
+		},
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=ExampleID&include=images,variants': {
+			data: {
+				data: bigcommerceProduct('ExampleID')
+			}
+		},
 	},
 	post: {
 	}
@@ -43,7 +48,7 @@ describe('bigcommerce integration', function () {
 			id: 'ExampleID'
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22ExampleID%22&offset=0&limit=20')
+			productRequest('ExampleID')
 		])
 		expect(result).toEqual(exampleProduct('ExampleID'))
 	})

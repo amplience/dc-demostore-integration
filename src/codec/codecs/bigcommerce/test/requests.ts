@@ -42,3 +42,18 @@ export const searchRequest = (filter: string) => ({
 	},
 	url: `https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?keyword=${filter}`
 })
+
+// BigCommerce Product request
+export const productRequest = (id: string) => ({
+	config: {
+		method: 'get',
+		baseURL: 'https://api.bigcommerce.com/stores/store_hash',
+		headers: {
+			'X-Auth-Token': 'api_token',
+			'Accept': 'application/json',
+        	'Content-Type': 'application/json'
+		},
+		url: `/v3/catalog/products?id:in=${id}&include=images,variants`
+	},
+	url: `https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=${id}&include=images,variants`
+})
