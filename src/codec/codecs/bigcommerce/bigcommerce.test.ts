@@ -4,7 +4,7 @@ import { CommerceCodec } from '../core'
 import BigCommerceCodecType, { BigCommerceCommerceCodec } from '.'
 import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups } from './test/responses'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
-import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest } from './test/requests'
+import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest, productCategoryRequest } from './test/requests'
 import { config } from './test/config'
 
 jest.mock('axios')
@@ -40,7 +40,15 @@ const commerceRequests: MockFixture = {
 					...bigcommerceProduct('ExampleID3')
 				]
 			}
-		}
+		},
+		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?categories:in=CategoryID': {
+			data: {
+				data: [
+					...bigcommerceProduct('ExampleID'),
+					...bigcommerceProduct('ExampleID2')
+				]
+			}
+		},
 	}
 }
 
@@ -93,23 +101,24 @@ describe('bigcommerce integration', function () {
 		expect(result).toEqual(Array.from({ length: 3 }).map((_, index) => exampleProduct(`ExampleID${index + 1}`)))
 	})
 
-	// TODO
+	// Get BigCommerce Products (from category)
 	test('getProducts (category)', async () => {
 		const products = await codec.getProducts({
 			category: {
 				children: [],
 				products: [],
-				id: 'men-id',
-				name: 'Men',
-				slug: 'men',
+				id: 'CategoryID',
+				name: 'Category',
+				slug: 'category',
 			}
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
-			searchRequest('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
+			productCategoryRequest('CategoryID')
 		])
-		expect(products.length).toEqual(30)
-		expect(products).toEqual(Array.from({ length: 30 }).map((_, index) => exampleProduct('Hit' + index)))
+		expect(products).toEqual([
+			exampleProduct('ExampleID'),
+			exampleProduct('ExampleID2')
+		])
 	})
 
 	// TODO

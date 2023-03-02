@@ -57,3 +57,18 @@ export const productRequest = (id: string) => ({
 	},
 	url: `https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?id:in=${id}&include=images,variants`
 })
+
+// BigCommerce Product (category) request
+export const productCategoryRequest = (id: string) => ({
+	config: {
+		method: 'get',
+		baseURL: 'https://api.bigcommerce.com/stores/store_hash',
+		headers: {
+			'X-Auth-Token': 'api_token',
+			'Accept': 'application/json',
+        	'Content-Type': 'application/json'
+		},
+		url: `/v3/catalog/products?categories:in=${id}`
+	},
+	url: `https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?categories:in=${id}`
+})
