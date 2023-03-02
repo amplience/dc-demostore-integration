@@ -87,12 +87,12 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
             }
         }
         const response = await catchAxiosErrors(async () => await axios.request(request))
-        console.log('========= REQUEST ==========', JSON.stringify(request, null, 4))
+        // console.log('========= REQUEST ==========', JSON.stringify(request, null, 4))
         if (url.indexOf('customer_groups') > -1) {
-            console.log('========= RESPONSE ==========', JSON.stringify(response.data, null, 4))
+            // console.log('========= RESPONSE ==========', JSON.stringify(response.data, null, 4))
             return response.data
         }
-        console.log('========= RESPONSE ==========', JSON.stringify(response.data.data, null, 4))
+        // console.log('========= RESPONSE ==========', JSON.stringify(response.data.data, null, 4))
         return response.data.data
     }
 
@@ -102,6 +102,15 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
      * @returns 
      */
     async getProducts(args: GetProductsArgs): Promise<Product[]> {
+		return (await this.getRawProducts(args, 'getProducts')).map(mapProduct)
+	}
+
+    /**
+     * TODO
+     * @param args 
+     * @returns 
+     */
+    async getRawProducts(args: GetProductsArgs, method = 'getRawProducts'): Promise<BigCommerceProduct[]> {
         let products: BigCommerceProduct[] = []
         if (args.productIds) {
             products = await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`)
@@ -110,9 +119,9 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
         } else if (args.category) {
             products = await this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`)
         } else {
-            throw getProductsArgError('getProducts')
-        }
-        return products.map(mapProduct)
+			throw getProductsArgError(method)
+		}
+        return products
     }
 
     /**

@@ -146,17 +146,17 @@ describe('bigcommerce integration', function () {
 		])
 	})
 
-	// TODO
+	// Get BigCommerce Products (raw, original value)
 	test('getRawProducts', async () => {
 		const result = await codec.getRawProducts({
 			productIds: 'ExampleID'
 		})
 		expect(requests).toEqual([
-			searchRequest('filter=id%3A%22ExampleID%22&offset=0&limit=20')
+			productRequest('ExampleID')
 		])
-		expect(result).toEqual([
+		expect(result).toEqual(
 			bigcommerceProduct('ExampleID')
-		])
+		)
 	})
 
 	// TODO
