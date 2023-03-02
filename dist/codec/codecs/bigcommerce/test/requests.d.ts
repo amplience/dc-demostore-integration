@@ -1,12 +1,12 @@
 export declare const categoriesRequest: {
     config: {
+        method: string;
         baseURL: string;
         headers: {
             'X-Auth-Token': string;
             Accept: string;
             'Content-Type': string;
         };
-        method: string;
         url: string;
     };
     url: string;
@@ -26,11 +26,13 @@ export declare const customerGroupsRequest: {
 };
 export declare const searchRequest: (filter: string) => {
     config: {
+        method: string;
         baseURL: string;
         headers: {
-            Authorization: string;
+            'X-Auth-Token': string;
+            Accept: string;
+            'Content-Type': string;
         };
-        method: string;
         url: string;
     };
     url: string;

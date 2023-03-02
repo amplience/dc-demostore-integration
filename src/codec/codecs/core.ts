@@ -17,7 +17,7 @@ import {
 	Identifiable, 
 	Product 
 } from '../../common/types'
-import { IntegrationError } from '../../common/errors'
+import { CodecError, CodecErrorType } from './codec-error'
 
 /**
  * Types of codec.
@@ -233,8 +233,9 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns List of products
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
-		console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`)
-		return []
+		throw new CodecError(CodecErrorType.NotSupported, {
+			message: `getProducts is not supported on platform [ ${this.codecType.vendor} ]`
+		})
 	}
 
 	/**
@@ -268,8 +269,9 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns List of customer groups
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-		console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`)
-		return []
+		throw new CodecError(CodecErrorType.NotSupported, {
+			message: `getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`
+		})
 	}
 
 	/**
@@ -278,8 +280,9 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns Product with variants
 	 */
 	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		console.warn(`getVariants is not supported on platform [ ${this.codecType.vendor} ]`)
-		return null
+		throw new CodecError(CodecErrorType.NotSupported, {
+			message: `getVariants is not supported on platform [ ${this.codecType.vendor} ]`
+		})
 	}
 
 	/**
@@ -288,8 +291,9 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns List of products in their original format
 	 */
 	async getRawProducts(args: GetProductsArgs): Promise<any[]> {
-		console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`)
-		return []
+		throw new CodecError(CodecErrorType.NotSupported, {
+			message: `getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`
+		})
 	}
 
 	/**
@@ -394,3 +398,4 @@ export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
 
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from '../cms-property-types'
 import { SFCCProduct } from './sfcc/types'
+

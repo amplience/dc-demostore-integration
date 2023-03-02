@@ -49,7 +49,9 @@ const commerceRequests = {
             data: responses_1.bigcommerceCustomerGroups
         },
         'https://api.bigcommerce.com/stores/store_hash/v3/catalog/categories/tree': {
-            data: responses_1.bigcommerceCategories
+            data: {
+                data: responses_1.bigcommerceCategories
+            }
         }
     },
     post: {}
