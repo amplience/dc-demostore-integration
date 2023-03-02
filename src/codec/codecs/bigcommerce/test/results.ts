@@ -9,30 +9,37 @@ export const exampleCustomerGroups = [
 // BigCommerce Category Hierarchy result
 export const exampleMegaMenu = [
 	{
+		id: '1',
+		name: 'Men',
+		slug: 'men',
+		children: [],
+		products: [],
+	},
+	{
 		id: "23",
-		name: "Tout parcourir",
-		slug: "tout-parcourir",
+		name: "Browse all",
+		slug: "browse-all",
 		children: [],
 		products: []
 	},
 	{
 		id: "18",
-		name: "Salle de bain",
-		slug: "salle-de-bain",
+		name: "Bathroom",
+		slug: "bathroom",
 		children: [],
 		products: []
 	},
 	{
 		id: "19",
-		name: "Jardin",
-		slug: "jardin",
+		name: "Garden",
+		slug: "garden",
 		children: [],
 		products: []
 	},
 	{
 		id: "21",
-		name: "Cuisine",
-		slug: "cuisine",
+		name: "Kitchen",
+		slug: "kitchen",
 		children: [],
 		products: []
 	},
@@ -45,8 +52,8 @@ export const exampleMegaMenu = [
 	},
 	{
 		id: "22",
-		name: "Entretien",
-		slug: "entretien",
+		name: "Maintenance",
+		slug: "maintenance",
 		children: [],
 		products: []
 	}
@@ -55,10 +62,10 @@ export const exampleMegaMenu = [
 // BigCommerce Product result
 export const exampleProduct = (id: string) => ({
 	id: id,
-	shortDescription: "<p>Née d'une véritable passion pour le café, la marque Able Brewing s'est mis en tête de créer une machine à café aussi esthétique que fonctionnelle. Pour cela, il a fallu imaginer un produit qui s'intégrerait facilement à la routine matinale de chacun et qui saurait mettre en valeur le filtre Kone, amoureusement perfectionné. Inspiré du design japonais et des années 50, cette cafetière infuse les cafés filtre avec élégance. Sa conception en plusieurs blocs permet de retirer la partie supérieure lorsque l'infusion est terminée et de se servir de la partie inférieure comme d'une verseuse. Le revêtement extérieur en céramique passe au lave-vaisselle.</p>\n<p>Fabriqué aux USA</p>\n<p>Dimensions en cm : 20,3 x 15,2</p>\n<p>Capacité : 946 ml</p>",
-	longDescription: "<p>Née d'une véritable passion pour le café, la marque Able Brewing s'est mis en tête de créer une machine à café aussi esthétique que fonctionnelle. Pour cela, il a fallu imaginer un produit qui s'intégrerait facilement à la routine matinale de chacun et qui saurait mettre en valeur le filtre Kone, amoureusement perfectionné. Inspiré du design japonais et des années 50, cette cafetière infuse les cafés filtre avec élégance. Sa conception en plusieurs blocs permet de retirer la partie supérieure lorsque l'infusion est terminée et de se servir de la partie inférieure comme d'une verseuse. Le revêtement extérieur en céramique passe au lave-vaisselle.</p>\n<p>Fabriqué aux USA</p>\n<p>Dimensions en cm : 20,3 x 15,2</p>\n<p>Capacité : 946 ml</p>",
-	slug: "sample-systeme-able-brewing",
-	name: "[Sample] Système Able Brewing",
+	shortDescription: "<p>Born out of a true passion for coffee, Able Brewing set out to create a coffee machine that was both aesthetically pleasing and functional. To achieve this, they had to imagine a product that would easily fit into everyone's morning routine and that would highlight the lovingly perfected Kone filter. Inspired by Japanese design and the 1950s, this coffee maker elegantly infuses filter coffees. Its multi-block design allows the top part to be removed once the infusion is complete and the bottom part to be used as a pitcher. The exterior ceramic coating is dishwasher safe.</p>\n<p>Made in USA</p>\n<p>Dimensions in cm: 20.3 x 15.2</p>\n<p>Capacity: 946 ml</p>",
+	longDescription: "<p>Born out of a true passion for coffee, Able Brewing set out to create a coffee machine that was both aesthetically pleasing and functional. To achieve this, they had to imagine a product that would easily fit into everyone's morning routine and that would highlight the lovingly perfected Kone filter. Inspired by Japanese design and the 1950s, this coffee maker elegantly infuses filter coffees. Its multi-block design allows the top part to be removed once the infusion is complete and the bottom part to be used as a pitcher. The exterior ceramic coating is dishwasher safe.</p>\n<p>Made in USA</p>\n<p>Dimensions in cm: 20.3 x 15.2</p>\n<p>Capacity: 946 ml</p>",
+	slug: "sample-able-brewing-system",
+	name: "[Sample] Able Brewing System",
 	categories: [],
 	variants: [
 		{
@@ -67,5 +74,5 @@ export const exampleProduct = (id: string) => ({
 			salePrice: "$0.00",
 			attributes: {}
 		}
-	],
+	]
 })

@@ -1,14 +1,14 @@
 // TODO
 export const bigcommerceProduct = (id: string) => ({
     id: id,
-    name: '[Sample] Cafetière Chemex 3 tasses',
-    type: 'physical',
-    sku: 'CC3C',
-    description: '<p>La cafetière Chemex a été mise au point en 1939 par son célèbre inventeur, Peter J. Schlumbohm.</p>\n' +
-      "<p>Fort de ses connaissances en filtration et extraction, M. Schlumbohm a créé une cafetière qui touche à la perfection. Les angles de la partie entonnoir, l'épaisseur du filtre papier et le compartiment d'aération permettent au café d'infuser en un temps voulu et de libérer ses arômes, alors qu'ils sont généralement inhibés dans les autres modes de préparation. Le résultat ? Une tasse de café soyeux et sans amertume, en moins de 4 minutes.</p>\n" +
-      "<p>Fabriqué dans du verre borosilicate résistant à la chaleur et équipé d'une simple poignée en bois, le design de la cafetière Chemex fait partie de la collection permanente du Musée d'art moderne.</p>\n" +
-      '<p>Dimensions en cm : 21 (h) × 7,6 (dia)</p>\n' +
-      '<p>Capacité : 473 ml</p>',
+    name: '[Sample] Chemex Coffee Maker 3 cups',
+	type: 'physical',
+	sku: 'CC3C',
+	description: '<p>The Chemex coffee maker was invented in 1939 by its famous inventor, Peter J. Schlumbohm.</p>\n' +
+	"<p>Drawing on his knowledge of filtration and extraction, Mr. Schlumbohm created a coffee maker that comes close to perfection. The angles of the funnel, the thickness of the paper filter, and the air vent allow the coffee to infuse for the right amount of time and release its flavors, which are typically inhibited in other brewing methods. The result? A smooth, non-bitter cup of coffee in less than 4 minutes.</p>\n" +
+	"<p>Made of heat-resistant borosilicate glass and equipped with a simple wooden handle, the Chemex coffee maker's design is part of the permanent collection of the Museum of Modern Art.</p>\n" +
+	'<p>Dimensions in cm: 21 (h) × 7.6 (dia)</p>\n' +
+	'<p>Capacity: 473 ml</p>',
     weight: 1,
     width: 0,
     depth: 0,
@@ -100,9 +100,17 @@ export const bigcommerceSearchResult = (
 // BigCommerce Category Hierarchy response
 export const bigcommerceCategories = [
     {
+        id: 1,
+        parent_id: 0,
+        name: "Men",
+        is_visible: true,
+        url: "/men/",
+        children: []
+    },
+    {
         id: 23,
         parent_id: 0,
-        name: "Tout parcourir",
+        name: "Browse all",
         is_visible: true,
         url: "/shop-all/",
         children: []
@@ -110,7 +118,7 @@ export const bigcommerceCategories = [
     {
         id: 18,
         parent_id: 0,
-        name: "Salle de bain",
+        name: "Bathroom",
         is_visible: true,
         url: "/bath/",
         children: []
@@ -118,7 +126,7 @@ export const bigcommerceCategories = [
     {
         id: 19,
         parent_id: 0,
-        name: "Jardin",
+        name: "Garden",
         is_visible: true,
         url: "/garden/",
         children: []
@@ -126,7 +134,7 @@ export const bigcommerceCategories = [
     {
         id: 21,
         parent_id: 0,
-        name: "Cuisine",
+        name: "Kitchen",
         is_visible: true,
         url: "/kitchen/",
         children: []
@@ -142,7 +150,7 @@ export const bigcommerceCategories = [
     {
         id: 22,
         parent_id: 0,
-        name: "Entretien",
+        name: "Maintenance",
         is_visible: true,
         url: "/utility/",
         children: []
