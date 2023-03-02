@@ -78,7 +78,7 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
      * @param productId Product ID to fetch
      * @returns SFCC product
      */
-    getProductById(productId: string): Promise<SFCCProduct>;
+    getProductById(productId: string): Promise<SFCCProduct | null>;
     /**
      * Lists SFCC products for a given search query.
      * @param query Search query
@@ -92,11 +92,11 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    getProducts(args: GetProductsArgs): Promise<Product[]>;
+    getRawProducts(args: GetProductsArgs, method?: string): Promise<SFCCProduct[]>;
     /**
      * @inheritdoc
      */
-    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
+    getProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
      * @inheritdoc
      */

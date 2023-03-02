@@ -88,7 +88,6 @@ describe('sfcc integration', function () {
             id: 'ExampleID'
         });
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.productIdRequest)('ExampleID')
         ]);
         expect(result).toEqual((0, results_1.exampleProduct)('ExampleID'));
@@ -98,7 +97,6 @@ describe('sfcc integration', function () {
             productIds: 'ExampleID,ExampleID2'
         });
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.productIdRequest)('ExampleID'),
             (0, requests_1.productIdRequest)('ExampleID2')
         ]);
@@ -112,7 +110,6 @@ describe('sfcc integration', function () {
             keyword: 'Hit'
         });
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.keywordSearch)(0),
             (0, requests_1.keywordSearch)(200),
             ...(0, requests_1.productIdRequests)('Hit', 300)
@@ -129,7 +126,6 @@ describe('sfcc integration', function () {
                 slug: 'newarrivals-womens',
             } });
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.categorySearch)(0),
             (0, requests_1.categorySearch)(200),
             ...(0, requests_1.productIdRequests)('Hit', 300)
@@ -138,26 +134,27 @@ describe('sfcc integration', function () {
         expect(products).toEqual(Array.from({ length: 300 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)));
     }));
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
-        yield expect(sfccCodec.getProduct({
+        const result = yield sfccCodec.getProduct({
             id: 'MissingID'
-        })).rejects.toMatchInlineSnapshot(`
-{
-  "config": {
-    "baseURL": "https://test.sandbox.us03.dx.commercecloud.salesforce.com",
-    "params": {
-      "client_id": "test-client",
-    },
-    "url": "/s/TestSite/dw/shop/v22_4/products/MissingID?expand=prices,options,images,variations&all_images=true",
-  },
-  "data": {},
-  "headers": {},
-  "status": 404,
-  "statusText": "Not Found",
-}
-`);
+        });
+        expect(result).toBeNull();
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.productIdRequest)('MissingID')
+        ]);
+    }));
+    test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield sfccCodec.getProducts({
+            productIds: 'ExampleID,NotHere,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productIdRequest)('ExampleID'),
+            (0, requests_1.productIdRequest)('NotHere'),
+            (0, requests_1.productIdRequest)('ExampleID2')
+        ]);
+        expect(result).toEqual([
+            (0, results_1.exampleProduct)('ExampleID'),
+            null,
+            (0, results_1.exampleProduct)('ExampleID2')
         ]);
     }));
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
@@ -165,10 +162,24 @@ describe('sfcc integration', function () {
             productIds: 'ExampleID'
         });
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             (0, requests_1.productIdRequest)('ExampleID')
         ]);
         expect(result).toEqual([(0, responses_1.sfccProduct)('ExampleID')]);
+    }));
+    test('getRawProducts (one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield sfccCodec.getRawProducts({
+            productIds: 'ExampleID,NotHere,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productIdRequest)('ExampleID'),
+            (0, requests_1.productIdRequest)('NotHere'),
+            (0, requests_1.productIdRequest)('ExampleID2')
+        ]);
+        expect(result).toEqual([
+            (0, responses_1.sfccProduct)('ExampleID'),
+            null,
+            (0, responses_1.sfccProduct)('ExampleID2')
+        ]);
     }));
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
         const category = yield sfccCodec.getCategory({ slug: 'newarrivals-womens' });
@@ -198,7 +209,6 @@ describe('sfcc integration', function () {
         const customerGroups = yield sfccCodec.getCustomerGroups({});
         expect(customerGroups).toEqual(results_1.exampleCustomerGroups);
         expect(requests).toEqual([
-            requests_1.categoryRequest,
             requests_1.oauthRequest,
             requests_1.customerGroupsRequest
         ]);

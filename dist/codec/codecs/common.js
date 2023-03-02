@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
+exports.getProductsArgError = exports.mapIdentifiers = exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
 const constants_1 = require("../../common/constants");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const process_1 = require("process");
+const codec_error_1 = require("./codec-error");
 /**
  * Find a category in the mega menu by slug.
  * @param categories Root categories in mega menu
@@ -140,3 +141,22 @@ const getContentTypeSchema = (ctype) => {
     return schema;
 };
 exports.getContentTypeSchema = getContentTypeSchema;
+/**
+ * Ensures a given array of identifiable objects has matching position to a list of IDs.
+ * Missing items are replaced with null.
+ * @param ids List of IDs
+ * @param items List of items
+ */
+const mapIdentifiers = (ids, items) => {
+    return ids.map(id => { var _a; return (_a = items.find(item => item.id === id)) !== null && _a !== void 0 ? _a : null; });
+};
+exports.mapIdentifiers = mapIdentifiers;
+/**
+ * Construct a CodecError for when get products arguments are missing
+ * @param method Method name
+ * @returns Codec error
+ */
+const getProductsArgError = (method) => {
+    return new codec_error_1.CodecError(codec_error_1.CodecErrorType.IncorrectArguments, { message: `${method} requires either: productIds, keyword, or category reference.` });
+};
+exports.getProductsArgError = getProductsArgError;

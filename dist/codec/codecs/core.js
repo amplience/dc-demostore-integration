@@ -16,7 +16,6 @@ exports.getRandom = exports.CommerceCodec = exports.CodecTestOperationType = exp
 const lodash_1 = __importDefault(require("lodash"));
 const common_1 = require("../../common");
 const common_2 = require("./common");
-const errors_1 = require("../../common/errors");
 /**
  * Types of codec.
  */
@@ -132,7 +131,6 @@ class CommerceCodec {
      * @param config API configuration
      */
     constructor(config) {
-        this.megaMenu = [];
         this.config = config;
     }
     /**
@@ -143,15 +141,8 @@ class CommerceCodec {
     init(codecType) {
         return __awaiter(this, void 0, void 0, function* () {
             const startInit = new Date().valueOf();
-            yield this.cacheMegaMenu();
             this.initDuration = new Date().valueOf() - startInit;
             this.codecType = codecType;
-            if (this.megaMenu.length === 0) {
-                throw new errors_1.IntegrationError({
-                    message: 'megaMenu has no categories, cannot build navigation',
-                    helpUrl: ''
-                });
-            }
             return this;
         });
     }
@@ -169,6 +160,21 @@ class CommerceCodec {
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             this.megaMenu = [];
+        });
+    }
+    /**
+     * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
+     * @returns A promise that resolves when the mega menu is avaiable
+     */
+    ensureMegaMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.megaMenu) {
+                return;
+            }
+            if (!this.megaMenuPromise) {
+                this.megaMenuPromise = this.cacheMegaMenu();
+            }
+            yield this.megaMenuPromise;
         });
     }
     /**
@@ -201,6 +207,7 @@ class CommerceCodec {
     // defined in terms of getMegaMenu, effectively
     getCategory(args) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureMegaMenu();
             const category = this.findCategory(args.slug);
             category.products = yield this.getProducts(Object.assign(Object.assign({}, args), { category }));
             return category;
@@ -213,6 +220,7 @@ class CommerceCodec {
      */
     getMegaMenu(args) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureMegaMenu();
             return this.megaMenu;
         });
     }
@@ -255,6 +263,7 @@ class CommerceCodec {
      */
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureMegaMenu();
             const results = [{
                     operationType: CodecTestOperationType.megaMenu,
                     description: 'cache the megamenu',

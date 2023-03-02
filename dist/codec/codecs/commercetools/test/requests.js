@@ -16,7 +16,7 @@ exports.categoriesRequest = {
         method: 'GET',
         url: '/categories?offset=0&limit=500',
     },
-    url: 'https://api.europe-west1.gcp.commercetools.com/categories?offset=0&limit=500'
+    url: 'https://api.europe-west1.gcp.commercetools.com/test/categories?offset=0&limit=500'
 };
 exports.customerGroupsRequest = {
     config: {
@@ -27,7 +27,7 @@ exports.customerGroupsRequest = {
         method: 'GET',
         url: '/customer-groups?offset=0&limit=20',
     },
-    url: 'https://api.europe-west1.gcp.commercetools.com/customer-groups?offset=0&limit=20',
+    url: 'https://api.europe-west1.gcp.commercetools.com/test/customer-groups?offset=0&limit=20',
 };
 const searchRequest = (filter) => ({
     config: {
@@ -38,6 +38,6 @@ const searchRequest = (filter) => ({
         method: 'GET',
         url: `/product-projections/search?${filter}`
     },
-    url: `https://api.europe-west1.gcp.commercetools.com/product-projections/search?${filter}`
+    url: `https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?${filter}`
 });
 exports.searchRequest = searchRequest;

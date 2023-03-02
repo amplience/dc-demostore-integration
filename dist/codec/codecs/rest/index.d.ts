@@ -44,7 +44,11 @@ export declare class RestCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    getProducts(args: GetProductsArgs): Promise<Product[]>;
+    getProducts(args: GetProductsArgs, raw?: boolean): Promise<Product[]>;
+    /**
+     * @inheritdoc
+     */
+    getRawProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
      * @inheritdoc
      */

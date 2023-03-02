@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TemplateCommerceCodec = exports.TemplateCommerceCodecType = void 0;
 const core_1 = require("./core");
+const common_1 = require("./common");
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
@@ -76,7 +77,10 @@ class TemplateCommerceCodec extends core_1.CommerceCodec {
             // eslint-disable-next-line no-empty
             else if (args.category) {
             }
-            throw new Error('getProducts() requires either: productIds, keyword, or category reference');
+            else {
+                throw (0, common_1.getProductsArgError)('getProducts');
+            }
+            return [];
         });
     }
     /**
@@ -93,7 +97,10 @@ class TemplateCommerceCodec extends core_1.CommerceCodec {
             // eslint-disable-next-line no-empty
             else if (args.category) {
             }
-            throw new Error('getProducts() requires either: productIds, keyword, or category reference');
+            else {
+                throw (0, common_1.getProductsArgError)('getRawProducts');
+            }
+            return [];
         });
     }
     /**

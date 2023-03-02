@@ -119,7 +119,7 @@ function paginate(requestPage, pageSize = 20, pageNum = 0, pageCount) {
             const pagesReturned = Math.floor(data.length / pageSize);
             let dataCount = data.length;
             if (pagesReturned > 0) {
-                dataCount = pagesReturned * pageCount;
+                dataCount = pagesReturned * pageSize;
                 i += pagesReturned - 1;
             }
             const targetMin = Math.min(total - startOffset, targetCount);

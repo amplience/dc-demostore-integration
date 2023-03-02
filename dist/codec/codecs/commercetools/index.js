@@ -18,6 +18,8 @@ const lodash_1 = __importDefault(require("lodash"));
 const core_1 = require("../core");
 const util_1 = require("../../../common/util");
 const pagination_1 = require("../pagination");
+const codec_error_1 = require("../codec-error");
+const common_2 = require("../common");
 const cats = ['women', 'men', 'new', 'sale', 'accessories'];
 /**
  * Commerce Codec Type that integrates with Commercetools.
@@ -120,6 +122,9 @@ const mapCategory = (category, categories, args) => {
  * @returns Method to map a Commercetools product to a common one
  */
 const mapProduct = (args) => (product) => {
+    if (!product) {
+        return null;
+    }
     return {
         id: product.id,
         name: localize(product.name, args),
@@ -188,17 +193,18 @@ class CommercetoolsCodec extends core_1.CommerceCodec {
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.rest.get({ url })).results;
+            return yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () { return (yield this.rest.get({ url })).results; }));
         });
     }
     /**
      * @inheritdoc
      */
-    getProducts(args) {
+    getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
             if (args.productIds) {
-                products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=id:${(0, util_1.quoteProductIdString)(args.productIds)}`));
+                const ids = args.productIds.split(',');
+                products = (0, common_2.mapIdentifiers)(ids, yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=id:${(0, util_1.quoteProductIdString)(args.productIds)}`)));
             }
             else if (args.keyword) {
                 products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?text.en="${args.keyword}"`));
@@ -206,7 +212,18 @@ class CommercetoolsCodec extends core_1.CommerceCodec {
             else if (args.category) {
                 products = yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=categories.id: subtree("${args.category.id}")`));
             }
-            return products.map(mapProduct(args));
+            else {
+                throw (0, common_2.getProductsArgError)(method);
+            }
+            return products;
+        });
+    }
+    /**
+     * @inheritdoc
+     */
+    getProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return (yield this.getRawProducts(args, 'getProducts')).map(mapProduct(args));
         });
     }
     /**

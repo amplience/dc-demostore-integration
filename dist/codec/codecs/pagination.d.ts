@@ -14,7 +14,7 @@ declare type StringPropMapper = string | PropMapper;
  * @param resultProp Property to extract result items from
  * @returns A generator that takes a client, url and base params and generates a function that gets a page.
  */
-export declare function getPageByQuery(offsetQuery: string, countQuery: string, totalProp: StringPropMapper, resultProp: string): <T>(client: OAuthRestClientInterface, url: string, params?: any) => (page: number, pageSize: number) => Promise<GetPageResult<T>>;
+export declare function getPageByQuery(offsetQuery: string, countQuery: string, totalProp: StringPropMapper, resultProp: StringPropMapper): <T>(client: OAuthRestClientInterface, url: string, params?: any) => (page: number, pageSize: number) => Promise<GetPageResult<T>>;
 /**
  * Return a generator for a function that gets a page using an axios client with query parameters.
  * @param offsetQuery Query key to use for item offset

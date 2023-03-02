@@ -17,13 +17,15 @@ const lodash_1 = __importDefault(require("lodash"));
 const core_1 = require("../core");
 const cms_property_types_1 = require("../../cms-property-types");
 const axios_1 = __importDefault(require("axios"));
+const codec_error_1 = require("../codec-error");
+const common_1 = require("../common");
 /**
  * Fetch JSON from a given URL.
  * @param url URL to fetch from
  * @param defaultValue Default value if URL is empty
  * @returns Response data
  */
-const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : (yield axios_1.default.get(url)).data; });
+const fetchFromURL = (url, defaultValue) => __awaiter(void 0, void 0, void 0, function* () { return lodash_1.default.isEmpty(url) ? defaultValue : yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(void 0, void 0, void 0, function* () { return (yield axios_1.default.get(url)).data; })); });
 /**
  * Commerce Codec Type that integrates with REST.
  */
@@ -90,10 +92,12 @@ class RestCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    getProducts(args) {
+    getProducts(args, raw = false) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureMegaMenu();
             if (args.productIds) {
-                return this.products.filter(prod => args.productIds.split(',').includes(prod.id));
+                const ids = args.productIds.split(',');
+                return (0, common_1.mapIdentifiers)(ids, this.products.filter(prod => ids.includes(prod.id)));
             }
             else if (args.keyword) {
                 return this.products.filter(prod => prod.name.toLowerCase().indexOf(args.keyword.toLowerCase()) > -1);
@@ -103,7 +107,15 @@ class RestCommerceCodec extends core_1.CommerceCodec {
                     ...lodash_1.default.filter(this.products, prod => lodash_1.default.includes(lodash_1.default.map(prod.categories, 'id'), args.category.id))
                 ];
             }
-            throw new Error('getProducts() requires either: productIds, keyword, or category reference');
+            throw (0, common_1.getProductsArgError)(raw ? 'getProductsRaw' : 'getProducts');
+        });
+    }
+    /**
+     * @inheritdoc
+     */
+    getRawProducts(args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.getProducts(args, true);
         });
     }
     /**
@@ -111,6 +123,7 @@ class RestCommerceCodec extends core_1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield this.ensureMegaMenu();
             return this.customerGroups;
         });
     }

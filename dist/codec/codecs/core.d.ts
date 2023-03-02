@@ -101,6 +101,7 @@ export declare class CommerceCodec implements CommerceAPI {
     megaMenu: Category[];
     codecType: CommerceCodecType;
     initDuration: number;
+    megaMenuPromise?: Promise<void>;
     /**
      * Create a new Commerce API implementation, given an input configuration.
      * @param config API configuration
@@ -122,6 +123,11 @@ export declare class CommerceCodec implements CommerceAPI {
      * Cache the mega menu.
      */
     cacheMegaMenu(): Promise<void>;
+    /**
+     * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
+     * @returns A promise that resolves when the mega menu is avaiable
+     */
+    ensureMegaMenu(): Promise<void>;
     /**
      * Get a single product by ID.
      * @param args Arguments object
@@ -163,7 +169,7 @@ export declare class CommerceCodec implements CommerceAPI {
      * @param args Arguments object
      * @returns List of products in their original format
      */
-    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
+    getRawProducts(args: GetProductsArgs): Promise<any[]>;
     /**
      * Test the various methods of this integration and provide a report.
      * @returns A report of all test results.

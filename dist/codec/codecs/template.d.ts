@@ -1,6 +1,5 @@
 import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from './core';
-import { SFCCProduct } from './sfcc/types';
 /**
  * Common codec configuration.
  */
@@ -38,7 +37,7 @@ export declare class TemplateCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    getRawProducts(args: GetProductsArgs): Promise<SFCCProduct[]>;
+    getRawProducts(args: GetProductsArgs): Promise<any[]>;
     /**
      * @inheritdoc
      */

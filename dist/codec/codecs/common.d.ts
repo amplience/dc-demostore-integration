@@ -1,6 +1,7 @@
 import { ContentType, ContentTypeSchema } from 'dc-management-sdk-js';
 import { Dictionary } from 'lodash';
 import { Category } from '../../common/types';
+import { CodecError } from './codec-error';
 /**
  * Find a category in the mega menu by slug.
  * @param categories Root categories in mega menu
@@ -51,3 +52,18 @@ export declare const getContentType: (ctype: CType) => ContentType;
  * @returns Amplience Content Type Schema
  */
 export declare const getContentTypeSchema: (ctype: CType) => ContentTypeSchema;
+/**
+ * Ensures a given array of identifiable objects has matching position to a list of IDs.
+ * Missing items are replaced with null.
+ * @param ids List of IDs
+ * @param items List of items
+ */
+export declare const mapIdentifiers: <T extends {
+    id: string;
+}>(ids: string[], items: T[]) => T[];
+/**
+ * Construct a CodecError for when get products arguments are missing
+ * @param method Method name
+ * @returns Codec error
+ */
+export declare const getProductsArgError: (method: string) => CodecError;

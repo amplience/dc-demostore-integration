@@ -21,6 +21,7 @@ const slugify_1 = __importDefault(require("slugify"));
 const btoa_1 = __importDefault(require("btoa"));
 const pagination_1 = require("../pagination");
 const common_2 = require("../common");
+const codec_error_1 = require("../codec-error");
 /**
  * Commerce Codec Type that integrates with SFCC.
  */
@@ -193,12 +194,14 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, common_2.logResponse)('get', url, (yield axios_1.default.get(url, {
-                baseURL: this.config.api_url,
-                params: {
-                    client_id: this.config.client_id
-                }
-            })).data);
+            return (0, common_2.logResponse)('get', url, yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () {
+                return yield axios_1.default.get(url, {
+                    baseURL: this.config.api_url,
+                    params: {
+                        client_id: this.config.client_id
+                    }
+                });
+            }))).data;
         });
     }
     /**
@@ -218,7 +221,15 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
      */
     getProductById(productId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`);
+            try {
+                return yield this.fetch(`${this.shopApi}/products/${productId}?expand=prices,options,images,variations&all_images=true`);
+            }
+            catch (e) {
+                if (e.type === codec_error_1.CodecErrorType.NotFound) {
+                    return null;
+                }
+                throw e;
+            }
         });
     }
     /**
@@ -248,7 +259,7 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    getProducts(args) {
+    getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
             if (args.productIds) {
@@ -260,25 +271,18 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
             else if (args.category) {
                 products = yield this.search(`refine_1=cgid=${args.category.id}`);
             }
-            return products.map(mapProduct);
+            else {
+                throw (0, common_2.getProductsArgError)(method);
+            }
+            return products;
         });
     }
     /**
      * @inheritdoc
      */
-    getRawProducts(args) {
+    getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            let products = [];
-            if (args.productIds) {
-                products = yield Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)));
-            }
-            else if (args.keyword) {
-                products = yield this.search(`q=${args.keyword}`);
-            }
-            else if (args.category) {
-                products = yield this.search(`refine_1=cgid=${args.category.id}`);
-            }
-            return products;
+            return (yield this.getRawProducts(args, 'getProducts')).map(mapProduct);
         });
     }
     /**

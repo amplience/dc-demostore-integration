@@ -45,74 +45,42 @@ const config_1 = require("./test/config");
 jest.mock('axios');
 const commerceRequests = {
     get: {
-        'https://api.europe-west1.gcp.commercetools.com/test/categories?offset=0&limit=500': {
-            data: responses_1.ctoolsCategories
+        'https://api.bigcommerce.com/stores/store_hash/v2/customer_groups': {
+            data: responses_1.bigcommerceCustomerGroups
         },
-        'https://api.europe-west1.gcp.commercetools.com/test/customer-groups?offset=0&limit=20': {
-            data: responses_1.ctoolsCustomerGroups
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(1, 20, 0, ['ExampleID'])
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(2, 20, 0, ['ExampleID', 'ExampleID2'])
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(2, 20, 0, ['ExampleID', 'ExampleID2'])
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=id%3A%22MissingID%22&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(0, 20, 0, [])
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?text.en=%22Hit%22&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(30, 20, 0)
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?text.en=%22Hit%22&offset=20&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(30, 20, 1)
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(30, 20, 0)
-        },
-        'https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20': {
-            data: (0, responses_1.ctoolsSearchResult)(30, 20, 1)
+        'https://api.bigcommerce.com/stores/store_hash/v3/catalog/categories/tree': {
+            data: responses_1.bigcommerceCategories
         }
     },
-    post: {
-        'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials': {
-            data: {
-                access_token: 'token',
-                token_type: 'Bearer',
-                expires_in: 172775,
-                scope: 'view_discount_codes:test view_categories:test view_cart_discounts:test view_customers:test view_product_selections:test view_published_products:test view_customer_groups:test view_products:test'
-            }
-        }
-    }
+    post: {}
 };
-describe('commercetools integration', function () {
+// BigCommerce Integration tests
+describe('bigcommerce integration', function () {
     let codec;
     let requests;
     beforeEach(() => __awaiter(this, void 0, void 0, function* () {
         jest.resetAllMocks();
         requests = [];
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceRequests);
-        codec = new _1.CommercetoolsCodec(config_1.config);
+        codec = new _1.BigCommerceCommerceCodec(config_1.config);
         yield codec.init(new _1.default());
     }));
+    // TODO
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProduct({
             id: 'ExampleID'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22&offset=0&limit=20')
         ]);
         expect(result).toEqual((0, results_1.exampleProduct)('ExampleID'));
     }));
+    // TODO
     test('getProducts (multiple)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
             productIds: 'ExampleID,ExampleID2'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22ExampleID2%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
@@ -120,48 +88,50 @@ describe('commercetools integration', function () {
             (0, results_1.exampleProduct)('ExampleID2')
         ]);
     }));
+    // TODO
     test('getProducts (keyword)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
             keyword: 'Hit'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('text.en=%22Hit%22&offset=0&limit=20'),
             (0, requests_1.searchRequest)('text.en=%22Hit%22&offset=20&limit=20')
         ]);
         expect(result).toEqual(Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)));
     }));
+    // TODO
     test('getProducts (category)', () => __awaiter(this, void 0, void 0, function* () {
-        const products = yield codec.getProducts({ category: {
+        const products = yield codec.getProducts({
+            category: {
                 children: [],
                 products: [],
                 id: 'men-id',
                 name: 'Men',
                 slug: 'men',
-            } });
+            }
+        });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
             (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
         ]);
         expect(products.length).toEqual(30);
         expect(products).toEqual(Array.from({ length: 30 }).map((_, index) => (0, results_1.exampleProduct)('Hit' + index)));
     }));
+    // TODO
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
         yield expect(codec.getProduct({
             id: 'MissingID'
         })).resolves.toBeNull();
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22MissingID%22&offset=0&limit=20')
         ]);
     }));
+    // TODO
     test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getProducts({
             productIds: 'ExampleID,NotHere,ExampleID2'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
@@ -170,37 +140,36 @@ describe('commercetools integration', function () {
             (0, results_1.exampleProduct)('ExampleID2')
         ]);
     }));
+    // TODO
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getRawProducts({
             productIds: 'ExampleID'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
-            (0, responses_1.ctoolsProduct)('ExampleID')
+            (0, responses_1.bigcommerceProduct)('ExampleID')
         ]);
     }));
+    // TODO
     test('getRawProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         const result = yield codec.getRawProducts({
             productIds: 'ExampleID,NotHere,ExampleID2'
         });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             (0, requests_1.searchRequest)('filter=id%3A%22ExampleID%22%2C%22NotHere%22%2C%22ExampleID2%22&offset=0&limit=20')
         ]);
         expect(result).toEqual([
-            (0, responses_1.ctoolsProduct)('ExampleID'),
+            (0, responses_1.bigcommerceProduct)('ExampleID'),
             null,
-            (0, responses_1.ctoolsProduct)('ExampleID2')
+            (0, responses_1.bigcommerceProduct)('ExampleID2')
         ]);
     }));
+    // TODO
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
         const category = yield codec.getCategory({ slug: 'men' });
         expect(requests).toEqual([
-            requests_1.oauthRequest,
-            requests_1.categoriesRequest,
             (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=0&limit=20'),
             (0, requests_1.searchRequest)('filter=categories.id%3A+subtree%28%22men-id%22%29&offset=20&limit=20')
         ]);
@@ -213,19 +182,19 @@ describe('commercetools integration', function () {
             slug: 'men',
         });
     }));
+    // Get Category Hierarchy
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
         const megaMenu = yield codec.getMegaMenu({});
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             requests_1.categoriesRequest
         ]);
         expect(megaMenu).toEqual(results_1.exampleMegaMenu);
     }));
+    // Get Customer Groups
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
         const customerGroups = yield codec.getCustomerGroups({});
         expect(customerGroups).toEqual(results_1.exampleCustomerGroups);
         expect(requests).toEqual([
-            requests_1.oauthRequest,
             requests_1.customerGroupsRequest
         ]);
     }));

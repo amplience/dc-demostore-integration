@@ -125,6 +125,8 @@ const rest_1 = __importDefault(require("./codecs/rest"));
 (0, exports.registerCodec)(new rest_1.default());
 const sfcc_1 = __importDefault(require("./codecs/sfcc"));
 (0, exports.registerCodec)(new sfcc_1.default());
+const bigcommerce_1 = __importDefault(require("./codecs/bigcommerce"));
+(0, exports.registerCodec)(new bigcommerce_1.default());
 // reexport codec common functions
 __exportStar(require("./codecs/common"), exports);
 __exportStar(require("./codecs/core"), exports);

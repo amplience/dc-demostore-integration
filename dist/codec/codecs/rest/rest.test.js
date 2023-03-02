@@ -128,12 +128,28 @@ describe('rest integration', function () {
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
         yield expect(codec.getProduct({
             id: 'MissingID'
-        })).resolves.toBeUndefined();
+        })).resolves.toBeNull();
         expect(requests).toEqual([
             requests_1.categoryRequest,
             requests_1.productRequest,
             requests_1.customerGroupRequest,
             requests_1.translationsRequest
+        ]);
+    }));
+    test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield codec.getProducts({
+            productIds: 'rootProduct,NotHere,cat2Product3'
+        });
+        expect(requests).toEqual([
+            requests_1.categoryRequest,
+            requests_1.productRequest,
+            requests_1.customerGroupRequest,
+            requests_1.translationsRequest
+        ]);
+        expect(result).toEqual([
+            (0, responses_1.restProduct)('rootProduct', 'A product in the root', responses_1.rootCategory),
+            null,
+            (0, responses_1.restProduct)('cat2Product3', 'A third product in the second category', responses_1.childCategories[1])
         ]);
     }));
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
@@ -146,7 +162,23 @@ describe('rest integration', function () {
             requests_1.customerGroupRequest,
             requests_1.translationsRequest
         ]);
-        expect(result).toEqual([]);
+        expect(result).toEqual([(0, responses_1.restProduct)('rootProduct', 'A product in the root', responses_1.rootCategory)]);
+    }));
+    test('getRawProducts, (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        const result = yield codec.getRawProducts({
+            productIds: 'rootProduct,NotHere,cat2Product3'
+        });
+        expect(requests).toEqual([
+            requests_1.categoryRequest,
+            requests_1.productRequest,
+            requests_1.customerGroupRequest,
+            requests_1.translationsRequest
+        ]);
+        expect(result).toEqual([
+            (0, responses_1.restProduct)('rootProduct', 'A product in the root', responses_1.rootCategory),
+            null,
+            (0, responses_1.restProduct)('cat2Product3', 'A third product in the second category', responses_1.childCategories[1])
+        ]);
     }));
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
         const category = yield codec.getCategory({ slug: 'child1-cat' });

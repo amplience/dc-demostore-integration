@@ -1,6 +1,7 @@
 import { ClientCredentialsConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, OAuthRestClientInterface, Product } from '../../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
 import { StringProperty } from '../../cms-property-types';
+import { CTProduct } from './types';
 /**
  * Commercetools Codec config properties
  */
@@ -49,6 +50,10 @@ export declare class CommercetoolsCodec extends CommerceCodec {
      * @returns Response data
      */
     fetch(url: string): Promise<any>;
+    /**
+     * @inheritdoc
+     */
+    getRawProducts(args: GetProductsArgs, method?: string): Promise<CTProduct[]>;
     /**
      * @inheritdoc
      */

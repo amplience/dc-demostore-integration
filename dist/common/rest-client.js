@@ -18,6 +18,7 @@ const util_1 = require("../common/util");
 const common_1 = require("../codec/codecs/common");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const cms_property_types_1 = require("../codec/cms-property-types");
+const codec_error_1 = require("../codec/codecs/codec-error");
 /**
  * JSON schema properties describing UsernamePasswordConfiguration.
  */
@@ -78,8 +79,10 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
      */
     const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
         if (!authenticatedAxios || Date.now() > expiryTime) {
-            const response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
-            const auth = (0, common_1.logResponse)('post', config.auth_url, response.data);
+            const auth = yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(void 0, void 0, void 0, function* () {
+                const response = yield axios_1.default.post(config.auth_url, payload, requestConfig);
+                return (0, common_1.logResponse)('post', config.auth_url, response.data);
+            }), codec_error_1.CodecErrorType.AuthError);
             if (!getHeaders) {
                 getHeaders = (auth) => ({
                     Authorization: `${auth.token_type || 'Bearer'} ${auth.access_token}`
@@ -99,7 +102,7 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
      * @returns HTTP request function, takes axios config or an URL.
      */
     const request = (method) => (config) => __awaiter(void 0, void 0, void 0, function* () {
-        var _a, _b;
+        var _a, _b, _c, _d;
         if (typeof config === 'string') {
             config = { url: config };
         }
@@ -134,7 +137,10 @@ const OAuthRestClient = (config, payload, requestConfig = {}, getHeaders) => {
             // if (error.stack) {
             //     console.log(error.stack)
             // }
-            console.log(`Error while ${method}ing URL [ ${config.url} ]: ${error.message} ${error.code}`);
+            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.ApiError, {
+                status: (_c = error.response) === null || _c === void 0 ? void 0 : _c.status,
+                message: (_d = error.response) === null || _d === void 0 ? void 0 : _d.data
+            });
         }
     });
     return {

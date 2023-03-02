@@ -3,16 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.massMock = exports.mockAxios = void 0;
 const actualAxios = jest.requireActual('axios');
 const methods = ['get', 'put', 'post', 'delete', 'patch'];
+function combineUrls(baseUrl, relativeUrl) {
+    if (!baseUrl)
+        return relativeUrl;
+    return relativeUrl ? baseUrl.replace(/\/+$/, '') + '/' + relativeUrl.replace(/^\/+/, '') : baseUrl;
+}
 function getMockAxios(method, methodRequests, requests, baseConfig) {
     return (url, config) => {
         var _a;
         config = Object.assign(Object.assign(Object.assign({}, baseConfig), config), { url: url });
-        const urlObj = new URL(url, config.baseURL);
+        const urlWithParams = combineUrls(config.baseURL, url);
+        const urlObj = new URL(urlWithParams);
         const keys = Array.from(urlObj.searchParams.keys());
         for (const key of keys) {
             urlObj.searchParams.delete(key);
         }
-        const urlWithParams = new URL(url, config.baseURL).toString();
         const fullUrl = urlObj.toString();
         requests.push({
             url: urlWithParams,
@@ -24,11 +29,14 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
         }
         if (request == null) {
             return Promise.reject({
-                status: 404,
-                statusText: 'Not Found',
-                data: {},
-                headers: {},
-                config
+                config,
+                response: {
+                    status: 404,
+                    statusText: 'Not Found',
+                    data: {},
+                    headers: {},
+                    config
+                }
             });
         }
         let contentType;
