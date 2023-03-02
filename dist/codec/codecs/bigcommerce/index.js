@@ -19,10 +19,19 @@ const axios_1 = __importDefault(require("axios"));
 const mappers_1 = require("./mappers");
 const codec_error_1 = require("../codec-error");
 const common_2 = require("../common");
+/**
+ * TODO
+ */
 class BigCommerceCommerceCodecType extends core_1.CommerceCodecType {
+    /**
+     * TODO
+     */
     get vendor() {
         return 'bigcommerce';
     }
+    /**
+     * TODO
+     */
     get properties() {
         return Object.assign(Object.assign({}, common_1.APIProperties), { api_token: {
                 title: "API Token",
@@ -34,6 +43,11 @@ class BigCommerceCommerceCodecType extends core_1.CommerceCodecType {
                 minLength: 1
             } });
     }
+    /**
+     * TODO
+     * @param config
+     * @returns
+     */
     getApi(config) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield new BigCommerceCommerceCodec(config).init(this);
@@ -41,12 +55,23 @@ class BigCommerceCommerceCodecType extends core_1.CommerceCodecType {
     }
 }
 exports.BigCommerceCommerceCodecType = BigCommerceCommerceCodecType;
+/**
+ * TODO
+ */
 class BigCommerceCommerceCodec extends core_1.CommerceCodec {
+    /**
+     * TODO
+     */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
             this.megaMenu = (yield this.fetch(`/v3/catalog/categories/tree`)).map(mappers_1.mapCategory);
         });
     }
+    /**
+     * TODO
+     * @param url
+     * @returns
+     */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
             const request = {
@@ -69,6 +94,11 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
             return response.data.data;
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
@@ -87,6 +117,11 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
             return products.map(mappers_1.mapProduct);
         });
     }
+    /**
+     * TODO
+     * @param args
+     * @returns
+     */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             return (yield this.fetch(`/v2/customer_groups`)).map(mappers_1.mapCustomerGroup);

@@ -4,13 +4,13 @@ exports.searchRequest = exports.customerGroupsRequest = exports.categoriesReques
 // BigCommerce Category Hierarchy request
 exports.categoriesRequest = {
     config: {
+        method: 'get',
         baseURL: 'https://api.bigcommerce.com/stores/store_hash',
         headers: {
             'X-Auth-Token': 'api_token',
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        method: 'GET',
         url: '/v3/catalog/categories/tree',
     },
     url: 'https://api.bigcommerce.com/stores/store_hash/v3/catalog/categories/tree'
@@ -29,16 +29,18 @@ exports.customerGroupsRequest = {
     },
     url: 'https://api.bigcommerce.com/stores/store_hash/v2/customer_groups',
 };
-// TODO
+// BigCommerce Search request
 const searchRequest = (filter) => ({
     config: {
-        baseURL: 'https://api.europe-west1.gcp.commercetools.com/test',
+        method: 'get',
+        baseURL: 'https://api.bigcommerce.com/stores/store_hash',
         headers: {
-            Authorization: 'Bearer token',
+            'X-Auth-Token': 'api_token',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
         },
-        method: 'GET',
-        url: `/product-projections/search?${filter}`
+        url: `/v3/catalog/products?keyword=${filter}`
     },
-    url: `https://api.europe-west1.gcp.commercetools.com/test/product-projections/search?${filter}`
+    url: `https://api.bigcommerce.com/stores/store_hash/v3/catalog/products?keyword=${filter}`
 });
 exports.searchRequest = searchRequest;

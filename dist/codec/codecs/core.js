@@ -16,6 +16,7 @@ exports.getRandom = exports.CommerceCodec = exports.CodecTestOperationType = exp
 const lodash_1 = __importDefault(require("lodash"));
 const common_1 = require("../../common");
 const common_2 = require("./common");
+const codec_error_1 = require("./codec-error");
 /**
  * Types of codec.
  */
@@ -195,8 +196,9 @@ class CommerceCodec {
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.warn(`getProducts is not supported on platform [ ${this.codecType.vendor} ]`);
-            return [];
+            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.NotSupported, {
+                message: `getProducts is not supported on platform [ ${this.codecType.vendor} ]`
+            });
         });
     }
     /**
@@ -231,8 +233,9 @@ class CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.warn(`getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`);
-            return [];
+            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.NotSupported, {
+                message: `getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`
+            });
         });
     }
     /**
@@ -242,8 +245,9 @@ class CommerceCodec {
      */
     getVariants(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.warn(`getVariants is not supported on platform [ ${this.codecType.vendor} ]`);
-            return null;
+            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.NotSupported, {
+                message: `getVariants is not supported on platform [ ${this.codecType.vendor} ]`
+            });
         });
     }
     /**
@@ -253,8 +257,9 @@ class CommerceCodec {
      */
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.warn(`getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`);
-            return [];
+            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.NotSupported, {
+                message: `getRawProducts is not supported on platform [ ${this.codecType.vendor} ]`
+            });
         });
     }
     /**
