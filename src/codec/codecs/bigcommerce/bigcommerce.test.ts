@@ -15,7 +15,9 @@ const commerceRequests: MockFixture = {
 			data: bigcommerceCustomerGroups
 		},
 		'https://api.bigcommerce.com/stores/store_hash/v3/catalog/categories/tree': {
-			data: bigcommerceCategories
+			data: {
+				data: bigcommerceCategories
+			}
 		}
 	},
 	post: {
