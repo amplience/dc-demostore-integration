@@ -189,7 +189,7 @@ describe('bigcommerce integration', function () {
 		])
 	})
 
-	// TODO
+	// Get BigCommerce Category with Products
 	test('getCategory', async () => {
 		const category = await codec.getCategory({ slug: 'men' })
 		expect(requests).toEqual([
