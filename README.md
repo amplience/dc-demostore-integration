@@ -20,24 +20,6 @@ Concrete implementations of this interface are referred to as `Codec`s and are l
 
 ## Codecs in use
 
-### `akeneoCodec`
-Location: `src/codec/codecs/akeneo`
-
-Schema: `https://demostore.amplience.com/site/integration/akeneo`
-
-Connects to an Akeneo instance.
-
-#### Configuration
-
-```
-{
-    "username": "<akeneo username>",
-    "password": "<akeneo password>",
-    "client_id": "<akeneo client id>",
-    "client_secret": "<akeneo client secret>"
-}
-```
-
 ### `bigCommerceCodec`
 Location: `src/codec/codecs/bigcommerce`
 
@@ -49,6 +31,7 @@ Connects to a BigCommerce instance.
 
 ```
 {
+    "vendor": "bigcommerce",
     "api_url": "<bigcommerce api url>",
     "api_token": "<bigcommerce api token>",
     "store_hash": "<bigcommerce store hash>"
@@ -66,83 +49,13 @@ Connects to a commercetools instance.
 
 ```
 {
+    "vendor": "commercetools",
     "project": "<ct project key>",
     "client_id": "<ct client id>",
     "client_secret": "<ct client secret>",
     "auth_url": "<ct auth url",
     "api_url": "<ct api url>",
     "scope": "<list of scopes>"
-}
-```
-
-### `constructorioCodec`
-Location: `src/codec/codecs/constructor.io`
-
-Schema: `https://demostore.amplience.com/site/integration/constructor.io`
-
-Connects to a constructor.io instance.
-
-#### Configuration
-
-```
-{
-    "api_key": "<constructor.io api key>",
-    "api_token": "<constructor.io api token>"
-}
-```
-
-### `elasticPathCodec`
-Location: `src/codec/codecs/elasticpath`
-
-Schema: `https://demostore.amplience.com/site/integration/elasticpath`
-
-Connects to an Elastic Path instance.
-
-#### Configuration
-
-```
-{
-    "client_id": "<ep client id>",
-    "client_secret": "<ep client secret>",
-    "auth_url": "<ep auth url>",
-    "api_url": "<ep base url>",
-    "pcm_url": "<ep pcm url>",
-    "catalog_name": "<base catalog name>"
-}
-```
-
-### `fabricCodec`
-Location: `src/codec/codecs/fabric`
-
-Schema: `https://demostore.amplience.com/site/integration/fabric`
-
-Connects to a fabric instance.
-
-#### Configuration
-
-```
-{
-    "username": "<fabric username>",
-    "password": "<fabric password>",
-    "accountId": "<fabric account id>",
-    "auth_url": "<fabric auth url>",
-    "api_url": "<fabric base url>"
-}
-```
-
-### `hybrisCodec`
-Location: `src/codec/codecs/hybris`
-
-Schema: `https://demostore.amplience.com/site/integration/hybris`
-
-Connects to an SAP/Hybris instance.
-
-#### Configuration
-
-```
-{
-    "api_url": "<api base URL>",
-    "catalog_id": "<catalog id>"
 }
 ```
 
@@ -157,6 +70,7 @@ Takes its product catalog, category structure, and translation data from URLs sp
 
 ```
 {
+    "vendor": "rest",
     "productURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/products.json",
     "categoryURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/categories.json",
     "customerGroupURL": "https://demostore-catalog.s3.us-east-2.amazonaws.com/customerGroups.json",
@@ -175,6 +89,7 @@ Connects to a SalesForce Commerce Cloud instance.
 
 ```
 {
+    "vendor": "sfcc",
     "api_url": "<sfcc api url>",
     "auth_url": "<sfcc auth url>",
     "site_id": "<sfcc site id>",
