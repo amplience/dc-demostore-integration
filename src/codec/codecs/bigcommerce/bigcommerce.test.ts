@@ -82,25 +82,25 @@ describe('bigcommerce integration', function () {
 	// Get BigCommerce Product
 	test('getProduct', async () => {
 		const result = await codec.getProduct({
-			id: "1"
+			id: '1'
 		})
 		expect(requests).toEqual([
-			productRequest("1")
+			productRequest('1')
 		])
-		expect(result).toEqual(exampleProduct("1"))
+		expect(result).toEqual(exampleProduct('1'))
 	})
 
 	// Get BigCommerce Products
 	test('getProducts (multiple)', async () => {
 		const result = await codec.getProducts({
-			productIds: "1,3"
+			productIds: '1,3'
 		})
 		expect(requests).toEqual([
-			productRequest("1,3")
+			productRequest('1,3')
 		])
 		expect(result).toEqual([
-			exampleProduct("1"),
-			exampleProduct("3")
+			exampleProduct('1'),
+			exampleProduct('3')
 		])
 	})
 
@@ -130,15 +130,15 @@ describe('bigcommerce integration', function () {
 			productCategoryRequest(1)
 		])
 		expect(products).toEqual([
-			exampleProduct("1"),
-			exampleProduct("3")
+			exampleProduct('1'),
+			exampleProduct('3')
 		])
 	})
 
 	// Get BigCommerce Product (missing ID)
 	test('getProduct (missing)', async () => {
 		const result = await codec.getProduct({
-			id: "-1"
+			id: '-1'
 		})
 		expect(requests).toEqual([
 			productRequest('-1')
@@ -152,22 +152,22 @@ describe('bigcommerce integration', function () {
 			productIds: '1,-1,3'
 		})
 		expect(requests).toEqual([
-			productRequest("1,-1,3")
+			productRequest('1,-1,3')
 		])
 		expect(result).toEqual([
-			exampleProduct("1"),
+			exampleProduct('1'),
 			null,
-			exampleProduct("3")
+			exampleProduct('3')
 		])
 	})
 
 	// Get BigCommerce Products (raw, original value)
 	test('getRawProducts', async () => {
 		const result = await codec.getRawProducts({
-			productIds: "1"
+			productIds: '1'
 		})
 		expect(requests).toEqual([
-			productRequest("1")
+			productRequest('1')
 		])
 		expect(result).toEqual(
 			bigcommerceProduct(1)
@@ -177,10 +177,10 @@ describe('bigcommerce integration', function () {
 	// Get BigCommerce Products (raw and one missing ID)
 	test('getRawProducts (multiple, one missing)', async () => {
 		const result = await codec.getRawProducts({
-			productIds: "1,-1,3"
+			productIds: '1,-1,3'
 		})
 		expect(requests).toEqual([
-			productRequest("1,-1,3")
+			productRequest('1,-1,3')
 		])
 		expect(result).toEqual([
 			...bigcommerceProduct(1),
@@ -199,8 +199,8 @@ describe('bigcommerce integration', function () {
 		expect(category).toEqual({
 			children: [],
 			products: [
-				exampleProduct("1"),
-				exampleProduct("3")
+				exampleProduct('1'),
+				exampleProduct('3')
 			],
 			id: '1',
 			name: 'Men',

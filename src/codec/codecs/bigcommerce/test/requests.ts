@@ -6,7 +6,7 @@ export const categoriesRequest = {
 		headers: {
 			'X-Auth-Token': 'api_token',
 			'Accept': 'application/json',
-        	'Content-Type': 'application/json'
+			'Content-Type': 'application/json'
 		},
 		url: '/v3/catalog/categories/tree',
 	},
@@ -22,7 +22,7 @@ export const customerGroupsRequest = {
 		headers: {
 			'X-Auth-Token': 'api_token',
 			'Accept': 'application/json',
-        	'Content-Type': 'application/json'
+			'Content-Type': 'application/json'
 		}
 	},
 	url: 'https://api.bigcommerce.com/stores/store_hash/v2/customer_groups',
@@ -36,7 +36,7 @@ export const searchRequest = (filter: string) => ({
 		headers: {
 			'X-Auth-Token': 'api_token',
 			'Accept': 'application/json',
-        	'Content-Type': 'application/json'
+			'Content-Type': 'application/json'
 		},
 		url: `/v3/catalog/products?keyword=${filter}`
 	},
@@ -51,7 +51,7 @@ export const productRequest = (id: string) => ({
 		headers: {
 			'X-Auth-Token': 'api_token',
 			'Accept': 'application/json',
-        	'Content-Type': 'application/json'
+			'Content-Type': 'application/json'
 		},
 		url: `/v3/catalog/products?id:in=${id}&include=images,variants`
 	},
@@ -66,7 +66,7 @@ export const productCategoryRequest = (id: number) => ({
 		headers: {
 			'X-Auth-Token': 'api_token',
 			'Accept': 'application/json',
-        	'Content-Type': 'application/json'
+			'Content-Type': 'application/json'
 		},
 		url: `/v3/catalog/products?categories:in=${id}`
 	},
