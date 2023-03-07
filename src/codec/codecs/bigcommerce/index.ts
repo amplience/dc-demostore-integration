@@ -6,7 +6,7 @@ import axios from "axios";
 import { BigCommerceProduct } from "./types";
 import { mapCategory, mapCustomerGroup, mapProduct } from "./mappers";
 import { catchAxiosErrors } from "../codec-error";
-import { getProductsArgError, mapIdentifiersNumber } from "../common";
+import { getProductsArgError, logResponse, mapIdentifiersNumber } from "../common";
 
 /**
  * TODO
@@ -87,13 +87,10 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
             }
         }
         const response = await catchAxiosErrors(async () => await axios.request(request))
-        // console.log('========= REQUEST ==========', JSON.stringify(request, null, 4))
         if (url.indexOf('customer_groups') > -1) {
-            // console.log('========= RESPONSE ==========', JSON.stringify(response.data, null, 4))
-            return response.data
+            return logResponse('get', url, response).data
         }
-        // console.log('========= RESPONSE ==========', JSON.stringify(response.data.data, null, 4))
-        return response.data.data
+        return logResponse('get', url, response).data.data
     }
 
     /**
