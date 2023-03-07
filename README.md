@@ -11,9 +11,9 @@ dc-demostore-integration uses codecs in order to determine how and where to get 
 The `CommerceAPI` interface exposes these methods:
 
 * `getProduct` (by ID or slug)
-* `getProducts` (search by keyword)
+* `getProducts` (by IDs, by category or by search keyword)
 * `getCategory` (by ID or slug)
-* `getMegaMenu` (category navigation)
+* `getMegaMenu` (category hierarchy)
 * `getCustomerGroups` (customer segmentation)
 
 Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`.
