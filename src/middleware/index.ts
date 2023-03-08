@@ -1,7 +1,7 @@
 import { getContentItem, getContentItemFromConfigLocator } from '../amplience'
 import axios from 'axios'
 import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
-import { isServer } from '../common/util'
+import { flattenConfig, isServer } from '../common/util'
 
 /**
  * Get an API for the given configuration.
@@ -54,14 +54,7 @@ export type CommerceOperation =
  */
 // getCommerceAPI is the main client interaction point with the integration layer
 export const getCommerceAPI = async (params: any = undefined): Promise<CommerceAPI> => {
-	let codec = params
-
-	if (params.codec_params) {
-		codec = {
-			...params.codec_params,
-			vendor: params.vendor
-		}
-	}
+	const codec = flattenConfig(params)
 
 	//const codec = params.codec_params ?? params // merge in vendor with params
 	if (isServer()) {

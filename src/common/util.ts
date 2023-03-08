@@ -13,10 +13,11 @@ export const sleep = (delay: number) => new Promise((resolve) => setTimeout(reso
  * @param args.currency Currency type
  * @returns Formatted value
  */
-export const formatMoneyString = (money, args) => new Intl.NumberFormat(args.locale, {
-	style: 'currency',
-	currency: args.currency || defaultArgs.currency
-}).format(money)
+export const formatMoneyString = (money, args) =>
+	new Intl.NumberFormat(args.locale, {
+		style: 'currency',
+		currency: args.currency || defaultArgs.currency
+	}).format(money)
 
 /**
  * Determine if the code is running on a server.
@@ -36,4 +37,18 @@ export const quote = (str: string) => `"${str}"`
  * @param productIds Comma separated list
  * @returns Comma separated list with quoted items
  */
-export const quoteProductIdString = (productIds: string) => productIds.split(',').map(quote).join(',')
+export const quoteProductIdString = (productIds: string) =>
+	productIds.split(',').map(quote).join(',')
+
+export const flattenConfig = (params: any = undefined): any => {
+	let codec = params
+
+	if (params.codec_params) {
+		codec = {
+			...params.codec_params,
+			vendor: params.vendor
+		}
+	}
+
+	return codec
+}
