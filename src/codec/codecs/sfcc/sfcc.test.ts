@@ -5,6 +5,7 @@ import { sfccCategories, sfccCustomerGroups, sfccProduct, sfccProducts, sfccSear
 import { categoryRequest, categorySearch, customerGroupsRequest, keywordSearch, oauthRequest, productIdRequest, productIdRequests } from './test/requests'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { config } from './test/config'
+import { flattenConfig } from '../../../common/util'
 
 jest.mock('axios')
 
@@ -60,7 +61,7 @@ describe('sfcc integration', function() {
 
 		massMock(axios, requests, sfccRequests)
 
-		sfccCodec = new SFCCCommerceCodec(config)
+		sfccCodec = new SFCCCommerceCodec(flattenConfig(config))
 		await sfccCodec.init(new SFCCCommerceCodecType())
 	})
 

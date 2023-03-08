@@ -6,6 +6,7 @@ import { ctoolsCategories, ctoolsCustomerGroups, ctoolsProduct, ctoolsSearchResu
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, oauthRequest, searchRequest } from './test/requests'
 import { config } from './test/config'
+import { flattenConfig } from '../../../common/util'
 
 jest.mock('axios')
 
@@ -65,7 +66,7 @@ describe('commercetools integration', function() {
 
 		massMock(axios, requests, commerceRequests)
 
-		codec = new CommercetoolsCodec(config)
+		codec = new CommercetoolsCodec(flattenConfig(config))
 		await codec.init(new CommercetoolsCodecType())
 	})
 

@@ -5,21 +5,22 @@ import RestCommerceCodecType, { RestCommerceCodec } from '.'
 import { config } from './test/config'
 import { categories, childCategories, groups, products, restProduct, rootCategory } from './test/responses'
 import { categoryRequest, customerGroupRequest, productRequest, translationsRequest } from './test/requests'
+import { flattenConfig } from '../../../common/util'
 
 jest.mock('axios')
 
 const restRequests: MockFixture = {
 	get: {
-		[config.categoryURL]: {
+		[config.codec_params.categoryURL]: {
 			data: categories
 		},
-		[config.productURL]: {
+		[config.codec_params.productURL]: {
 			data: products
 		},
-		[config.customerGroupURL]: {
+		[config.codec_params.customerGroupURL]: {
 			data: groups
 		},
-		[config.translationsURL]: {
+		[config.codec_params.translationsURL]: {
 			data: []
 		},	
 	}
@@ -36,7 +37,7 @@ describe('rest integration', function() {
 
 		massMock(axios, requests, restRequests)
 
-		codec = new RestCommerceCodec(config)
+		codec = new RestCommerceCodec(flattenConfig(config))
 		await codec.init(new RestCommerceCodecType())
 	})
 

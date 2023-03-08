@@ -2,28 +2,28 @@ import { config } from './config'
 
 export const categoryRequest = {
 	config: {
-		url: config.categoryURL
+		url: config.codec_params.categoryURL
 	},
-	url: config.categoryURL
+	url: config.codec_params.categoryURL
 }
 
 export const productRequest = {
 	config: {
-		url: config.productURL
+		url: config.codec_params.productURL
 	},
-	url: config.productURL
+	url: config.codec_params.productURL
 }
 
 export const customerGroupRequest = {
 	config: {
-		url: config.customerGroupURL
+		url: config.codec_params.customerGroupURL
 	},
-	url: config.customerGroupURL
+	url: config.codec_params.customerGroupURL
 }
 
 export const translationsRequest = {
 	config: {
-		url: config.translationsURL
+		url: config.codec_params.translationsURL
 	},
-	url: config.translationsURL
+	url: config.codec_params.translationsURL
 }

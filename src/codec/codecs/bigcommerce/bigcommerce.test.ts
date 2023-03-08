@@ -6,6 +6,7 @@ import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups } 
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest, productCategoryRequest } from './test/requests'
 import { config } from './test/config'
+import { flattenConfig } from '../../../common/util'
 
 jest.mock('axios')
 
@@ -75,7 +76,7 @@ describe('bigcommerce integration', function () {
 		jest.resetAllMocks()
 		requests = []
 		massMock(axios, requests, commerceRequests)
-		codec = new BigCommerceCommerceCodec(config)
+		codec = new BigCommerceCommerceCodec(flattenConfig(config))
 		await codec.init(new BigCommerceCodecType())
 	})
 
