@@ -29,7 +29,6 @@ exports.mapCategory = mapCategory;
  */
 const mapVariant = (variant, product) => {
     var _a;
-    console.log("MAP VARIANT", variant, product);
     return {
         sku: `${variant.sku}`,
         listPrice: (0, util_1.formatMoneyString)(variant.calculated_price, { currency: 'USD' }),
@@ -50,19 +49,7 @@ exports.mapVariant = mapVariant;
  * @returns
  */
 const mapVariantProduct = (product) => {
-    var _a, _b;
-    console.log("MAP VARIANT PRODUCT", {
-        sku: `${product.sku}`,
-        listPrice: (0, util_1.formatMoneyString)(product.calculated_price, { currency: 'USD' }),
-        salePrice: (0, util_1.formatMoneyString)(product.sale_price, { currency: 'USD' }),
-        // attributesx: variant.option_values.map(opt => ({
-        //     name: opt.option_display_name.toLowerCase(),
-        //     value: opt.label
-        // })),
-        // attributes: _.keyBy(variant.option_values, ''),
-        attributes: {},
-        images: (_a = product.images) === null || _a === void 0 ? void 0 : _a.map(i => ({ url: i.url_standard }))
-    });
+    var _a;
     return {
         sku: `${product.sku}`,
         listPrice: (0, util_1.formatMoneyString)(product.calculated_price, { currency: 'USD' }),
@@ -73,7 +60,7 @@ const mapVariantProduct = (product) => {
         // })),
         // attributes: _.keyBy(variant.option_values, ''),
         attributes: {},
-        images: (_b = product.images) === null || _b === void 0 ? void 0 : _b.map(i => ({ url: i.url_standard }))
+        images: (_a = product.images) === null || _a === void 0 ? void 0 : _a.map(i => ({ url: i.url_standard }))
     };
 };
 exports.mapVariantProduct = mapVariantProduct;
@@ -83,16 +70,7 @@ exports.mapVariantProduct = mapVariantProduct;
  * @returns
  */
 const mapProduct = (product) => {
-    var _a, _b;
-    console.log("MAP_PRODUCT", product && {
-        id: `${product.id}`,
-        shortDescription: product.description,
-        longDescription: product.description,
-        slug: (0, slugify_1.default)(product.name, { lower: true }),
-        name: product.name,
-        categories: [],
-        variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => (0, exports.mapVariant)(variant, product))) || [(0, exports.mapVariantProduct)(product)]
-    });
+    var _a;
     return product && {
         id: `${product.id}`,
         shortDescription: product.description,
@@ -100,7 +78,7 @@ const mapProduct = (product) => {
         slug: (0, slugify_1.default)(product.name, { lower: true }),
         name: product.name,
         categories: [],
-        variants: ((_b = product.variants) === null || _b === void 0 ? void 0 : _b.map(variant => (0, exports.mapVariant)(variant, product))) || [(0, exports.mapVariantProduct)(product)]
+        variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map(variant => (0, exports.mapVariant)(variant, product))) || [(0, exports.mapVariantProduct)(product)]
     };
 };
 exports.mapProduct = mapProduct;

@@ -103,10 +103,7 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
     getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
-            if (args.productIds === '') {
-                return [];
-            }
-            else if (args.productIds) {
+            if (args.productIds) {
                 const ids = args.productIds.split(',');
                 products = (0, common_2.mapIdentifiersNumber)(ids, yield this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`));
             }
@@ -117,10 +114,9 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
                 products = yield this.fetch(`/v3/catalog/products?categories:in=${args.category.id}&include=images,variants`);
             }
             else {
-                console.log("Incorrect arguments: ", args);
+                console.log("ARGS", args);
                 throw (0, common_2.getProductsArgError)(method);
             }
-            console.log("GET RAW PRODUCTS", products);
             return products;
         });
     }
