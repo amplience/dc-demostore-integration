@@ -4,25 +4,25 @@ exports.translationsRequest = exports.customerGroupRequest = exports.productRequ
 const config_1 = require("./config");
 exports.categoryRequest = {
     config: {
-        url: config_1.config.categoryURL
+        url: config_1.config.codec_params.categoryURL
     },
-    url: config_1.config.categoryURL
+    url: config_1.config.codec_params.categoryURL
 };
 exports.productRequest = {
     config: {
-        url: config_1.config.productURL
+        url: config_1.config.codec_params.productURL
     },
-    url: config_1.config.productURL
+    url: config_1.config.codec_params.productURL
 };
 exports.customerGroupRequest = {
     config: {
-        url: config_1.config.customerGroupURL
+        url: config_1.config.codec_params.customerGroupURL
     },
-    url: config_1.config.customerGroupURL
+    url: config_1.config.codec_params.customerGroupURL
 };
 exports.translationsRequest = {
     config: {
-        url: config_1.config.translationsURL
+        url: config_1.config.codec_params.translationsURL
     },
-    url: config_1.config.translationsURL
+    url: config_1.config.codec_params.translationsURL
 };

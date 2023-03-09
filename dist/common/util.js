@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.quoteProductIdString = exports.quote = exports.isServer = exports.formatMoneyString = exports.sleep = void 0;
+exports.flattenConfig = exports.quoteProductIdString = exports.quote = exports.isServer = exports.formatMoneyString = exports.sleep = void 0;
 const default_args_1 = require("./default-args");
 /**
  * Sleep for a period of time in milliseconds.
@@ -40,3 +40,11 @@ exports.quote = quote;
  */
 const quoteProductIdString = (productIds) => productIds.split(',').map(exports.quote).join(',');
 exports.quoteProductIdString = quoteProductIdString;
+const flattenConfig = (params = undefined) => {
+    let codec = params;
+    if (params.codec_params) {
+        codec = Object.assign(Object.assign({}, params.codec_params), { vendor: params.vendor });
+    }
+    return codec;
+};
+exports.flattenConfig = flattenConfig;

@@ -42,6 +42,7 @@ const responses_1 = require("./test/responses");
 const requests_1 = require("./test/requests");
 const results_1 = require("./test/results");
 const config_1 = require("./test/config");
+const util_1 = require("../../../common/util");
 jest.mock('axios');
 const sfccRequests = {
     get: Object.assign(Object.assign({ 'https://test.sandbox.us03.dx.commercecloud.salesforce.com/s/TestSite/dw/shop/v22_4/categories/root': {
@@ -80,7 +81,7 @@ describe('sfcc integration', function () {
         jest.resetAllMocks();
         requests = [];
         (0, rest_mock_1.massMock)(axios_1.default, requests, sfccRequests);
-        sfccCodec = new _1.SFCCCommerceCodec(config_1.config);
+        sfccCodec = new _1.SFCCCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield sfccCodec.init(new _1.default());
     }));
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {

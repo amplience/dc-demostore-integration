@@ -61,6 +61,12 @@ export declare const getContentTypeSchema: (ctype: CType) => ContentTypeSchema;
 export declare const mapIdentifiers: <T extends {
     id: string;
 }>(ids: string[], items: T[]) => T[];
+/**
+ *
+ * @param ids
+ * @param items
+ * @returns
+ */
 export declare const mapIdentifiersNumber: <T extends {
     id: number;
 }>(ids: string[], items: T[]) => T[];

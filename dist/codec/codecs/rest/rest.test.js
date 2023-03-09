@@ -41,19 +41,20 @@ const _1 = __importStar(require("."));
 const config_1 = require("./test/config");
 const responses_1 = require("./test/responses");
 const requests_1 = require("./test/requests");
+const util_1 = require("../../../common/util");
 jest.mock('axios');
 const restRequests = {
     get: {
-        [config_1.config.categoryURL]: {
+        [config_1.config.codec_params.categoryURL]: {
             data: responses_1.categories
         },
-        [config_1.config.productURL]: {
+        [config_1.config.codec_params.productURL]: {
             data: responses_1.products
         },
-        [config_1.config.customerGroupURL]: {
+        [config_1.config.codec_params.customerGroupURL]: {
             data: responses_1.groups
         },
-        [config_1.config.translationsURL]: {
+        [config_1.config.codec_params.translationsURL]: {
             data: []
         },
     }
@@ -65,7 +66,7 @@ describe('rest integration', function () {
         jest.resetAllMocks();
         requests = [];
         (0, rest_mock_1.massMock)(axios_1.default, requests, restRequests);
-        codec = new _1.RestCommerceCodec(config_1.config);
+        codec = new _1.RestCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
     }));
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {

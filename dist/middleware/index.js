@@ -50,10 +50,7 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
  */
 // getCommerceAPI is the main client interaction point with the integration layer
 const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0, function* () {
-    let codec = params;
-    if (params.codec_params) {
-        codec = Object.assign(Object.assign({}, params.codec_params), { vendor: params.vendor });
-    }
+    const codec = (0, util_1.flattenConfig)(params);
     //const codec = params.codec_params ?? params // merge in vendor with params
     if ((0, util_1.isServer)()) {
         return yield getAPI(codec);

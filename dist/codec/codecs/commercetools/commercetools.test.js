@@ -42,6 +42,7 @@ const responses_1 = require("./test/responses");
 const results_1 = require("./test/results");
 const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
+const util_1 = require("../../../common/util");
 jest.mock('axios');
 const commerceRequests = {
     get: {
@@ -94,7 +95,7 @@ describe('commercetools integration', function () {
         jest.resetAllMocks();
         requests = [];
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceRequests);
-        codec = new _1.CommercetoolsCodec(config_1.config);
+        codec = new _1.CommercetoolsCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
     }));
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {

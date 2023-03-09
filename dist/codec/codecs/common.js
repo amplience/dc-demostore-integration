@@ -151,8 +151,14 @@ const mapIdentifiers = (ids, items) => {
     return ids.map(id => { var _a; return (_a = items.find(item => item.id === id)) !== null && _a !== void 0 ? _a : null; });
 };
 exports.mapIdentifiers = mapIdentifiers;
+/**
+ *
+ * @param ids
+ * @param items
+ * @returns
+ */
 const mapIdentifiersNumber = (ids, items) => {
-    return ids.map(id => { var _a; return (_a = items.find(item => item.id === Number(id))) !== null && _a !== void 0 ? _a : null; });
+    return ids.map(id => { var _a; return (_a = items.find(item => item && item.id === Number(id))) !== null && _a !== void 0 ? _a : null; });
 };
 exports.mapIdentifiersNumber = mapIdentifiersNumber;
 /**

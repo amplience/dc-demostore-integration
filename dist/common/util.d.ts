@@ -28,3 +28,4 @@ export declare const quote: (str: string) => string;
  * @returns Comma separated list with quoted items
  */
 export declare const quoteProductIdString: (productIds: string) => string;
+export declare const flattenConfig: (params?: any) => any;

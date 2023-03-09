@@ -107,9 +107,9 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 			const ids = args.productIds.split(',')
 			products = mapIdentifiersNumber<BigCommerceProduct>(ids, await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`))
 		} else if (args.keyword) {
-			products = await this.fetch(`/v3/catalog/products?keyword=${args.keyword}`)
+			products = await this.fetch(`/v3/catalog/products?keyword=${args.keyword}&include=images,variants`)
 		} else if (args.category) {
-			products = await this.fetch(`/v3/catalog/products?categories:in=${args.category.id}`)
+			products = await this.fetch(`/v3/catalog/products?categories:in=${args.category.id}&include=images,variants`)
 		} else {
 			throw getProductsArgError(method)
 		}

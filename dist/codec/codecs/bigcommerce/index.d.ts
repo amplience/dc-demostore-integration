@@ -1,64 +1,56 @@
-import { APIConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from "../../../common";
+import { APIConfiguration, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core';
-import { StringProperty } from "../../cms-property-types";
-import { BigCommerceProduct } from "./types";
+import { StringProperty } from '../../cms-property-types';
+import { BigCommerceProduct } from './types';
 /**
- * TODO
+ * BigCommerce Codec config properties
  */
 declare type CodecConfig = APIConfiguration & {
     api_token: StringProperty;
     store_hash: StringProperty;
 };
 /**
- * TODO
+ * Commerce Codec Type that integrates with BigCommerce.
  */
 export declare class BigCommerceCommerceCodecType extends CommerceCodecType {
     /**
-     * TODO
+     * @inheritdoc
      */
     get vendor(): string;
     /**
-     * TODO
+     * @inheritdoc
      */
     get properties(): CodecConfig;
     /**
-     * TODO
-     * @param config
-     * @returns
+     * @inheritdoc
      */
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * TODO
+ * ommerce Codec that integrates with BigCommerce.
  */
 export declare class BigCommerceCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     /**
-     * TODO
+     * @inheritdoc
      */
     cacheMegaMenu(): Promise<void>;
     /**
-     * TODO
-     * @param url
-     * @returns
+     * Fetches data using store hash and API token.
+     * @param url URL to fetch data from
+     * @returns Response data
      */
     fetch(url: string): Promise<any>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getProducts(args: GetProductsArgs): Promise<Product[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getRawProducts(args: GetProductsArgs, method?: string): Promise<BigCommerceProduct[]>;
     /**
-     * TODO
-     * @param args
-     * @returns
+     * @inheritdoc
      */
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
 }
