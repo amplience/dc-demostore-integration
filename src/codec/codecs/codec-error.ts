@@ -83,6 +83,8 @@ export type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | undefin
  * A generic error that can be thrown by a codec, with an error type and optional information.
  */
 export class CodecError extends Error {
+	errorType: 'codec' = 'codec'
+
 	constructor(public type: CodecErrorType, public info?: CodecErrorInfo) {
 		super(typeToString(type, info))
 	}

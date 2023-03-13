@@ -2,6 +2,8 @@ import { getContentItem, getContentItemFromConfigLocator } from '../amplience'
 import axios from 'axios'
 import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
 import { flattenConfig, isServer } from '../common/util'
+import { CodecError, CodecErrorType } from '../codec/codecs/codec-error'
+import { IntegrationError } from '@/common/errors'
 
 /**
  * Get an API for the given configuration.
@@ -46,6 +48,68 @@ export type CommerceOperation =
 	| 'getCustomerGroups'
 	| 'getRawProducts'
 
+export interface MiddlewareError {
+	type: string
+	message: string,
+	info?: object
+}
+
+/**
+ * Convert an error thrown by an integration to one deliverable by the middleware API.
+ * @param error The error to convert
+ * @returns A middleware API error
+ */
+const toApiError = (error: Error | CodecError | IntegrationError): MiddlewareError => {
+	if ('errorType' in error && error.errorType === 'codec') {
+		return {
+			type: CodecErrorType[error.type],
+			info: error.info,
+			message: error.message
+		}
+	} else if ('errorType' in error && error.errorType === 'integration') {
+		return {
+			type: 'Integration',
+			message: error.message,
+			info: {
+				helpUrl: error.helpUrl
+			}
+		}
+	} else {
+		return {
+			type: 'Generic',
+			message: error.message,
+		}
+	}
+}
+
+/**
+ * Throws a CodecError, IntegrationError or Error delivered by the middleware API.
+ * @param error Error delivered by the middleware API
+ */
+const fromApiError = (error: MiddlewareError): Error | IntegrationError | CodecError => {
+	switch (error.type) {
+	case 'Integration':
+		return new IntegrationError({
+			message: error.message,
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			helpUrl: (error.info as any).helpUrl
+		})
+	case 'Generic':
+		return new Error(error.message)
+	default: {
+		// Try parse as a codec error.
+		const type = CodecErrorType[error.type]
+
+		if (type !== undefined) {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return new CodecError(type, error.info as any)
+		} else {
+			return new Error(error.message)
+		}
+	}
+	}
+}
+
 /**
  * Get a Commerce API for the given configuration.
  * @param params Configuration object and vendor
@@ -61,14 +125,19 @@ export const getCommerceAPI = async (params: any = undefined): Promise<CommerceA
 	} else {
 		const getResponse =
 			(operation: CommerceOperation) =>
-			async (args: any): Promise<any> => {
-				const apiUrl = (window as any).isStorybook
-					? 'https://core.dc-demostore.com/api'
-					: '/api'
-				return await (
-					await axios.get(apiUrl, { params: { ...args, ...codec, operation } })
-				).data
-			}
+				async (args: any): Promise<any> => {
+					const apiUrl = (window as any).isStorybook
+						? 'https://core.dc-demostore.com/api'
+						: '/api'
+
+					const response = (await axios.get(apiUrl, { params: { ...args, ...codec, operation } })).data
+
+					if (response.error) {
+						throw fromApiError(response.error)
+					}
+
+					return response.result
+				}
 
 		return {
 			getProduct: getResponse('getProduct'),
@@ -97,15 +166,19 @@ export const middleware = async (req, res) => {
 	const config = req.body || req.query
 	const commerceAPI = await getCommerceAPI(config)
 	switch (req.method.toLowerCase()) {
-		case 'get':
-		case 'post':
-			return res.status(200).json(await commerceAPI[config.operation](config))
+	case 'get':
+	case 'post':
+		try {
+			return res.status(200).json({result: await commerceAPI[config.operation](config)})
+		} catch (e) {
+			return res.status(200).json({error: toApiError(e)})
+		}
 
-		case 'options':
-			return res.status(200).send()
+	case 'options':
+		return res.status(200).send()
 
-		default:
-			break
+	default:
+		break
 	}
 }
 

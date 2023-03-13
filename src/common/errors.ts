@@ -2,6 +2,7 @@
  * Error type thrown by integrations.
  */
 export class IntegrationError {
+	errorType: 'integration' = 'integration'
 	message: string
 	helpUrl: string
 
