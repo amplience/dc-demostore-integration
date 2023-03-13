@@ -1,12 +1,12 @@
-import { APIConfiguration, APIProperties, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../common';
-import _ from 'lodash';
+import { APIConfiguration, APIProperties, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../common'
+import _ from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
-import { StringProperty } from '../../cms-property-types';
-import axios from 'axios';
-import { BigCommerceProduct } from './types';
-import { mapCategory, mapCustomerGroup, mapProduct } from './mappers';
-import { catchAxiosErrors } from '../codec-error';
-import { getProductsArgError, logResponse, mapIdentifiersNumber } from '../common';
+import { StringProperty } from '../../cms-property-types'
+import axios from 'axios'
+import { BigCommerceProduct } from './types'
+import { mapCategory, mapCustomerGroup, mapProduct } from './mappers'
+import { catchAxiosErrors } from '../codec-error'
+import { getProductsArgError, logResponse, mapIdentifiersNumber } from '../common'
 
 /**
  * BigCommerce Codec config properties
@@ -65,7 +65,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async cacheMegaMenu(): Promise<void> {
-		this.megaMenu = (await this.fetch(`/v3/catalog/categories/tree`)).map(mapCategory)
+		this.megaMenu = (await this.fetch('/v3/catalog/categories/tree')).map(mapCategory)
 	}
 
 	/**
@@ -80,8 +80,8 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 			baseURL: `${this.config.api_url}/stores/${this.config.store_hash}`,
 			headers: {
 				'X-Auth-Token': this.config.api_token,
-				'Accept': `application/json`,
-				'Content-Type': `application/json`
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
 			}
 		}
 		const response = await catchAxiosErrors(async () => await axios.request(request))
@@ -124,7 +124,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 	 * @inheritdoc 
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-		return (await this.fetch(`/v2/customer_groups`)).map(mapCustomerGroup)
+		return (await this.fetch('/v2/customer_groups')).map(mapCustomerGroup)
 	}
 }
 
