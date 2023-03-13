@@ -103,12 +103,18 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
     getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
-            if (args.productIds) {
+            if (args.productIds && args.productIds === '') {
+                products = [];
+            }
+            else if (args.productIds) {
                 const ids = args.productIds.split(',');
                 products = (0, common_2.mapIdentifiersNumber)(ids, yield this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`));
             }
             else if (args.keyword) {
                 products = yield this.fetch(`/v3/catalog/products?keyword=${args.keyword}&include=images,variants`);
+            }
+            else if (args.category && args.category.id === '') {
+                products = [];
             }
             else if (args.category) {
                 products = yield this.fetch(`/v3/catalog/products?categories:in=${args.category.id}&include=images,variants`);
