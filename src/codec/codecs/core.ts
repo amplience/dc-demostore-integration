@@ -13,7 +13,6 @@ import {
 	CommonArgs, 
 	GetCommerceObjectArgs, 
 	GetProductsArgs, 
-	GetVariantsArgs,
 	Identifiable, 
 	Product 
 } from '../../common/types'
@@ -271,17 +270,6 @@ export class CommerceCodec implements CommerceAPI {
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
 		throw new CodecError(CodecErrorType.NotSupported, {
 			message: `getCustomerGroups is not supported on platform [ ${this.codecType.vendor} ]`
-		})
-	}
-
-	/**
-	 * Gets variants for the given product, by ID.
-	 * @param args Arguments object
-	 * @returns Product with variants
-	 */
-	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		throw new CodecError(CodecErrorType.NotSupported, {
-			message: `getVariants is not supported on platform [ ${this.codecType.vendor} ]`
 		})
 	}
 

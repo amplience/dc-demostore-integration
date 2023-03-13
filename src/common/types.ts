@@ -99,13 +99,6 @@ export type GetCommerceObjectArgs = CommonArgs & {
 }
 
 /**
- * Method arguments for fetching variants.
- */
-export type GetVariantsArgs = CommonArgs & {
-	productId: string
-}
-
-/**
  * Method arguments for fetching products.
  */
 export type GetProductsArgs = CommonArgs & {

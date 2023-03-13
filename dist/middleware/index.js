@@ -68,9 +68,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             getCategory: getResponse('getCategory'),
             getMegaMenu: getResponse('getMegaMenu'),
             getCustomerGroups: getResponse('getCustomerGroups'),
-            getVariants: getResponse('getVariants'),
             getRawProducts: getResponse('getRawProducts')
-            //getPromotions: getResponse('getPromotions')
         };
     }
 });

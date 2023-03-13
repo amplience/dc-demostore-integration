@@ -1,5 +1,4 @@
-import { SFCCProduct } from '@/codec/codecs/sfcc/types';
-import { GetCommerceObjectArgs, Product, GetProductsArgs, Category, CommonArgs, CustomerGroup, GetVariantsArgs } from './types';
+import { GetCommerceObjectArgs, Product, GetProductsArgs, Category, CommonArgs, CustomerGroup } from './types';
 /**
  * Common exception type, with a string message.
  */
@@ -19,6 +18,5 @@ export declare type CommerceAPI = API & {
     getCategory: (args: GetCommerceObjectArgs) => Promise<Category>;
     getMegaMenu: (args: CommonArgs) => Promise<Category[]>;
     getCustomerGroups: (args: CommonArgs) => Promise<CustomerGroup[]>;
-    getVariants: (args: GetVariantsArgs) => Promise<SFCCProduct>;
     getRawProducts: (args: GetProductsArgs) => Promise<any[]>;
 };

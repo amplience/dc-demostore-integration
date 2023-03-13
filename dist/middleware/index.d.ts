@@ -2,7 +2,7 @@ import { CommerceAPI } from '../index';
 /**
  * Commerce API method names.
  */
-export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getVariants' | 'getRawProducts';
+export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getRawProducts';
 /**
  * Get a Commerce API for the given configuration.
  * @param params Configuration object and vendor

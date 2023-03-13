@@ -251,14 +251,6 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    getVariants(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield this.fetch(`${this.shopApi}/products/${args.productId}/variations`);
-        });
-    }
-    /**
-     * @inheritdoc
-     */
     getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];

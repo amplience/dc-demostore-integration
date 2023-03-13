@@ -239,18 +239,6 @@ class CommerceCodec {
         });
     }
     /**
-     * Gets variants for the given product, by ID.
-     * @param args Arguments object
-     * @returns Product with variants
-     */
-    getVariants(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.NotSupported, {
-                message: `getVariants is not supported on platform [ ${this.codecType.vendor} ]`
-            });
-        });
-    }
-    /**
      * Gets products by a list of IDs or a filter, in their original format.
      * @param args Arguments object
      * @returns List of products in their original format

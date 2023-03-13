@@ -1,6 +1,6 @@
 import { Dictionary } from 'lodash';
 import { API, CommerceAPI } from '../../common';
-import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, GetVariantsArgs, Identifiable, Product } from '../../common/types';
+import { Category, CommonArgs, GetCommerceObjectArgs, GetProductsArgs, Identifiable, Product } from '../../common/types';
 /**
  * Types of codec.
  */
@@ -159,12 +159,6 @@ export declare class CommerceCodec implements CommerceAPI {
      */
     getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
     /**
-     * Gets variants for the given product, by ID.
-     * @param args Arguments object
-     * @returns Product with variants
-     */
-    getVariants(args: GetVariantsArgs): Promise<SFCCProduct>;
-    /**
      * Gets products by a list of IDs or a filter, in their original format.
      * @param args Arguments object
      * @returns List of products in their original format
@@ -189,4 +183,3 @@ export declare type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
     [K in keyof T]: T[K] extends StringProperty ? string : T[K] extends StringConstProperty ? string : T[K] extends NumberProperty ? number : T[K] extends IntegerProperty ? number : any[];
 };
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from '../cms-property-types';
-import { SFCCProduct } from './sfcc/types';

@@ -8,8 +8,7 @@ import {
 	OAuthRestClient,
 	OAuthRestClientInterface,
 	Product,
-	CustomerGroup,
-	GetVariantsArgs
+	CustomerGroup
 } from '../../../common'
 import _ from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../core'
@@ -278,13 +277,6 @@ export class SFCCCommerceCodec extends CommerceCodec {
 			)
 		}
 		return []
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	async getVariants(args: GetVariantsArgs): Promise<SFCCProduct> {
-		return await this.fetch(`${this.shopApi}/products/${args.productId}/variations`)
 	}
 
 	/**

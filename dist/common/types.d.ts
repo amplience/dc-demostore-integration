@@ -86,12 +86,6 @@ export declare type GetCommerceObjectArgs = CommonArgs & {
     slug?: string;
 };
 /**
- * Method arguments for fetching variants.
- */
-export declare type GetVariantsArgs = CommonArgs & {
-    productId: string;
-};
-/**
  * Method arguments for fetching products.
  */
 export declare type GetProductsArgs = CommonArgs & {

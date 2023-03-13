@@ -114,7 +114,6 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
                 products = yield this.fetch(`/v3/catalog/products?categories:in=${args.category.id}&include=images,variants`);
             }
             else {
-                console.log("ARGS", args);
                 throw (0, common_2.getProductsArgError)(method);
             }
             return products;

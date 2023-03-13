@@ -44,7 +44,6 @@ export type CommerceOperation =
 	| 'getCategory'
 	| 'getMegaMenu'
 	| 'getCustomerGroups'
-	| 'getVariants'
 	| 'getRawProducts'
 
 /**
@@ -77,9 +76,7 @@ export const getCommerceAPI = async (params: any = undefined): Promise<CommerceA
 			getCategory: getResponse('getCategory'),
 			getMegaMenu: getResponse('getMegaMenu'),
 			getCustomerGroups: getResponse('getCustomerGroups'),
-			getVariants: getResponse('getVariants'),
 			getRawProducts: getResponse('getRawProducts')
-			//getPromotions: getResponse('getPromotions')
 		}
 	}
 }

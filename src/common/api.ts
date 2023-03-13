@@ -5,8 +5,7 @@ import {
 	GetProductsArgs,
 	Category,
 	CommonArgs,
-	CustomerGroup,
-	GetVariantsArgs
+	CustomerGroup
 } from './types'
 
 /**
@@ -31,6 +30,5 @@ export type CommerceAPI = API & {
 	getCategory: (args: GetCommerceObjectArgs) => Promise<Category>
 	getMegaMenu: (args: CommonArgs) => Promise<Category[]>
 	getCustomerGroups: (args: CommonArgs) => Promise<CustomerGroup[]>
-	getVariants: (args: GetVariantsArgs) => Promise<SFCCProduct>
 	getRawProducts: (args: GetProductsArgs) => Promise<any[]>
 }
