@@ -105,16 +105,16 @@ export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
 export const getCommerceCodec = async (config: any): Promise<CommerceAPI> => await getCodec(config, CodecTypes.commerce) as CommerceAPI
 // end public interface
 
-import CommerceToolsCodecType from './codecs/commercetools'
+import CommerceToolsCodecType from './codecs/commerce/commercetools'
 registerCodec(new CommerceToolsCodecType())
 
-import RestCodecType from './codecs/rest'
+import RestCodecType from './codecs/commerce/rest'
 registerCodec(new RestCodecType())
 
-import SFCCCodecType from './codecs/sfcc'
+import SFCCCodecType from './codecs/commerce/sfcc'
 registerCodec(new SFCCCodecType())
 
-import BigCommerceCommerceCodecType from './codecs/bigcommerce'
+import BigCommerceCommerceCodecType from './codecs/commerce/bigcommerce'
 registerCodec(new BigCommerceCommerceCodecType())
 
 // reexport codec common functions

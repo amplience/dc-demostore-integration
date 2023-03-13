@@ -3,7 +3,7 @@ import axios from 'axios'
 import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
 import { flattenConfig, isServer } from '../common/util'
 import { CodecError, CodecErrorType } from '../codec/codecs/codec-error'
-import { IntegrationError } from '@/common/errors'
+import { IntegrationError } from '../common/errors'
 
 /**
  * Get an API for the given configuration.

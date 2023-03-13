@@ -74,6 +74,7 @@ class CodecError extends Error {
         super(typeToString(type, info));
         this.type = type;
         this.info = info;
+        this.errorType = 'codec';
     }
 }
 exports.CodecError = CodecError;

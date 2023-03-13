@@ -1,4 +1,3 @@
-import { SFCCProduct } from '@/codec/codecs/sfcc/types'
 import {
 	GetCommerceObjectArgs,
 	Product,

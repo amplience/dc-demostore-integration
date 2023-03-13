@@ -3,6 +3,11 @@ import { CommerceAPI } from '../index';
  * Commerce API method names.
  */
 export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getRawProducts';
+export interface MiddlewareError {
+    type: string;
+    message: string;
+    info?: object;
+}
 /**
  * Get a Commerce API for the given configuration.
  * @param params Configuration object and vendor

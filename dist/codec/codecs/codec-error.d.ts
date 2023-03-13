@@ -41,5 +41,6 @@ export declare type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo |
 export declare class CodecError extends Error {
     type: CodecErrorType;
     info?: CodecErrorInfo;
+    errorType: 'codec';
     constructor(type: CodecErrorType, info?: CodecErrorInfo);
 }

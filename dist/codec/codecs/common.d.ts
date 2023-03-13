@@ -57,19 +57,11 @@ export declare const getContentTypeSchema: (ctype: CType) => ContentTypeSchema;
  * Missing items are replaced with null.
  * @param ids List of IDs
  * @param items List of items
+ * @returns Items in the order of the specified ID list
  */
 export declare const mapIdentifiers: <T extends {
-    id: string;
-}>(ids: string[], items: T[]) => T[];
-/**
- *
- * @param ids
- * @param items
- * @returns
- */
-export declare const mapIdentifiersNumber: <T extends {
-    id: number;
-}>(ids: string[], items: T[]) => T[];
+    id: string | number;
+}>(ids: (string | number)[], items: T[]) => T[];
 /**
  * Construct a CodecError for when get products arguments are missing
  * @param method Method name

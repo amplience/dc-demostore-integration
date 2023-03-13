@@ -17,6 +17,8 @@ const amplience_1 = require("../amplience");
 const axios_1 = __importDefault(require("axios"));
 const index_1 = require("../index");
 const util_1 = require("../common/util");
+const codec_error_1 = require("../codec/codecs/codec-error");
+const errors_1 = require("../common/errors");
 /**
  * Get an API for the given configuration.
  * @param config Configuration object
@@ -44,6 +46,62 @@ const getAPI = (config) => __awaiter(void 0, void 0, void 0, function* () {
     return yield (0, index_1.getCommerceCodec)(config);
 });
 /**
+ * Convert an error thrown by an integration to one deliverable by the middleware API.
+ * @param error The error to convert
+ * @returns A middleware API error
+ */
+const toApiError = (error) => {
+    if ('errorType' in error && error.errorType === 'codec') {
+        return {
+            type: codec_error_1.CodecErrorType[error.type],
+            info: error.info,
+            message: error.message
+        };
+    }
+    else if ('errorType' in error && error.errorType === 'integration') {
+        return {
+            type: 'Integration',
+            message: error.message,
+            info: {
+                helpUrl: error.helpUrl
+            }
+        };
+    }
+    else {
+        return {
+            type: 'Generic',
+            message: error.message,
+        };
+    }
+};
+/**
+ * Throws a CodecError, IntegrationError or Error delivered by the middleware API.
+ * @param error Error delivered by the middleware API
+ */
+const fromApiError = (error) => {
+    switch (error.type) {
+        case 'Integration':
+            return new errors_1.IntegrationError({
+                message: error.message,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                helpUrl: error.info.helpUrl
+            });
+        case 'Generic':
+            return new Error(error.message);
+        default: {
+            // Try parse as a codec error.
+            const type = codec_error_1.CodecErrorType[error.type];
+            if (type !== undefined) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return new codec_error_1.CodecError(type, error.info);
+            }
+            else {
+                return new Error(error.message);
+            }
+        }
+    }
+};
+/**
  * Get a Commerce API for the given configuration.
  * @param params Configuration object and vendor
  * @returns Commerce API matching the configuration.
@@ -60,7 +118,11 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             const apiUrl = window.isStorybook
                 ? 'https://core.dc-demostore.com/api'
                 : '/api';
-            return yield (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), codec), { operation }) })).data;
+            const response = (yield axios_1.default.get(apiUrl, { params: Object.assign(Object.assign(Object.assign({}, args), codec), { operation }) })).data;
+            if (response.error) {
+                throw fromApiError(response.error);
+            }
+            return response.result;
         });
         return {
             getProduct: getResponse('getProduct'),
@@ -90,7 +152,12 @@ const middleware = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     switch (req.method.toLowerCase()) {
         case 'get':
         case 'post':
-            return res.status(200).json(yield commerceAPI[config.operation](config));
+            try {
+                return res.status(200).json({ result: yield commerceAPI[config.operation](config) });
+            }
+            catch (e) {
+                return res.status(200).json({ error: toApiError(e) });
+            }
         case 'options':
             return res.status(200).send();
         default:

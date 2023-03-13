@@ -385,5 +385,3 @@ export type CodecPropertyConfig<T extends Dictionary<AnyProperty>> = {
 }
 
 import { StringProperty, NumberProperty, IntegerProperty, ArrayProperty, StringConstProperty } from '../cms-property-types'
-import { SFCCProduct } from './sfcc/types'
-

@@ -119,13 +119,13 @@ exports.getCodec = getCodec;
 const getCommerceCodec = (config) => __awaiter(void 0, void 0, void 0, function* () { return yield (0, exports.getCodec)(config, core_1.CodecTypes.commerce); });
 exports.getCommerceCodec = getCommerceCodec;
 // end public interface
-const commercetools_1 = __importDefault(require("./codecs/commercetools"));
+const commercetools_1 = __importDefault(require("./codecs/commerce/commercetools"));
 (0, exports.registerCodec)(new commercetools_1.default());
-const rest_1 = __importDefault(require("./codecs/rest"));
+const rest_1 = __importDefault(require("./codecs/commerce/rest"));
 (0, exports.registerCodec)(new rest_1.default());
-const sfcc_1 = __importDefault(require("./codecs/sfcc"));
+const sfcc_1 = __importDefault(require("./codecs/commerce/sfcc"));
 (0, exports.registerCodec)(new sfcc_1.default());
-const bigcommerce_1 = __importDefault(require("./codecs/bigcommerce"));
+const bigcommerce_1 = __importDefault(require("./codecs/commerce/bigcommerce"));
 (0, exports.registerCodec)(new bigcommerce_1.default());
 // reexport codec common functions
 __exportStar(require("./codecs/common"), exports);

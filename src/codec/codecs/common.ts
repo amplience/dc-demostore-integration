@@ -1,7 +1,7 @@
 import { CONSTANTS } from '../../common/constants'
 import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-sdk-js'
 import _, { Dictionary } from 'lodash'
-import { Category, Identifiable } from '../../common/types'
+import { Category } from '../../common/types'
 import { env } from 'process'
 import { CodecError, CodecErrorType } from './codec-error'
 

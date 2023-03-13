@@ -11,6 +11,7 @@ class IntegrationError {
      * @param param0.helpUrl URL for any helpful documentation
      */
     constructor({ message, helpUrl }) {
+        this.errorType = 'integration';
         this.message = message;
         this.helpUrl = helpUrl;
     }
