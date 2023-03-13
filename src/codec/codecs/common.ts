@@ -165,19 +165,10 @@ export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
  * Missing items are replaced with null.
  * @param ids List of IDs
  * @param items List of items
+ * @returns Items in the order of the specified ID list
  */
-export const mapIdentifiers = <T extends {id: string}>(ids: string[], items: T[]): (T | null)[] => {
-	return ids.map(id => items.find(item => item.id === id) ?? null)
-}
-
-/**
- * 
- * @param ids 
- * @param items 
- * @returns 
- */
-export const mapIdentifiersNumber = <T extends {id: number}>(ids: string[], items: T[]): (T | null)[] => {
-	return ids.map(id => items.find(item => item && item.id === Number(id)) ?? null)
+export const mapIdentifiers = <T extends {id: string | number}>(ids: (string | number)[], items: T[]): (T | null)[] => {
+	return ids.map(id => items.find(item => item && item.id == id) ?? null)
 }
 
 /**

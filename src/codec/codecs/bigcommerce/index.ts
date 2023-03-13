@@ -6,7 +6,7 @@ import axios from 'axios'
 import { BigCommerceProduct } from './types'
 import { mapCategory, mapCustomerGroup, mapProduct } from './mappers'
 import { catchAxiosErrors } from '../codec-error'
-import { getProductsArgError, logResponse, mapIdentifiersNumber } from '../common'
+import { getProductsArgError, logResponse, mapIdentifiers } from '../common'
 
 /**
  * BigCommerce Codec config properties
@@ -107,7 +107,7 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 			products = []
 		} else if (args.productIds) {
 			const ids = args.productIds.split(',')
-			products = mapIdentifiersNumber<BigCommerceProduct>(ids, await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`))
+			products = mapIdentifiers<BigCommerceProduct>(ids, await this.fetch(`/v3/catalog/products?id:in=${args.productIds}&include=images,variants`))
 		} else if (args.keyword) {
 			products = await this.fetch(`/v3/catalog/products?keyword=${args.keyword}&include=images,variants`)
 		} else if (args.category && args.category.id === '') {
