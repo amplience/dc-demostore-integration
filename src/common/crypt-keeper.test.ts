@@ -25,8 +25,8 @@ describe('CryptKeeper', function() {
 
 		const keeper1 = CryptKeeper(config, 'hub1')
 
-		expect(keeper1.encrypt('example text to encrypt')).toMatchInlineSnapshot(`"===>)?f3^c8!}Kpz:}3d+Cy#3Z9_;'4Ke>A'=r&%J(<@^eIbG9I"ZqK&^\`)<'v5Dua&==="`)
-		expect(keeper1.encrypt('an additional encryption example')).toMatchInlineSnapshot(`"===ll8Z"+}9>ZI$!&K$A<+b<+g3J?_2q^2_x"K)}*:e@GC6u%G?>|KEE&%;xvBqfaHK9u8HH5DJJ>!2fg\`)<'v5Dua&==="`)
+		expect(keeper1.decrypt('===D(>w|#K`}((EaGdv("Be7IIu>Kr(e3g~_9`{sC$p{Gd8c\'AH:G:{9g`)<\'v5Dua&===')).toEqual('example text to encrypt')
+		expect(keeper1.decrypt('===ll8\'e}x&d:8{F(&gu!Gz~2$$F?"!=#fac3Cagbz;Hbt}yfg|A"9~Fzf(E=:\'A?Ku&"2@9:w^J+2Cs^`)<\'v5Dua&===')).toEqual('an additional encryption example')
 	})
 
 	test('cannot encrypt and decrypt with different input config', () => {
