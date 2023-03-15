@@ -1,7 +1,8 @@
-import { Category, CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product, Variant } from '../../../../common';
+import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core';
 import { StringProperty } from '../../../cms-property-types';
 import { AxiosInstance } from 'axios';
+import { ShopifyProduct } from './types';
 /**
  * Shopify codec configuration.
  */
@@ -10,51 +11,6 @@ declare type CodecConfig = {
     version: StringProperty;
     site_id: StringProperty;
 };
-interface Edge<T> {
-    node: T;
-    cursor: string;
-}
-interface Paginated<T> {
-    edges: Edge<T>[];
-}
-interface ShopifyCollectionMinimal {
-    id: string;
-    handle: string;
-    title: string;
-}
-interface ShopifyPrice {
-    currencyCode: string;
-    amount: string;
-}
-interface ShopifyImage {
-    id: string;
-    url: string;
-    altText: string;
-}
-interface ShopifyVariant {
-    id: string;
-    title: string;
-    sku: string;
-    selectedOptions: {
-        name: string;
-        value: string;
-    }[];
-    price: ShopifyPrice;
-    unitPrice?: ShopifyPrice;
-    compareAtPrice?: ShopifyPrice;
-    image: ShopifyImage;
-}
-interface ShopifyProduct {
-    id: string;
-    title: string;
-    handle: string;
-    description: string;
-    collections: Paginated<ShopifyCollectionMinimal>;
-    tags: string[];
-    variants: Paginated<ShopifyVariant>;
-    images: Paginated<ShopifyImage>;
-    availableForSale: boolean;
-}
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
@@ -82,15 +38,31 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      * @inheritdoc
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
+    /**
+     * TODO
+     * @param query
+     * @param variables
+     * @returns
+     */
     gqlRequest<T>(query: string, variables: any): Promise<T>;
+    /**
+     * TODO
+     * @param id
+     * @returns
+     */
     getProductById(id: string): Promise<ShopifyProduct>;
+    /**
+     * TODO
+     * @param keyword
+     * @returns
+     */
     getProductsByKeyword(keyword: string): Promise<ShopifyProduct[]>;
+    /**
+     * TODO
+     * @param keyword
+     * @returns
+     */
     getProductsByCategory(keyword: string): Promise<ShopifyProduct[]>;
-    firstNonEmpty(strings: string[]): string;
-    mapPrice(price: ShopifyPrice): string;
-    mapCategoryMinimal(collection: ShopifyCollectionMinimal): Category;
-    mapVariant(variant: ShopifyVariant, sharedImages: ShopifyImage[]): Variant;
-    mapProduct(product: ShopifyProduct): Product;
     /**
      * @inheritdoc
      */

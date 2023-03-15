@@ -17,95 +17,8 @@ const core_1 = require("../../core");
 const common_1 = require("../../common");
 const axios_1 = __importDefault(require("axios"));
 const codec_error_1 = require("../../codec-error");
-const util_1 = require("../../../../common/util");
-const productShared = `
-id
-title
-description
-collections(first: 100) {
-  edges {
-	node {
-	  id
-	  handle
-	  title
-	}
-	cursor
-  }
-}
-tags
-variants(first: 100) {
-  edges {
-	node {
-	  id
-	  title
-	  sku
-	  selectedOptions {
-		name
-		value
-	  }
-	  price {
-		currencyCode
-		amount
-	  }
-	  unitPrice {
-		currencyCode
-		amount
-	  },
-	  compareAtPrice {
-		currencyCode
-		amount
-	  }
-	  image {
-		id
-		url
-		altText
-	  }
-	}
-	cursor
-  }
-}
-images(first: 100) {
-  edges {
-	node {
-	  id
-	  url
-	  altText
-	}
-	cursor
-  }
-}
-availableForSale
-handle`;
-const productsByQuery = `
-query getProducts($pageSize: Int!, $query: String, $after: String){
-  products(first: $pageSize, after: $after, query: $query) {
-    edges {
-      node {
-${productShared}
-      }
-      cursor
-    }
-  }
-}`;
-const productById = `
-query getProductById($id: ID!) {
-	product(id: $id) {
-${productShared}
-	}
-}`;
-const productsByCategory = `
-query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
-  collection(handle: $handle) {
-    products(first: $pageSize, after: $after) {
-      edges {
-        node {
-${productShared}
-        }
-        cursor
-      }
-    }
-  }
-}`;
+const queries_1 = require("./queries");
+const mappers_1 = require("./mappers");
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
@@ -174,6 +87,12 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
             return yield _super.init.call(this, codecType);
         });
     }
+    /**
+     * TODO
+     * @param query
+     * @param variables
+     * @returns
+     */
     gqlRequest(query, variables) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = 'graphql.json';
@@ -186,76 +105,50 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
             return result.data;
         });
     }
+    /**
+     * TODO
+     * @param id
+     * @returns
+     */
     getProductById(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.gqlRequest(productById, { id })).product;
+            return (yield this.gqlRequest(queries_1.productById, { id })).product;
         });
     }
+    /**
+     * TODO
+     * @param keyword
+     * @returns
+     */
     getProductsByKeyword(keyword) {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO: pagination
             const query = keyword;
             const pageSize = 100;
-            const result = yield this.gqlRequest(productsByQuery, { query, pageSize });
+            const result = yield this.gqlRequest(queries_1.productsByQuery, { query, pageSize });
             return result.products.edges.map(edge => edge.node);
         });
     }
+    /**
+     * TODO
+     * @param keyword
+     * @returns
+     */
     getProductsByCategory(keyword) {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO: pagination
             const query = keyword;
             const pageSize = 100;
-            const result = yield this.gqlRequest(productsByCategory, { query, pageSize });
+            const result = yield this.gqlRequest(queries_1.productsByCategory, { query, pageSize });
             return result.category.products.edges.map(edge => edge.node);
         });
-    }
-    firstNonEmpty(strings) {
-        return strings.find(string => string !== '' && string != null);
-    }
-    mapPrice(price) {
-        return (0, util_1.formatMoneyString)(price.amount, { currency: price.currencyCode });
-    }
-    mapCategoryMinimal(collection) {
-        return {
-            id: collection.id,
-            slug: collection.handle,
-            name: collection.title,
-            children: [],
-            products: []
-        };
-    }
-    mapVariant(variant, sharedImages) {
-        var _a, _b, _c, _d;
-        const attributes = {};
-        for (const option of variant.selectedOptions) {
-            attributes[option.name] = option.value;
-        }
-        return {
-            sku: this.firstNonEmpty([variant.sku, variant.id]),
-            listPrice: this.mapPrice((_b = (_a = variant.compareAtPrice) !== null && _a !== void 0 ? _a : variant.price) !== null && _b !== void 0 ? _b : variant.unitPrice),
-            salePrice: this.mapPrice((_d = (_c = variant.compareAtPrice) !== null && _c !== void 0 ? _c : variant.price) !== null && _d !== void 0 ? _d : variant.unitPrice),
-            attributes: attributes,
-            images: [variant.image, ...sharedImages]
-        };
-    }
-    mapProduct(product) {
-        const sharedImages = product.images.edges.filter(image => product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1).map(edge => edge.node);
-        return {
-            id: product.id,
-            name: product.title,
-            slug: product.handle,
-            categories: product.collections.edges.map(collection => this.mapCategoryMinimal(collection.node)),
-            variants: product.variants.edges.map(variant => this.mapVariant(variant.node, sharedImages)),
-            shortDescription: product.description,
-            longDescription: product.description
-        };
     }
     /**
      * @inheritdoc
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.getRawProducts(args)).map(product => this.mapProduct(product));
+            return (yield this.getRawProducts(args)).map(product => (0, mappers_1.mapProduct)(product));
         });
     }
     /**
