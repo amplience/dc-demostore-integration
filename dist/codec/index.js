@@ -127,6 +127,8 @@ const sfcc_1 = __importDefault(require("./codecs/commerce/sfcc"));
 (0, exports.registerCodec)(new sfcc_1.default());
 const bigcommerce_1 = __importDefault(require("./codecs/commerce/bigcommerce"));
 (0, exports.registerCodec)(new bigcommerce_1.default());
+const shopify_1 = __importDefault(require("./codecs/commerce/shopify"));
+(0, exports.registerCodec)(new shopify_1.default());
 // reexport codec common functions
 __exportStar(require("./codecs/common"), exports);
 __exportStar(require("./codecs/core"), exports);

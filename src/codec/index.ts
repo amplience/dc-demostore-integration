@@ -117,6 +117,9 @@ registerCodec(new SFCCCodecType())
 import BigCommerceCommerceCodecType from './codecs/commerce/bigcommerce'
 registerCodec(new BigCommerceCommerceCodecType())
 
+import ShopifyCommerceCodecType from './codecs/commerce/shopify'
+registerCodec(new ShopifyCommerceCodecType())
+
 // reexport codec common functions
 export * from './codecs/common'
 export * from './codecs/core'
