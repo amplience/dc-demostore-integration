@@ -106,7 +106,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 		return await super.init(codecType)
 	}
 
-	async gqlRequest<T>(query: string, variables: any): T {
+	async gqlRequest<T>(query: string, variables: any): Promise<T> {
 		const url = 'graphql.json'
 		const result: GqlResponse<T> = await logResponse('get', url, (await catchAxiosErrors(
 			await this.apiClient.post(url, {
