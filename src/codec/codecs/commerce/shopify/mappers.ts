@@ -1,0 +1,86 @@
+import { Category, Product, Variant } from "../../../../common/types"
+import { formatMoneyString } from "../../../../common/util"
+import { 
+	ShopifyCollectionMinimal, 
+	ShopifyImage, 
+	ShopifyPrice, 
+	ShopifyProduct, 
+	ShopifyVariant 
+} from "./types"
+import { Dictionary } from "lodash"
+
+/**
+ * TODO
+ * @param strings 
+ * @returns 
+ */
+export const firstNonEmpty = (strings: string[]) => {
+	return strings.find(string => string !== '' && string != null)
+}
+
+/**
+ * TODO
+ * @param price 
+ * @returns 
+ */
+export const mapPrice = (price: ShopifyPrice): string => {
+	return formatMoneyString(price.amount, { currency: price.currencyCode })
+}
+
+/**
+ * TODO
+ * @param collection 
+ * @returns 
+ */
+export const mapCategoryMinimal = (collection: ShopifyCollectionMinimal): Category => {
+	return {
+		id: collection.id,
+		slug: collection.handle,
+		name: collection.title,
+		children: [],
+		products: []
+	}
+}
+
+/**
+ * TODO
+ * @param variant 
+ * @param sharedImages 
+ * @returns 
+ */
+export const mapVariant = (variant: ShopifyVariant, sharedImages: ShopifyImage[]): Variant => {
+	const attributes: Dictionary<string> = {}
+
+	for (const option of variant.selectedOptions) {
+		attributes[option.name] = option.value
+	}
+	
+	return {
+		sku: firstNonEmpty([variant.sku, variant.id]),
+		listPrice: mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
+		salePrice: mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
+		attributes: attributes,
+		images: [variant.image, ...sharedImages]
+	}
+}
+
+/**
+ * TODO
+ * @param product 
+ * @returns 
+ */
+export const mapProduct = (product: ShopifyProduct): Product => {
+	const sharedImages = product.images.edges.filter(image => 
+		product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1
+	).map(edge => edge.node)
+
+	return {
+		id: product.id,
+		name: product.title,
+		slug: product.handle,
+		categories: product.collections.edges.map(collection => mapCategoryMinimal(collection.node)),
+		variants: product.variants.edges.map(variant => mapVariant(variant.node, sharedImages)),
+		shortDescription: product.description,
+		longDescription: product.description
+	}
+}
