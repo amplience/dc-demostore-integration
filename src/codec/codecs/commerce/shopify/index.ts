@@ -18,7 +18,11 @@ import { catchAxiosErrors } from '../../codec-error'
 /**
  * Common codec configuration.
  */
-type CodecConfig = ClientCredentialsConfiguration
+type CodecConfig = ClientCredentialsConfiguration & {
+	accessToken: StringProperty,
+	version: StringProperty,
+	site_id: StringProperty
+}
 
 interface GqlResponse<T> {
 	data: T
@@ -48,7 +52,22 @@ export class ShopifyCommerceCodecType extends CommerceCodecType {
 	 */
 	get properties(): CodecConfig {
 		return {
-			...ClientCredentialProperties
+			...ClientCredentialProperties,
+			accessToken:  {
+				title: 'access token',
+				type: 'string',
+				minLength: 1
+			},
+			version:  {
+				title: 'version',
+				type: 'string',
+				minLength: 1
+			},
+			site_id:  {
+				title: 'site id',
+				type: 'string',
+				minLength: 1
+			}
 		}
 	}
 
