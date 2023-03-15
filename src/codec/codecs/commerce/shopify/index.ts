@@ -318,7 +318,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 		
 		return {
 			sku: this.firstNonEmpty([variant.sku, variant.id]),
-			listPrice: this.mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
+			listPrice: this.mapPrice(variant.price ?? variant.unitPrice),
 			salePrice: this.mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
 			attributes: attributes,
 			images: [variant.image, ...sharedImages]

@@ -225,15 +225,15 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
         };
     }
     mapVariant(variant, sharedImages) {
-        var _a, _b, _c, _d;
+        var _a, _b, _c;
         const attributes = {};
         for (const option of variant.selectedOptions) {
             attributes[option.name] = option.value;
         }
         return {
             sku: this.firstNonEmpty([variant.sku, variant.id]),
-            listPrice: this.mapPrice((_b = (_a = variant.compareAtPrice) !== null && _a !== void 0 ? _a : variant.price) !== null && _b !== void 0 ? _b : variant.unitPrice),
-            salePrice: this.mapPrice((_d = (_c = variant.compareAtPrice) !== null && _c !== void 0 ? _c : variant.price) !== null && _d !== void 0 ? _d : variant.unitPrice),
+            listPrice: this.mapPrice((_a = variant.price) !== null && _a !== void 0 ? _a : variant.unitPrice),
+            salePrice: this.mapPrice((_c = (_b = variant.compareAtPrice) !== null && _b !== void 0 ? _b : variant.price) !== null && _c !== void 0 ? _c : variant.unitPrice),
             attributes: attributes,
             images: [variant.image, ...sharedImages]
         };
