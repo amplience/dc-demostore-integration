@@ -10,24 +10,37 @@ import {
 } from '../../../../common'
 import _ from 'lodash'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core'
-import { getProductsArgError } from '../../common'
+import { getProductsArgError, logResponse } from '../../common'
 import { StringProperty } from '@/codec/cms-property-types'
+import axios, { AxiosInstance } from 'axios'
+import { catchAxiosErrors } from '../../codec-error'
 
 /**
  * Common codec configuration.
  */
 type CodecConfig = ClientCredentialsConfiguration
 
+interface GqlResponse<T> {
+	data: T
+}
+
+const productQuery = `
+query getProductById($id: ID!) {
+	product(id: $id) {
+		title
+	}
+}`
+
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
-export class TemplateCommerceCodecType extends CommerceCodecType {
+export class ShopifyCommerceCodecType extends CommerceCodecType {
 
 	/**
 	 * @inheritdoc
 	 */
 	get vendor(): string {
-		return 'template'
+		return 'shopify'
 	}
 
 	/**
@@ -43,15 +56,16 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 	 * @inheritdoc
 	 */
 	async getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI> {
-		return await new TemplateCommerceCodec(config).init(this)
+		return await new ShopifyCommerceCodec(config).init(this)
 	}
 }
 
 /**
  * A template commerce codec, useful as a starting point for a new integration.
  */
-export class TemplateCommerceCodec extends CommerceCodec {
+export class ShopifyCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
+	apiClient: AxiosInstance
 
 	// instance variables
 	// products: Product[]
@@ -61,9 +75,32 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
+		axios.create({
+			baseURL: `https://${this.config.site_id}.myshopify.com/api/${this.config.version}`,
+			headers: {
+				'X-Shopify-Storefront-Access-Token': this.config.accessToken
+			}
+		})
+
 		// this.products = await fetchFromURL(this.config.productURL, [])
 		// this.megaMenu = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
+	}
+
+	async gqlRequest<T>(query: string, variables: any): T {
+		const url = 'graphql.json'
+		const result: GqlResponse<T> = await logResponse('get', url, (await catchAxiosErrors(
+			await this.apiClient.post(url, {
+				query,
+				variables
+			})
+		)))
+
+		return result.data
+	}
+
+	async getProductById(id: string) {
+		return await this.gqlRequest<any>(productQuery, { id })
 	}
 
 	/**
@@ -72,7 +109,9 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
 		// eslint-disable-next-line no-empty
 		if (args.productIds) {
-
+			const products = await Promise.all(
+				args.productIds.split(',').map(this.getProductById.bind(this))
+			)
 		}
 		// eslint-disable-next-line no-empty
 		else if (args.keyword) {
@@ -120,5 +159,5 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	}
 }
 
-export default TemplateCommerceCodecType
-// registerCodec(new TemplateCommerceCodecType())
+export default ShopifyCommerceCodecType
+// registerCodec(new ShopifyCommerceCodecType())
