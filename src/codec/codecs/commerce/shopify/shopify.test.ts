@@ -18,6 +18,14 @@ const commerceSegmentsRequests: MockFixture = {
 	}
 }
 
+const commerceCollectionsRequests: MockFixture = {
+	post: {
+		'https://site_id.myshopify.com/api/version/graphql.json': {
+			data: shopifyCategories
+		}
+	}
+}
+
 describe('shopify integration', function() {
 	let codec: CommerceCodec
 	let requests: Request[]
@@ -55,13 +63,22 @@ describe('shopify integration', function() {
 	})
 
 	test('getMegaMenu', async () => {
+		massMock(axios, requests, commerceCollectionsRequests)
+		codec = new ShopifyCommerceCodec(flattenConfig(config))
+		await codec.init(new ShopifyCodecType())
+		
+		const categories = await codec.getMegaMenu({})
+		expect(categories).toEqual(exampleMegaMenu)
+		expect(requests).toEqual([
+			collectionsRequest
+		])
 	})
 
 	test('getCustomerGroups', async () => {
 		massMock(axios, requests, commerceSegmentsRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
-		
+
 		const customerGroups = await codec.getCustomerGroups({})
 		expect(customerGroups).toEqual(exampleCustomerGroups)
 		expect(requests).toEqual([

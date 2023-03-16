@@ -51,6 +51,13 @@ const commerceSegmentsRequests = {
         }
     }
 };
+const commerceCollectionsRequests = {
+    post: {
+        'https://site_id.myshopify.com/api/version/graphql.json': {
+            data: responses_1.shopifyCategories
+        }
+    }
+};
 describe('shopify integration', function () {
     let codec;
     let requests;
@@ -77,6 +84,14 @@ describe('shopify integration', function () {
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
     }));
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceCollectionsRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        const categories = yield codec.getMegaMenu({});
+        expect(categories).toEqual(results_1.exampleMegaMenu);
+        expect(requests).toEqual([
+            requests_1.collectionsRequest
+        ]);
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceSegmentsRequests);

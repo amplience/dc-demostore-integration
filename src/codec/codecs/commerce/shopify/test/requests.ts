@@ -1,10 +1,18 @@
-import { segments } from "../queries"
+import { collections, segments } from "../queries"
 
 export const collectionsRequest = {
 	config: {
-		url: ''
+		baseURL: 'https://site_id.myshopify.com/api/version',
+		headers: {
+			'X-Shopify-Storefront-Access-Token': 'access_token'
+		},
+		url: 'graphql.json',
+		query: collections,
+		variables: {
+			pageSize: 100
+		}
 	},
-	url: ''
+	url: 'https://site_id.myshopify.com/api/version/graphql.json'
 }
 
 export const segmentsRequest = {

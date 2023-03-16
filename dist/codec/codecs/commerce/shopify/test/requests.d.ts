@@ -1,6 +1,14 @@
 export declare const collectionsRequest: {
     config: {
+        baseURL: string;
+        headers: {
+            'X-Shopify-Storefront-Access-Token': string;
+        };
         url: string;
+        query: string;
+        variables: {
+            pageSize: number;
+        };
     };
     url: string;
 };

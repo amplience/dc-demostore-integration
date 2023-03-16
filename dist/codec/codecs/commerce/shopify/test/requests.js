@@ -4,9 +4,17 @@ exports.productsRequest = exports.segmentsRequest = exports.collectionsRequest =
 const queries_1 = require("../queries");
 exports.collectionsRequest = {
     config: {
-        url: ''
+        baseURL: 'https://site_id.myshopify.com/api/version',
+        headers: {
+            'X-Shopify-Storefront-Access-Token': 'access_token'
+        },
+        url: 'graphql.json',
+        query: queries_1.collections,
+        variables: {
+            pageSize: 100
+        }
     },
-    url: ''
+    url: 'https://site_id.myshopify.com/api/version/graphql.json'
 };
 exports.segmentsRequest = {
     config: {
