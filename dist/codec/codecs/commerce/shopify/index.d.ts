@@ -2,7 +2,8 @@ import { CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Product } from
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core';
 import { StringProperty } from '../../../cms-property-types';
 import { AxiosInstance } from 'axios';
-import { ShopifyProduct } from './types';
+import { Paginated, ShopifyProduct } from './types';
+import { GetPageResultCursor } from '../../pagination';
 /**
  * Shopify codec configuration.
  */
@@ -41,32 +42,42 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
     /**
-     * TODO
-     * @param query
-     * @param variables
+     * Make a request to the shopify GraphQL API.
+     * @param query The GraphQL query string
+     * @param variables Variables to use with the GraphQL query
+     * @param isAdmin Whether the admin credentials must be used or not
      * @returns
      */
     gqlRequest<T>(query: string, variables: any, isAdmin?: boolean): Promise<T>;
+    /**
+     * Generate a function that gets a page from the shopify GraphQL API.
+     * @param query The GraphQL query string
+     * @param variables Variables to use with the GraphQL query
+     * @param getPaginated Function that gets the Paginated<T2> type from the request type T
+     * @param isAdmin Whether the admin credentials must be used or not
+     * @returns A function that gets a page from a cursor and pageSize.
+     */
+    getPageGql<T, T2>(query: string, variables: any, getPaginated: (response: T) => Paginated<T2>, isAdmin?: boolean): (cursor: string | undefined, pageSize: number) => Promise<GetPageResultCursor<T2>>;
     /**
      * @inheritdoc
      */
     cacheMegaMenu(): Promise<void>;
     /**
-     * TODO
-     * @param id
-     * @returns
+     * Get a shopify product by ID.
+     * @param id The ID of the product to fetch
+     * @returns The shopify product
      */
     getProductById(id: string): Promise<ShopifyProduct>;
     /**
-     * TODO
-     * @param keyword
-     * @returns
+     * Get a list of all shopify products that match the given keyword.
+     * @param keyword Keyword used to search products
+     * @returns A list of all matching products
      */
     getProductsByKeyword(keyword: string): Promise<ShopifyProduct[]>;
     /**
-     * TODO
-     * @param slug
-     * @returns
+     * Get a list of all shopify products in the category with the given slug.
+     * @param slug The category slug
+     * @returns A list of all products in the category
      */
     getProductsByCategory(slug: string): Promise<ShopifyProduct[]>;
     /**

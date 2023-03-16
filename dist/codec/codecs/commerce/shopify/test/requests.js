@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.productsByKeywordRequest = exports.productRequest = exports.segmentsRequest = exports.collectionsRequest = void 0;
+exports.productsByCategoryRequest = exports.productsByKeywordRequest = exports.productRequest = exports.segmentsRequest = exports.collectionsRequest = void 0;
 const queries_1 = require("../queries");
 exports.collectionsRequest = {
     config: {
@@ -56,6 +56,21 @@ exports.productsByKeywordRequest = {
         variables: {
             pageSize: 100,
             query: 'fulfilled'
+        }
+    },
+    url: 'https://site_id.myshopify.com/api/version/graphql.json'
+};
+exports.productsByCategoryRequest = {
+    config: {
+        baseURL: 'https://site_id.myshopify.com/api/version',
+        headers: {
+            'X-Shopify-Storefront-Access-Token': 'access_token'
+        },
+        url: 'graphql.json',
+        query: queries_1.productsByCategory,
+        variables: {
+            pageSize: 100,
+            slug: 'hydrogen'
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'

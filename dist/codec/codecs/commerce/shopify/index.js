@@ -19,6 +19,8 @@ const axios_1 = __importDefault(require("axios"));
 const codec_error_1 = require("../../codec-error");
 const queries_1 = require("./queries");
 const mappers_1 = require("./mappers");
+const pagination_1 = require("../../pagination");
+const PAGE_SIZE = 100;
 /**
  * A template commerce codec type, useful as a starting point for a new integration.
  */
@@ -70,9 +72,6 @@ exports.ShopifyCommerceCodecType = ShopifyCommerceCodecType;
  * A template commerce codec, useful as a starting point for a new integration.
  */
 class ShopifyCommerceCodec extends core_1.CommerceCodec {
-    // instance variables
-    // products: Product[]
-    // categories: Category[]
     /**
      * @inheritdoc
      */
@@ -99,9 +98,10 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param query
-     * @param variables
+     * Make a request to the shopify GraphQL API.
+     * @param query The GraphQL query string
+     * @param variables Variables to use with the GraphQL query
+     * @param isAdmin Whether the admin credentials must be used or not
      * @returns
      */
     gqlRequest(query, variables, isAdmin = false) {
@@ -125,20 +125,45 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
         });
     }
     /**
+     * Generate a function that gets a page from the shopify GraphQL API.
+     * @param query The GraphQL query string
+     * @param variables Variables to use with the GraphQL query
+     * @param getPaginated Function that gets the Paginated<T2> type from the request type T
+     * @param isAdmin Whether the admin credentials must be used or not
+     * @returns A function that gets a page from a cursor and pageSize.
+     */
+    getPageGql(query, variables, getPaginated, isAdmin = false) {
+        return (cursor, pageSize) => __awaiter(this, void 0, void 0, function* () {
+            const result = yield this.gqlRequest(query, Object.assign(Object.assign({}, variables), { pageSize, after: cursor }), isAdmin);
+            const paginated = getPaginated(result);
+            if (paginated.edges.length > pageSize) {
+                paginated.edges = paginated.edges.slice(0, pageSize);
+                return {
+                    data: paginated.edges.map(edge => edge.node),
+                    nextCursor: paginated.edges.at(-1).cursor,
+                    hasNext: true
+                };
+            }
+            return {
+                data: paginated.edges.map(edge => edge.node),
+                nextCursor: paginated.pageInfo.endCursor,
+                hasNext: paginated.pageInfo.hasNextPage
+            };
+        });
+    }
+    /**
      * @inheritdoc
      */
     cacheMegaMenu() {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: pagination
-            const pageSize = 100;
-            const result = yield this.gqlRequest(queries_1.collections, { pageSize });
-            this.megaMenu = result.collections.edges.map(edge => (0, mappers_1.mapCategory)(edge.node));
+            const shopifyCollections = yield (0, pagination_1.paginateCursor)(this.getPageGql(queries_1.collections, {}, response => response.collections), PAGE_SIZE);
+            this.megaMenu = shopifyCollections.data.map(collection => (0, mappers_1.mapCategory)(collection));
         });
     }
     /**
-     * TODO
-     * @param id
-     * @returns
+     * Get a shopify product by ID.
+     * @param id The ID of the product to fetch
+     * @returns The shopify product
      */
     getProductById(id) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -146,31 +171,27 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
         });
     }
     /**
-     * TODO
-     * @param keyword
-     * @returns
+     * Get a list of all shopify products that match the given keyword.
+     * @param keyword Keyword used to search products
+     * @returns A list of all matching products
      */
     getProductsByKeyword(keyword) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: pagination
             const query = keyword;
-            const pageSize = 100;
-            const result = yield this.gqlRequest(queries_1.productsByQuery, { query, pageSize });
-            return result.products.edges.map(edge => edge.node);
+            const shopifyProducts = yield (0, pagination_1.paginateCursor)(this.getPageGql(queries_1.productsByQuery, { query }, response => response.products), PAGE_SIZE);
+            return shopifyProducts.data;
         });
     }
     /**
-     * TODO
-     * @param slug
-     * @returns
+     * Get a list of all shopify products in the category with the given slug.
+     * @param slug The category slug
+     * @returns A list of all products in the category
      */
     getProductsByCategory(slug) {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: pagination
             const handle = slug;
-            const pageSize = 100;
-            const result = yield this.gqlRequest(queries_1.productsByCategory, { handle, pageSize });
-            return result.collection.products.edges.map(edge => edge.node);
+            const shopifyProducts = yield (0, pagination_1.paginateCursor)(this.getPageGql(queries_1.productsByCategory, { handle }, response => response.collection.products), PAGE_SIZE);
+            return shopifyProducts.data;
         });
     }
     /**
@@ -210,9 +231,8 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            const pageSize = 100;
-            const result = yield this.gqlRequest(queries_1.segments, { pageSize }, true);
-            return result.segments.edges.map(edge => (0, mappers_1.mapCustomerGroup)(edge.node));
+            const shopifySegments = yield (0, pagination_1.paginateCursor)(this.getPageGql(queries_1.segments, {}, response => response.segments, true), PAGE_SIZE);
+            return shopifySegments.data.map(segment => (0, mappers_1.mapCustomerGroup)(segment));
         });
     }
 }

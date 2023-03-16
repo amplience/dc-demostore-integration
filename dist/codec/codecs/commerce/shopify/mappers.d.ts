@@ -1,39 +1,39 @@
-import { Category, CustomerGroup, Product, Variant } from "../../../../common/types";
-import { ShopifyCollection, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from "./types";
+import { Category, CustomerGroup, Product, Variant } from '../../../../common/types';
+import { ShopifyCollection, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from './types';
 /**
- * TODO
- * @param strings
- * @returns
+ * Find the first non-empty (not null or length 0) string in a list of strings.
+ * @param strings List of strings to search
+ * @returns The first non-empty string in the list
  */
 export declare const firstNonEmpty: (strings: string[]) => string;
 /**
- * TODO
- * @param price
- * @returns
+ * Map a shopify price to the common price type.
+ * @param price The shopify price
+ * @returns The common price
  */
 export declare const mapPrice: (price: ShopifyPrice) => string;
 /**
- * TODO
- * @param collection
- * @returns
+ * Map a shopify collection to the common category type.
+ * @param collection The shopify collection
+ * @returns The common category
  */
 export declare const mapCategory: (collection: ShopifyCollection) => Category;
 /**
- * TODO
- * @param variant
- * @param sharedImages
- * @returns
+ * Map a shopify product variant to the common product variant type.
+ * @param variant The shopify product variant
+ * @param sharedImages Images shared between each variant
+ * @returns The common variant
  */
 export declare const mapVariant: (variant: ShopifyVariant, sharedImages: ShopifyImage[]) => Variant;
 /**
- * TODO
- * @param product
- * @returns
+ * Map a shopify product to the common product type.
+ * @param product The shopify product
+ * @returns The common product
  */
 export declare const mapProduct: (product: ShopifyProduct) => Product;
 /**
- * TODO
- * @param segment
- * @returns
+ * Map a shopify segment to the common customer group type
+ * @param segment The shopify segment
+ * @returns The common customer group
  */
 export declare const mapCustomerGroup: (segment: ShopifySegment) => CustomerGroup;

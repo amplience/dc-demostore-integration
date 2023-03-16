@@ -19,6 +19,10 @@ collections(first: 100) {
 		}
 		cursor
 	}
+	pageInfo {
+		hasNextPage
+		endCursor
+	}
 }
 tags
 variants(first: 100) {
@@ -51,6 +55,10 @@ variants(first: 100) {
 		}
 		cursor
 	}
+	pageInfo {
+		hasNextPage
+		endCursor
+	}
 }
 images(first: 100) {
 	edges {
@@ -60,6 +68,10 @@ images(first: 100) {
 			altText
 		}
 		cursor
+	}
+	pageInfo {
+		hasNextPage
+		endCursor
 	}
 }
 availableForSale
@@ -76,6 +88,10 @@ query getProducts($pageSize: Int!, $query: String, $after: String){
 				${productShared}
 			}
 			cursor
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
 		}
 	}
 }`
@@ -103,6 +119,10 @@ query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 				}
 				cursor
 			}
+			pageInfo {
+				hasNextPage
+				endCursor
+			}
 		}
 	}
 }`
@@ -118,6 +138,11 @@ query getSegments($pageSize: Int!, $after: String) {
 				id
 				name
 			}
+			cursor
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
 		}
 	}
 }`
@@ -134,12 +159,16 @@ query getCollections($pageSize: Int!, $after: String){
 				handle
 				title
 				image {
-				id
-				url
-				altText
+					id
+					url
+					altText
 				}
 			}
 			cursor
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
 		}
 	}
 }`

@@ -12,15 +12,21 @@ import axios, { AxiosInstance } from 'axios'
 import { catchAxiosErrors } from '../../codec-error'
 import { 
 	GqlResponse, 
+	Paginated, 
+	ShopifyCollection, 
 	ShopifyCollections, 
 	ShopifyProduct, 
 	ShopifyProductByID, 
 	ShopifyProductsByCollection, 
 	ShopifyProductsByQuery,
+	ShopifySegment,
 	ShopifySegments,
- } from './types'
+} from './types'
 import { collections, productById, productsByCategory, productsByQuery, segments } from './queries'
 import { mapCategory, mapCustomerGroup, mapProduct } from './mappers'
+import { GetPageResultCursor, paginateCursor } from '../../pagination'
+
+const PAGE_SIZE = 100
 
 /**
  * Shopify codec configuration.
@@ -117,36 +123,67 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @param isAdmin Whether the admin credentials must be used or not
 	 * @returns 
 	 */
-	async gqlRequest<T>(query: string, variables: any, isAdmin: boolean = false): Promise<T> {
+	async gqlRequest<T>(query: string, variables: any, isAdmin = false): Promise<T> {
 		const url = 'graphql.json'
 		const result: GqlResponse<T> = await logResponse('post', url, (await catchAxiosErrors(async () =>
-			{
-				if (isAdmin) {
-					return await this.adminApiClient.post(url, {
-						query,
-						variables
-					})
-				} else {
-					return await this.apiClient.post(url, {
-						query,
-						variables
-					})	
-				}
+		{
+			if (isAdmin) {
+				return await this.adminApiClient.post(url, {
+					query,
+					variables
+				})
+			} else {
+				return await this.apiClient.post(url, {
+					query,
+					variables
+				})	
 			}
+		}
 		)).data)
 
 		return result.data
 	}
 
 	/**
+	 * Generate a function that gets a page from the shopify GraphQL API.
+	 * @param query The GraphQL query string
+	 * @param variables Variables to use with the GraphQL query
+	 * @param getPaginated Function that gets the Paginated<T2> type from the request type T
+	 * @param isAdmin Whether the admin credentials must be used or not
+	 * @returns A function that gets a page from a cursor and pageSize.
+	 */
+	getPageGql<T, T2>(query: string, variables: any, getPaginated: (response: T) => Paginated<T2>, isAdmin = false) {
+		return async (cursor: string | undefined, pageSize: number): Promise<GetPageResultCursor<T2>> => {
+			const result = await this.gqlRequest<T>(query, {...variables, pageSize, after: cursor}, isAdmin)
+			const paginated = getPaginated(result)
+
+			if (paginated.edges.length > pageSize) {
+				paginated.edges = paginated.edges.slice(0, pageSize)
+				
+				return {
+					data: paginated.edges.map(edge => edge.node),
+					nextCursor: paginated.edges.at(-1).cursor,
+					hasNext: true
+				}
+			}
+
+			return {
+				data: paginated.edges.map(edge => edge.node),
+				nextCursor: paginated.pageInfo.endCursor,
+				hasNext: paginated.pageInfo.hasNextPage
+			}
+		}
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	async cacheMegaMenu(): Promise<void> {
-		// TODO: pagination
-		const pageSize = 100
-		const result = await this.gqlRequest<ShopifyCollections>(collections, {pageSize})
+		const shopifyCollections = await paginateCursor(
+			this.getPageGql<ShopifyCollections, ShopifyCollection>(collections, {}, response => response.collections),
+			PAGE_SIZE)
 
-		this.megaMenu = result.collections.edges.map(edge => mapCategory(edge.node))
+		this.megaMenu = shopifyCollections.data.map(collection => mapCategory(collection))
 	}
 
 	/**
@@ -164,12 +201,12 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @returns A list of all matching products
 	 */
 	async getProductsByKeyword(keyword: string): Promise<ShopifyProduct[]> {
-		// TODO: pagination
 		const query = keyword
-		const pageSize = 100
-		const result = await this.gqlRequest<ShopifyProductsByQuery>(productsByQuery, {query, pageSize})
+		const shopifyProducts = await paginateCursor(
+			this.getPageGql<ShopifyProductsByQuery, ShopifyProduct>(productsByQuery, {query}, response => response.products),
+			PAGE_SIZE)
 
-		return result.products.edges.map(edge => edge.node)
+		return shopifyProducts.data
 	}
 
 	/**
@@ -178,12 +215,12 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @returns A list of all products in the category
 	 */
 	async getProductsByCategory(slug: string): Promise<ShopifyProduct[]> {
-		// TODO: pagination
 		const handle = slug
-		const pageSize = 100
-		const result = await this.gqlRequest<ShopifyProductsByCollection>(productsByCategory, {handle, pageSize})
+		const shopifyProducts = await paginateCursor(
+			this.getPageGql<ShopifyProductsByCollection, ShopifyProduct>(productsByCategory, {handle}, response => response.collection.products),
+			PAGE_SIZE)
 
-		return result.collection.products.edges.map(edge => edge.node)
+		return shopifyProducts.data
 	}
 
 	/**
@@ -224,9 +261,11 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
-		const pageSize = 100
-		const result = await this.gqlRequest<ShopifySegments>(segments, {pageSize}, true)
-		return result.segments.edges.map(edge => mapCustomerGroup(edge.node))
+		const shopifySegments = await paginateCursor(
+			this.getPageGql<ShopifySegments, ShopifySegment>(segments, {}, response => response.segments, true),
+			PAGE_SIZE)
+
+		return shopifySegments.data.map(segment => mapCustomerGroup(segment))
 	}
 }
 
