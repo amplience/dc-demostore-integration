@@ -46,9 +46,17 @@ const PAGE_SIZE = 100
  * Shopify codec configuration.
  */
 type CodecConfig = {
+
+	/** Storefront access token */
 	access_token: StringProperty,
+
+	/** Admin access token */
 	admin_access_token: StringProperty,
+
+	/** API version */
 	version: StringProperty,
+
+	/** Site identifier */
 	site_id: StringProperty
 }
 
