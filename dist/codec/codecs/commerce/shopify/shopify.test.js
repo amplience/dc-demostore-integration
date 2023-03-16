@@ -58,6 +58,14 @@ const commerceProductsByKeywordRequests = {
         }
     }
 };
+// TODO: add collections request
+const commerceProductsByCategoryRequests = {
+    post: {
+        'https://site_id.myshopify.com/api/version/graphql.json': {
+            data: responses_1.shopifyCategoryProducts
+        }
+    }
+};
 const commerceSegmentsRequests = {
     post: {
         'https://site_id.myshopify.com/admin/api/version/graphql.json': {
@@ -133,6 +141,17 @@ describe('shopify integration', function () {
     test('getRawProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
     }));
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByCategoryRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const categories = yield codec.getCategory({ slug: 'hydrogen' });
+        expect(categories).toEqual(results_1.exampleCategoryProducts);
+        expect(requests).toEqual([
+            requests_1.collectionsRequest,
+            requests_1.productsByCategoryRequest
+        ]);
     }));
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture

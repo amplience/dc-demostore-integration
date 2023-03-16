@@ -3,27 +3,27 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapCategory = exports.mapPrice = exports.firstNonEmpty = void 0;
 const util_1 = require("../../../../common/util");
 /**
- * TODO
- * @param strings
- * @returns
+ * Find the first non-empty (not null or length 0) string in a list of strings.
+ * @param strings List of strings to search
+ * @returns The first non-empty string in the list
  */
 const firstNonEmpty = (strings) => {
     return strings.find(string => string !== '' && string != null);
 };
 exports.firstNonEmpty = firstNonEmpty;
 /**
- * TODO
- * @param price
- * @returns
+ * Map a shopify price to the common price type.
+ * @param price The shopify price
+ * @returns The common price
  */
 const mapPrice = (price) => {
     return (0, util_1.formatMoneyString)(price.amount, { currency: price.currencyCode });
 };
 exports.mapPrice = mapPrice;
 /**
- * TODO
- * @param collection
- * @returns
+ * Map a shopify collection to the common category type.
+ * @param collection The shopify collection
+ * @returns The common category
  */
 const mapCategory = (collection) => {
     return {
@@ -37,10 +37,10 @@ const mapCategory = (collection) => {
 };
 exports.mapCategory = mapCategory;
 /**
- * TODO
- * @param variant
- * @param sharedImages
- * @returns
+ * Map a shopify product variant to the common product variant type.
+ * @param variant The shopify product variant
+ * @param sharedImages Images shared between each variant
+ * @returns The common variant
  */
 const mapVariant = (variant, sharedImages) => {
     var _a, _b, _c;
@@ -58,9 +58,9 @@ const mapVariant = (variant, sharedImages) => {
 };
 exports.mapVariant = mapVariant;
 /**
- * TODO
- * @param product
- * @returns
+ * Map a shopify product to the common product type.
+ * @param product The shopify product
+ * @returns The common product
  */
 const mapProduct = (product) => {
     const sharedImages = product.images.edges.filter(image => product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1).map(edge => edge.node);
@@ -76,9 +76,9 @@ const mapProduct = (product) => {
 };
 exports.mapProduct = mapProduct;
 /**
- * TODO
- * @param segment
- * @returns
+ * Map a shopify segment to the common customer group type
+ * @param segment The shopify segment
+ * @returns The common customer group
  */
 const mapCustomerGroup = (segment) => {
     return {

@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.collections = exports.segments = exports.productsByCategory = exports.productById = exports.productsByQuery = exports.productShared = void 0;
+/**
+ * GraphQL request to fetch product information (minimal set required for conversion).
+ */
 exports.productShared = `
 id
 title
@@ -18,6 +21,10 @@ collections(first: 100) {
 			}
 		}
 		cursor
+	}
+	pageInfo {
+		hasNextPage
+		endCursor
 	}
 }
 tags
@@ -51,6 +58,10 @@ variants(first: 100) {
 		}
 		cursor
 	}
+	pageInfo {
+		hasNextPage
+		endCursor
+	}
 }
 images(first: 100) {
 	edges {
@@ -61,9 +72,16 @@ images(first: 100) {
 		}
 		cursor
 	}
+	pageInfo {
+		hasNextPage
+		endCursor
+	}
 }
 availableForSale
 handle`;
+/**
+ * GraphQL request to fetch products by query. (paginated)
+ */
 exports.productsByQuery = `
 query getProducts($pageSize: Int!, $query: String, $after: String){
 	products(first: $pageSize, after: $after, query: $query) {
@@ -73,14 +91,24 @@ query getProducts($pageSize: Int!, $query: String, $after: String){
 			}
 			cursor
 		}
+		pageInfo {
+			hasNextPage
+			endCursor
+		}
 	}
 }`;
+/**
+ * GraphQL request to fetch a product by ID.
+ */
 exports.productById = `
 query getProductById($id: ID!) {
 	product(id: $id) {
 		${exports.productShared}
 	}
 }`;
+/**
+ * GraphQL request to fetch products by category. (paginated)
+ */
 exports.productsByCategory = `
 query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 	collection(handle: $handle) {
@@ -91,9 +119,16 @@ query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 				}
 				cursor
 			}
+			pageInfo {
+				hasNextPage
+				endCursor
+			}
 		}
 	}
 }`;
+/**
+ * GraphQL request to fetch segments. (paginated)
+ */
 exports.segments = `
 query getSegments($pageSize: Int!, $after: String) {
 	segments(first: $pageSize, after: $after) {
@@ -102,9 +137,17 @@ query getSegments($pageSize: Int!, $after: String) {
 				id
 				name
 			}
+			cursor
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
 		}
 	}
 }`;
+/**
+ * GraphQL request to fetch collections. (paginated)
+ */
 exports.collections = `
 query getCollections($pageSize: Int!, $after: String){
 	collections(first: $pageSize, after: $after) {
@@ -114,12 +157,16 @@ query getCollections($pageSize: Int!, $after: String){
 				handle
 				title
 				image {
-				id
-				url
-				altText
+					id
+					url
+					altText
 				}
 			}
 			cursor
+		}
+		pageInfo {
+			hasNextPage
+			endCursor
 		}
 	}
 }`;

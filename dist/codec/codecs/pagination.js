@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.paginate = exports.getPageByQueryAxios = exports.getPageByQuery = void 0;
+exports.paginateCursor = exports.paginate = exports.getPageByQueryAxios = exports.getPageByQuery = void 0;
 const common_1 = require("./common");
 /**
  * Get an URL with added params from the given object.
@@ -134,3 +134,36 @@ function paginate(requestPage, pageSize = 20, pageNum = 0, pageCount) {
     });
 }
 exports.paginate = paginate;
+function paginateCursor(requestPage, pageSize = 20, cursor, pageCount) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const result = [];
+        if (pageCount === undefined) {
+            pageCount = Infinity;
+        }
+        const targetCount = pageCount * pageSize;
+        for (let i = 0; i < pageCount; i++) {
+            const { data, hasNext, nextCursor } = yield requestPage(cursor, pageSize);
+            const dataCount = data.length;
+            const end = targetCount - result.length;
+            const toAdd = Math.min(dataCount, end);
+            result.push(...(data.slice(0, toAdd)));
+            cursor = nextCursor;
+            if (!hasNext) {
+                return {
+                    data: result,
+                    hasNext: false,
+                    nextCursor: cursor
+                };
+            }
+            else if (result.length === targetCount) {
+                break;
+            }
+        }
+        return {
+            data: result,
+            hasNext: true,
+            nextCursor: cursor
+        };
+    });
+}
+exports.paginateCursor = paginateCursor;

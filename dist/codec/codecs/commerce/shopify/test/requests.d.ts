@@ -55,3 +55,18 @@ export declare const productsByKeywordRequest: {
     };
     url: string;
 };
+export declare const productsByCategoryRequest: {
+    config: {
+        baseURL: string;
+        headers: {
+            'X-Shopify-Storefront-Access-Token': string;
+        };
+        url: string;
+        query: string;
+        variables: {
+            pageSize: number;
+            slug: string;
+        };
+    };
+    url: string;
+};

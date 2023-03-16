@@ -14,6 +14,10 @@ export declare const shopifyProduct: (id: string) => {
                     };
                     cursor: string;
                 }[];
+                pageInfo: {
+                    hasNextPage: boolean;
+                    endCursor: string;
+                };
             };
             tags: string[];
             variants: {
@@ -40,6 +44,10 @@ export declare const shopifyProduct: (id: string) => {
                     };
                     cursor: string;
                 }[];
+                pageInfo: {
+                    hasNextPage: boolean;
+                    endCursor: string;
+                };
             };
             images: {
                 edges: {
@@ -50,6 +58,10 @@ export declare const shopifyProduct: (id: string) => {
                     };
                     cursor: string;
                 }[];
+                pageInfo: {
+                    hasNextPage: boolean;
+                    endCursor: string;
+                };
             };
             availableForSale: boolean;
             handle: string;
@@ -68,6 +80,10 @@ export declare const shopifyCategories: {
                 };
                 cursor: string;
             }[];
+            pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+            };
         };
     };
 };
@@ -75,6 +91,10 @@ export declare const shopifyCategoryProducts: {
     data: {
         collection: {
             products: {
+                pageInfo: {
+                    hasNextPage: boolean;
+                    endCursor: string;
+                };
                 edges: {
                     node: {
                         id: string;
@@ -90,6 +110,10 @@ export declare const shopifyCategoryProducts: {
                                 };
                                 cursor: string;
                             }[];
+                            pageInfo: {
+                                hasNextPage: boolean;
+                                endCursor: string;
+                            };
                         };
                         tags: string[];
                         variants: {
@@ -116,6 +140,10 @@ export declare const shopifyCategoryProducts: {
                                 };
                                 cursor: string;
                             }[];
+                            pageInfo: {
+                                hasNextPage: boolean;
+                                endCursor: string;
+                            };
                         };
                         images: {
                             edges: {
@@ -126,6 +154,10 @@ export declare const shopifyCategoryProducts: {
                                 };
                                 cursor: string;
                             }[];
+                            pageInfo: {
+                                hasNextPage: boolean;
+                                endCursor: string;
+                            };
                         };
                         availableForSale: boolean;
                         handle: string;
@@ -139,6 +171,10 @@ export declare const shopifyCategoryProducts: {
 export declare const shopifyProductsByKeyword: {
     data: {
         products: {
+            pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+            };
             edges: {
                 node: {
                     id: string;
@@ -146,6 +182,10 @@ export declare const shopifyProductsByKeyword: {
                     description: string;
                     collections: {
                         edges: any[];
+                        pageInfo: {
+                            hasNextPage: boolean;
+                            endCursor: any;
+                        };
                     };
                     tags: string[];
                     variants: {
@@ -172,6 +212,10 @@ export declare const shopifyProductsByKeyword: {
                             };
                             cursor: string;
                         }[];
+                        pageInfo: {
+                            hasNextPage: boolean;
+                            endCursor: string;
+                        };
                     };
                     images: {
                         edges: {
@@ -182,6 +226,10 @@ export declare const shopifyProductsByKeyword: {
                             };
                             cursor: string;
                         }[];
+                        pageInfo: {
+                            hasNextPage: boolean;
+                            endCursor: string;
+                        };
                     };
                     availableForSale: boolean;
                     handle: string;
@@ -194,10 +242,15 @@ export declare const shopifyProductsByKeyword: {
 export declare const shopifySegments: {
     data: {
         segments: {
+            pageInfo: {
+                hasNextPage: boolean;
+                endCursor: string;
+            };
             edges: {
                 node: {
                     id: string;
                     name: string;
+                    cursor: string;
                 };
             }[];
         };

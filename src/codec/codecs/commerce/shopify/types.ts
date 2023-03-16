@@ -14,10 +14,19 @@ export interface Edge<T> {
 }
 
 /**
+ * GraphQL pagination info.
+ */
+export interface PageInfo {
+	hasNextPage: boolean,
+	endCursor: string
+}
+
+/**
  * GraphQL paginated request with edges.
  */
 export interface Paginated<T> {
-	edges: Edge<T>[]
+	edges: Edge<T>[],
+	pageInfo: PageInfo
 }
 
 /**

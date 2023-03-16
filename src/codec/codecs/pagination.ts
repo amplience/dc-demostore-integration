@@ -2,6 +2,8 @@ import { OAuthRestClientInterface } from '@/common'
 import { AxiosRequestConfig, AxiosStatic } from 'axios'
 import { logResponse } from './common'
 
+export type GetPageResultCursor<T> = { data: T[], hasNext: boolean, nextCursor: string }
+
 type GetPageResult<T> = { data: T[], total: number }
 type PropMapper = <T>(data: any) => T
 type StringPropMapper = string | PropMapper
@@ -170,4 +172,50 @@ export async function paginate<T>(
 	}
 
 	return result
+}
+
+export async function paginateCursor<T>(
+	requestPage: (cursor: string, pageSize: number) => Promise<GetPageResultCursor<T>>,
+	pageSize = 20,
+	cursor?: string,
+	pageCount?: number
+): Promise<GetPageResultCursor<T>> {
+	const result: T[] = []
+
+	if (pageCount === undefined) {
+		pageCount = Infinity
+	}
+
+	const targetCount = pageCount * pageSize
+
+	for (let i = 0; i < pageCount; i++) {
+		const {data, hasNext, nextCursor} = await requestPage(cursor, pageSize)
+
+		const dataCount = data.length
+
+		const end = targetCount - result.length
+		const toAdd = Math.min(dataCount, end)
+
+		result.push(...(data.slice(0, toAdd)))
+
+		cursor = nextCursor
+
+		if (!hasNext) {
+			return {
+				data: result,
+				hasNext: false,
+				nextCursor: cursor
+			}
+		}
+		else if (result.length === targetCount)
+		{
+			break
+		}
+	}
+
+	return {
+		data: result,
+		hasNext: true,
+		nextCursor: cursor
+	}
 }

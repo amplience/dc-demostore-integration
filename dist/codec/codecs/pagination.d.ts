@@ -1,5 +1,10 @@
 import { OAuthRestClientInterface } from '@/common';
 import { AxiosRequestConfig, AxiosStatic } from 'axios';
+export declare type GetPageResultCursor<T> = {
+    data: T[];
+    hasNext: boolean;
+    nextCursor: string;
+};
 declare type GetPageResult<T> = {
     data: T[];
     total: number;
@@ -33,4 +38,5 @@ export declare function getPageByQueryAxios(offsetQuery: string, countQuery: str
  * @returns List of items fetched from the paginated endpoint
  */
 export declare function paginate<T>(requestPage: (page: number, pageSize: number) => Promise<GetPageResult<T>>, pageSize?: number, pageNum?: number, pageCount?: number): Promise<T[]>;
+export declare function paginateCursor<T>(requestPage: (cursor: string, pageSize: number) => Promise<GetPageResultCursor<T>>, pageSize?: number, cursor?: string, pageCount?: number): Promise<GetPageResultCursor<T>>;
 export {};

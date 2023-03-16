@@ -15,7 +15,11 @@ export const shopifyProduct = (id: string) => ({
                         },
                         "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MDQyNTYsImxhc3RfdmFsdWUiOjQzOTAzODgwNDI1Nn0="
                     }
-                ]
+                ],
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "endCursor": "eyJsYXN0X2lkIjo0MzkwMzg4MDQyNTYsImxhc3RfdmFsdWUiOjQzOTAzODgwNDI1Nn0="
+                }
             },
             "tags": [
                 "Premium",
@@ -51,7 +55,11 @@ export const shopifyProduct = (id: string) => ({
                         },
                         "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzQzNzcyOCwibGFzdF92YWx1ZSI6MX0="
                     }
-                ]
+                ],
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "endCursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzQzNzcyOCwibGFzdF92YWx1ZSI6MX0="
+                }
             },
             "images": {
                 "edges": [
@@ -63,7 +71,11 @@ export const shopifyProduct = (id: string) => ({
                         },
                         "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODM3ODY1NiwibGFzdF92YWx1ZSI6MX0="
                     }
-                ]
+                ],
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "endCursor": "eyJsYXN0X2lkIjo0MDg2NjcyODM3ODY1NiwibGFzdF92YWx1ZSI6MX0="
+                }
             },
             "availableForSale": true,
             "handle": "the-hidden-snowboard"
@@ -102,7 +114,11 @@ export const shopifyCategories = {
                     },
                     "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
                 }
-            ]
+            ],
+            "pageInfo": {
+                "hasNextPage": false,
+                "endCursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
+            }
         }
     }
 }
@@ -111,6 +127,10 @@ export const shopifyCategoryProducts = {
     "data": {
         "collection": {
             "products": {
+                "pageInfo": {
+                    "hasNextPage": false,
+                    "endCursor": "eyJsYXN0X2lkIjo4MTcwMzExNTE2NDQ4LCJsYXN0X3ZhbHVlIjowfQ=="
+                },
                 "edges": [
                     {
                         "node": {
@@ -137,7 +157,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
+                                }
                             },
                             "tags": [
                                 "Accessory",
@@ -171,7 +195,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzMwNjY1NiwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzMwNjY1NiwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "images": {
                                 "edges": [
@@ -183,7 +211,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODI4MDM1MiwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MDg2NjcyODI4MDM1MiwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "availableForSale": true,
                             "handle": "the-collection-snowboard-liquid"
@@ -206,7 +238,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
+                                }
                             },
                             "tags": [
                                 "Accessory",
@@ -240,7 +276,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzI0MTEyMCwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzI0MTEyMCwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "images": {
                                 "edges": [
@@ -252,7 +292,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODIxNDgxNiwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MDg2NjcyODIxNDgxNiwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "availableForSale": true,
                             "handle": "the-collection-snowboard-oxygen"
@@ -284,7 +328,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
+                                }
                             },
                             "tags": [
                                 "Accessory",
@@ -318,7 +366,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzI3Mzg4OCwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0NDcyMzQ5MzI3Mzg4OCwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "images": {
                                 "edges": [
@@ -330,7 +382,11 @@ export const shopifyCategoryProducts = {
                                         },
                                         "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODI0NzU4NCwibGFzdF92YWx1ZSI6MX0="
                                     }
-                                ]
+                                ],
+                                "pageInfo": {
+                                    "hasNextPage": false,
+                                    "endCursor": "eyJsYXN0X2lkIjo0MDg2NjcyODI0NzU4NCwibGFzdF92YWx1ZSI6MX0="
+                                }
                             },
                             "availableForSale": true,
                             "handle": "the-collection-snowboard-hydrogen"
@@ -346,6 +402,10 @@ export const shopifyCategoryProducts = {
 export const shopifyProductsByKeyword = {
     "data": {
         "products": {
+            "pageInfo": {
+                "hasNextPage": false,
+                "endCursor": "eyJsYXN0X2lkIjo4MTcwMzExNDE4MTQ0LCJsYXN0X3ZhbHVlIjo4MTcwMzExNDE4MTQ0fQ="
+            },
             "edges": [
                 {
                     "node": {
@@ -353,7 +413,11 @@ export const shopifyProductsByKeyword = {
                         "title": "The 3p Fulfilled Snowboard",
                         "description": "A snowboard that will leave you fulfilled. TITLE",
                         "collections": {
-                            "edges": []
+                            "edges": [],
+                            "pageInfo": {
+                                "hasNextPage": false,
+                                "endCursor": null
+                            }
                         },
                         "tags": [
                             "Accessory",
@@ -387,7 +451,11 @@ export const shopifyProductsByKeyword = {
                                     },
                                     "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5Mjk3ODk3NiwibGFzdF92YWx1ZSI6MX0="
                                 }
-                            ]
+                            ],
+                            "pageInfo": {
+                                "hasNextPage": false,
+                                "endCursor": "eyJsYXN0X2lkIjo0NDcyMzQ5Mjk3ODk3NiwibGFzdF92YWx1ZSI6MX0="
+                            }
                         },
                         "images": {
                             "edges": [
@@ -399,7 +467,11 @@ export const shopifyProductsByKeyword = {
                                     },
                                     "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODExNjUxMiwibGFzdF92YWx1ZSI6MX0="
                                 }
-                            ]
+                            ],
+                            "pageInfo": {
+                                "hasNextPage": false,
+                                "endCursor": "eyJsYXN0X2lkIjo0MDg2NjcyODExNjUxMiwibGFzdF92YWx1ZSI6MX0="
+                            }
                         },
                         "availableForSale": true,
                         "handle": "the-3p-fulfilled-snowboard"
@@ -414,29 +486,37 @@ export const shopifyProductsByKeyword = {
 export const shopifySegments = {
     "data": {
         "segments": {
+            "pageInfo": {
+                "hasNextPage": false,
+                "endCursor": "3"
+            },
             "edges": [
                 {
                     "node": {
                         "id": "gid://shopify/Segment/514502426912",
-                        "name": "Customers who haven't purchased"
+                        "name": "Customers who haven't purchased",
+                        "cursor": "0"
                     }
                 },
                 {
                     "node": {
                         "id": "gid://shopify/Segment/514502459680",
-                        "name": "Customers who have purchased more than once"
+                        "name": "Customers who have purchased more than once",
+                        "cursor": "1"
                     }
                 },
                 {
                     "node": {
                         "id": "gid://shopify/Segment/514502492448",
-                        "name": "Abandoned checkouts in the last 30 days"
+                        "name": "Abandoned checkouts in the last 30 days",
+                        "cursor": "2"
                     }
                 },
                 {
                     "node": {
                         "id": "gid://shopify/Segment/514502525216",
-                        "name": "Email subscribers"
+                        "name": "Email subscribers",
+                        "cursor": "3"
                     }
                 }
             ]
