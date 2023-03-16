@@ -1,3 +1,6 @@
+/**
+ * GraphQL request to fetch product information (minimal set required for conversion).
+ */
 export const productShared = `
 id
 title
@@ -62,6 +65,9 @@ images(first: 100) {
 availableForSale
 handle`
 
+/**
+ * GraphQL request to fetch products by query. (paginated)
+ */
 export const productsByQuery = `
 query getProducts($pageSize: Int!, $query: String, $after: String){
 	products(first: $pageSize, after: $after, query: $query) {
@@ -74,6 +80,9 @@ query getProducts($pageSize: Int!, $query: String, $after: String){
 	}
 }`
 
+/**
+ * GraphQL request to fetch a product by ID.
+ */
 export const productById = `
 query getProductById($id: ID!) {
 	product(id: $id) {
@@ -81,6 +90,9 @@ query getProductById($id: ID!) {
 	}
 }`
 
+/**
+ * GraphQL request to fetch products by category. (paginated)
+ */
 export const productsByCategory = `
 query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 	collection(handle: $handle) {
@@ -95,6 +107,9 @@ query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 	}
 }`
 
+/**
+ * GraphQL request to fetch segments. (paginated)
+ */
 export const segments = `
 query getSegments($pageSize: Int!, $after: String) {
 	segments(first: $pageSize, after: $after) {
@@ -107,6 +122,9 @@ query getSegments($pageSize: Int!, $after: String) {
 	}
 }`
 
+/**
+ * GraphQL request to fetch collections. (paginated)
+ */
 export const collections = `
 query getCollections($pageSize: Int!, $after: String){
 	collections(first: $pageSize, after: $after) {
