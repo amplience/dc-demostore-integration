@@ -121,7 +121,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 */
 	async gqlRequest<T>(query: string, variables: any, isAdmin: boolean = false): Promise<T> {
 		const url = 'graphql.json'
-		const result: GqlResponse<T> = await logResponse('get', url, (await catchAxiosErrors(async () =>
+		const result: GqlResponse<T> = await logResponse('post', url, (await catchAxiosErrors(async () =>
 			{
 				if (isAdmin) {
 					return await this.adminApiClient.post(url, {
