@@ -1,16 +1,28 @@
+/**
+ * GraphQL response.
+ */
 export interface GqlResponse<T> {
 	data: T
 }
 
+/**
+ * GraphQL edge from a paginated request.
+ */
 export interface Edge<T> {
 	node: T,
 	cursor: string
 }
 
+/**
+ * GraphQL paginated request with edges.
+ */
 export interface Paginated<T> {
 	edges: Edge<T>[]
 }
 
+/**
+ * Shopify collection type.
+ */
 export interface ShopifyCollection {
 	id: string,
 	handle: string,
@@ -18,17 +30,26 @@ export interface ShopifyCollection {
 	image: ShopifyImage
 }
 
+/**
+ * Shopify price type.
+ */
 export interface ShopifyPrice {
 	currencyCode: string,
 	amount: string
 }
 
+/**
+ * Shopify image type.
+ */
 export interface ShopifyImage {
 	id: string,
 	url: string,
 	altText: string
 }
 
+/**
+ * Shopify variant type.
+ */
 export interface ShopifyVariant {
 	id: string,
 	title: string,
@@ -40,6 +61,9 @@ export interface ShopifyVariant {
 	image: ShopifyImage
 }
 
+/**
+ * Shopify product type.
+ */
 export interface ShopifyProduct {
 	id: string,
 	title: string,
@@ -52,29 +76,47 @@ export interface ShopifyProduct {
 	availableForSale: boolean
 }
 
+/**
+ * Shopify get products by query response.
+ */
 export interface ShopifyProductsByQuery {
 	products: Paginated<ShopifyProduct>
 }
 
+/**
+ * Shopify get product by ID response.
+ */
 export interface ShopifyProductByID {
 	product: ShopifyProduct
 }
 
+/**
+ * Shopify get products by collection response.
+ */
 export interface ShopifyProductsByCollection {
 	collection: {
 		products: Paginated<ShopifyProduct>
 	}
 }
 
+/**
+ * Shopify get collections response.
+ */
 export interface ShopifyCollections {
 	collections: Paginated<ShopifyCollection>
 }
 
+/**
+ * Shopify user segment.
+ */
 export interface ShopifySegment {
 	id: string,
 	name: string
 }
 
+/**
+ * Shopify get segments response.
+ */
 export interface ShopifySegments {
 	segments: Paginated<ShopifySegment>
 }

@@ -88,10 +88,6 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	apiClient: AxiosInstance
 	adminApiClient: AxiosInstance
 
-	// instance variables
-	// products: Product[]
-	// categories: Category[]
-
 	/**
 	 * @inheritdoc
 	 */
@@ -115,9 +111,10 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param query 
-	 * @param variables 
+	 * Make a request to the shopify GraphQL API.
+	 * @param query The GraphQL query string
+	 * @param variables Variables to use with the GraphQL query
+	 * @param isAdmin Whether the admin credentials must be used or not
 	 * @returns 
 	 */
 	async gqlRequest<T>(query: string, variables: any, isAdmin: boolean = false): Promise<T> {
@@ -153,18 +150,18 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param id 
-	 * @returns 
+	 * Get a shopify product by ID.
+	 * @param id The ID of the product to fetch
+	 * @returns The shopify product
 	 */
 	async getProductById(id: string): Promise<ShopifyProduct> {
 		return (await this.gqlRequest<ShopifyProductByID>(productById, { id })).product
 	}
 
 	/**
-	 * TODO
-	 * @param keyword 
-	 * @returns 
+	 * Get a list of all shopify products that match the given keyword.
+	 * @param keyword Keyword used to search products
+	 * @returns A list of all matching products
 	 */
 	async getProductsByKeyword(keyword: string): Promise<ShopifyProduct[]> {
 		// TODO: pagination
@@ -176,9 +173,9 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	}
 
 	/**
-	 * TODO
-	 * @param slug 
-	 * @returns 
+	 * Get a list of all shopify products in the category with the given slug.
+	 * @param slug The category slug
+	 * @returns A list of all products in the category
 	 */
 	async getProductsByCategory(slug: string): Promise<ShopifyProduct[]> {
 		// TODO: pagination
