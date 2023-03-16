@@ -2,6 +2,39 @@ export const shopifyProduct = {
 }
 
 export const shopifyCategories = {
+    "data": {
+        "collections": {
+            "edges": [
+                {
+                    "node": {
+                        "id": "gid://shopify/Collection/439038771488",
+                        "handle": "frontpage",
+                        "title": "Home page",
+                        "image": null
+                    },
+                    "cursor": "eyJsYXN0X2lkIjo0MzkwMzg3NzE0ODgsImxhc3RfdmFsdWUiOjQzOTAzODc3MTQ4OH0="
+                },
+                {
+                    "node": {
+                        "id": "gid://shopify/Collection/439038804256",
+                        "handle": "automated-collection",
+                        "title": "Automated Collection",
+                        "image": null
+                    },
+                    "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MDQyNTYsImxhc3RfdmFsdWUiOjQzOTAzODgwNDI1Nn0="
+                },
+                {
+                    "node": {
+                        "id": "gid://shopify/Collection/439038837024",
+                        "handle": "hydrogen",
+                        "title": "Hydrogen",
+                        "image": null
+                    },
+                    "cursor": "eyJsYXN0X2lkIjo0MzkwMzg4MzcwMjQsImxhc3RfdmFsdWUiOjQzOTAzODgzNzAyNH0="
+                }
+            ]
+        }
+    }
 }
 
 export const shopifySegments = {
