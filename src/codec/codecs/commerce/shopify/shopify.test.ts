@@ -217,6 +217,28 @@ describe('shopify integration', function () {
 	})
 
 	test('getRawProducts (multiple, one missing)', async () => {
+						
+		// Setup with the right fixture
+		massMock(axios, requests, commerceProductRequests)
+		codec = new ShopifyCommerceCodec(flattenConfig(config))
+		await codec.init(new ShopifyCodecType())
+
+		// Test
+		const result = await codec.getRawProducts({
+			productIds: 'ExampleID,MissingID,ExampleID2'
+		})
+		expect(requests).toEqual([
+			productRequest('ExampleID'),
+			productRequest('MissingID'),
+			productRequest('ExampleID2')	
+		])
+		
+		// TODO: manage missing id
+		expect(result).toEqual([
+			shopifyProduct('ExampleID').data.product,
+			null,
+			shopifyProduct('ExampleID').data.product
+		])
 	})
 
 	test('getCategory', async () => {
