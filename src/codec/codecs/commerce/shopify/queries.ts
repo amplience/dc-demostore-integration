@@ -89,3 +89,16 @@ ${productShared}
     }
   }
 }`
+
+export const segments = `
+query getSegments($pageSize: Int!, $after: String) {
+	segments(first: $pageSize, after: $after) {
+	  	edges {
+			node {
+				id
+				name
+				query
+			}
+	  	}
+	}
+}`
