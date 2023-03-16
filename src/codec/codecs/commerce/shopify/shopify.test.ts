@@ -26,6 +26,7 @@ const commerceProductsByKeywordRequests: MockFixture = {
 	}
 }
 
+// TODO: add collections request
 const commerceProductsByCategoryRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
