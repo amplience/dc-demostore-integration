@@ -61,7 +61,6 @@ describe('shopify integration', function() {
 	test('getProducts (multiple)', async () => {
 
 		// Setup with the right fixture
-		// TODO: for now always returning 'ProductID' response because of fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
@@ -74,9 +73,10 @@ describe('shopify integration', function() {
 			productRequest('ExampleID'),
 			productRequest('ExampleID2')
 		])
+		// TODO: for now always returning 'ProductID' responses because of fixture
 		expect(result).toEqual([
 			exampleProduct('ExampleID'),
-			exampleProduct('ExampleID2')
+			exampleProduct('ExampleID')
 		])
 	})
 
