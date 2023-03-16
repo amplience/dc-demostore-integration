@@ -2,4 +2,4 @@ export declare const productShared = "\nid\ntitle\ndescription\ncollections(firs
 export declare const productsByQuery: string;
 export declare const productById: string;
 export declare const productsByCategory: string;
-export declare const segments = "\nquery getSegments($pageSize: Int!, $after: String) {\n\tsegments(first: $pageSize, after: $after) {\n\t  \tedges {\n\t\t\tnode {\n\t\t\t\tid\n\t\t\t\tname\n\t\t\t\tquery\n\t\t\t}\n\t  \t}\n\t}\n}";
+export declare const segments = "\nquery getSegments($pageSize: Int!, $after: String) {\n\tsegments(first: $pageSize, after: $after) {\n\t  \tedges {\n\t\t\tnode {\n\t\t\t\tid\n\t\t\t\tname\n\t\t\t}\n\t  \t}\n\t}\n}";

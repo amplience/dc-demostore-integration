@@ -1,4 +1,4 @@
-import { CommerceAPI, CommonArgs, GetProductsArgs, Identifiable, Product } from '../../../../common';
+import { CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Product } from '../../../../common';
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core';
 import { StringProperty } from '../../../cms-property-types';
 import { AxiosInstance } from 'axios';
@@ -74,6 +74,6 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    getCustomerGroups(args: CommonArgs): Promise<Identifiable[]>;
+    getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]>;
 }
 export default ShopifyCommerceCodecType;

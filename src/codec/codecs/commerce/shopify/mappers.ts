@@ -1,10 +1,11 @@
-import { Category, Product, Variant } from "../../../../common/types"
+import { Category, CustomerGroup, Product, Variant } from "../../../../common/types"
 import { formatMoneyString } from "../../../../common/util"
 import { 
 	ShopifyCollectionMinimal, 
 	ShopifyImage, 
 	ShopifyPrice, 
 	ShopifyProduct, 
+	ShopifySegment, 
 	ShopifyVariant 
 } from "./types"
 import { Dictionary } from "lodash"
@@ -82,5 +83,17 @@ export const mapProduct = (product: ShopifyProduct): Product => {
 		variants: product.variants.edges.map(variant => mapVariant(variant.node, sharedImages)),
 		shortDescription: product.description,
 		longDescription: product.description
+	}
+}
+
+/**
+ * TODO
+ * @param segment 
+ * @returns 
+ */
+export const mapCustomerGroup = (segment: ShopifySegment): CustomerGroup => {
+	return {
+		id: segment.id,
+		name: segment.name
 	}
 }

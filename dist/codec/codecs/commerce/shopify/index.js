@@ -148,7 +148,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
      */
     getProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (yield this.getRawProducts(args)).map(product => (0, mappers_1.mapProduct)(product));
+            return (yield this.getRawProducts(args)).map(mappers_1.mapProduct);
         });
     }
     /**
@@ -180,7 +180,9 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            return [];
+            const pageSize = 100;
+            const groups = yield this.gqlRequest(queries_1.segments, { pageSize });
+            return groups.map(mappers_1.mapCustomerGroup);
         });
     }
 }

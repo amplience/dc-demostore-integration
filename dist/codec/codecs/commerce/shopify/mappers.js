@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapProduct = exports.mapVariant = exports.mapCategoryMinimal = exports.mapPrice = exports.firstNonEmpty = void 0;
+exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapCategoryMinimal = exports.mapPrice = exports.firstNonEmpty = void 0;
 const util_1 = require("../../../../common/util");
 /**
  * TODO
@@ -74,3 +74,15 @@ const mapProduct = (product) => {
     };
 };
 exports.mapProduct = mapProduct;
+/**
+ * TODO
+ * @param segment
+ * @returns
+ */
+const mapCustomerGroup = (segment) => {
+    return {
+        id: segment.id,
+        name: segment.name
+    };
+};
+exports.mapCustomerGroup = mapCustomerGroup;

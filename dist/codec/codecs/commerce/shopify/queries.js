@@ -96,7 +96,6 @@ query getSegments($pageSize: Int!, $after: String) {
 			node {
 				id
 				name
-				query
 			}
 	  	}
 	}

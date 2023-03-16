@@ -1,6 +1,7 @@
 import { 
 	CommerceAPI, 
 	CommonArgs, 
+	CustomerGroup, 
 	GetProductsArgs, 
 	Identifiable, 
 	Product, 
@@ -16,9 +17,10 @@ import {
 	ShopifyProductByID, 
 	ShopifyProductsByCategory, 
 	ShopifyProductsByQuery,
+	ShopifySegment,
  } from './types'
-import { productById, productsByCategory, productsByQuery } from './queries'
-import { mapProduct } from './mappers'
+import { productById, productsByCategory, productsByQuery, segments } from './queries'
+import { mapCustomerGroup, mapProduct } from './mappers'
 
 /**
  * Shopify codec configuration.
@@ -158,7 +160,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs): Promise<Product[]> {
-		return (await this.getRawProducts(args)).map(product => mapProduct(product))
+		return (await this.getRawProducts(args)).map(mapProduct)
 	}
 
 	/**
@@ -191,8 +193,10 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-		return []
+	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
+		const pageSize = 100
+		const groups = await this.gqlRequest<ShopifySegment[]>(segments, {pageSize})
+		return groups.map(mapCustomerGroup)
 	}
 }
 
