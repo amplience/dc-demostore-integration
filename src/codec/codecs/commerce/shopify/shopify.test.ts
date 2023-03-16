@@ -10,11 +10,18 @@ import { flattenConfig } from '../../../../common/util'
 
 jest.mock('axios')
 
+// TODO: manage multiple requests
 const commerceProductRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
 			data: shopifyProduct('ExampleID')
 		}
+		// 'https://site_id.myshopify.com/api/version/graphql.json': {
+		// 	data: shopifyProduct('ExampleID2')
+		// },
+		// 'https://site_id.myshopify.com/api/version/graphql.json': {
+		// 	data: null
+		// }
 	}
 }
 
@@ -232,7 +239,7 @@ describe('shopify integration', function () {
 			productRequest('MissingID'),
 			productRequest('ExampleID2')	
 		])
-		
+
 		// TODO: manage missing id
 		expect(result).toEqual([
 			shopifyProduct('ExampleID').data.product,
