@@ -8,6 +8,7 @@ import { ShopifyProduct } from './types';
  */
 declare type CodecConfig = {
     access_token: StringProperty;
+    admin_access_token: StringProperty;
     version: StringProperty;
     site_id: StringProperty;
 };
@@ -34,6 +35,7 @@ export declare class ShopifyCommerceCodecType extends CommerceCodecType {
 export declare class ShopifyCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
     apiClient: AxiosInstance;
+    adminApiClient: AxiosInstance;
     /**
      * @inheritdoc
      */
@@ -44,7 +46,7 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      * @param variables
      * @returns
      */
-    gqlRequest<T>(query: string, variables: any): Promise<T>;
+    gqlRequest<T>(query: string, variables: any, isAdmin?: boolean): Promise<T>;
     /**
      * TODO
      * @param id

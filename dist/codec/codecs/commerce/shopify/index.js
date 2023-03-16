@@ -39,6 +39,11 @@ class ShopifyCommerceCodecType extends core_1.CommerceCodecType {
                 type: 'string',
                 minLength: 1
             },
+            admin_access_token: {
+                title: 'admin access token',
+                type: 'string',
+                minLength: 1
+            },
             version: {
                 title: 'version',
                 type: 'string',
@@ -82,6 +87,12 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                     'X-Shopify-Storefront-Access-Token': this.config.access_token
                 }
             });
+            this.adminApiClient = axios_1.default.create({
+                baseURL: `https://${this.config.site_id}.myshopify.com/admin/api/${this.config.version}`,
+                headers: {
+                    'X-Shopify-Access-Token': this.config.admin_access_token
+                }
+            });
             // this.products = await fetchFromURL(this.config.productURL, [])
             // this.megaMenu = this.categories.filter(cat => !cat.parent)
             return yield _super.init.call(this, codecType);
@@ -93,14 +104,22 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
      * @param variables
      * @returns
      */
-    gqlRequest(query, variables) {
+    gqlRequest(query, variables, isAdmin = false) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = 'graphql.json';
             const result = yield (0, common_1.logResponse)('get', url, (yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () {
-                return yield this.apiClient.post(url, {
-                    query,
-                    variables
-                });
+                if (isAdmin) {
+                    return yield this.adminApiClient.post(url, {
+                        query,
+                        variables
+                    });
+                }
+                else {
+                    return yield this.apiClient.post(url, {
+                        query,
+                        variables
+                    });
+                }
             }))).data);
             return result.data;
         });
@@ -181,8 +200,8 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
             const pageSize = 100;
-            const groups = yield this.gqlRequest(queries_1.segments, { pageSize });
-            return groups.map(mappers_1.mapCustomerGroup);
+            const result = yield this.gqlRequest(queries_1.segments, { pageSize }, true);
+            return result.segments.edges.map(edge => (0, mappers_1.mapCustomerGroup)(edge.node));
         });
     }
 }

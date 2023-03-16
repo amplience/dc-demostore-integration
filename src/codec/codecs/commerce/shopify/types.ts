@@ -67,6 +67,9 @@ export interface ShopifyProductsByCategory {
 
 export interface ShopifySegment {
 	id: string,
-	name: string,
-	query: string
+	name: string
+}
+
+export interface ShopifySegments {
+	segments: Paginated<ShopifySegment>
 }

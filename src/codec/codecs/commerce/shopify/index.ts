@@ -17,6 +17,7 @@ import {
 	ShopifyProductsByCategory, 
 	ShopifyProductsByQuery,
 	ShopifySegment,
+	ShopifySegments,
  } from './types'
 import { productById, productsByCategory, productsByQuery, segments } from './queries'
 import { mapCustomerGroup, mapProduct } from './mappers'
@@ -26,6 +27,7 @@ import { mapCustomerGroup, mapProduct } from './mappers'
  */
 type CodecConfig = {
 	access_token: StringProperty,
+	admin_access_token: StringProperty,
 	version: StringProperty,
 	site_id: StringProperty
 }
@@ -49,6 +51,11 @@ export class ShopifyCommerceCodecType extends CommerceCodecType {
 		return {
 			access_token:  {
 				title: 'access token',
+				type: 'string',
+				minLength: 1
+			},
+			admin_access_token:  {
+				title: 'admin access token',
 				type: 'string',
 				minLength: 1
 			},
@@ -79,6 +86,7 @@ export class ShopifyCommerceCodecType extends CommerceCodecType {
 export class ShopifyCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 	apiClient: AxiosInstance
+	adminApiClient: AxiosInstance
 
 	// instance variables
 	// products: Product[]
@@ -94,6 +102,12 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 				'X-Shopify-Storefront-Access-Token': this.config.access_token
 			}
 		})
+		this.adminApiClient = axios.create({
+			baseURL: `https://${this.config.site_id}.myshopify.com/admin/api/${this.config.version}`,
+			headers: {
+				'X-Shopify-Access-Token': this.config.admin_access_token
+			}
+		})
 
 		// this.products = await fetchFromURL(this.config.productURL, [])
 		// this.megaMenu = this.categories.filter(cat => !cat.parent)
@@ -106,13 +120,22 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @param variables 
 	 * @returns 
 	 */
-	async gqlRequest<T>(query: string, variables: any): Promise<T> {
+	async gqlRequest<T>(query: string, variables: any, isAdmin: boolean = false): Promise<T> {
 		const url = 'graphql.json'
 		const result: GqlResponse<T> = await logResponse('get', url, (await catchAxiosErrors(async () =>
-			await this.apiClient.post(url, {
-				query,
-				variables
-			})
+			{
+				if (isAdmin) {
+					return await this.adminApiClient.post(url, {
+						query,
+						variables
+					})
+				} else {
+					return await this.apiClient.post(url, {
+						query,
+						variables
+					})	
+				}
+			}
 		)).data)
 
 		return result.data
@@ -194,8 +217,8 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<CustomerGroup[]> {
 		const pageSize = 100
-		const groups = await this.gqlRequest<ShopifySegment[]>(segments, {pageSize})
-		return groups.map(mapCustomerGroup)
+		const result = await this.gqlRequest<ShopifySegments>(segments, {pageSize}, true)
+		return result.segments.edges.map(edge => mapCustomerGroup(edge.node))
 	}
 }
 

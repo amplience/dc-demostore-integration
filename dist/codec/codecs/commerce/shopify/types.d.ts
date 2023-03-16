@@ -62,3 +62,6 @@ export interface ShopifySegment {
     name: string;
     query: string;
 }
+export interface ShopifySegments {
+    segments: Paginated<ShopifySegment>;
+}
