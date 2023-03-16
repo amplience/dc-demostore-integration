@@ -18,6 +18,18 @@ const commerceProductRequests: MockFixture = {
 	}
 }
 
+const commerceProductMissingRequests: MockFixture = {
+	post: {
+		'https://site_id.myshopify.com/api/version/graphql.json': {
+			data: {
+				"data": {
+					"product": null
+				}
+			}
+		}
+	}
+}
+
 const commerceProductsByKeywordRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
@@ -119,6 +131,19 @@ describe('shopify integration', function() {
 	})
 
 	test('getProduct (missing)', async () => {
+
+		// Setup with the right fixture
+		massMock(axios, requests, commerceProductMissingRequests)
+		codec = new ShopifyCommerceCodec(flattenConfig(config))
+		await codec.init(new ShopifyCodecType())
+
+		// Test
+		// TODO: handle missing product in codec
+		const result = await codec.getProduct({id: 'MissingID'})
+		expect(result).resolves.toBeNull()
+		expect(requests).toEqual([
+			productRequest('MissingID')
+		])
 	})
 
 	test('getProducts (multiple, one missing)', async () => {
