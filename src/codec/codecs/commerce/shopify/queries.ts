@@ -8,6 +8,11 @@ collections(first: 100) {
 			id
 			handle
 			title
+			image {
+				id
+				url
+				altText
+			}
 		}
 		cursor
 	}
@@ -98,6 +103,25 @@ query getSegments($pageSize: Int!, $after: String) {
 				id
 				name
 			}
+		}
+	}
+}`
+
+export const collections = `
+query getCollections($pageSize: Int!, $after: String){
+	collections(first: $pageSize, after: $after) {
+		edges {
+			node {
+				id
+				handle
+				title
+				image {
+				id
+				url
+				altText
+				}
+			}
+			cursor
 		}
 	}
 }`

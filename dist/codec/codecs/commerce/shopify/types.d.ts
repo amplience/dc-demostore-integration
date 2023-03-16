@@ -8,10 +8,11 @@ export interface Edge<T> {
 export interface Paginated<T> {
     edges: Edge<T>[];
 }
-export interface ShopifyCollectionMinimal {
+export interface ShopifyCollection {
     id: string;
     handle: string;
     title: string;
+    image: ShopifyImage;
 }
 export interface ShopifyPrice {
     currencyCode: string;
@@ -40,7 +41,7 @@ export interface ShopifyProduct {
     title: string;
     handle: string;
     description: string;
-    collections: Paginated<ShopifyCollectionMinimal>;
+    collections: Paginated<ShopifyCollection>;
     tags: string[];
     variants: Paginated<ShopifyVariant>;
     images: Paginated<ShopifyImage>;
@@ -52,10 +53,13 @@ export interface ShopifyProductsByQuery {
 export interface ShopifyProductByID {
     product: ShopifyProduct;
 }
-export interface ShopifyProductsByCategory {
-    category: {
+export interface ShopifyProductsByCollection {
+    collection: {
         products: Paginated<ShopifyProduct>;
     };
+}
+export interface ShopifyCollections {
+    collections: Paginated<ShopifyCollection>;
 }
 export interface ShopifySegment {
     id: string;

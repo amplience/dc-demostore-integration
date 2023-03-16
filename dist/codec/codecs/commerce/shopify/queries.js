@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.segments = exports.productsByCategory = exports.productById = exports.productsByQuery = exports.productShared = void 0;
+exports.collections = exports.segments = exports.productsByCategory = exports.productById = exports.productsByQuery = exports.productShared = void 0;
 exports.productShared = `
 id
 title
@@ -11,6 +11,11 @@ collections(first: 100) {
 			id
 			handle
 			title
+			image {
+				id
+				url
+				altText
+			}
 		}
 		cursor
 	}
@@ -97,6 +102,24 @@ query getSegments($pageSize: Int!, $after: String) {
 				id
 				name
 			}
+		}
+	}
+}`;
+exports.collections = `
+query getCollections($pageSize: Int!, $after: String){
+	collections(first: $pageSize, after: $after) {
+		edges {
+			node {
+				id
+				handle
+				title
+				image {
+				id
+				url
+				altText
+				}
+			}
+			cursor
 		}
 	}
 }`;

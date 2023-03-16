@@ -1,5 +1,5 @@
 import { Category, CustomerGroup, Product, Variant } from "../../../../common/types";
-import { ShopifyCollectionMinimal, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from "./types";
+import { ShopifyCollection, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from "./types";
 /**
  * TODO
  * @param strings
@@ -17,7 +17,7 @@ export declare const mapPrice: (price: ShopifyPrice) => string;
  * @param collection
  * @returns
  */
-export declare const mapCategoryMinimal: (collection: ShopifyCollectionMinimal) => Category;
+export declare const mapCategory: (collection: ShopifyCollection) => Category;
 /**
  * TODO
  * @param variant

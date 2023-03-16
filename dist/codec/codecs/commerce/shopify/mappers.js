@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapCategoryMinimal = exports.mapPrice = exports.firstNonEmpty = void 0;
+exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapCategory = exports.mapPrice = exports.firstNonEmpty = void 0;
 const util_1 = require("../../../../common/util");
 /**
  * TODO
@@ -25,16 +25,17 @@ exports.mapPrice = mapPrice;
  * @param collection
  * @returns
  */
-const mapCategoryMinimal = (collection) => {
+const mapCategory = (collection) => {
     return {
         id: collection.id,
         slug: collection.handle,
         name: collection.title,
+        image: collection.image,
         children: [],
         products: []
     };
 };
-exports.mapCategoryMinimal = mapCategoryMinimal;
+exports.mapCategory = mapCategory;
 /**
  * TODO
  * @param variant
@@ -67,7 +68,7 @@ const mapProduct = (product) => {
         id: product.id,
         name: product.title,
         slug: product.handle,
-        categories: product.collections.edges.map(collection => (0, exports.mapCategoryMinimal)(collection.node)),
+        categories: product.collections.edges.map(collection => (0, exports.mapCategory)(collection.node)),
         variants: product.variants.edges.map(variant => (0, exports.mapVariant)(variant.node, sharedImages)),
         shortDescription: product.description,
         longDescription: product.description

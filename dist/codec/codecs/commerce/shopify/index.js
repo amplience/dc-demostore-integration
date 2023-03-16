@@ -107,7 +107,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     gqlRequest(query, variables, isAdmin = false) {
         return __awaiter(this, void 0, void 0, function* () {
             const url = 'graphql.json';
-            const result = yield (0, common_1.logResponse)('get', url, (yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () {
+            const result = yield (0, common_1.logResponse)('post', url, (yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () {
                 if (isAdmin) {
                     return yield this.adminApiClient.post(url, {
                         query,
@@ -122,6 +122,17 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                 }
             }))).data);
             return result.data;
+        });
+    }
+    /**
+     * @inheritdoc
+     */
+    cacheMegaMenu() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: pagination
+            const pageSize = 100;
+            const result = yield this.gqlRequest(queries_1.collections, { pageSize });
+            this.megaMenu = result.collections.edges.map(edge => (0, mappers_1.mapCategory)(edge.node));
         });
     }
     /**
@@ -150,16 +161,16 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     }
     /**
      * TODO
-     * @param keyword
+     * @param slug
      * @returns
      */
-    getProductsByCategory(keyword) {
+    getProductsByCategory(slug) {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO: pagination
-            const query = keyword;
+            const handle = slug;
             const pageSize = 100;
-            const result = yield this.gqlRequest(queries_1.productsByCategory, { query, pageSize });
-            return result.category.products.edges.map(edge => edge.node);
+            const result = yield this.gqlRequest(queries_1.productsByCategory, { handle, pageSize });
+            return result.collection.products.edges.map(edge => edge.node);
         });
     }
     /**

@@ -48,6 +48,10 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      */
     gqlRequest<T>(query: string, variables: any, isAdmin?: boolean): Promise<T>;
     /**
+     * @inheritdoc
+     */
+    cacheMegaMenu(): Promise<void>;
+    /**
      * TODO
      * @param id
      * @returns
@@ -61,10 +65,10 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
     getProductsByKeyword(keyword: string): Promise<ShopifyProduct[]>;
     /**
      * TODO
-     * @param keyword
+     * @param slug
      * @returns
      */
-    getProductsByCategory(keyword: string): Promise<ShopifyProduct[]>;
+    getProductsByCategory(slug: string): Promise<ShopifyProduct[]>;
     /**
      * @inheritdoc
      */

@@ -44,7 +44,7 @@ const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
 const util_1 = require("../../../../common/util");
 jest.mock('axios');
-const commerceRequests = {
+const commerceSegmentsRequests = {
     post: {
         'https://site_id.myshopify.com/admin/api/version/graphql.json': {
             data: responses_1.shopifySegments
@@ -57,9 +57,6 @@ describe('shopify integration', function () {
     beforeEach(() => __awaiter(this, void 0, void 0, function* () {
         jest.resetAllMocks();
         requests = [];
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceRequests);
-        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
-        yield codec.init(new _1.default());
     }));
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {
     }));
@@ -82,6 +79,9 @@ describe('shopify integration', function () {
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceSegmentsRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
         const customerGroups = yield codec.getCustomerGroups({});
         expect(customerGroups).toEqual(results_1.exampleCustomerGroups);
         expect(requests).toEqual([

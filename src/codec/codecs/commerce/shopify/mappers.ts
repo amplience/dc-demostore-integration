@@ -1,7 +1,7 @@
 import { Category, CustomerGroup, Product, Variant } from "../../../../common/types"
 import { formatMoneyString } from "../../../../common/util"
 import { 
-	ShopifyCollectionMinimal, 
+	ShopifyCollection, 
 	ShopifyImage, 
 	ShopifyPrice, 
 	ShopifyProduct, 
@@ -33,11 +33,12 @@ export const mapPrice = (price: ShopifyPrice): string => {
  * @param collection 
  * @returns 
  */
-export const mapCategoryMinimal = (collection: ShopifyCollectionMinimal): Category => {
+export const mapCategory = (collection: ShopifyCollection): Category => {
 	return {
 		id: collection.id,
 		slug: collection.handle,
 		name: collection.title,
+		image: collection.image,
 		children: [],
 		products: []
 	}
@@ -79,7 +80,7 @@ export const mapProduct = (product: ShopifyProduct): Product => {
 		id: product.id,
 		name: product.title,
 		slug: product.handle,
-		categories: product.collections.edges.map(collection => mapCategoryMinimal(collection.node)),
+		categories: product.collections.edges.map(collection => mapCategory(collection.node)),
 		variants: product.variants.edges.map(variant => mapVariant(variant.node, sharedImages)),
 		shortDescription: product.description,
 		longDescription: product.description

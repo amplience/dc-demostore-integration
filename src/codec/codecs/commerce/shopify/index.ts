@@ -12,14 +12,15 @@ import axios, { AxiosInstance } from 'axios'
 import { catchAxiosErrors } from '../../codec-error'
 import { 
 	GqlResponse, 
+	ShopifyCollections, 
 	ShopifyProduct, 
 	ShopifyProductByID, 
-	ShopifyProductsByCategory, 
+	ShopifyProductsByCollection, 
 	ShopifyProductsByQuery,
 	ShopifySegments,
  } from './types'
-import { productById, productsByCategory, productsByQuery, segments } from './queries'
-import { mapCustomerGroup, mapProduct } from './mappers'
+import { collections, productById, productsByCategory, productsByQuery, segments } from './queries'
+import { mapCategory, mapCustomerGroup, mapProduct } from './mappers'
 
 /**
  * Shopify codec configuration.
@@ -141,6 +142,17 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	}
 
 	/**
+	 * @inheritdoc
+	 */
+	async cacheMegaMenu(): Promise<void> {
+		// TODO: pagination
+		const pageSize = 100
+		const result = await this.gqlRequest<ShopifyCollections>(collections, {pageSize})
+
+		this.megaMenu = result.collections.edges.map(edge => mapCategory(edge.node))
+	}
+
+	/**
 	 * TODO
 	 * @param id 
 	 * @returns 
@@ -165,16 +177,16 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 
 	/**
 	 * TODO
-	 * @param keyword 
+	 * @param slug 
 	 * @returns 
 	 */
-	async getProductsByCategory(keyword: string): Promise<ShopifyProduct[]> {
+	async getProductsByCategory(slug: string): Promise<ShopifyProduct[]> {
 		// TODO: pagination
-		const query = keyword
+		const handle = slug
 		const pageSize = 100
-		const result = await this.gqlRequest<ShopifyProductsByCategory>(productsByCategory, {query, pageSize})
+		const result = await this.gqlRequest<ShopifyProductsByCollection>(productsByCategory, {handle, pageSize})
 
-		return result.category.products.edges.map(edge => edge.node)
+		return result.collection.products.edges.map(edge => edge.node)
 	}
 
 	/**
