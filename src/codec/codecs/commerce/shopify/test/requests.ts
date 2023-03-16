@@ -1,4 +1,4 @@
-import { collections, productById, productsByQuery, segments } from "../queries"
+import { collections, productById, productsByCategory, productsByQuery, segments } from "../queries"
 
 export const collectionsRequest = {
 	config: {
@@ -56,6 +56,22 @@ export const productsByKeywordRequest = {
 		variables: {
 			pageSize: 100,
 			query: 'fulfilled'
+		}
+	},
+	url: 'https://site_id.myshopify.com/api/version/graphql.json'
+}
+
+export const productsByCategoryRequest = {
+	config: {
+		baseURL: 'https://site_id.myshopify.com/api/version',
+		headers: {
+			'X-Shopify-Storefront-Access-Token': 'access_token'
+		},
+		url: 'graphql.json',
+		query: productsByCategory,
+		variables: {
+			pageSize: 100,
+			slug: 'hydrogen'
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'
