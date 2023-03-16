@@ -3,7 +3,6 @@ import {
 	CommonArgs, 
 	CustomerGroup, 
 	GetProductsArgs, 
-	Identifiable, 
 	Product, 
 } from '../../../../common'
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core'
