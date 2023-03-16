@@ -43,7 +43,7 @@ describe('shopify integration', function() {
 		requests = []
 	})
 
-	test('getProduct', async () => {
+	test('getProduct (by id)', async () => {
 
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
