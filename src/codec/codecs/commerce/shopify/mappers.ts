@@ -1,4 +1,9 @@
-import { Category, CustomerGroup, Product, Variant } from '../../../../common/types'
+import { 
+	Category, 
+	CustomerGroup, 
+	Product, 
+	Variant 
+} from '../../../../common/types'
 import { formatMoneyString } from '../../../../common/util'
 import { 
 	ShopifyCollection, 

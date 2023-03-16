@@ -5,7 +5,11 @@ import {
 	GetProductsArgs, 
 	Product, 
 } from '../../../../common'
-import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core'
+import { 
+	CodecPropertyConfig, 
+	CommerceCodecType, 
+	CommerceCodec 
+} from '../../core'
 import { getProductsArgError, logResponse } from '../../common'
 import { StringProperty } from '../../../cms-property-types'
 import axios, { AxiosInstance } from 'axios'
@@ -22,8 +26,18 @@ import {
 	ShopifySegment,
 	ShopifySegments,
 } from './types'
-import { collections, productById, productsByCategory, productsByQuery, segments } from './queries'
-import { mapCategory, mapCustomerGroup, mapProduct } from './mappers'
+import { 
+	collections, 
+	productById, 
+	productsByCategory, 
+	productsByQuery, 
+	segments 
+} from './queries'
+import { 
+	mapCategory, 
+	mapCustomerGroup, 
+	mapProduct 
+} from './mappers'
 import { GetPageResultCursor, paginateCursor } from '../../pagination'
 
 const PAGE_SIZE = 100

@@ -2,9 +2,27 @@ import { Request, MockFixture, massMock } from '../../../../common/test/rest-moc
 import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import ShopifyCodecType, { ShopifyCommerceCodec } from '.'
-import { shopifyCategories, shopifySegments, shopifyProduct, shopifyProductsByKeyword, shopifyCategoryProducts } from './test/responses'
-import { exampleCategoryProducts, exampleCustomerGroups, exampleMegaMenu, exampleProduct, exampleProductsByKeyword } from './test/results'
-import { collectionsRequest, segmentsRequest, productRequest, productsByKeywordRequest, productsByCategoryRequest } from './test/requests'
+import { 
+	shopifyCategories, 
+	shopifySegments, 
+	shopifyProduct, 
+	shopifyProductsByKeyword, 
+	shopifyCategoryProducts 
+} from './test/responses'
+import { 
+	exampleCategoryProducts, 
+	exampleCustomerGroups, 
+	exampleMegaMenu, 
+	exampleProduct, 
+	exampleProductsByKeyword 
+} from './test/results'
+import { 
+	collectionsRequest, 
+	segmentsRequest, 
+	productRequest, 
+	productsByKeywordRequest, 
+	productsByCategoryRequest 
+} from './test/requests'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
 
