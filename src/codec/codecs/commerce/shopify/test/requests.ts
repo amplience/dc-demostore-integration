@@ -1,4 +1,4 @@
-import { collections, segments } from "../queries"
+import { collections, productById, segments } from "../queries"
 
 export const collectionsRequest = {
 	config: {
@@ -30,9 +30,17 @@ export const segmentsRequest = {
 	url: 'https://site_id.myshopify.com/admin/api/version/graphql.json'
 }
 
-export const productsRequest = {
+export const productRequest = (id: string) => ({
 	config: {
-		url: ''
+		baseURL: 'https://site_id.myshopify.com/api/version',
+		headers: {
+			'X-Shopify-Storefront-Access-Token': 'access_token'
+		},
+		url: 'graphql.json',
+		query: productById,
+		variables: {
+			id: 'ExampleID'
+		}
 	},
-	url: ''
-}
+	url: 'https://site_id.myshopify.com/api/version/graphql.json'
+})

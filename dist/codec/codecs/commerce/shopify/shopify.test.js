@@ -44,6 +44,13 @@ const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
 const util_1 = require("../../../../common/util");
 jest.mock('axios');
+const commerceProductRequests = {
+    post: {
+        'https://site_id.myshopify.com/api/version/graphql.json': {
+            data: (0, responses_1.shopifyProduct)('ExampleID')
+        }
+    }
+};
 const commerceSegmentsRequests = {
     post: {
         'https://site_id.myshopify.com/admin/api/version/graphql.json': {
@@ -66,6 +73,16 @@ describe('shopify integration', function () {
         requests = [];
     }));
     test('getProduct', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const result = yield codec.getProduct({ id: 'ExampleID' });
+        expect(result).toEqual((0, results_1.exampleProduct)('ExampleID'));
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('ExampleID')
+        ]);
     }));
     test('getProducts (multiple)', () => __awaiter(this, void 0, void 0, function* () {
     }));
@@ -84,9 +101,11 @@ describe('shopify integration', function () {
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
     }));
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceCollectionsRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
+        // Test
         const categories = yield codec.getMegaMenu({});
         expect(categories).toEqual(results_1.exampleMegaMenu);
         expect(requests).toEqual([
@@ -94,9 +113,11 @@ describe('shopify integration', function () {
         ]);
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceSegmentsRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
+        // Test
         const customerGroups = yield codec.getCustomerGroups({});
         expect(customerGroups).toEqual(results_1.exampleCustomerGroups);
         expect(requests).toEqual([

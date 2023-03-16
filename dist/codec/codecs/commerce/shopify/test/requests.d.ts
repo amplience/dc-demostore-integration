@@ -26,9 +26,17 @@ export declare const segmentsRequest: {
     };
     url: string;
 };
-export declare const productsRequest: {
+export declare const productRequest: (id: string) => {
     config: {
+        baseURL: string;
+        headers: {
+            'X-Shopify-Storefront-Access-Token': string;
+        };
         url: string;
+        query: string;
+        variables: {
+            id: string;
+        };
     };
     url: string;
 };
