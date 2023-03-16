@@ -26,12 +26,15 @@ const commerceProductsByKeywordRequests: MockFixture = {
 	}
 }
 
-// TODO: add collections request
+// TODO: manage multiple requests
 const commerceProductsByCategoryRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: shopifyCategoryProducts
-		}
+			data: shopifyCategories
+		},
+		// 'https://site_id.myshopify.com/api/version/graphql.json': {
+		// 	data: shopifyCategoryProducts
+		// }
 	}
 }
 
