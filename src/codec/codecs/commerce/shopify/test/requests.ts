@@ -39,7 +39,7 @@ export const productRequest = (id: string) => ({
 		url: 'graphql.json',
 		query: productById,
 		variables: {
-			id: 'ExampleID'
+			id
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'
