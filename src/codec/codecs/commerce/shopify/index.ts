@@ -16,7 +16,6 @@ import {
 	ShopifyProductByID, 
 	ShopifyProductsByCategory, 
 	ShopifyProductsByQuery,
-	ShopifySegment,
 	ShopifySegments,
  } from './types'
 import { productById, productsByCategory, productsByQuery, segments } from './queries'

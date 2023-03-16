@@ -38,11 +38,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const rest_mock_1 = require("../../../../common/test/rest-mock");
 const axios_1 = __importDefault(require("axios"));
 const _1 = __importStar(require("."));
+const responses_1 = require("./test/responses");
+const results_1 = require("./test/results");
+const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
 const util_1 = require("../../../../common/util");
 jest.mock('axios');
 const commerceRequests = {
-    post: {}
+    post: {
+        'https://site_id.myshopify.com/admin/api/version/graphql.json': {
+            data: responses_1.shopifySegments
+        }
+    }
 };
 describe('shopify integration', function () {
     let codec;
@@ -75,5 +82,10 @@ describe('shopify integration', function () {
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
+        const customerGroups = yield codec.getCustomerGroups({});
+        expect(customerGroups).toEqual(results_1.exampleCustomerGroups);
+        expect(requests).toEqual([
+            requests_1.segmentsRequest
+        ]);
     }));
 });

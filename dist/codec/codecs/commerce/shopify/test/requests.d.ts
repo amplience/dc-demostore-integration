@@ -6,7 +6,15 @@ export declare const collectionsRequest: {
 };
 export declare const segmentsRequest: {
     config: {
+        baseURL: string;
+        headers: {
+            'X-Shopify-Access-Token': string;
+        };
         url: string;
+        query: string;
+        variables: {
+            pageSize: number;
+        };
     };
     url: string;
 };

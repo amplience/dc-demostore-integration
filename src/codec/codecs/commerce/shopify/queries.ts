@@ -93,11 +93,11 @@ query getProductsByCategory($handle: String!, $pageSize: Int!, $after: String) {
 export const segments = `
 query getSegments($pageSize: Int!, $after: String) {
 	segments(first: $pageSize, after: $after) {
-	  	edges {
+		edges {
 			node {
 				id
 				name
 			}
-	  	}
+		}
 	}
 }`

@@ -2,7 +2,7 @@ import { Request, MockFixture, massMock } from '../../../../common/test/rest-moc
 import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import ShopifyCodecType, { ShopifyCommerceCodec } from '.'
-import { shopifyCategories, shopifyCustomerGroups, shopifyProduct} from './test/responses'
+import { shopifyCategories, shopifySegments, shopifyProduct} from './test/responses'
 import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
 import { collectionsRequest, segmentsRequest, productsRequest} from './test/requests'
 import { config } from './test/config'
@@ -12,6 +12,9 @@ jest.mock('axios')
 
 const commerceRequests: MockFixture = {
 	post: {
+		'https://site_id.myshopify.com/admin/api/version/graphql.json': {
+			data: shopifySegments
+		}
 	}
 }
 
@@ -21,11 +24,8 @@ describe('shopify integration', function() {
 
 	beforeEach(async () => {
 		jest.resetAllMocks()
-
 		requests = []
-
 		massMock(axios, requests, commerceRequests)
-
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
 	})
@@ -61,5 +61,10 @@ describe('shopify integration', function() {
 	})
 
 	test('getCustomerGroups', async () => {
+		const customerGroups = await codec.getCustomerGroups({})
+		expect(customerGroups).toEqual(exampleCustomerGroups)
+		expect(requests).toEqual([
+			segmentsRequest
+		])
 	})
 })
