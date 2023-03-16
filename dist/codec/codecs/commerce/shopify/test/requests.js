@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.productRequest = exports.segmentsRequest = exports.collectionsRequest = void 0;
+exports.productsByKeywordRequest = exports.productRequest = exports.segmentsRequest = exports.collectionsRequest = void 0;
 const queries_1 = require("../queries");
 exports.collectionsRequest = {
     config: {
@@ -39,9 +39,24 @@ const productRequest = (id) => ({
         url: 'graphql.json',
         query: queries_1.productById,
         variables: {
-            id: 'ExampleID'
+            id
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'
 });
 exports.productRequest = productRequest;
+exports.productsByKeywordRequest = {
+    config: {
+        baseURL: 'https://site_id.myshopify.com/api/version',
+        headers: {
+            'X-Shopify-Storefront-Access-Token': 'access_token'
+        },
+        url: 'graphql.json',
+        query: queries_1.productsByQuery,
+        variables: {
+            pageSize: 100,
+            query: 'fulfilled'
+        }
+    },
+    url: 'https://site_id.myshopify.com/api/version/graphql.json'
+};

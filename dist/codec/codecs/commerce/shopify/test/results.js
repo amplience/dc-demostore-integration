@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exampleCategoryProducts = exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups = void 0;
+exports.exampleProductsByKeyword = exports.exampleCategoryProducts = exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups = void 0;
 exports.exampleCustomerGroups = [
     {
         id: "gid://shopify/Segment/514502426912",
@@ -207,3 +207,30 @@ exports.exampleCategoryProducts = {
         }
     ]
 };
+exports.exampleProductsByKeyword = [
+    {
+        "id": "gid://shopify/Product/8170311418144",
+        "name": "The 3p Fulfilled Snowboard",
+        "slug": "the-3p-fulfilled-snowboard",
+        "categories": [],
+        "variants": [
+            {
+                "sku": "sku-hosted-1",
+                "listPrice": "£2,629.95",
+                "salePrice": "£2,629.95",
+                "attributes": {
+                    "Title": "Default Title"
+                },
+                "images": [
+                    {
+                        "id": "gid://shopify/ProductImage/40866728116512",
+                        "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_b9e0da7f-db89-4d41-83f0-7f417b02831d.jpg?v=1678879294",
+                        "altText": "The Third-party fulfilled Snowboard"
+                    }
+                ]
+            }
+        ],
+        "shortDescription": "A snowboard that will leave you fulfilled. TITLE",
+        "longDescription": "A snowboard that will leave you fulfilled. TITLE"
+    }
+];

@@ -2,9 +2,9 @@ import { Request, MockFixture, massMock } from '../../../../common/test/rest-moc
 import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import ShopifyCodecType, { ShopifyCommerceCodec } from '.'
-import { shopifyCategories, shopifySegments, shopifyProduct} from './test/responses'
-import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
-import { collectionsRequest, segmentsRequest, productRequest} from './test/requests'
+import { shopifyCategories, shopifySegments, shopifyProduct, shopifyProductsByKeyword} from './test/responses'
+import { exampleCustomerGroups, exampleMegaMenu, exampleProduct, exampleProductsByKeyword } from './test/results'
+import { collectionsRequest, segmentsRequest, productRequest, productsByKeywordRequest} from './test/requests'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
 
@@ -14,6 +14,14 @@ const commerceProductRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
 			data: shopifyProduct('ExampleID')
+		}
+	}
+}
+
+const commerceProductsByKeywordRequests: MockFixture = {
+	post: {
+		'https://site_id.myshopify.com/api/version/graphql.json': {
+			data: shopifyProductsByKeyword
 		}
 	}
 }
@@ -81,6 +89,18 @@ describe('shopify integration', function() {
 	})
 
 	test('getProducts (keyword)', async () => {
+
+		// Setup with the right fixture
+		massMock(axios, requests, commerceProductsByKeywordRequests)
+		codec = new ShopifyCommerceCodec(flattenConfig(config))
+		await codec.init(new ShopifyCodecType())
+		
+		// Test
+		const categories = await codec.getProducts({keyword: 'fulfilled'})
+		expect(categories).toEqual(exampleProductsByKeyword)
+		expect(requests).toEqual([
+			productsByKeywordRequest
+		])
 	})
 
 	test('getProducts (category)', async () => {

@@ -51,6 +51,13 @@ const commerceProductRequests = {
         }
     }
 };
+const commerceProductsByKeywordRequests = {
+    post: {
+        'https://site_id.myshopify.com/api/version/graphql.json': {
+            data: responses_1.shopifyProductsByKeyword
+        }
+    }
+};
 const commerceSegmentsRequests = {
     post: {
         'https://site_id.myshopify.com/admin/api/version/graphql.json': {
@@ -72,7 +79,7 @@ describe('shopify integration', function () {
         jest.resetAllMocks();
         requests = [];
     }));
-    test('getProduct', () => __awaiter(this, void 0, void 0, function* () {
+    test('getProduct (by id)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
         (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
@@ -85,8 +92,35 @@ describe('shopify integration', function () {
         ]);
     }));
     test('getProducts (multiple)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const result = yield codec.getProducts({
+            productIds: 'ExampleID,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('ExampleID'),
+            (0, requests_1.productRequest)('ExampleID2')
+        ]);
+        // TODO: for now always returning 'ProductID' responses because of fixture
+        expect(result).toEqual([
+            (0, results_1.exampleProduct)('ExampleID'),
+            (0, results_1.exampleProduct)('ExampleID')
+        ]);
     }));
     test('getProducts (keyword)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByKeywordRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const categories = yield codec.getProducts({ keyword: 'fulfilled' });
+        expect(categories).toEqual(results_1.exampleProductsByKeyword);
+        expect(requests).toEqual([
+            requests_1.productsByKeywordRequest
+        ]);
     }));
     test('getProducts (category)', () => __awaiter(this, void 0, void 0, function* () {
     }));

@@ -136,6 +136,61 @@ export declare const shopifyCategoryProducts: {
         };
     };
 };
+export declare const shopifyProductsByKeyword: {
+    data: {
+        products: {
+            edges: {
+                node: {
+                    id: string;
+                    title: string;
+                    description: string;
+                    collections: {
+                        edges: any[];
+                    };
+                    tags: string[];
+                    variants: {
+                        edges: {
+                            node: {
+                                id: string;
+                                title: string;
+                                sku: string;
+                                selectedOptions: {
+                                    name: string;
+                                    value: string;
+                                }[];
+                                price: {
+                                    currencyCode: string;
+                                    amount: string;
+                                };
+                                unitPrice: any;
+                                compareAtPrice: any;
+                                image: {
+                                    id: string;
+                                    url: string;
+                                    altText: string;
+                                };
+                            };
+                            cursor: string;
+                        }[];
+                    };
+                    images: {
+                        edges: {
+                            node: {
+                                id: string;
+                                url: string;
+                                altText: string;
+                            };
+                            cursor: string;
+                        }[];
+                    };
+                    availableForSale: boolean;
+                    handle: string;
+                };
+                cursor: string;
+            }[];
+        };
+    };
+};
 export declare const shopifySegments: {
     data: {
         segments: {

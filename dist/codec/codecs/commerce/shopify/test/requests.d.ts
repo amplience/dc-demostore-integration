@@ -40,3 +40,18 @@ export declare const productRequest: (id: string) => {
     };
     url: string;
 };
+export declare const productsByKeywordRequest: {
+    config: {
+        baseURL: string;
+        headers: {
+            'X-Shopify-Storefront-Access-Token': string;
+        };
+        url: string;
+        query: string;
+        variables: {
+            pageSize: number;
+            query: string;
+        };
+    };
+    url: string;
+};

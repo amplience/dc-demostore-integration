@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shopifySegments = exports.shopifyCategoryProducts = exports.shopifyCategories = exports.shopifyProduct = void 0;
+exports.shopifySegments = exports.shopifyProductsByKeyword = exports.shopifyCategoryProducts = exports.shopifyCategories = exports.shopifyProduct = void 0;
 const shopifyProduct = (id) => ({
     "data": {
         "product": {
@@ -341,6 +341,73 @@ exports.shopifyCategoryProducts = {
                     }
                 ]
             }
+        }
+    }
+};
+exports.shopifyProductsByKeyword = {
+    "data": {
+        "products": {
+            "edges": [
+                {
+                    "node": {
+                        "id": "gid://shopify/Product/8170311418144",
+                        "title": "The 3p Fulfilled Snowboard",
+                        "description": "A snowboard that will leave you fulfilled. TITLE",
+                        "collections": {
+                            "edges": []
+                        },
+                        "tags": [
+                            "Accessory",
+                            "Sport",
+                            "Winter"
+                        ],
+                        "variants": {
+                            "edges": [
+                                {
+                                    "node": {
+                                        "id": "gid://shopify/ProductVariant/44723492978976",
+                                        "title": "Default Title",
+                                        "sku": "sku-hosted-1",
+                                        "selectedOptions": [
+                                            {
+                                                "name": "Title",
+                                                "value": "Default Title"
+                                            }
+                                        ],
+                                        "price": {
+                                            "currencyCode": "GBP",
+                                            "amount": "2629.95"
+                                        },
+                                        "unitPrice": null,
+                                        "compareAtPrice": null,
+                                        "image": {
+                                            "id": "gid://shopify/ProductImage/40866728116512",
+                                            "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_b9e0da7f-db89-4d41-83f0-7f417b02831d.jpg?v=1678879294",
+                                            "altText": "The Third-party fulfilled Snowboard"
+                                        }
+                                    },
+                                    "cursor": "eyJsYXN0X2lkIjo0NDcyMzQ5Mjk3ODk3NiwibGFzdF92YWx1ZSI6MX0="
+                                }
+                            ]
+                        },
+                        "images": {
+                            "edges": [
+                                {
+                                    "node": {
+                                        "id": "gid://shopify/ProductImage/40866728116512",
+                                        "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_b9e0da7f-db89-4d41-83f0-7f417b02831d.jpg?v=1678879294",
+                                        "altText": "The Third-party fulfilled Snowboard"
+                                    },
+                                    "cursor": "eyJsYXN0X2lkIjo0MDg2NjcyODExNjUxMiwibGFzdF92YWx1ZSI6MX0="
+                                }
+                            ]
+                        },
+                        "availableForSale": true,
+                        "handle": "the-3p-fulfilled-snowboard"
+                    },
+                    "cursor": "eyJsYXN0X2lkIjo4MTcwMzExNDE4MTQ0LCJsYXN0X3ZhbHVlIjo4MTcwMzExNDE4MTQ0fQ=="
+                }
+            ]
         }
     }
 };

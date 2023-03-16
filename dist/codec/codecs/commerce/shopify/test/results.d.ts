@@ -73,3 +73,24 @@ export declare const exampleCategoryProducts: {
         longDescription: string;
     }[];
 };
+export declare const exampleProductsByKeyword: {
+    id: string;
+    name: string;
+    slug: string;
+    categories: any[];
+    variants: {
+        sku: string;
+        listPrice: string;
+        salePrice: string;
+        attributes: {
+            Title: string;
+        };
+        images: {
+            id: string;
+            url: string;
+            altText: string;
+        }[];
+    }[];
+    shortDescription: string;
+    longDescription: string;
+}[];
