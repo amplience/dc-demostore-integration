@@ -8,9 +8,13 @@ import { GetPageResultCursor } from '../../pagination';
  * Shopify codec configuration.
  */
 declare type CodecConfig = {
+    /** Storefront access token */
     access_token: StringProperty;
+    /** Admin access token */
     admin_access_token: StringProperty;
+    /** API version */
     version: StringProperty;
+    /** Site identifier */
     site_id: StringProperty;
 };
 /**

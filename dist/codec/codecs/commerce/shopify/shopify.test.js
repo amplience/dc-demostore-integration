@@ -44,10 +44,28 @@ const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
 const util_1 = require("../../../../common/util");
 jest.mock('axios');
+// TODO: manage multiple requests
 const commerceProductRequests = {
     post: {
         'https://site_id.myshopify.com/api/version/graphql.json': {
             data: (0, responses_1.shopifyProduct)('ExampleID')
+        }
+        // 'https://site_id.myshopify.com/api/version/graphql.json': {
+        // 	data: shopifyProduct('ExampleID2')
+        // },
+        // 'https://site_id.myshopify.com/api/version/graphql.json': {
+        // 	data: null
+        // }
+    }
+};
+const commerceProductMissingRequests = {
+    post: {
+        'https://site_id.myshopify.com/api/version/graphql.json': {
+            data: {
+                "data": {
+                    "product": null
+                }
+            }
         }
     }
 };
@@ -58,12 +76,15 @@ const commerceProductsByKeywordRequests = {
         }
     }
 };
-// TODO: add collections request
+// TODO: manage multiple requests
 const commerceProductsByCategoryRequests = {
     post: {
         'https://site_id.myshopify.com/api/version/graphql.json': {
-            data: responses_1.shopifyCategoryProducts
-        }
+            data: responses_1.shopifyCategories
+        },
+        // 'https://site_id.myshopify.com/api/version/graphql.json': {
+        // 	data: shopifyCategoryProducts
+        // }
     }
 };
 const commerceSegmentsRequests = {
@@ -115,7 +136,7 @@ describe('shopify integration', function () {
         // TODO: for now always returning 'ProductID' responses because of fixture
         expect(result).toEqual([
             (0, results_1.exampleProduct)('ExampleID'),
-            (0, results_1.exampleProduct)('ExampleID')
+            (0, results_1.exampleProduct)('ExampleID2')
         ]);
     }));
     test('getProducts (keyword)', () => __awaiter(this, void 0, void 0, function* () {
@@ -131,14 +152,99 @@ describe('shopify integration', function () {
         ]);
     }));
     test('getProducts (category)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByKeywordRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const products = yield codec.getProducts({
+            category: {
+                id: "gid://shopify/Collection/439038837024",
+                slug: "hydrogen",
+                name: "Hydrogen",
+                image: null,
+                children: [],
+                products: []
+            }
+        });
+        // TODO
+        expect(products).toEqual([]);
+        // TODO
+        expect(requests).toEqual([]);
     }));
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductMissingRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        // TODO: handle missing product in codec
+        const result = yield codec.getProduct({ id: 'MissingID' });
+        expect(result).resolves.toBeNull();
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('MissingID')
+        ]);
     }));
     test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const result = yield codec.getProducts({
+            productIds: 'ExampleID,MissingID,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('ExampleID'),
+            (0, requests_1.productRequest)('MissingID'),
+            (0, requests_1.productRequest)('ExampleID2')
+        ]);
+        // TODO: for now always returning 'ProductID' responses because of fixture
+        // TODO: manage missing id, should return null
+        expect(result).toEqual([
+            (0, results_1.exampleProduct)('ExampleID'),
+            null,
+            (0, results_1.exampleProduct)('ExampleID')
+        ]);
     }));
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const result = yield codec.getRawProducts({
+            productIds: 'ExampleID,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('ExampleID'),
+            (0, requests_1.productRequest)('ExampleID2')
+        ]);
+        expect(result).toEqual([
+            (0, responses_1.shopifyProduct)('ExampleID').data.product,
+            (0, responses_1.shopifyProduct)('ExampleID').data.product
+        ]);
     }));
     test('getRawProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
+        // Setup with the right fixture
+        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
+        yield codec.init(new _1.default());
+        // Test
+        const result = yield codec.getRawProducts({
+            productIds: 'ExampleID,MissingID,ExampleID2'
+        });
+        expect(requests).toEqual([
+            (0, requests_1.productRequest)('ExampleID'),
+            (0, requests_1.productRequest)('MissingID'),
+            (0, requests_1.productRequest)('ExampleID2')
+        ]);
+        // TODO: manage missing id
+        expect(result).toEqual([
+            (0, responses_1.shopifyProduct)('ExampleID').data.product,
+            null,
+            (0, responses_1.shopifyProduct)('ExampleID').data.product
+        ]);
     }));
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
@@ -148,6 +254,7 @@ describe('shopify integration', function () {
         // Test
         const categories = yield codec.getCategory({ slug: 'hydrogen' });
         expect(categories).toEqual(results_1.exampleCategoryProducts);
+        // TODO: manage multiple requests
         expect(requests).toEqual([
             requests_1.collectionsRequest,
             requests_1.productsByCategoryRequest
