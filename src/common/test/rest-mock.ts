@@ -2,18 +2,30 @@ import { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 'a
 import { isEqual } from 'lodash'
 const actualAxios = jest.requireActual('axios')
 
+/**
+ * TODO
+ */
 export interface MockRequest {
 	status?: number;
 	data: string | object;
 	headers?: object;
 }
 
+/**
+ * TODO
+ */
 export type MockRequestOrFunction = MockRequest | ((config: AxiosRequestConfig) => MockRequest)
 
+/**
+ * TODO
+ */
 export interface MockRequests {
 	[url: string]: MockRequestOrFunction
 }
 
+/**
+ * TODO
+ */
 export interface MockFixture {
 	get?: MockRequests,
 	post?: MockRequests,
@@ -22,25 +34,48 @@ export interface MockFixture {
 	delete?: MockRequests,
 }
 
+/**
+ * TODO
+ */
 export interface Request {
 	url: string;
 	config: AxiosRequestConfig
 }
 
+/**
+ * TODO
+ */
 interface DataResponseMapping {
 	data: any,
 	response: MockRequest
 }
 
+// TODO
 const methods = ['get', 'put', 'post', 'delete', 'patch']
+
+// TODO
 const dataMethods = ['put', 'post', 'patch']
 
+/**
+ * TODO
+ * @param baseUrl 
+ * @param relativeUrl 
+ * @returns 
+ */
 function combineUrls(baseUrl, relativeUrl) {
 	if (!baseUrl) return relativeUrl
 
 	return relativeUrl ? baseUrl.replace(/\/+$/, '') + '/' + relativeUrl.replace(/^\/+/, '') : baseUrl
 }
 
+/**
+ * TODO
+ * @param method 
+ * @param methodRequests 
+ * @param requests 
+ * @param baseConfig 
+ * @returns 
+ */
 function getMockAxios(method: string, methodRequests: MockRequests, requests: Request[], baseConfig: object) {
 	return (url: string, config?: AxiosRequestConfig): Promise<AxiosResponse> => {
 		config = { ...baseConfig, ...config, url: url }
@@ -99,6 +134,13 @@ function getMockAxios(method: string, methodRequests: MockRequests, requests: Re
 	}
 }
 
+/**
+ * TODO
+ * @param axios 
+ * @param mockFixture 
+ * @param requests 
+ * @param baseConfig 
+ */
 export function mockAxios(axios: AxiosInstance, mockFixture: MockFixture, requests: Request[], baseConfig = {}) {
 	for (const method of methods) {
 		const methodRequests = mockFixture[method] ?? []
@@ -128,6 +170,12 @@ export function mockAxios(axios: AxiosInstance, mockFixture: MockFixture, reques
 	})
 }
 
+/**
+ * TODO
+ * @param axios
+ * @param requests 
+ * @param mockFixture 
+ */
 export function massMock(axios: AxiosStatic, requests: Request[], mockFixture: MockFixture) {
 	mockAxios(axios, mockFixture, requests)
 
@@ -147,6 +195,11 @@ export function massMock(axios: AxiosStatic, requests: Request[], mockFixture: M
 	})
 }
 
+/**
+ * TODO
+ * @param mappings 
+ * @returns 
+ */
 export function dataToResponse(mappings: DataResponseMapping[]): (config: AxiosRequestConfig) => MockRequest {
 	return (config) => {
 		const matching = mappings.find(mapping => isEqual(mapping.data, config.data))
