@@ -1,4 +1,10 @@
-import { collections, productById, productsByCategory, productsByQuery, segments } from "../queries"
+import { 
+	collections, 
+	productById, 
+	productsByCategory, 
+	productsByQuery, 
+	segments 
+} from "../queries"
 
 export const collectionsRequest = {
 	config: {
