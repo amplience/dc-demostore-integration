@@ -133,7 +133,7 @@ describe('shopify integration', function () {
 		// TODO: for now always returning 'ProductID' responses because of fixture
 		expect(result).toEqual([
 			exampleProduct('ExampleID'),
-			exampleProduct('ExampleID')
+			exampleProduct('ExampleID2')
 		])
 	})
 
