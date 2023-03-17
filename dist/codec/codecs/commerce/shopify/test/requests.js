@@ -9,9 +9,12 @@ exports.collectionsRequest = {
             'X-Shopify-Storefront-Access-Token': 'access_token'
         },
         url: 'graphql.json',
-        query: queries_1.collections,
-        variables: {
-            pageSize: 100
+        data: {
+            query: queries_1.collections,
+            variables: {
+                pageSize: 100,
+                after: undefined
+            }
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -23,9 +26,12 @@ exports.segmentsRequest = {
             'X-Shopify-Access-Token': 'admin_access_token'
         },
         url: 'graphql.json',
-        query: queries_1.segments,
-        variables: {
-            pageSize: 100
+        data: {
+            query: queries_1.segments,
+            variables: {
+                pageSize: 100,
+                after: undefined
+            }
         }
     },
     url: 'https://site_id.myshopify.com/admin/api/version/graphql.json'
@@ -37,9 +43,11 @@ const productRequest = (id) => ({
             'X-Shopify-Storefront-Access-Token': 'access_token'
         },
         url: 'graphql.json',
-        query: queries_1.productById,
-        variables: {
-            id
+        data: {
+            query: queries_1.productById,
+            variables: {
+                id
+            }
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -52,10 +60,13 @@ exports.productsByKeywordRequest = {
             'X-Shopify-Storefront-Access-Token': 'access_token'
         },
         url: 'graphql.json',
-        query: queries_1.productsByQuery,
-        variables: {
-            pageSize: 100,
-            query: 'fulfilled'
+        data: {
+            query: queries_1.productsByQuery,
+            variables: {
+                pageSize: 100,
+                query: 'fulfilled',
+                after: undefined
+            }
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -67,10 +78,13 @@ exports.productsByCategoryRequest = {
             'X-Shopify-Storefront-Access-Token': 'access_token'
         },
         url: 'graphql.json',
-        query: queries_1.productsByCategory,
-        variables: {
-            pageSize: 100,
-            slug: 'hydrogen'
+        data: {
+            query: queries_1.productsByCategory,
+            variables: {
+                pageSize: 100,
+                handle: 'hydrogen',
+                after: undefined
+            }
         }
     },
     url: 'https://site_id.myshopify.com/api/version/graphql.json'

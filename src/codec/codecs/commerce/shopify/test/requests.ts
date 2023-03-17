@@ -4,7 +4,7 @@ import {
 	productsByCategory, 
 	productsByQuery, 
 	segments 
-} from "../queries"
+} from '../queries'
 
 export const collectionsRequest = {
 	config: {
@@ -13,9 +13,12 @@ export const collectionsRequest = {
 			'X-Shopify-Storefront-Access-Token': 'access_token'
 		},
 		url: 'graphql.json',
-		query: collections,
-		variables: {
-			pageSize: 100
+		data: {
+			query: collections,
+			variables: {
+				pageSize: 100,
+				after: undefined
+			}
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -28,9 +31,12 @@ export const segmentsRequest = {
 			'X-Shopify-Access-Token': 'admin_access_token'
 		},
 		url: 'graphql.json',
-		query: segments,
-		variables: {
-			pageSize: 100
+		data: {
+			query: segments,
+			variables: {
+				pageSize: 100,
+				after: undefined
+			}
 		}
 	},
 	url: 'https://site_id.myshopify.com/admin/api/version/graphql.json'
@@ -43,9 +49,11 @@ export const productRequest = (id: string) => ({
 			'X-Shopify-Storefront-Access-Token': 'access_token'
 		},
 		url: 'graphql.json',
-		query: productById,
-		variables: {
-			id
+		data: {
+			query: productById,
+			variables: {
+				id
+			}
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -58,10 +66,13 @@ export const productsByKeywordRequest = {
 			'X-Shopify-Storefront-Access-Token': 'access_token'
 		},
 		url: 'graphql.json',
-		query: productsByQuery,
-		variables: {
-			pageSize: 100,
-			query: 'fulfilled'
+		data: {
+			query: productsByQuery,
+			variables: {
+				pageSize: 100,
+				query: 'fulfilled',
+				after: undefined
+			}
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'
@@ -74,10 +85,13 @@ export const productsByCategoryRequest = {
 			'X-Shopify-Storefront-Access-Token': 'access_token'
 		},
 		url: 'graphql.json',
-		query: productsByCategory,
-		variables: {
-			pageSize: 100,
-			slug: 'hydrogen'
+		data: {
+			query: productsByCategory,
+			variables: {
+				pageSize: 100,
+				handle: 'hydrogen',
+				after: undefined
+			}
 		}
 	},
 	url: 'https://site_id.myshopify.com/api/version/graphql.json'

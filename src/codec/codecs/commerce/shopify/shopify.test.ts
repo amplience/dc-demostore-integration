@@ -1,4 +1,4 @@
-import { Request, MockFixture, massMock } from '../../../../common/test/rest-mock'
+import { Request, MockFixture, massMock, dataToResponse } from '../../../../common/test/rest-mock'
 import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import ShopifyCodecType, { ShopifyCommerceCodec } from '.'
@@ -28,18 +28,30 @@ import { flattenConfig } from '../../../../common/util'
 
 jest.mock('axios')
 
-// TODO: manage multiple requests
 const commerceProductRequests: MockFixture = {
 	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: shopifyProduct('ExampleID')
-		}
-		// 'https://site_id.myshopify.com/api/version/graphql.json': {
-		// 	data: shopifyProduct('ExampleID2')
-		// },
-		// 'https://site_id.myshopify.com/api/version/graphql.json': {
-		// 	data: null
-		// }
+		'https://site_id.myshopify.com/api/version/graphql.json': dataToResponse([
+			{
+				data: productRequest('ExampleID').config.data,
+				response: {
+					data: shopifyProduct('ExampleID')
+				}
+			},
+			{
+				data: productRequest('ExampleID2').config.data,
+				response: {
+					data: shopifyProduct('ExampleID2')
+				}
+			},
+			{
+				data: productRequest('MissingID').config.data,
+				response: {
+					data: {
+						errors: []
+					}
+				}
+			}
+		])
 	}
 }
 
@@ -47,8 +59,8 @@ const commerceProductMissingRequests: MockFixture = {
 	post: {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
 			data: {
-				"data": {
-					"product": null
+				data: {
+					errors: []
 				}
 			}
 		}
@@ -63,15 +75,22 @@ const commerceProductsByKeywordRequests: MockFixture = {
 	}
 }
 
-// TODO: manage multiple requests
 const commerceProductsByCategoryRequests: MockFixture = {
 	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: shopifyCategories
-		},
-		// 'https://site_id.myshopify.com/api/version/graphql.json': {
-		// 	data: shopifyCategoryProducts
-		// }
+		'https://site_id.myshopify.com/api/version/graphql.json': dataToResponse([
+			{
+				data: collectionsRequest.config.data,
+				response: {
+					data: shopifyCategories
+				}
+			},
+			{
+				data: productsByCategoryRequest.config.data,
+				response: {
+					data: shopifyCategoryProducts
+				}
+			}
+		])
 	}
 }
 
@@ -126,11 +145,12 @@ describe('shopify integration', function () {
 		const result = await codec.getProducts({
 			productIds: 'ExampleID,ExampleID2'
 		})
+
 		expect(requests).toEqual([
 			productRequest('ExampleID'),
 			productRequest('ExampleID2')
 		])
-		// TODO: for now always returning 'ProductID' responses because of fixture
+
 		expect(result).toEqual([
 			exampleProduct('ExampleID'),
 			exampleProduct('ExampleID2')
@@ -153,50 +173,45 @@ describe('shopify integration', function () {
 	})
 
 	test('getProducts (category)', async () => {
-
 		// Setup with the right fixture
-		massMock(axios, requests, commerceProductsByKeywordRequests)
+		massMock(axios, requests, commerceProductsByCategoryRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
 
 		// Test
 		const products = await codec.getProducts({
 			category: {
-				id: "gid://shopify/Collection/439038837024",
-				slug: "hydrogen",
-				name: "Hydrogen",
+				id: 'gid://shopify/Collection/439038837024',
+				slug: 'hydrogen',
+				name: 'Hydrogen',
 				image: null,
 				children: [],
 				products: []
 			}
 		})
 
-		// TODO
-		expect(products).toEqual([])
+		expect(products).toEqual(exampleCategoryProducts.products)
 
-		// TODO
 		expect(requests).toEqual([
+			productsByCategoryRequest
 		])
 	})
 
 	test('getProduct (missing)', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductMissingRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
 
 		// Test
-		// TODO: handle missing product in codec
 		const result = await codec.getProduct({ id: 'MissingID' })
-		expect(result).resolves.toBeNull()
+		expect(result).toBeNull()
 		expect(requests).toEqual([
 			productRequest('MissingID')
 		])
 	})
 
 	test('getProducts (multiple, one missing)', async () => {
-		
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -206,22 +221,21 @@ describe('shopify integration', function () {
 		const result = await codec.getProducts({
 			productIds: 'ExampleID,MissingID,ExampleID2'
 		})
+
 		expect(requests).toEqual([
 			productRequest('ExampleID'),
 			productRequest('MissingID'),
 			productRequest('ExampleID2')
 		])
-		// TODO: for now always returning 'ProductID' responses because of fixture
-		// TODO: manage missing id, should return null
+
 		expect(result).toEqual([
 			exampleProduct('ExampleID'),
 			null,
-			exampleProduct('ExampleID')
+			exampleProduct('ExampleID2')
 		])
 	})
 
 	test('getRawProducts', async () => {
-				
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -231,18 +245,19 @@ describe('shopify integration', function () {
 		const result = await codec.getRawProducts({
 			productIds: 'ExampleID,ExampleID2'
 		})
+
 		expect(requests).toEqual([
 			productRequest('ExampleID'),
 			productRequest('ExampleID2')	
 		])
+
 		expect(result).toEqual([
 			shopifyProduct('ExampleID').data.product,
-			shopifyProduct('ExampleID').data.product
+			shopifyProduct('ExampleID2').data.product
 		])
 	})
 
 	test('getRawProducts (multiple, one missing)', async () => {
-						
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -258,16 +273,14 @@ describe('shopify integration', function () {
 			productRequest('ExampleID2')	
 		])
 
-		// TODO: manage missing id
 		expect(result).toEqual([
 			shopifyProduct('ExampleID').data.product,
 			null,
-			shopifyProduct('ExampleID').data.product
+			shopifyProduct('ExampleID2').data.product
 		])
 	})
 
 	test('getCategory', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductsByCategoryRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -277,7 +290,6 @@ describe('shopify integration', function () {
 		const categories = await codec.getCategory({ slug: 'hydrogen' })
 		expect(categories).toEqual(exampleCategoryProducts)
 
-		// TODO: manage multiple requests
 		expect(requests).toEqual([
 			collectionsRequest,
 			productsByCategoryRequest
@@ -285,7 +297,6 @@ describe('shopify integration', function () {
 	})
 
 	test('getMegaMenu', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceCollectionsRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -300,7 +311,6 @@ describe('shopify integration', function () {
 	})
 
 	test('getCustomerGroups', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceSegmentsRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))

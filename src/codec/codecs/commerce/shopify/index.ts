@@ -214,7 +214,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @returns The shopify product
 	 */
 	async getProductById(id: string): Promise<ShopifyProduct> {
-		return (await this.gqlRequest<ShopifyProductByID>(productById, { id })).product
+		return (await this.gqlRequest<ShopifyProductByID>(productById, { id }))?.product ?? null
 	}
 
 	/**

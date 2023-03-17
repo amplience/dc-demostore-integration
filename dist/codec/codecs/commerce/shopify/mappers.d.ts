@@ -30,7 +30,7 @@ export declare const mapVariant: (variant: ShopifyVariant, sharedImages: Shopify
  * @param product The shopify product
  * @returns The common product
  */
-export declare const mapProduct: (product: ShopifyProduct) => Product;
+export declare const mapProduct: (product: ShopifyProduct | null) => Product | null;
 /**
  * Map a shopify segment to the common customer group type
  * @param segment The shopify segment

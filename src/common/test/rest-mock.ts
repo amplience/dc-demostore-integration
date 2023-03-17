@@ -1,14 +1,17 @@
 import { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosStatic } from 'axios'
+import { isEqual } from 'lodash'
 const actualAxios = jest.requireActual('axios')
 
 export interface MockRequest {
 	status?: number;
-	data: string | object | ((method: string, config: AxiosRequestConfig, params: URLSearchParams) => object);
+	data: string | object;
 	headers?: object;
 }
 
+export type MockRequestOrFunction = MockRequest | ((config: AxiosRequestConfig) => MockRequest)
+
 export interface MockRequests {
-	[url: string]: MockRequest
+	[url: string]: MockRequestOrFunction
 }
 
 export interface MockFixture {
@@ -24,8 +27,13 @@ export interface Request {
 	config: AxiosRequestConfig
 }
 
+interface DataResponseMapping {
+	data: any,
+	response: MockRequest
+}
 
 const methods = ['get', 'put', 'post', 'delete', 'patch']
+const dataMethods = ['put', 'post', 'patch']
 
 function combineUrls(baseUrl, relativeUrl) {
 	if (!baseUrl) return relativeUrl
@@ -53,13 +61,13 @@ function getMockAxios(method: string, methodRequests: MockRequests, requests: Re
 			config
 		})
 
-		let request = methodRequests[urlWithParams]
+		let requestF = methodRequests[urlWithParams]
 
-		if (request == null) {
-			request = methodRequests[fullUrl]
+		if (requestF == null) {
+			requestF = methodRequests[fullUrl]
 		}
 
-		if (request == null) {
+		if (requestF == null) {
 			return Promise.reject({
 				config,
 				response: {
@@ -72,12 +80,10 @@ function getMockAxios(method: string, methodRequests: MockRequests, requests: Re
 			})
 		}
 
-		let contentType
-		let requestData = request.data
+		const request = (typeof requestF == 'function') ? requestF(config) : requestF
 
-		if (typeof requestData === 'function') {
-			requestData = requestData(method, config, urlObj.searchParams)
-		}
+		let contentType
+		const requestData = request.data
 
 		if (typeof requestData === 'object') {
 			contentType = 'application/json'
@@ -97,8 +103,20 @@ export function mockAxios(axios: AxiosInstance, mockFixture: MockFixture, reques
 	for (const method of methods) {
 		const methodRequests = mockFixture[method] ?? []
 		const mock = axios[method] as jest.Mock
-		
-		mock.mockImplementation(getMockAxios(method, methodRequests, requests, baseConfig))
+
+		if (dataMethods.indexOf(method) !== -1) {
+			mock.mockImplementation((url: string, data: any, config: AxiosRequestConfig) => {
+				if (config == null) {
+					config = {}
+				}
+
+				config.data = data
+
+				return getMockAxios(method, methodRequests, requests, baseConfig)(url, config)
+			})
+		} else {
+			mock.mockImplementation(getMockAxios(method, methodRequests, requests, baseConfig))
+		}
 	}
 
 	const reqMock = axios.request as jest.Mock
@@ -127,4 +145,16 @@ export function massMock(axios: AxiosStatic, requests: Request[], mockFixture: M
 
 		return client
 	})
+}
+
+export function dataToResponse(mappings: DataResponseMapping[]): (config: AxiosRequestConfig) => MockRequest {
+	return (config) => {
+		const matching = mappings.find(mapping => isEqual(mapping.data, config.data))
+
+		if (!matching) {
+			throw new Error('Unrecognized request data.')
+		}
+
+		return matching.response
+	}
 }

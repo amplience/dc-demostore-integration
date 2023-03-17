@@ -22,6 +22,14 @@ export const productIdRequest = (id: string) => ({
 
 export const oauthRequest = {
 	config: {
+		data: {},
+		headers: {
+			Authorization: 'Basic undefined',
+			'Content-Type': 'application/x-www-form-urlencoded',
+		},
+		params: {
+			client_id: 'test-client',
+		},
 		url: 'https://account.demandware.com/dwsso/oauth2/access_token?grant_type=client_credentials'
 	},
 	url: 'https://account.demandware.com/dwsso/oauth2/access_token?grant_type=client_credentials'

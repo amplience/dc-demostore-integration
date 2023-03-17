@@ -1,8 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.massMock = exports.mockAxios = void 0;
+exports.dataToResponse = exports.massMock = exports.mockAxios = void 0;
+const lodash_1 = require("lodash");
 const actualAxios = jest.requireActual('axios');
 const methods = ['get', 'put', 'post', 'delete', 'patch'];
+const dataMethods = ['put', 'post', 'patch'];
 function combineUrls(baseUrl, relativeUrl) {
     if (!baseUrl)
         return relativeUrl;
@@ -23,11 +25,11 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
             url: urlWithParams,
             config
         });
-        let request = methodRequests[urlWithParams];
-        if (request == null) {
-            request = methodRequests[fullUrl];
+        let requestF = methodRequests[urlWithParams];
+        if (requestF == null) {
+            requestF = methodRequests[fullUrl];
         }
-        if (request == null) {
+        if (requestF == null) {
             return Promise.reject({
                 config,
                 response: {
@@ -39,11 +41,9 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
                 }
             });
         }
+        const request = (typeof requestF == 'function') ? requestF(config) : requestF;
         let contentType;
-        let requestData = request.data;
-        if (typeof requestData === 'function') {
-            requestData = requestData(method, config, urlObj.searchParams);
-        }
+        const requestData = request.data;
         if (typeof requestData === 'object') {
             contentType = 'application/json';
         }
@@ -61,7 +61,18 @@ function mockAxios(axios, mockFixture, requests, baseConfig = {}) {
     for (const method of methods) {
         const methodRequests = (_a = mockFixture[method]) !== null && _a !== void 0 ? _a : [];
         const mock = axios[method];
-        mock.mockImplementation(getMockAxios(method, methodRequests, requests, baseConfig));
+        if (dataMethods.indexOf(method) !== -1) {
+            mock.mockImplementation((url, data, config) => {
+                if (config == null) {
+                    config = {};
+                }
+                config.data = data;
+                return getMockAxios(method, methodRequests, requests, baseConfig)(url, config);
+            });
+        }
+        else {
+            mock.mockImplementation(getMockAxios(method, methodRequests, requests, baseConfig));
+        }
     }
     const reqMock = axios.request;
     reqMock.mockImplementation((config) => {
@@ -86,3 +97,13 @@ function massMock(axios, requests, mockFixture) {
     });
 }
 exports.massMock = massMock;
+function dataToResponse(mappings) {
+    return (config) => {
+        const matching = mappings.find(mapping => (0, lodash_1.isEqual)(mapping.data, config.data));
+        if (!matching) {
+            throw new Error('Unrecognized request data.');
+        }
+        return matching.response;
+    };
+}
+exports.dataToResponse = dataToResponse;

@@ -63,6 +63,8 @@ exports.mapVariant = mapVariant;
  * @returns The common product
  */
 const mapProduct = (product) => {
+    if (product == null)
+        return null;
     const sharedImages = product.images.edges.filter(image => product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1).map(edge => edge.node);
     return {
         id: product.id,

@@ -5,9 +5,12 @@ export declare const collectionsRequest: {
             'X-Shopify-Storefront-Access-Token': string;
         };
         url: string;
-        query: string;
-        variables: {
-            pageSize: number;
+        data: {
+            query: string;
+            variables: {
+                pageSize: number;
+                after: any;
+            };
         };
     };
     url: string;
@@ -19,9 +22,12 @@ export declare const segmentsRequest: {
             'X-Shopify-Access-Token': string;
         };
         url: string;
-        query: string;
-        variables: {
-            pageSize: number;
+        data: {
+            query: string;
+            variables: {
+                pageSize: number;
+                after: any;
+            };
         };
     };
     url: string;
@@ -33,9 +39,11 @@ export declare const productRequest: (id: string) => {
             'X-Shopify-Storefront-Access-Token': string;
         };
         url: string;
-        query: string;
-        variables: {
-            id: string;
+        data: {
+            query: string;
+            variables: {
+                id: string;
+            };
         };
     };
     url: string;
@@ -47,10 +55,13 @@ export declare const productsByKeywordRequest: {
             'X-Shopify-Storefront-Access-Token': string;
         };
         url: string;
-        query: string;
-        variables: {
-            pageSize: number;
+        data: {
             query: string;
+            variables: {
+                pageSize: number;
+                query: string;
+                after: any;
+            };
         };
     };
     url: string;
@@ -62,10 +73,13 @@ export declare const productsByCategoryRequest: {
             'X-Shopify-Storefront-Access-Token': string;
         };
         url: string;
-        query: string;
-        variables: {
-            pageSize: number;
-            slug: string;
+        data: {
+            query: string;
+            variables: {
+                pageSize: number;
+                handle: string;
+                after: any;
+            };
         };
     };
     url: string;

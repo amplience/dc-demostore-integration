@@ -76,7 +76,9 @@ export const mapVariant = (variant: ShopifyVariant, sharedImages: ShopifyImage[]
  * @param product The shopify product
  * @returns The common product
  */
-export const mapProduct = (product: ShopifyProduct): Product => {
+export const mapProduct = (product: ShopifyProduct | null): Product | null => {
+	if (product == null) return null
+
 	const sharedImages = product.images.edges.filter(image => 
 		product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1
 	).map(edge => edge.node)

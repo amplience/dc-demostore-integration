@@ -20,6 +20,14 @@ export declare const productIdRequest: (id: string) => {
 };
 export declare const oauthRequest: {
     config: {
+        data: {};
+        headers: {
+            Authorization: string;
+            'Content-Type': string;
+        };
+        params: {
+            client_id: string;
+        };
         url: string;
     };
     url: string;

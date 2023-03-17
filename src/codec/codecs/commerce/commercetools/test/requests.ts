@@ -1,5 +1,10 @@
 export const oauthRequest = {
 	config: {
+		auth: {
+			password: 'test_secret',
+			username: 'test_client',
+		},
+		data: {},
 		url: 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials'
 	},
 	url: 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials'

@@ -1,5 +1,10 @@
 export declare const oauthRequest: {
     config: {
+        auth: {
+            password: string;
+            username: string;
+        };
+        data: {};
         url: string;
     };
     url: string;
