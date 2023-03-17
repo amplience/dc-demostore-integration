@@ -5,9 +5,9 @@ import { BigCommerceCategory, BigCommerceCustomerGroup, BigCommerceProduct, BigC
 import _ from 'lodash'
 
 /**
- * TODO
- * @param category 
- * @returns 
+ * Map a bigcommerce category to the common category type.
+ * @param category The bigcommerce category
+ * @returns The common category
  */
 export const mapCategory = (category: BigCommerceCategory): Category => {
 	return {
@@ -20,10 +20,10 @@ export const mapCategory = (category: BigCommerceCategory): Category => {
 }
 
 /**
- * TODO
- * @param variant 
- * @param product 
- * @returns 
+ * Map a bigcommerce product variant to the common product variant type.
+ * @param variant The bigcommerce product variant
+ * @param product The bigcommerce product
+ * @returns The common variant
  */
 export const mapVariant = (variant: BigCommerceVariant, product: BigCommerceProduct): Variant => {
 	return {
@@ -41,9 +41,9 @@ export const mapVariant = (variant: BigCommerceVariant, product: BigCommerceProd
 }
 
 /**
- * TODO
- * @param product 
- * @returns 
+ * Map a bigcommerce product to the common product variant type.
+ * @param product The bigcommerce product
+ * @returns The common variant
  */
 export const mapVariantProduct = (product: BigCommerceProduct): Variant => {
 	return {
@@ -61,9 +61,9 @@ export const mapVariantProduct = (product: BigCommerceProduct): Variant => {
 }
 
 /**
- * TODO
- * @param product 
- * @returns 
+ * Map a bigcommerce product to the common product type
+ * @param product The bigcommerce product
+ * @returns The common product
  */
 export const mapProduct = (product: BigCommerceProduct): Product => {
 	return product && {
@@ -78,9 +78,9 @@ export const mapProduct = (product: BigCommerceProduct): Product => {
 }
 
 /**
- * TODO
- * @param group 
- * @returns 
+ * Map a bigcommerce customer group to the common customer group type
+ * @param group The bigcommerce customer group
+ * @returns The common customer group
  */
 export const mapCustomerGroup = (group: BigCommerceCustomerGroup): CustomerGroup => ({
 	id: `${group.id}`,
