@@ -276,6 +276,8 @@ describe('shopify integration', function () {
 		// Test
 		const categories = await codec.getCategory({ slug: 'hydrogen' })
 		expect(categories).toEqual(exampleCategoryProducts)
+
+		// TODO: manage multiple requests
 		expect(requests).toEqual([
 			collectionsRequest,
 			productsByCategoryRequest
