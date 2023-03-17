@@ -8,6 +8,7 @@ export enum CodecErrorType {
 	AuthError,
 	ApiUnreachable,
 	ApiError,
+	ApiGraphQL,
 
 	NotAuthenticated,
 	NotFound,
@@ -20,6 +21,16 @@ export enum CodecErrorType {
 export interface CodecApiErrorInfo {
 	status: number;
 	message: string;
+}
+
+/**
+* Codec error info for an HTTP error.
+*/
+export interface CodecGqlErrorInfo {
+	message: string;
+	errors: {
+		message: string;
+	}[]
 }
 
 /**
@@ -77,7 +88,7 @@ export async function catchAxiosErrors<T>(method: () => Promise<T>, errorType = 
 /**
  * Types of information that can be included in a CodecError.
  */
-export type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | undefined;
+export type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | CodecGqlErrorInfo | undefined;
 
 /**
  * A generic error that can be thrown by a codec, with an error type and optional information.

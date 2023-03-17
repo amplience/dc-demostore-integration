@@ -47,7 +47,9 @@ const commerceProductRequests: MockFixture = {
 				data: productRequest('MissingID').config.data,
 				response: {
 					data: {
-						errors: []
+						data: {
+							product: null
+						}
 					}
 				}
 			}
@@ -60,7 +62,7 @@ const commerceProductMissingRequests: MockFixture = {
 		'https://site_id.myshopify.com/api/version/graphql.json': {
 			data: {
 				data: {
-					errors: []
+					product: null
 				}
 			}
 		}
