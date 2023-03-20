@@ -26,6 +26,14 @@ var CodecErrorType;
     CodecErrorType[CodecErrorType["NotSupported"] = 8] = "NotSupported";
 })(CodecErrorType = exports.CodecErrorType || (exports.CodecErrorType = {}));
 /**
+ * Determine if the given character is uppercase.
+ * @param char Character to check
+ * @returns True if uppercase, false otherwise
+ */
+const isUpper = (char) => {
+    return char.toLowerCase() !== char;
+};
+/**
  * Converts a codec error type to a descriptive string.
  * @param type The codec error type
  * @param info Optional info for the codec error
@@ -33,13 +41,13 @@ var CodecErrorType;
  */
 function typeToString(type, info) {
     let name = CodecErrorType[type];
-    for (let i = 1; i < name.length; i++) {
-        if (name[i].toLowerCase() !== name[i]) {
+    for (let i = 1; i < name.length - 1; i++) {
+        if (isUpper(name[i]) && !isUpper(name[i - 1]) && !isUpper(name[i + 1])) {
             name = name.substring(0, i) + ' ' + name.substring(i);
             i++;
         }
     }
-    if (info.message) {
+    if (info.message && typeof info.message === 'string') {
         return `${name}: ${info.message}`;
     }
     return name + '.';
