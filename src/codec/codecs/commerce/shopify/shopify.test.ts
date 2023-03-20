@@ -1,13 +1,9 @@
-import { Request, MockFixture, massMock, dataToResponse } from '../../../../common/test/rest-mock'
+import { Request, massMock } from '../../../../common/test/rest-mock'
 import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import ShopifyCodecType, { ShopifyCommerceCodec } from '.'
 import { 
-	shopifyCategories, 
-	shopifySegments, 
-	shopifyProduct, 
-	shopifyProductsByKeyword, 
-	shopifyCategoryProducts 
+	shopifyProduct 
 } from './test/responses'
 import { 
 	exampleCategoryProducts, 
@@ -25,92 +21,16 @@ import {
 } from './test/requests'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
+import { 
+	commerceCollectionsRequests, 
+	commerceProductMissingRequests, 
+	commerceProductRequests, 
+	commerceProductsByCategoryRequests, 
+	commerceProductsByKeywordRequests, 
+	commerceSegmentsRequests 
+} from './fixtures'
 
 jest.mock('axios')
-
-const commerceProductRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': dataToResponse([
-			{
-				data: productRequest('ExampleID').config.data,
-				response: {
-					data: shopifyProduct('ExampleID')
-				}
-			},
-			{
-				data: productRequest('ExampleID2').config.data,
-				response: {
-					data: shopifyProduct('ExampleID2')
-				}
-			},
-			{
-				data: productRequest('MissingID').config.data,
-				response: {
-					data: {
-						data: {
-							product: null
-						}
-					}
-				}
-			}
-		])
-	}
-}
-
-const commerceProductMissingRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: {
-				data: {
-					product: null
-				}
-			}
-		}
-	}
-}
-
-const commerceProductsByKeywordRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: shopifyProductsByKeyword
-		}
-	}
-}
-
-const commerceProductsByCategoryRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': dataToResponse([
-			{
-				data: collectionsRequest.config.data,
-				response: {
-					data: shopifyCategories
-				}
-			},
-			{
-				data: productsByCategoryRequest.config.data,
-				response: {
-					data: shopifyCategoryProducts
-				}
-			}
-		])
-	}
-}
-
-const commerceSegmentsRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/admin/api/version/graphql.json': {
-			data: shopifySegments
-		}
-	}
-}
-
-const commerceCollectionsRequests: MockFixture = {
-	post: {
-		'https://site_id.myshopify.com/api/version/graphql.json': {
-			data: shopifyCategories
-		}
-	}
-}
 
 describe('shopify integration', function () {
 	let codec: CommerceCodec
