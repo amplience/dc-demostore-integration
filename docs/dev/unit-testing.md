@@ -25,29 +25,29 @@ To keep tests organised, API requests and responses, expected method results and
 
 All codecs should have the following tests:
 
-- getProduct
+- `getProduct`
   - Get a single product by ID.
-- getProducts (multiple)
+- `getProducts` (multiple)
   - Get multiple products by ID. Returned data must be in the same order as the request.
   - TODO: error on missing, return undefined, or flatten IDs that were returned?
-- getProducts (keyword)
+- `getProducts` (keyword)
   - Get multiple products by keyword.
   - Should fetch more than one page of products to test pagination.
-- getProducts (category)
+- `getProducts` (category)
   - Get multiple products by category.
   - Should fetch more than one page of products to test pagination.
-- getProduct (missing)
+- `getProduct` (missing)
   - Get a single product by ID, but the service doesn't find a match.
   - TODO: error or return undefined?
-- getRawProducts
+- `getRawProducts`
   - Get a single product by ID, without any conversion from the source format.
-- getCategory
+- `getCategory`
   - Get a category by slug.
   - TODO: should get products in category? 
-- getMegaMenu
+- `getMegaMenu`
   - Get a list of root level categories.
   - Sub-categories should be contained in children as a tree, should not appear at root level.
-- getCustomerGroups
+- `getCustomerGroups`
   - Get a list of customer groups.
   
 Additional tests should be added if the vendor has any unusual behaviours that you need to test have been properly handled. If you need an example of the absolute baseline required for codec unit tests, look at the unit tests for the `rest` codec.
