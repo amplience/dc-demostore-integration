@@ -56,7 +56,7 @@ function typeToString(type: CodecErrorType, info: CodecErrorInfo) {
 		}
 	}
 
-	if (info.message) {
+	if (info.message && typeof info.message === 'string') {
 		return `${name}: ${info.message}`
 	}
 
