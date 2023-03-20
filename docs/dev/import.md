@@ -132,14 +132,14 @@ export type Promotion = Identifiable & {
 
 ## Methods
 
-#### getProduct
+#### `getProduct`
 Get a single product by ID. This method calls getProducts internally.
 
 ##### Edge Cases
 - Product does not exist:
   - It will receive undefined from getProducts, not sure if we should throw when we see it though.
 
-#### getProducts (multiple)
+#### `getProducts` (multiple)
 Get multiple products by ID. Returned data must be in the same order as the request.
 Missing products must return undefined entries in the list, so that the length of the request and response lists are identical even when assets are missing.
 
@@ -149,26 +149,26 @@ Missing products must return undefined entries in the list, so that the length o
 - All products do not exist:
   - Return a list of all undefined.
 
-#### getProducts (keyword)
+#### `getProducts` (keyword)
 Get multiple products by keyword.
 
 ##### Edge Cases
 - Not really any.
 
-#### getProducts (category)
+#### `getProducts` (category)
 Get multiple products by category.
 
 ##### Edge Cases
 - Category does not exist:
   - Must return []. Only getCategory should throw.
 
-#### getRawProducts
+#### `getRawProducts`
 Get products by ID, without any conversion from the source format.
 
 ##### Edge Cases
 - Same as GetProducts, order must be preserved.
 
-#### getCategory
+#### `getCategory`
 Get a category by slug. This must hydrate all fields in the requested category, including products.
 For an unhydrated category, look to getMegaMenu.
 
@@ -176,14 +176,14 @@ For an unhydrated category, look to getMegaMenu.
 - Category does not exist:
   - Throw a CodecError (NotFound)
 
-#### getMegaMenu
+#### `getMegaMenu`
 Get a list of root level categories.
 Sub-categories should be contained in children as a tree, should not appear at root level.
 
 ##### Edge Cases
 - No root categories is a weird one, right now it throws but I guess it is possible for there to be none. There could be some benefit in throwing as it generally isn't meant to be empty.
 
-#### getCustomerGroups
+#### `getCustomerGroups`
 Get a list of customer groups.
 
 ##### Edge Cases
