@@ -7,9 +7,9 @@ exports.mapCustomerGroup = exports.mapProduct = exports.mapVariantProduct = expo
 const util_1 = require("../../../../common/util");
 const slugify_1 = __importDefault(require("slugify"));
 /**
- * TODO
- * @param category
- * @returns
+ * Map a bigcommerce category to the common category type.
+ * @param category The bigcommerce category
+ * @returns The common category
  */
 const mapCategory = (category) => {
     return {
@@ -22,10 +22,10 @@ const mapCategory = (category) => {
 };
 exports.mapCategory = mapCategory;
 /**
- * TODO
- * @param variant
- * @param product
- * @returns
+ * Map a bigcommerce product variant to the common product variant type.
+ * @param variant The bigcommerce product variant
+ * @param product The bigcommerce product
+ * @returns The common variant
  */
 const mapVariant = (variant, product) => {
     var _a;
@@ -44,9 +44,9 @@ const mapVariant = (variant, product) => {
 };
 exports.mapVariant = mapVariant;
 /**
- * TODO
- * @param product
- * @returns
+ * Map a bigcommerce product to the common product variant type.
+ * @param product The bigcommerce product
+ * @returns The common variant
  */
 const mapVariantProduct = (product) => {
     var _a;
@@ -65,9 +65,9 @@ const mapVariantProduct = (product) => {
 };
 exports.mapVariantProduct = mapVariantProduct;
 /**
- * TODO
- * @param product
- * @returns
+ * Map a bigcommerce product to the common product type
+ * @param product The bigcommerce product
+ * @returns The common product
  */
 const mapProduct = (product) => {
     var _a;
@@ -83,9 +83,9 @@ const mapProduct = (product) => {
 };
 exports.mapProduct = mapProduct;
 /**
- * TODO
- * @param group
- * @returns
+ * Map a bigcommerce customer group to the common customer group type
+ * @param group The bigcommerce customer group
+ * @returns The common customer group
  */
 const mapCustomerGroup = (group) => ({
     id: `${group.id}`,

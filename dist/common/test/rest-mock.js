@@ -3,13 +3,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dataToResponse = exports.massMock = exports.mockAxios = void 0;
 const lodash_1 = require("lodash");
 const actualAxios = jest.requireActual('axios');
+// http methods
 const methods = ['get', 'put', 'post', 'delete', 'patch'];
+// http data methods
 const dataMethods = ['put', 'post', 'patch'];
+/**
+ * Combine a base url with a relative url
+ * @param baseUrl
+ * @param relativeUrl
+ * @returns
+ */
 function combineUrls(baseUrl, relativeUrl) {
     if (!baseUrl)
         return relativeUrl;
     return relativeUrl ? baseUrl.replace(/\/+$/, '') + '/' + relativeUrl.replace(/^\/+/, '') : baseUrl;
 }
+/**
+ * TODO
+ * @param method
+ * @param methodRequests
+ * @param requests
+ * @param baseConfig
+ * @returns
+ */
 function getMockAxios(method, methodRequests, requests, baseConfig) {
     return (url, config) => {
         var _a;
@@ -56,6 +72,13 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
         });
     };
 }
+/**
+ * TODO
+ * @param axios
+ * @param mockFixture
+ * @param requests
+ * @param baseConfig
+ */
 function mockAxios(axios, mockFixture, requests, baseConfig = {}) {
     var _a;
     for (const method of methods) {
@@ -83,6 +106,12 @@ function mockAxios(axios, mockFixture, requests, baseConfig = {}) {
     });
 }
 exports.mockAxios = mockAxios;
+/**
+ * TODO
+ * @param axios
+ * @param requests
+ * @param mockFixture
+ */
 function massMock(axios, requests, mockFixture) {
     mockAxios(axios, mockFixture, requests);
     const mockCreate = axios.create;
@@ -97,6 +126,11 @@ function massMock(axios, requests, mockFixture) {
     });
 }
 exports.massMock = massMock;
+/**
+ * TODO
+ * @param mappings
+ * @returns
+ */
 function dataToResponse(mappings) {
     return (config) => {
         const matching = mappings.find(mapping => (0, lodash_1.isEqual)(mapping.data, config.data));

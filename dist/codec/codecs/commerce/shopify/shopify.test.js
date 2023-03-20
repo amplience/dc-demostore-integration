@@ -43,83 +43,8 @@ const results_1 = require("./test/results");
 const requests_1 = require("./test/requests");
 const config_1 = require("./test/config");
 const util_1 = require("../../../../common/util");
+const fixtures_1 = require("./fixtures");
 jest.mock('axios');
-const commerceProductRequests = {
-    post: {
-        'https://site_id.myshopify.com/api/version/graphql.json': (0, rest_mock_1.dataToResponse)([
-            {
-                data: (0, requests_1.productRequest)('ExampleID').config.data,
-                response: {
-                    data: (0, responses_1.shopifyProduct)('ExampleID')
-                }
-            },
-            {
-                data: (0, requests_1.productRequest)('ExampleID2').config.data,
-                response: {
-                    data: (0, responses_1.shopifyProduct)('ExampleID2')
-                }
-            },
-            {
-                data: (0, requests_1.productRequest)('MissingID').config.data,
-                response: {
-                    data: {
-                        errors: []
-                    }
-                }
-            }
-        ])
-    }
-};
-const commerceProductMissingRequests = {
-    post: {
-        'https://site_id.myshopify.com/api/version/graphql.json': {
-            data: {
-                data: {
-                    errors: []
-                }
-            }
-        }
-    }
-};
-const commerceProductsByKeywordRequests = {
-    post: {
-        'https://site_id.myshopify.com/api/version/graphql.json': {
-            data: responses_1.shopifyProductsByKeyword
-        }
-    }
-};
-const commerceProductsByCategoryRequests = {
-    post: {
-        'https://site_id.myshopify.com/api/version/graphql.json': (0, rest_mock_1.dataToResponse)([
-            {
-                data: requests_1.collectionsRequest.config.data,
-                response: {
-                    data: responses_1.shopifyCategories
-                }
-            },
-            {
-                data: requests_1.productsByCategoryRequest.config.data,
-                response: {
-                    data: responses_1.shopifyCategoryProducts
-                }
-            }
-        ])
-    }
-};
-const commerceSegmentsRequests = {
-    post: {
-        'https://site_id.myshopify.com/admin/api/version/graphql.json': {
-            data: responses_1.shopifySegments
-        }
-    }
-};
-const commerceCollectionsRequests = {
-    post: {
-        'https://site_id.myshopify.com/api/version/graphql.json': {
-            data: responses_1.shopifyCategories
-        }
-    }
-};
 describe('shopify integration', function () {
     let codec;
     let requests;
@@ -129,7 +54,7 @@ describe('shopify integration', function () {
     }));
     test('getProduct (by id)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -141,7 +66,7 @@ describe('shopify integration', function () {
     }));
     test('getProducts (multiple)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -159,7 +84,7 @@ describe('shopify integration', function () {
     }));
     test('getProducts (keyword)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByKeywordRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductsByKeywordRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -171,7 +96,7 @@ describe('shopify integration', function () {
     }));
     test('getProducts (category)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByCategoryRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductsByCategoryRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -192,7 +117,7 @@ describe('shopify integration', function () {
     }));
     test('getProduct (missing)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductMissingRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductMissingRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -204,7 +129,7 @@ describe('shopify integration', function () {
     }));
     test('getProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -224,7 +149,7 @@ describe('shopify integration', function () {
     }));
     test('getRawProducts', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -242,7 +167,7 @@ describe('shopify integration', function () {
     }));
     test('getRawProducts (multiple, one missing)', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -262,7 +187,7 @@ describe('shopify integration', function () {
     }));
     test('getCategory', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceProductsByCategoryRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceProductsByCategoryRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -275,7 +200,7 @@ describe('shopify integration', function () {
     }));
     test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceCollectionsRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceCollectionsRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
@@ -287,7 +212,7 @@ describe('shopify integration', function () {
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
-        (0, rest_mock_1.massMock)(axios_1.default, requests, commerceSegmentsRequests);
+        (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceSegmentsRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test

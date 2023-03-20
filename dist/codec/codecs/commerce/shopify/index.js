@@ -98,6 +98,18 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
         });
     }
     /**
+     * Converts GraphQL errors to CodecError info.
+     * @param errors GraphQL errors
+     * @returns CodecError info
+     */
+    fromGqlErrors(errors) {
+        const message = errors.map(error => error.message).join(', ');
+        return {
+            message,
+            errors
+        };
+    }
+    /**
      * Make a request to the shopify GraphQL API.
      * @param query The GraphQL query string
      * @param variables Variables to use with the GraphQL query
@@ -121,6 +133,9 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                     });
                 }
             }))).data);
+            if (result.data == null && result.errors) {
+                throw new codec_error_1.CodecError(codec_error_1.CodecErrorType.ApiGraphQL, this.fromGqlErrors(result.errors));
+            }
             return result.data;
         });
     }

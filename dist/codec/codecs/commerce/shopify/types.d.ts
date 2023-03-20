@@ -1,8 +1,15 @@
 /**
+ * GraphQL error.
+ */
+export interface GqlError {
+    message: string;
+}
+/**
  * GraphQL response.
  */
 export interface GqlResponse<T> {
     data: T;
+    errors?: GqlError[];
 }
 /**
  * GraphQL edge from a paginated request.

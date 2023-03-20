@@ -20,9 +20,10 @@ var CodecErrorType;
     CodecErrorType[CodecErrorType["AuthError"] = 2] = "AuthError";
     CodecErrorType[CodecErrorType["ApiUnreachable"] = 3] = "ApiUnreachable";
     CodecErrorType[CodecErrorType["ApiError"] = 4] = "ApiError";
-    CodecErrorType[CodecErrorType["NotAuthenticated"] = 5] = "NotAuthenticated";
-    CodecErrorType[CodecErrorType["NotFound"] = 6] = "NotFound";
-    CodecErrorType[CodecErrorType["NotSupported"] = 7] = "NotSupported";
+    CodecErrorType[CodecErrorType["ApiGraphQL"] = 5] = "ApiGraphQL";
+    CodecErrorType[CodecErrorType["NotAuthenticated"] = 6] = "NotAuthenticated";
+    CodecErrorType[CodecErrorType["NotFound"] = 7] = "NotFound";
+    CodecErrorType[CodecErrorType["NotSupported"] = 8] = "NotSupported";
 })(CodecErrorType = exports.CodecErrorType || (exports.CodecErrorType = {}));
 /**
  * Converts a codec error type to a descriptive string.

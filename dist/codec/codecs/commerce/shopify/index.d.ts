@@ -2,7 +2,7 @@ import { CommerceAPI, CommonArgs, CustomerGroup, GetProductsArgs, Product } from
 import { CodecPropertyConfig, CommerceCodecType, CommerceCodec } from '../../core';
 import { StringProperty } from '../../../cms-property-types';
 import { AxiosInstance } from 'axios';
-import { Paginated, ShopifyProduct } from './types';
+import { GqlError, Paginated, ShopifyProduct } from './types';
 import { GetPageResultCursor } from '../../pagination';
 /**
  * Shopify codec configuration.
@@ -45,6 +45,15 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      * @inheritdoc
      */
     init(codecType: CommerceCodecType): Promise<CommerceCodec>;
+    /**
+     * Converts GraphQL errors to CodecError info.
+     * @param errors GraphQL errors
+     * @returns CodecError info
+     */
+    fromGqlErrors(errors: GqlError[]): {
+        message: string;
+        errors: GqlError[];
+    };
     /**
      * Make a request to the shopify GraphQL API.
      * @param query The GraphQL query string

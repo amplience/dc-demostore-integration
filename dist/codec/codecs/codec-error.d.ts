@@ -7,9 +7,10 @@ export declare enum CodecErrorType {
     AuthError = 2,
     ApiUnreachable = 3,
     ApiError = 4,
-    NotAuthenticated = 5,
-    NotFound = 6,
-    NotSupported = 7
+    ApiGraphQL = 5,
+    NotAuthenticated = 6,
+    NotFound = 7,
+    NotSupported = 8
 }
 /**
  * Codec error info for an HTTP error.
@@ -17,6 +18,15 @@ export declare enum CodecErrorType {
 export interface CodecApiErrorInfo {
     status: number;
     message: string;
+}
+/**
+* Codec error info for an HTTP error.
+*/
+export interface CodecGqlErrorInfo {
+    message: string;
+    errors: {
+        message: string;
+    }[];
 }
 /**
  * Codec error info for a generic error.
@@ -34,7 +44,7 @@ export declare function catchAxiosErrors<T>(method: () => Promise<T>, errorType?
 /**
  * Types of information that can be included in a CodecError.
  */
-export declare type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | undefined;
+export declare type CodecErrorInfo = CodecApiErrorInfo | CodecGenericErrorInfo | CodecGqlErrorInfo | undefined;
 /**
  * A generic error that can be thrown by a codec, with an error type and optional information.
  */
