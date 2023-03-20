@@ -3,7 +3,7 @@ import { isEqual } from 'lodash'
 const actualAxios = jest.requireActual('axios')
 
 /**
- * TODO
+ * Mock request object type
  */
 export interface MockRequest {
 	status?: number;
@@ -12,19 +12,19 @@ export interface MockRequest {
 }
 
 /**
- * TODO
+ * Mock request or function returning a mock request
  */
 export type MockRequestOrFunction = MockRequest | ((config: AxiosRequestConfig) => MockRequest)
 
 /**
- * TODO
+ * Object matching urls with mock requests or functions
  */
 export interface MockRequests {
 	[url: string]: MockRequestOrFunction
 }
 
 /**
- * TODO
+ * Mock fixture object matching request methods with mock requests
  */
 export interface MockFixture {
 	get?: MockRequests,
@@ -35,7 +35,7 @@ export interface MockFixture {
 }
 
 /**
- * TODO
+ * Axios request type
  */
 export interface Request {
 	url: string;
@@ -43,21 +43,21 @@ export interface Request {
 }
 
 /**
- * TODO
+ * Object mapping data with a mock request
  */
 interface DataResponseMapping {
 	data: any,
 	response: MockRequest
 }
 
-// TODO
+// http methods
 const methods = ['get', 'put', 'post', 'delete', 'patch']
 
-// TODO
+// http data methods
 const dataMethods = ['put', 'post', 'patch']
 
 /**
- * TODO
+ * Combine a base url with a relative url
  * @param baseUrl 
  * @param relativeUrl 
  * @returns 
