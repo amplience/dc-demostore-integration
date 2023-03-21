@@ -230,12 +230,12 @@ describe('bigcommerce integration', function () {
         });
     }));
     // Get Category Hierarchy
-    test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
-        const megaMenu = yield codec.getMegaMenu({});
+    test('getCategoryTree', () => __awaiter(this, void 0, void 0, function* () {
+        const categoryTree = yield codec.getCategoryTree({});
         expect(requests).toEqual([
             requests_1.categoriesRequest
         ]);
-        expect(megaMenu).toEqual(results_1.exampleMegaMenu);
+        expect(categoryTree).toEqual(results_1.exampleCategoryTree);
     }));
     // Get Customer Groups
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {

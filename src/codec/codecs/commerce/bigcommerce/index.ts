@@ -64,8 +64,8 @@ export class BigCommerceCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async cacheMegaMenu(): Promise<void> {
-		this.megaMenu = (await this.fetch('/v3/catalog/categories/tree')).map(mapCategory)
+	async cacheCategoryTree(): Promise<void> {
+		this.categoryTree = (await this.fetch('/v3/catalog/categories/tree')).map(mapCategory)
 	}
 
 	/**

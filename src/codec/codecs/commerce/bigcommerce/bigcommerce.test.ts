@@ -3,7 +3,7 @@ import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import BigCommerceCodecType, { BigCommerceCommerceCodec } from '.'
 import { bigcommerceProduct, bigcommerceCategories, bigcommerceCustomerGroups } from './test/responses'
-import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
+import { exampleCustomerGroups, exampleCategoryTree, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, searchRequest, productRequest, productCategoryRequest } from './test/requests'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
@@ -210,12 +210,12 @@ describe('bigcommerce integration', function () {
 	})
 
 	// Get Category Hierarchy
-	test('getMegaMenu', async () => {
-		const megaMenu = await codec.getMegaMenu({})
+	test('getCategoryTree', async () => {
+		const categoryTree = await codec.getCategoryTree({})
 		expect(requests).toEqual([
 			categoriesRequest
 		])
-		expect(megaMenu).toEqual(exampleMegaMenu)
+		expect(categoryTree).toEqual(exampleCategoryTree)
 	})
 
 	// Get Customer Groups

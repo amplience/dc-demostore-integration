@@ -55,7 +55,7 @@ export declare class SFCCCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
      * Gets the request config based off of the configuration parameters
      * @returns Axios request config

@@ -167,10 +167,10 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = (yield this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories;
-            this.megaMenu = categories
+            this.categoryTree = categories
                 .filter((cat) => cat.parent_category_id === 'root')
                 .map(mapCategory);
         });

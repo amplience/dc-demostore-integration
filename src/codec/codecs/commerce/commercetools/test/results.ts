@@ -33,7 +33,7 @@ export const exampleCustomerGroups = [
 	},
 ]
 
-export const exampleMegaMenu = [
+export const exampleCategoryTree = [
 	{
 		children: [],
 		id: 'men-id',

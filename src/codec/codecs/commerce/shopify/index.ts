@@ -135,7 +135,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 		})
 
 		// this.products = await fetchFromURL(this.config.productURL, [])
-		// this.megaMenu = this.categories.filter(cat => !cat.parent)
+		// this.categoryTree = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
 	}
 
@@ -219,12 +219,12 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async cacheMegaMenu(): Promise<void> {
+	async cacheCategoryTree(): Promise<void> {
 		const shopifyCollections = await paginateCursor(
 			this.getPageGql<ShopifyCollections, ShopifyCollection>(collections, {}, response => response.collections),
 			PAGE_SIZE)
 
-		this.megaMenu = shopifyCollections.data.map(collection => mapCategory(collection))
+		this.categoryTree = shopifyCollections.data.map(collection => mapCategory(collection))
 	}
 
 	/**

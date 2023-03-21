@@ -43,7 +43,7 @@ export declare class CommercetoolsCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
      * Fetches data from the OAuth authenticated client.
      * @param url URL to fetch data from

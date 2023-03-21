@@ -95,19 +95,19 @@ export class RestCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async cacheMegaMenu(): Promise<void> {
+	async cacheCategoryTree(): Promise<void> {
 		this.categories = await fetchFromURL(this.config.categoryURL, [])
 		this.products = await fetchFromURL(this.config.productURL, [])
 		this.customerGroups = await fetchFromURL(this.config.customerGroupURL, [])
 		this.translations = await fetchFromURL(this.config.translationsURL, {})
-		this.megaMenu = this.categories.filter(cat => !cat.parent)
+		this.categoryTree = this.categories.filter(cat => !cat.parent)
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	async getProducts(args: GetProductsArgs, raw = false): Promise<Product[]> {
-		await this.ensureMegaMenu()
+		await this.ensureCategoryTree()
 
 		if (args.productIds) {
 			const ids = args.productIds.split(',')
@@ -136,7 +136,7 @@ export class RestCommerceCodec extends CommerceCodec {
 	 * @inheritdoc
 	 */
 	async getCustomerGroups(args: CommonArgs): Promise<Identifiable[]> {
-		await this.ensureMegaMenu()
+		await this.ensureCategoryTree()
 
 		return this.customerGroups
 	}

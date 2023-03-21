@@ -170,13 +170,13 @@ Get products by ID, without any conversion from the source format.
 
 #### `getCategory`
 Get a category by slug. This must hydrate all fields in the requested category, including products.
-For an unhydrated category, look to getMegaMenu.
+For an unhydrated category, look to getCategoryTree.
 
 ##### Edge Cases
 - Category does not exist:
   - Throw a CodecError (NotFound)
 
-#### `getMegaMenu`
+#### `getCategoryTree`
 Get a list of root level categories.
 Sub-categories should be contained in children as a tree, should not appear at root level.
 

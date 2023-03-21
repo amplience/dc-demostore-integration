@@ -116,7 +116,7 @@ exports.CommerceCodecType = CommerceCodecType;
  */
 var CodecTestOperationType;
 (function (CodecTestOperationType) {
-    CodecTestOperationType[CodecTestOperationType["megaMenu"] = 0] = "megaMenu";
+    CodecTestOperationType[CodecTestOperationType["categoryTree"] = 0] = "categoryTree";
     CodecTestOperationType[CodecTestOperationType["getCategory"] = 1] = "getCategory";
     CodecTestOperationType[CodecTestOperationType["getProductById"] = 2] = "getProductById";
     CodecTestOperationType[CodecTestOperationType["getProductsByKeyword"] = 3] = "getProductsByKeyword";
@@ -153,29 +153,29 @@ class CommerceCodec {
      * @returns Category matching the slug
      */
     findCategory(slug) {
-        return (0, common_2.findInMegaMenu)(this.megaMenu, slug);
+        return (0, common_2.findInCategoryTree)(this.categoryTree, slug);
     }
     /**
-     * Cache the mega menu.
+     * Cache the category tree.
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.megaMenu = [];
+            this.categoryTree = [];
         });
     }
     /**
-     * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
-     * @returns A promise that resolves when the mega menu is avaiable
+     * Ensures that the category tree has been fetched. If not, it is fetched immediately.
+     * @returns A promise that resolves when the category tree is avaiable
      */
-    ensureMegaMenu() {
+    ensureCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.megaMenu) {
+            if (this.categoryTree) {
                 return;
             }
-            if (!this.megaMenuPromise) {
-                this.megaMenuPromise = this.cacheMegaMenu();
+            if (!this.categoryTreePromise) {
+                this.categoryTreePromise = this.cacheCategoryTree();
             }
-            yield this.megaMenuPromise;
+            yield this.categoryTreePromise;
         });
     }
     /**
@@ -206,24 +206,24 @@ class CommerceCodec {
      * @param args Arguments object
      * @returns Category object
      */
-    // defined in terms of getMegaMenu, effectively
+    // defined in terms of getCategoryTree, effectively
     getCategory(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureMegaMenu();
+            yield this.ensureCategoryTree();
             const category = this.findCategory(args.slug);
             category.products = yield this.getProducts(Object.assign(Object.assign({}, args), { category }));
             return category;
         });
     }
     /**
-     * Gets the mega menu for the current configuration.
+     * Gets the category tree for the current configuration.
      * @param args Arguments object
-     * @returns Mega Menu
+     * @returns Category Tree
      */
-    getMegaMenu(args) {
+    getCategoryTree(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureMegaMenu();
-            return this.megaMenu;
+            yield this.ensureCategoryTree();
+            return this.categoryTree;
         });
     }
     /**
@@ -256,16 +256,16 @@ class CommerceCodec {
      */
     testIntegration() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureMegaMenu();
+            yield this.ensureCategoryTree();
             const results = [{
-                    operationType: CodecTestOperationType.megaMenu,
+                    operationType: CodecTestOperationType.categoryTree,
                     description: 'cache the megamenu',
                     arguments: '',
                     duration: this.initDuration,
-                    results: this.megaMenu
+                    results: this.categoryTree
                 }];
             // 2: get a category by slug, which is done implicitly for all categories here
-            const categories = yield Promise.all((0, common_2.flattenCategories)(this.megaMenu).map((c) => __awaiter(this, void 0, void 0, function* () {
+            const categories = yield Promise.all((0, common_2.flattenCategories)(this.categoryTree).map((c) => __awaiter(this, void 0, void 0, function* () {
                 const categoryStart = new Date().valueOf();
                 const category = yield this.getCategory(c);
                 results.push({

@@ -3,7 +3,7 @@ import axios from 'axios'
 import { CommerceCodec } from '../../core'
 import CommercetoolsCodecType, { CommercetoolsCodec } from '.'
 import { ctoolsCategories, ctoolsCustomerGroups, ctoolsProduct, ctoolsSearchResult } from './test/responses'
-import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
+import { exampleCustomerGroups, exampleCategoryTree, exampleProduct } from './test/results'
 import { categoriesRequest, customerGroupsRequest, oauthRequest, searchRequest } from './test/requests'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
@@ -214,15 +214,15 @@ describe('commercetools integration', function() {
 		})
 	})
 
-	test('getMegaMenu', async () => {
-		const megaMenu = await codec.getMegaMenu({})
+	test('getCategoryTree', async () => {
+		const categoryTree = await codec.getCategoryTree({})
 
 		expect(requests).toEqual([
 			oauthRequest,
 			categoriesRequest
 		])
 
-		expect(megaMenu).toEqual(exampleMegaMenu)
+		expect(categoryTree).toEqual(exampleCategoryTree)
 	})
 
 	test('getCustomerGroups', async () => {

@@ -74,7 +74,7 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
      * Get a shopify product by ID.
      * @param id The ID of the product to fetch

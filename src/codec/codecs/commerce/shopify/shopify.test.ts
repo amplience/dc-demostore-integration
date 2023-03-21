@@ -8,7 +8,7 @@ import {
 import { 
 	exampleCategoryProducts, 
 	exampleCustomerGroups, 
-	exampleMegaMenu, 
+	exampleCategoryTree, 
 	exampleProduct, 
 	exampleProductsByKeyword 
 } from './test/results'
@@ -218,15 +218,15 @@ describe('shopify integration', function () {
 		])
 	})
 
-	test('getMegaMenu', async () => {
+	test('getCategoryTree', async () => {
 		// Setup with the right fixture
 		massMock(axios, requests, commerceCollectionsRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
 		await codec.init(new ShopifyCodecType())
 
 		// Test
-		const categories = await codec.getMegaMenu({})
-		expect(categories).toEqual(exampleMegaMenu)
+		const categories = await codec.getCategoryTree({})
+		expect(categories).toEqual(exampleCategoryTree)
 		expect(requests).toEqual([
 			collectionsRequest
 		])

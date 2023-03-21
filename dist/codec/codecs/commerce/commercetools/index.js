@@ -179,11 +179,11 @@ class CommercetoolsCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
             const categories = yield (0, pagination_1.paginate)(this.getPage(this.rest, '/categories'), 500);
             const mapped = categories.map(cat => mapCategory(cat, categories, {}));
-            this.megaMenu = mapped.filter(cat => cats.includes(cat.slug));
+            this.categoryTree = mapped.filter(cat => cats.includes(cat.slug));
         });
     }
     /**

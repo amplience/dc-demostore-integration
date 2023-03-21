@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exampleProductsByKeyword = exports.exampleCategoryProducts = exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups = void 0;
+exports.exampleProductsByKeyword = exports.exampleCategoryProducts = exports.exampleProduct = exports.exampleCategoryTree = exports.exampleCustomerGroups = void 0;
 exports.exampleCustomerGroups = [
     {
         id: "gid://shopify/Segment/514502426912",
@@ -19,7 +19,7 @@ exports.exampleCustomerGroups = [
         name: "Email subscribers"
     }
 ];
-exports.exampleMegaMenu = [
+exports.exampleCategoryTree = [
     {
         "id": "gid://shopify/Collection/439038771488",
         "slug": "frontpage",

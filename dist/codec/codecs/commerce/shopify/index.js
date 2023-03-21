@@ -93,7 +93,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                 }
             });
             // this.products = await fetchFromURL(this.config.productURL, [])
-            // this.megaMenu = this.categories.filter(cat => !cat.parent)
+            // this.categoryTree = this.categories.filter(cat => !cat.parent)
             return yield _super.init.call(this, codecType);
         });
     }
@@ -169,10 +169,10 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
             const shopifyCollections = yield (0, pagination_1.paginateCursor)(this.getPageGql(queries_1.collections, {}, response => response.collections), PAGE_SIZE);
-            this.megaMenu = shopifyCollections.data.map(collection => (0, mappers_1.mapCategory)(collection));
+            this.categoryTree = shopifyCollections.data.map(collection => (0, mappers_1.mapCategory)(collection));
         });
     }
     /**

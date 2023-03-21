@@ -5,7 +5,7 @@ import {
 	CONSTANTS
 } from '../../common'
 import {
-	findInMegaMenu, 
+	findInCategoryTree, 
 	flattenCategories 
 } from './common'
 import { 
@@ -133,7 +133,7 @@ export class CommerceCodecType extends CodecType {
  * Codec operations for testing.
  */
 export enum CodecTestOperationType {
-    megaMenu,
+    categoryTree,
     getCategory,
     getProductById,
     getProductsByKeyword,
@@ -157,11 +157,11 @@ export interface CodecTestResult {
  */
 export class CommerceCodec implements CommerceAPI {
 	config: CodecPropertyConfig<Dictionary<AnyProperty>>
-	megaMenu: Category[]
+	categoryTree: Category[]
 	codecType: CommerceCodecType
 	initDuration: number
 
-	megaMenuPromise?: Promise<void>
+	categoryTreePromise?: Promise<void>
     
 	/**
 	 * Create a new Commerce API implementation, given an input configuration.
@@ -190,30 +190,30 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns Category matching the slug
 	 */
 	findCategory(slug: string): Category {
-		return findInMegaMenu(this.megaMenu, slug)
+		return findInCategoryTree(this.categoryTree, slug)
 	}    
 
 	/**
-	 * Cache the mega menu.
+	 * Cache the category tree.
 	 */
-	async cacheMegaMenu(): Promise<void> {
-		this.megaMenu = []
+	async cacheCategoryTree(): Promise<void> {
+		this.categoryTree = []
 	}
 
 	/**
-	 * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
-	 * @returns A promise that resolves when the mega menu is avaiable
+	 * Ensures that the category tree has been fetched. If not, it is fetched immediately.
+	 * @returns A promise that resolves when the category tree is avaiable
 	 */
-	async ensureMegaMenu(): Promise<void> {
-		if (this.megaMenu) {
+	async ensureCategoryTree(): Promise<void> {
+		if (this.categoryTree) {
 			return
 		}
 
-		if (!this.megaMenuPromise) {
-			this.megaMenuPromise = this.cacheMegaMenu()
+		if (!this.categoryTreePromise) {
+			this.categoryTreePromise = this.cacheCategoryTree()
 		}
 
-		await this.megaMenuPromise
+		await this.categoryTreePromise
 	}
 
 	/**
@@ -242,9 +242,9 @@ export class CommerceCodec implements CommerceAPI {
 	 * @param args Arguments object
 	 * @returns Category object
 	 */
-	// defined in terms of getMegaMenu, effectively
+	// defined in terms of getCategoryTree, effectively
 	async getCategory(args: GetCommerceObjectArgs): Promise<Category> {
-		await this.ensureMegaMenu()
+		await this.ensureCategoryTree()
 
 		const category = this.findCategory(args.slug)
 		category.products = await this.getProducts({ ...args, category })
@@ -252,14 +252,14 @@ export class CommerceCodec implements CommerceAPI {
 	}
 
 	/**
-	 * Gets the mega menu for the current configuration.
+	 * Gets the category tree for the current configuration.
 	 * @param args Arguments object
-	 * @returns Mega Menu
+	 * @returns Category Tree
 	 */
-	async getMegaMenu(args: CommonArgs): Promise<Category[]> {
-		await this.ensureMegaMenu()
+	async getCategoryTree(args: CommonArgs): Promise<Category[]> {
+		await this.ensureCategoryTree()
 
-		return this.megaMenu
+		return this.categoryTree
 	}
 
 	/**
@@ -289,18 +289,18 @@ export class CommerceCodec implements CommerceAPI {
 	 * @returns A report of all test results.
 	 */
 	async testIntegration(): Promise<CodecTestResult[]> {
-		await this.ensureMegaMenu()
+		await this.ensureCategoryTree()
 
 		const results: CodecTestResult[] = [{
-			operationType: CodecTestOperationType.megaMenu,
+			operationType: CodecTestOperationType.categoryTree,
 			description: 'cache the megamenu',
 			arguments: '',
 			duration: this.initDuration,
-			results: this.megaMenu
+			results: this.categoryTree
 		}]
 
 		// 2: get a category by slug, which is done implicitly for all categories here
-		const categories: Category[] = await Promise.all(flattenCategories(this.megaMenu).map(async c => {
+		const categories: Category[] = await Promise.all(flattenCategories(this.categoryTree).map(async c => {
 			const categoryStart = new Date().valueOf()
 			const category = await this.getCategory(c)
 			results.push({

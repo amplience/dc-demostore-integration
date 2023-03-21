@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exampleCustomerGroups = exports.exampleMegaMenu = exports.exampleProduct = void 0;
+exports.exampleCustomerGroups = exports.exampleCategoryTree = exports.exampleProduct = void 0;
 const exampleProduct = (id) => ({
     categories: [],
     id: id,
@@ -63,7 +63,7 @@ const exampleProduct = (id) => ({
     ],
 });
 exports.exampleProduct = exampleProduct;
-exports.exampleMegaMenu = [
+exports.exampleCategoryTree = [
     {
         children: [],
         id: 'content-link',

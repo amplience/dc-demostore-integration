@@ -3,12 +3,12 @@ import { Dictionary } from 'lodash';
 import { Category } from '../../common/types';
 import { CodecError } from './codec-error';
 /**
- * Find a category in the mega menu by slug.
- * @param categories Root categories in mega menu
+ * Find a category in the category tree by slug.
+ * @param categories Root categories in category tree
  * @param slug Category slug
  * @returns Found category, if present
  */
-export declare const findInMegaMenu: (categories: Category[], slug: string) => Category;
+export declare const findInCategoryTree: (categories: Category[], slug: string) => Category;
 /**
  * Flattens categories to a single dimensional array, rather than a tree
  * @param categories Root categories

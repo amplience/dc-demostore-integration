@@ -64,7 +64,7 @@ export const exampleProduct = (id: string) => ({
 	],
 })
 
-export const exampleMegaMenu: Category[] = [
+export const exampleCategoryTree: Category[] = [
 	{
 		children: [],
 		id: 'content-link',

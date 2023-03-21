@@ -189,8 +189,8 @@ describe('rest integration', function() {
 		expect(category).toEqual(childCategories[0])
 	})
 
-	test('getMegaMenu', async () => {
-		const megaMenu = await codec.getMegaMenu({})
+	test('getCategoryTree', async () => {
+		const categoryTree = await codec.getCategoryTree({})
 
 		expect(requests).toEqual([
 			categoryRequest,
@@ -199,7 +199,7 @@ describe('rest integration', function() {
 			translationsRequest
 		])
 
-		expect(megaMenu).toEqual([rootCategory])
+		expect(categoryTree).toEqual([rootCategory])
 	})
 
 	test('getCustomerGroups', async () => {

@@ -199,12 +199,12 @@ describe('sfcc integration', function () {
             slug: 'newarrivals-womens',
         });
     }));
-    test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
-        const megaMenu = yield sfccCodec.getMegaMenu({});
+    test('getCategoryTree', () => __awaiter(this, void 0, void 0, function* () {
+        const categoryTree = yield sfccCodec.getCategoryTree({});
         expect(requests).toEqual([
             requests_1.categoryRequest,
         ]);
-        expect(megaMenu).toEqual(results_1.exampleMegaMenu);
+        expect(categoryTree).toEqual(results_1.exampleCategoryTree);
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
         const customerGroups = yield sfccCodec.getCustomerGroups({});

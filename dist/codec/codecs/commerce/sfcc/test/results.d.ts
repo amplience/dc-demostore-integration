@@ -19,7 +19,7 @@ export declare const exampleProduct: (id: string) => {
         sku: string;
     }[];
 };
-export declare const exampleMegaMenu: Category[];
+export declare const exampleCategoryTree: Category[];
 export declare const exampleCustomerGroups: {
     _resource_state: string;
     _type: string;

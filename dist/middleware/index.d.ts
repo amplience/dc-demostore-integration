@@ -2,7 +2,7 @@ import { CommerceAPI } from '../index';
 /**
  * Commerce API method names.
  */
-export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getMegaMenu' | 'getCustomerGroups' | 'getRawProducts';
+export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getCategoryTree' | 'getCustomerGroups' | 'getRawProducts';
 export interface MiddlewareError {
     type: string;
     message: string;

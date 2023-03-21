@@ -40,7 +40,7 @@ export declare class RestCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
      * @inheritdoc
      */

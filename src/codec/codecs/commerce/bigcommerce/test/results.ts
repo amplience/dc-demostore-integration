@@ -7,7 +7,7 @@ export const exampleCustomerGroups = [
 ]
 
 // BigCommerce Category Hierarchy result
-export const exampleMegaMenu = [
+export const exampleCategoryTree = [
 	{
 		id: '1',
 		name: 'Men',

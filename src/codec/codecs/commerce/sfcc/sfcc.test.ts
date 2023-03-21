@@ -3,7 +3,7 @@ import { Request, MockFixture, massMock } from '../../../../common/test/rest-moc
 import axios from 'axios'
 import { sfccCategories, sfccCustomerGroups, sfccProduct, sfccProducts, sfccSearchResult } from './test/responses'
 import { categoryRequest, categorySearch, customerGroupsRequest, keywordSearch, oauthRequest, productIdRequest, productIdRequests } from './test/requests'
-import { exampleCustomerGroups, exampleMegaMenu, exampleProduct } from './test/results'
+import { exampleCustomerGroups, exampleCategoryTree, exampleProduct } from './test/results'
 import { config } from './test/config'
 import { flattenConfig } from '../../../../common/util'
 
@@ -211,14 +211,14 @@ describe('sfcc integration', function() {
 		})
 	})
 
-	test('getMegaMenu', async () => {
-		const megaMenu = await sfccCodec.getMegaMenu({})
+	test('getCategoryTree', async () => {
+		const categoryTree = await sfccCodec.getCategoryTree({})
 
 		expect(requests).toEqual([
 			categoryRequest,
 		])
 
-		expect(megaMenu).toEqual(exampleMegaMenu)
+		expect(categoryTree).toEqual(exampleCategoryTree)
 	})
 
 	test('getCustomerGroups', async () => {

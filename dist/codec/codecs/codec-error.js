@@ -60,6 +60,9 @@ function catchAxiosErrors(method, errorType = CodecErrorType.ApiError) {
                 if (e.response.status === 404) {
                     errorType = CodecErrorType.NotFound;
                 }
+                else if (e.response.status === 401) {
+                    errorType = CodecErrorType.NotAuthenticated;
+                }
                 throw new CodecError(errorType, { status: e.response.status, message: e.response.data });
             }
             throw e;

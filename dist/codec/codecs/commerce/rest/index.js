@@ -80,13 +80,13 @@ class RestCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
             this.categories = yield fetchFromURL(this.config.categoryURL, []);
             this.products = yield fetchFromURL(this.config.productURL, []);
             this.customerGroups = yield fetchFromURL(this.config.customerGroupURL, []);
             this.translations = yield fetchFromURL(this.config.translationsURL, {});
-            this.megaMenu = this.categories.filter(cat => !cat.parent);
+            this.categoryTree = this.categories.filter(cat => !cat.parent);
         });
     }
     /**
@@ -94,7 +94,7 @@ class RestCommerceCodec extends core_1.CommerceCodec {
      */
     getProducts(args, raw = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureMegaMenu();
+            yield this.ensureCategoryTree();
             if (args.productIds) {
                 const ids = args.productIds.split(',');
                 return (0, common_1.mapIdentifiers)(ids, this.products.filter(prod => ids.includes(prod.id)));
@@ -123,7 +123,7 @@ class RestCommerceCodec extends core_1.CommerceCodec {
      */
     getCustomerGroups(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.ensureMegaMenu();
+            yield this.ensureCategoryTree();
             return this.customerGroups;
         });
     }

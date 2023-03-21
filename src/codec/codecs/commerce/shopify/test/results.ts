@@ -17,7 +17,7 @@ export const exampleCustomerGroups = [
     }
 ]
 
-export const exampleMegaMenu = [
+export const exampleCategoryTree = [
     {
         "id": "gid://shopify/Collection/439038771488",
         "slug": "frontpage",

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups = void 0;
+exports.exampleProduct = exports.exampleCategoryTree = exports.exampleCustomerGroups = void 0;
 exports.exampleCustomerGroups = [
     {
         createdAt: '2020-04-14T17:38:16.220Z',
@@ -35,7 +35,7 @@ exports.exampleCustomerGroups = [
         version: 1,
     },
 ];
-exports.exampleMegaMenu = [
+exports.exampleCategoryTree = [
     {
         children: [],
         id: 'men-id',

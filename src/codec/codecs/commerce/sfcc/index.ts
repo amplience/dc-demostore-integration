@@ -197,9 +197,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async cacheMegaMenu(): Promise<void> {
+	async cacheCategoryTree(): Promise<void> {
 		const categories = (await this.fetch(`${this.shopApi}/categories/root?levels=4`)).categories
-		this.megaMenu = categories
+		this.categoryTree = categories
 			.filter((cat) => cat.parent_category_id === 'root')
 			.map(mapCategory)
 	}

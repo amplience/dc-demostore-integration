@@ -191,15 +191,15 @@ describe('rest integration', function () {
         ]);
         expect(category).toEqual(responses_1.childCategories[0]);
     }));
-    test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
-        const megaMenu = yield codec.getMegaMenu({});
+    test('getCategoryTree', () => __awaiter(this, void 0, void 0, function* () {
+        const categoryTree = yield codec.getCategoryTree({});
         expect(requests).toEqual([
             requests_1.categoryRequest,
             requests_1.productRequest,
             requests_1.customerGroupRequest,
             requests_1.translationsRequest
         ]);
-        expect(megaMenu).toEqual([responses_1.rootCategory]);
+        expect(categoryTree).toEqual([responses_1.rootCategory]);
     }));
     test('getCustomerGroups', () => __awaiter(this, void 0, void 0, function* () {
         const customerGroups = yield codec.getCustomerGroups({});

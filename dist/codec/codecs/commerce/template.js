@@ -59,7 +59,7 @@ class TemplateCommerceCodec extends core_1.CommerceCodec {
         });
         return __awaiter(this, void 0, void 0, function* () {
             // this.products = await fetchFromURL(this.config.productURL, [])
-            // this.megaMenu = this.categories.filter(cat => !cat.parent)
+            // this.categoryTree = this.categories.filter(cat => !cat.parent)
             return yield _super.init.call(this, codecType);
         });
     }

@@ -200,10 +200,10 @@ export class CommercetoolsCodec extends CommerceCodec {
 	/**
 	 * @inheritdoc
 	 */
-	async cacheMegaMenu(): Promise<void> {
+	async cacheCategoryTree(): Promise<void> {
 		const categories: CTCategory[] = await paginate(this.getPage(this.rest, '/categories'), 500)
 		const mapped: Category[] = categories.map(cat => mapCategory(cat, categories, {}))
-		this.megaMenu = mapped.filter(cat => cats.includes(cat.slug))
+		this.categoryTree = mapped.filter(cat => cats.includes(cat.slug))
 	}
 
 	/**

@@ -198,14 +198,14 @@ describe('shopify integration', function () {
             requests_1.productsByCategoryRequest
         ]);
     }));
-    test('getMegaMenu', () => __awaiter(this, void 0, void 0, function* () {
+    test('getCategoryTree', () => __awaiter(this, void 0, void 0, function* () {
         // Setup with the right fixture
         (0, rest_mock_1.massMock)(axios_1.default, requests, fixtures_1.commerceCollectionsRequests);
         codec = new _1.ShopifyCommerceCodec((0, util_1.flattenConfig)(config_1.config));
         yield codec.init(new _1.default());
         // Test
-        const categories = yield codec.getMegaMenu({});
-        expect(categories).toEqual(results_1.exampleMegaMenu);
+        const categories = yield codec.getCategoryTree({});
+        expect(categories).toEqual(results_1.exampleCategoryTree);
         expect(requests).toEqual([
             requests_1.collectionsRequest
         ]);

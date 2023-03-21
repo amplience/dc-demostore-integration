@@ -14,7 +14,7 @@ export declare const exampleCustomerGroups: {
     name: string;
     version: number;
 }[];
-export declare const exampleMegaMenu: {
+export declare const exampleCategoryTree: {
     children: any[];
     id: string;
     name: string;

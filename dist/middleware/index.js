@@ -128,7 +128,7 @@ const getCommerceAPI = (params = undefined) => __awaiter(void 0, void 0, void 0,
             getProduct: getResponse('getProduct'),
             getProducts: getResponse('getProducts'),
             getCategory: getResponse('getCategory'),
-            getMegaMenu: getResponse('getMegaMenu'),
+            getCategoryTree: getResponse('getCategoryTree'),
             getCustomerGroups: getResponse('getCustomerGroups'),
             getRawProducts: getResponse('getRawProducts')
         };

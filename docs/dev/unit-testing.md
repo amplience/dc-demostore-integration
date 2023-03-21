@@ -44,7 +44,7 @@ All codecs should have the following tests:
 - `getCategory`
   - Get a category by slug.
   - TODO: should get products in category? 
-- `getMegaMenu`
+- `getCategoryTree`
   - Get a list of root level categories.
   - Sub-categories should be contained in children as a tree, should not appear at root level.
 - `getCustomerGroups`

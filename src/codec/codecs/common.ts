@@ -6,12 +6,12 @@ import { env } from 'process'
 import { CodecError, CodecErrorType } from './codec-error'
 
 /**
- * Find a category in the mega menu by slug.
- * @param categories Root categories in mega menu
+ * Find a category in the category tree by slug.
+ * @param categories Root categories in category tree
  * @param slug Category slug
  * @returns Found category, if present
  */
-export const findInMegaMenu = (categories: Category[], slug: string) => {
+export const findInCategoryTree = (categories: Category[], slug: string) => {
 	return flattenCategories(categories).find(category => category.slug?.toLowerCase() === slug?.toLowerCase())
 }
 

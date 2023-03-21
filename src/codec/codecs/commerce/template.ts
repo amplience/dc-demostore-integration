@@ -63,7 +63,7 @@ export class TemplateCommerceCodec extends CommerceCodec {
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
 		// this.products = await fetchFromURL(this.config.productURL, [])
-		// this.megaMenu = this.categories.filter(cat => !cat.parent)
+		// this.categoryTree = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
 	}
 

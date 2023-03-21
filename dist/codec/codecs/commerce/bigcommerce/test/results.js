@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.exampleProduct = exports.exampleMegaMenu = exports.exampleCustomerGroups = void 0;
+exports.exampleProduct = exports.exampleCategoryTree = exports.exampleCustomerGroups = void 0;
 // BigCommerce Customer Groups result
 exports.exampleCustomerGroups = [
     {
@@ -9,7 +9,7 @@ exports.exampleCustomerGroups = [
     }
 ];
 // BigCommerce Category Hierarchy result
-exports.exampleMegaMenu = [
+exports.exampleCategoryTree = [
     {
         id: '1',
         name: 'Men',

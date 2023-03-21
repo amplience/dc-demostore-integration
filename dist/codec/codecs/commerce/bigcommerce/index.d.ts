@@ -34,7 +34,7 @@ export declare class BigCommerceCommerceCodec extends CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
      * Fetches data using store hash and API token.
      * @param url URL to fetch data from

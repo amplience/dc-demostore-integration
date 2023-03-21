@@ -60,9 +60,9 @@ class BigCommerceCommerceCodec extends core_1.CommerceCodec {
     /**
      * @inheritdoc
      */
-    cacheMegaMenu() {
+    cacheCategoryTree() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.megaMenu = (yield this.fetch('/v3/catalog/categories/tree')).map(mappers_1.mapCategory);
+            this.categoryTree = (yield this.fetch('/v3/catalog/categories/tree')).map(mappers_1.mapCategory);
         });
     }
     /**

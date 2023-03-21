@@ -76,7 +76,7 @@ export declare class CommerceCodecType extends CodecType {
  * Codec operations for testing.
  */
 export declare enum CodecTestOperationType {
-    megaMenu = 0,
+    categoryTree = 0,
     getCategory = 1,
     getProductById = 2,
     getProductsByKeyword = 3,
@@ -98,10 +98,10 @@ export interface CodecTestResult {
  */
 export declare class CommerceCodec implements CommerceAPI {
     config: CodecPropertyConfig<Dictionary<AnyProperty>>;
-    megaMenu: Category[];
+    categoryTree: Category[];
     codecType: CommerceCodecType;
     initDuration: number;
-    megaMenuPromise?: Promise<void>;
+    categoryTreePromise?: Promise<void>;
     /**
      * Create a new Commerce API implementation, given an input configuration.
      * @param config API configuration
@@ -120,14 +120,14 @@ export declare class CommerceCodec implements CommerceAPI {
      */
     findCategory(slug: string): Category;
     /**
-     * Cache the mega menu.
+     * Cache the category tree.
      */
-    cacheMegaMenu(): Promise<void>;
+    cacheCategoryTree(): Promise<void>;
     /**
-     * Ensures that the mega menu has been fetched. If not, it is fetched immediately.
-     * @returns A promise that resolves when the mega menu is avaiable
+     * Ensures that the category tree has been fetched. If not, it is fetched immediately.
+     * @returns A promise that resolves when the category tree is avaiable
      */
-    ensureMegaMenu(): Promise<void>;
+    ensureCategoryTree(): Promise<void>;
     /**
      * Get a single product by ID.
      * @param args Arguments object
@@ -147,11 +147,11 @@ export declare class CommerceCodec implements CommerceAPI {
      */
     getCategory(args: GetCommerceObjectArgs): Promise<Category>;
     /**
-     * Gets the mega menu for the current configuration.
+     * Gets the category tree for the current configuration.
      * @param args Arguments object
-     * @returns Mega Menu
+     * @returns Category Tree
      */
-    getMegaMenu(args: CommonArgs): Promise<Category[]>;
+    getCategoryTree(args: CommonArgs): Promise<Category[]>;
     /**
      * Gets customer groups for the current configuration.
      * @param args Arguments object

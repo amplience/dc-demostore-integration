@@ -1,20 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsArgError = exports.mapIdentifiers = exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInMegaMenu = void 0;
+exports.getProductsArgError = exports.mapIdentifiers = exports.getContentTypeSchema = exports.getContentType = exports.CTypes = exports.logResponse = exports.flattenCategories = exports.findInCategoryTree = void 0;
 const constants_1 = require("../../common/constants");
 const dc_management_sdk_js_1 = require("dc-management-sdk-js");
 const process_1 = require("process");
 const codec_error_1 = require("./codec-error");
 /**
- * Find a category in the mega menu by slug.
- * @param categories Root categories in mega menu
+ * Find a category in the category tree by slug.
+ * @param categories Root categories in category tree
  * @param slug Category slug
  * @returns Found category, if present
  */
-const findInMegaMenu = (categories, slug) => {
+const findInCategoryTree = (categories, slug) => {
     return (0, exports.flattenCategories)(categories).find(category => { var _a; return ((_a = category.slug) === null || _a === void 0 ? void 0 : _a.toLowerCase()) === (slug === null || slug === void 0 ? void 0 : slug.toLowerCase()); });
 };
-exports.findInMegaMenu = findInMegaMenu;
+exports.findInCategoryTree = findInCategoryTree;
 /**
  * Flattens categories to a single dimensional array, rather than a tree
  * @param categories Root categories
