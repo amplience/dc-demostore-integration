@@ -203,7 +203,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 				
 				return {
 					data: paginated.edges.map(edge => edge.node),
-					nextCursor: paginated.edges.at(-1).cursor,
+					nextCursor: paginated.edges[paginated.edges.length - 1].cursor,
 					hasNext: true
 				}
 			}
@@ -233,7 +233,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @returns The shopify product
 	 */
 	async getProductById(id: string): Promise<ShopifyProduct> {
-		return (await this.gqlRequest<ShopifyProductByID>(productById, { id }))?.product ?? null
+		return (await this.gqlRequest<ShopifyProductByID>(productById, { id: 'gid://shopify/Product/' + id }))?.product ?? null
 	}
 
 	/**

@@ -2,7 +2,8 @@ import {
 	Category, 
 	CustomerGroup, 
 	Product, 
-	Variant 
+	Variant,
+	Image
 } from '../../../../common/types'
 import { formatMoneyString } from '../../../../common/util'
 import { 
@@ -25,6 +26,20 @@ export const firstNonEmpty = (strings: string[]) => {
 }
 
 /**
+ * Extracts a Resource ID from a globally unique GraphQL ID.
+ * @param id GUID
+ * @returns Resource ID
+ */
+const extractID = (id: string): string => {
+	if (id == null) {
+		return null
+	}
+
+	const split = id.split('/')
+	return split[split.length - 1]
+}
+
+/**
  * Map a shopify price to the common price type.
  * @param price The shopify price
  * @returns The common price
@@ -40,7 +55,7 @@ export const mapPrice = (price: ShopifyPrice): string => {
  */
 export const mapCategory = (collection: ShopifyCollection): Category => {
 	return {
-		id: collection.id,
+		id: extractID(collection.id),
 		slug: collection.handle,
 		name: collection.title,
 		image: collection.image,
@@ -48,6 +63,17 @@ export const mapCategory = (collection: ShopifyCollection): Category => {
 		products: []
 	}
 }
+
+/**
+ * Map a shopify image to the common image type.
+ * @param image The shopify image
+ * @returns The common image
+ */
+export const mapImage = (image: ShopifyImage): Image => ({
+	id: extractID(image.id),
+	url: image.url,
+	altText: image.altText
+} as Image)
 
 /**
  * Map a shopify product variant to the common product variant type.
@@ -67,7 +93,7 @@ export const mapVariant = (variant: ShopifyVariant, sharedImages: ShopifyImage[]
 		listPrice: mapPrice(variant.price ?? variant.unitPrice),
 		salePrice: mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
 		attributes: attributes,
-		images: [variant.image, ...sharedImages]
+		images: [variant.image, ...sharedImages].map(mapImage)
 	}
 }
 
@@ -84,7 +110,7 @@ export const mapProduct = (product: ShopifyProduct | null): Product | null => {
 	).map(edge => edge.node)
 
 	return {
-		id: product.id,
+		id: extractID(product.id),
 		name: product.title,
 		slug: product.handle,
 		categories: product.collections.edges.map(collection => mapCategory(collection.node)),
@@ -101,7 +127,7 @@ export const mapProduct = (product: ShopifyProduct | null): Product | null => {
  */
 export const mapCustomerGroup = (segment: ShopifySegment): CustomerGroup => {
 	return {
-		id: segment.id,
+		id: extractID(segment.id),
 		name: segment.name
 	}
 }

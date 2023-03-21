@@ -183,7 +183,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     getProductById(id) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            return (_b = (_a = (yield this.gqlRequest(queries_1.productById, { id }))) === null || _a === void 0 ? void 0 : _a.product) !== null && _b !== void 0 ? _b : null;
+            return (_b = (_a = (yield this.gqlRequest(queries_1.productById, { id: 'gid://shopify/Product/' + id }))) === null || _a === void 0 ? void 0 : _a.product) !== null && _b !== void 0 ? _b : null;
         });
     }
     /**

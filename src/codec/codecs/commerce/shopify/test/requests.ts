@@ -52,7 +52,7 @@ export const productRequest = (id: string) => ({
 		data: {
 			query: productById,
 			variables: {
-				id
+				id: 'gid://shopify/Product/' + id
 			}
 		}
 	},

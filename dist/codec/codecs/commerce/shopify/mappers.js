@@ -12,6 +12,14 @@ const firstNonEmpty = (strings) => {
 };
 exports.firstNonEmpty = firstNonEmpty;
 /**
+ * Extracts a Resource ID from a globally unique GraphQL ID.
+ * @param id GUID
+ * @returns Resource ID
+ */
+const extractID = (id) => {
+    return id.split('/').at(-1);
+};
+/**
  * Map a shopify price to the common price type.
  * @param price The shopify price
  * @returns The common price
@@ -27,7 +35,7 @@ exports.mapPrice = mapPrice;
  */
 const mapCategory = (collection) => {
     return {
-        id: collection.id,
+        id: extractID(collection.id),
         slug: collection.handle,
         name: collection.title,
         image: collection.image,
@@ -49,7 +57,7 @@ const mapVariant = (variant, sharedImages) => {
         attributes[option.name] = option.value;
     }
     return {
-        sku: (0, exports.firstNonEmpty)([variant.sku, variant.id]),
+        sku: (0, exports.firstNonEmpty)([variant.sku, extractID(variant.id)]),
         listPrice: (0, exports.mapPrice)((_a = variant.price) !== null && _a !== void 0 ? _a : variant.unitPrice),
         salePrice: (0, exports.mapPrice)((_c = (_b = variant.compareAtPrice) !== null && _b !== void 0 ? _b : variant.price) !== null && _c !== void 0 ? _c : variant.unitPrice),
         attributes: attributes,
@@ -67,7 +75,7 @@ const mapProduct = (product) => {
         return null;
     const sharedImages = product.images.edges.filter(image => product.variants.edges.findIndex(variant => variant.node.image.id === image.node.id) === -1).map(edge => edge.node);
     return {
-        id: product.id,
+        id: extractID(product.id),
         name: product.title,
         slug: product.handle,
         categories: product.collections.edges.map(collection => (0, exports.mapCategory)(collection.node)),
@@ -84,7 +92,7 @@ exports.mapProduct = mapProduct;
  */
 const mapCustomerGroup = (segment) => {
     return {
-        id: segment.id,
+        id: extractID(segment.id),
         name: segment.name
     };
 };
