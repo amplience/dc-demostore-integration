@@ -47,8 +47,18 @@ function typeToString(type, info) {
             i++;
         }
     }
-    if (info.message && typeof info.message === 'string') {
-        return `${name}: ${info.message}`;
+    if (info.message) {
+        if (typeof info.message === 'string') {
+            return `${name}: ${info.message}`;
+        }
+        else if (Array.isArray(info.message) && info.message[0]) {
+            info.message = info.message[0];
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (typeof info.message === 'object' && info.message != null && info.message.message) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            return `${name}: ${info.message.message}`;
+        }
     }
     return name + '.';
 }
