@@ -19,6 +19,16 @@ TODO: ecomm toolkit
 
 ## Features
 
+The `CommerceAPI` interface exposes these methods:
+
+* `getProduct` (by ID or slug)
+* `getProducts` (by IDs or keyword)
+* `getCategory` (by ID or slug)
+* `getCategoryTree` (category structure)
+* `getCustomerGroups` (customer segmentation)
+
+Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`.
+
 ## Quick Start
 
 ## Architecture Diagram
