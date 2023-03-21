@@ -87,7 +87,8 @@ export type Category = CommerceObject & {
 ### Variant
 Variants are versions of a product with unique sku, price and image.
 
-- SKU and prices must be defined, and appropriately localized.
+- ID should be uniquely identifying. Can be equal to SKU, if the platform doesn't have a separate ID.
+- SKU and prices must be defined, and appropriately localized. An empty string SKU is allowed, where the ID should be used as the identifier.
 - Attributes include any other generic data associated with the variant.
 - Ideally a variant should include images with public URL and thumb.
 
@@ -96,6 +97,7 @@ Variants are versions of a product with unique sku, price and image.
  * Variant identified by SKU, with price, images and attributes.
  */
 export type Variant = {
+    id:                 string
     sku:                string
     listPrice:          string
     salePrice:          string
