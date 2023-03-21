@@ -17,6 +17,7 @@ export declare const exampleProduct: (id: string) => {
         listPrice: string;
         salePrice: string;
         sku: string;
+        id: string;
     }[];
 };
 export declare const exampleCategoryTree: Category[];

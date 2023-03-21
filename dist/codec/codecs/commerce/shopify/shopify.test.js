@@ -102,7 +102,7 @@ describe('shopify integration', function () {
         // Test
         const products = yield codec.getProducts({
             category: {
-                id: 'gid://shopify/Collection/439038837024',
+                id: '439038837024',
                 slug: 'hydrogen',
                 name: 'Hydrogen',
                 image: null,

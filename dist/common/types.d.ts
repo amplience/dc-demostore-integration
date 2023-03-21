@@ -37,6 +37,7 @@ export declare type Product = CommerceObject & {
  * Variant identified by SKU, with price, images and attributes.
  */
 export declare type Variant = {
+    id: string;
     sku: string;
     listPrice: string;
     salePrice: string;

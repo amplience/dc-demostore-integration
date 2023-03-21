@@ -23,6 +23,7 @@ export declare const exampleProduct: (id: string) => {
         products: any[];
     }[];
     variants: {
+        id: string;
         sku: string;
         listPrice: string;
         salePrice: string;
@@ -57,6 +58,7 @@ export declare const exampleCategoryProducts: {
             products: any[];
         }[];
         variants: {
+            id: string;
             sku: string;
             listPrice: string;
             salePrice: string;
@@ -79,6 +81,7 @@ export declare const exampleProductsByKeyword: {
     slug: string;
     categories: any[];
     variants: {
+        id: string;
         sku: string;
         listPrice: string;
         salePrice: string;

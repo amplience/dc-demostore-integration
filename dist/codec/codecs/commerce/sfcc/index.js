@@ -107,6 +107,7 @@ const mapProduct = (product) => {
         longDescription: product.long_description,
         categories: [],
         variants: ((_a = product.variants) === null || _a === void 0 ? void 0 : _a.map((variant) => ({
+            id: variant.product_id,
             sku: variant.product_id,
             listPrice: (0, util_1.formatMoneyString)(variant.price, {
                 currency: product.currency
@@ -118,6 +119,7 @@ const mapProduct = (product) => {
             attributes: variant.variation_values
         }))) || [
             {
+                id: product.id,
                 sku: product.id,
                 listPrice: (0, util_1.formatMoneyString)(product.price, {
                     currency: product.currency

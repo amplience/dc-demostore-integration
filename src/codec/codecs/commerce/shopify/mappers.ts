@@ -89,7 +89,8 @@ export const mapVariant = (variant: ShopifyVariant, sharedImages: ShopifyImage[]
 	}
 	
 	return {
-		sku: firstNonEmpty([variant.sku, variant.id]),
+		id: extractID(variant.id),
+		sku: variant.sku,
 		listPrice: mapPrice(variant.price ?? variant.unitPrice),
 		salePrice: mapPrice(variant.compareAtPrice ?? variant.price ?? variant.unitPrice),
 		attributes: attributes,

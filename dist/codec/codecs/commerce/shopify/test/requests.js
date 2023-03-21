@@ -46,7 +46,7 @@ const productRequest = (id) => ({
         data: {
             query: queries_1.productById,
             variables: {
-                id
+                id: 'gid://shopify/Product/' + id
             }
         }
     },

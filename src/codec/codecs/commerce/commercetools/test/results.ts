@@ -66,6 +66,7 @@ export const exampleProduct = (id: string) => ({
 			listPrice: '$2.50',
 			salePrice: '$2.50',
 			sku: '0CAIS5',
+			id: '1'
 		},
 	],
 })

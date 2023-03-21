@@ -155,7 +155,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                 paginated.edges = paginated.edges.slice(0, pageSize);
                 return {
                     data: paginated.edges.map(edge => edge.node),
-                    nextCursor: paginated.edges.at(-1).cursor,
+                    nextCursor: paginated.edges[paginated.edges.length - 1].cursor,
                     hasNext: true
                 };
             }

@@ -41,5 +41,6 @@ export declare const exampleProduct: (id: string) => {
         listPrice: string;
         salePrice: string;
         sku: string;
+        id: string;
     }[];
 };

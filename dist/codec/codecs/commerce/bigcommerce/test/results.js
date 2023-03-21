@@ -70,6 +70,7 @@ const exampleProduct = (id) => ({
     categories: [],
     variants: [
         {
+            id: '67',
             sku: 'CC3C',
             listPrice: '$49.50',
             salePrice: '$0.00',

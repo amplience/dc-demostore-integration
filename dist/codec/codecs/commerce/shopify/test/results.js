@@ -3,25 +3,25 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.exampleProductsByKeyword = exports.exampleCategoryProducts = exports.exampleProduct = exports.exampleCategoryTree = exports.exampleCustomerGroups = void 0;
 exports.exampleCustomerGroups = [
     {
-        id: "gid://shopify/Segment/514502426912",
+        id: "514502426912",
         name: "Customers who haven't purchased"
     },
     {
-        id: "gid://shopify/Segment/514502459680",
+        id: "514502459680",
         name: "Customers who have purchased more than once"
     },
     {
-        id: "gid://shopify/Segment/514502492448",
+        id: "514502492448",
         name: "Abandoned checkouts in the last 30 days"
     },
     {
-        id: "gid://shopify/Segment/514502525216",
+        id: "514502525216",
         name: "Email subscribers"
     }
 ];
 exports.exampleCategoryTree = [
     {
-        "id": "gid://shopify/Collection/439038771488",
+        "id": "439038771488",
         "slug": "frontpage",
         "name": "Home page",
         "image": null,
@@ -29,7 +29,7 @@ exports.exampleCategoryTree = [
         "products": []
     },
     {
-        "id": "gid://shopify/Collection/439038804256",
+        "id": "439038804256",
         "slug": "automated-collection",
         "name": "Automated Collection",
         "image": null,
@@ -37,7 +37,7 @@ exports.exampleCategoryTree = [
         "products": []
     },
     {
-        "id": "gid://shopify/Collection/439038837024",
+        "id": "439038837024",
         "slug": "hydrogen",
         "name": "Hydrogen",
         "image": null,
@@ -51,7 +51,7 @@ const exampleProduct = (id) => ({
     "slug": "the-hidden-snowboard",
     "categories": [
         {
-            "id": "gid://shopify/Collection/439038804256",
+            "id": "439038804256",
             "slug": "automated-collection",
             "name": "Automated Collection",
             "image": null,
@@ -61,7 +61,8 @@ const exampleProduct = (id) => ({
     ],
     "variants": [
         {
-            "sku": "gid://shopify/ProductVariant/44723493437728",
+            "id": "44723493437728",
+            "sku": "",
             "listPrice": "£749.95",
             "salePrice": "£749.95",
             "attributes": {
@@ -69,7 +70,7 @@ const exampleProduct = (id) => ({
             },
             "images": [
                 {
-                    "id": "gid://shopify/ProductImage/40866728378656",
+                    "id": "40866728378656",
                     "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_c8ff0b5d-c712-429a-be00-b29bd55cbc9d.jpg?v=1678879296",
                     "altText": "Hidden Snowboard"
                 }
@@ -81,19 +82,19 @@ const exampleProduct = (id) => ({
 });
 exports.exampleProduct = exampleProduct;
 exports.exampleCategoryProducts = {
-    "id": "gid://shopify/Collection/439038837024",
+    "id": "439038837024",
     "slug": "hydrogen",
     "name": "Hydrogen",
     "image": null,
     "children": [],
     "products": [
         {
-            "id": "gid://shopify/Product/8170311581984",
+            "id": "8170311581984",
             "name": "The Collection Snowboard: Liquid",
             "slug": "the-collection-snowboard-liquid",
             "categories": [
                 {
-                    "id": "gid://shopify/Collection/439038804256",
+                    "id": "439038804256",
                     "slug": "automated-collection",
                     "name": "Automated Collection",
                     "image": null,
@@ -101,7 +102,7 @@ exports.exampleCategoryProducts = {
                     "products": []
                 },
                 {
-                    "id": "gid://shopify/Collection/439038837024",
+                    "id": "439038837024",
                     "slug": "hydrogen",
                     "name": "Hydrogen",
                     "image": null,
@@ -111,7 +112,8 @@ exports.exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493306656",
+                    "id": "44723493306656",
+                    "sku": "",
                     "listPrice": "£749.95",
                     "salePrice": "£749.95",
                     "attributes": {
@@ -119,7 +121,7 @@ exports.exampleCategoryProducts = {
                     },
                     "images": [
                         {
-                            "id": "gid://shopify/ProductImage/40866728280352",
+                            "id": "40866728280352",
                             "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_b13ad453-477c-4ed1-9b43-81f3345adfd6.jpg?v=1678879295",
                             "altText": "The Collection Snowboard: Liquid"
                         }
@@ -130,12 +132,12 @@ exports.exampleCategoryProducts = {
             "longDescription": "A snowboard that probably won't be solid for long."
         },
         {
-            "id": "gid://shopify/Product/8170311549216",
+            "id": "8170311549216",
             "name": "The Collection Snowboard: Oxygen",
             "slug": "the-collection-snowboard-oxygen",
             "categories": [
                 {
-                    "id": "gid://shopify/Collection/439038837024",
+                    "id": "439038837024",
                     "slug": "hydrogen",
                     "name": "Hydrogen",
                     "image": null,
@@ -145,7 +147,8 @@ exports.exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493241120",
+                    "id": "44723493241120",
+                    "sku": "",
                     "listPrice": "£1,025.00",
                     "salePrice": "£1,025.00",
                     "attributes": {
@@ -153,7 +156,7 @@ exports.exampleCategoryProducts = {
                     },
                     "images": [
                         {
-                            "id": "gid://shopify/ProductImage/40866728214816",
+                            "id": "40866728214816",
                             "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_d624f226-0a89-4fe1-b333-0d1548b43c06.jpg?v=1678879295",
                             "altText": "The Collection Snowboard: Oxygen"
                         }
@@ -164,12 +167,12 @@ exports.exampleCategoryProducts = {
             "longDescription": "A snowboard that is as light as air. Because it is air. It doesn't exist."
         },
         {
-            "id": "gid://shopify/Product/8170311516448",
+            "id": "8170311516448",
             "name": "The Collection Snowboard: Hydrogen",
             "slug": "the-collection-snowboard-hydrogen",
             "categories": [
                 {
-                    "id": "gid://shopify/Collection/439038804256",
+                    "id": "439038804256",
                     "slug": "automated-collection",
                     "name": "Automated Collection",
                     "image": null,
@@ -177,7 +180,7 @@ exports.exampleCategoryProducts = {
                     "products": []
                 },
                 {
-                    "id": "gid://shopify/Collection/439038837024",
+                    "id": "439038837024",
                     "slug": "hydrogen",
                     "name": "Hydrogen",
                     "image": null,
@@ -187,7 +190,8 @@ exports.exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493273888",
+                    "id": "44723493273888",
+                    "sku": "",
                     "listPrice": "£600.00",
                     "salePrice": "£600.00",
                     "attributes": {
@@ -195,7 +199,7 @@ exports.exampleCategoryProducts = {
                     },
                     "images": [
                         {
-                            "id": "gid://shopify/ProductImage/40866728247584",
+                            "id": "40866728247584",
                             "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main.jpg?v=1678879295",
                             "altText": "The Collection Snowboard: Hydrogen"
                         }
@@ -209,12 +213,13 @@ exports.exampleCategoryProducts = {
 };
 exports.exampleProductsByKeyword = [
     {
-        "id": "gid://shopify/Product/8170311418144",
+        "id": "8170311418144",
         "name": "The 3p Fulfilled Snowboard",
         "slug": "the-3p-fulfilled-snowboard",
         "categories": [],
         "variants": [
             {
+                "id": "44723492978976",
                 "sku": "sku-hosted-1",
                 "listPrice": "£2,629.95",
                 "salePrice": "£2,629.95",
@@ -223,7 +228,7 @@ exports.exampleProductsByKeyword = [
                 },
                 "images": [
                     {
-                        "id": "gid://shopify/ProductImage/40866728116512",
+                        "id": "40866728116512",
                         "url": "https://cdn.shopify.com/s/files/1/0732/0289/3088/products/Main_b9e0da7f-db89-4d41-83f0-7f417b02831d.jpg?v=1678879294",
                         "altText": "The Third-party fulfilled Snowboard"
                     }

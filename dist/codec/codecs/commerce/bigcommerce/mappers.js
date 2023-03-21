@@ -30,6 +30,7 @@ exports.mapCategory = mapCategory;
 const mapVariant = (variant, product) => {
     var _a;
     return {
+        id: `${variant.id}`,
         sku: `${variant.sku}`,
         listPrice: (0, util_1.formatMoneyString)(variant.calculated_price, { currency: 'USD' }),
         salePrice: (0, util_1.formatMoneyString)(variant.sale_price, { currency: 'USD' }),
@@ -51,6 +52,7 @@ exports.mapVariant = mapVariant;
 const mapVariantProduct = (product) => {
     var _a;
     return {
+        id: `${product.id}`,
         sku: `${product.sku}`,
         listPrice: (0, util_1.formatMoneyString)(product.calculated_price, { currency: 'USD' }),
         salePrice: (0, util_1.formatMoneyString)(product.sale_price, { currency: 'USD' }),

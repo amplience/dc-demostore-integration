@@ -60,7 +60,8 @@ export const exampleProduct = (id: string) => ({
     ],
     "variants": [
         {
-            "sku": "gid://shopify/ProductVariant/44723493437728",
+            "id": "44723493437728",
+            "sku": "",
             "listPrice": "£749.95",
             "salePrice": "£749.95",
             "attributes": {
@@ -110,7 +111,8 @@ export const exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493306656",
+                    "id": "44723493306656",
+                    "sku": "",
                     "listPrice": "£749.95",
                     "salePrice": "£749.95",
                     "attributes": {
@@ -144,7 +146,8 @@ export const exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493241120",
+                    "id": "44723493241120",
+                    "sku": "",
                     "listPrice": "£1,025.00",
                     "salePrice": "£1,025.00",
                     "attributes": {
@@ -186,7 +189,8 @@ export const exampleCategoryProducts = {
             ],
             "variants": [
                 {
-                    "sku": "gid://shopify/ProductVariant/44723493273888",
+                    "id": "44723493273888",
+                    "sku": "",
                     "listPrice": "£600.00",
                     "salePrice": "£600.00",
                     "attributes": {
@@ -215,6 +219,7 @@ export const exampleProductsByKeyword = [
         "categories": [],
         "variants": [
             {
+                "id": "44723492978976",
                 "sku": "sku-hosted-1",
                 "listPrice": "£2,629.95",
                 "salePrice": "£2,629.95",

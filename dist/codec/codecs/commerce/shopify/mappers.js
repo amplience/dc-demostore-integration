@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapCategory = exports.mapPrice = exports.firstNonEmpty = void 0;
+exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapImage = exports.mapCategory = exports.mapPrice = exports.firstNonEmpty = void 0;
 const util_1 = require("../../../../common/util");
 /**
  * Find the first non-empty (not null or length 0) string in a list of strings.
@@ -17,7 +17,11 @@ exports.firstNonEmpty = firstNonEmpty;
  * @returns Resource ID
  */
 const extractID = (id) => {
-    return id.split('/').at(-1);
+    if (id == null) {
+        return null;
+    }
+    const split = id.split('/');
+    return split[split.length - 1];
 };
 /**
  * Map a shopify price to the common price type.
@@ -45,6 +49,17 @@ const mapCategory = (collection) => {
 };
 exports.mapCategory = mapCategory;
 /**
+ * Map a shopify image to the common image type.
+ * @param image The shopify image
+ * @returns The common image
+ */
+const mapImage = (image) => ({
+    id: extractID(image.id),
+    url: image.url,
+    altText: image.altText
+});
+exports.mapImage = mapImage;
+/**
  * Map a shopify product variant to the common product variant type.
  * @param variant The shopify product variant
  * @param sharedImages Images shared between each variant
@@ -57,11 +72,12 @@ const mapVariant = (variant, sharedImages) => {
         attributes[option.name] = option.value;
     }
     return {
-        sku: (0, exports.firstNonEmpty)([variant.sku, extractID(variant.id)]),
+        id: extractID(variant.id),
+        sku: variant.sku,
         listPrice: (0, exports.mapPrice)((_a = variant.price) !== null && _a !== void 0 ? _a : variant.unitPrice),
         salePrice: (0, exports.mapPrice)((_c = (_b = variant.compareAtPrice) !== null && _b !== void 0 ? _b : variant.price) !== null && _c !== void 0 ? _c : variant.unitPrice),
         attributes: attributes,
-        images: [variant.image, ...sharedImages]
+        images: [variant.image, ...sharedImages].map(exports.mapImage)
     };
 };
 exports.mapVariant = mapVariant;

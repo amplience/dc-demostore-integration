@@ -27,6 +27,7 @@ export const mapCategory = (category: BigCommerceCategory): Category => {
  */
 export const mapVariant = (variant: BigCommerceVariant, product: BigCommerceProduct): Variant => {
 	return {
+		id: `${variant.id}`,
 		sku: `${variant.sku}`,
 		listPrice: formatMoneyString(variant.calculated_price, { currency: 'USD' }),
 		salePrice: formatMoneyString(variant.sale_price, { currency: 'USD' }),
@@ -47,6 +48,7 @@ export const mapVariant = (variant: BigCommerceVariant, product: BigCommerceProd
  */
 export const mapVariantProduct = (product: BigCommerceProduct): Variant => {
 	return {
+		id: `${product.id}`,
 		sku: `${product.sku}`,
 		listPrice: formatMoneyString(product.calculated_price, { currency: 'USD' }),
 		salePrice: formatMoneyString(product.sale_price, { currency: 'USD' }),

@@ -26,6 +26,7 @@ export const exampleProduct = (id: string) => ({
 			listPrice: '£69.76',
 			salePrice: '£69.76',
 			sku: 'variant1M',
+			id: 'variant1M'
 		},
 		{
 			attributes: {
@@ -43,6 +44,7 @@ export const exampleProduct = (id: string) => ({
 			listPrice: '£69.76',
 			salePrice: '£69.76',
 			sku: 'variant2M',
+			id: 'variant2M'
 		},
 		{
 			attributes: {
@@ -60,6 +62,7 @@ export const exampleProduct = (id: string) => ({
 			listPrice: '£69.76',
 			salePrice: '£69.76',
 			sku: 'variant3M',
+			id: 'variant3M'
 		},
 	],
 })

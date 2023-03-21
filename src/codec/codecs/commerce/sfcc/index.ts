@@ -126,6 +126,7 @@ const mapProduct = (product: SFCCProduct | null): Product => {
 		longDescription: product.long_description,
 		categories: [],
 		variants: product.variants?.map((variant) => ({
+			id: variant.product_id,
 			sku: variant.product_id,
 			listPrice: formatMoneyString(variant.price, {
 				currency: product.currency
@@ -137,6 +138,7 @@ const mapProduct = (product: SFCCProduct | null): Product => {
 			attributes: variant.variation_values
 		})) || [
 			{
+				id: product.id,
 				sku: product.id,
 				listPrice: formatMoneyString(product.price, {
 					currency: product.currency

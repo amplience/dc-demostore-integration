@@ -140,6 +140,7 @@ const mapProduct = (args) => (product) => {
  */
 const mapVariant = (args) => (variant) => {
     return {
+        id: `${variant.id}`,
         sku: variant.sku,
         images: variant.images,
         listPrice: findPrice(variant, args),

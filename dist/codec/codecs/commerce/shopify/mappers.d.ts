@@ -1,4 +1,4 @@
-import { Category, CustomerGroup, Product, Variant } from '../../../../common/types';
+import { Category, CustomerGroup, Product, Variant, Image } from '../../../../common/types';
 import { ShopifyCollection, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from './types';
 /**
  * Find the first non-empty (not null or length 0) string in a list of strings.
@@ -18,6 +18,12 @@ export declare const mapPrice: (price: ShopifyPrice) => string;
  * @returns The common category
  */
 export declare const mapCategory: (collection: ShopifyCollection) => Category;
+/**
+ * Map a shopify image to the common image type.
+ * @param image The shopify image
+ * @returns The common image
+ */
+export declare const mapImage: (image: ShopifyImage) => Image;
 /**
  * Map a shopify product variant to the common product variant type.
  * @param variant The shopify product variant

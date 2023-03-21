@@ -17,6 +17,7 @@ export declare const exampleProduct: (id: string) => {
     name: string;
     categories: any[];
     variants: {
+        id: string;
         sku: string;
         listPrice: string;
         salePrice: string;
