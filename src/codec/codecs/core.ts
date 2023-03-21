@@ -247,7 +247,11 @@ export class CommerceCodec implements CommerceAPI {
 		await this.ensureMegaMenu()
 
 		const category = this.findCategory(args.slug)
-		category.products = await this.getProducts({ ...args, category })
+
+		if (category != null) {
+			category.products = await this.getProducts({ ...args, category })
+		}
+
 		return category
 	}
 

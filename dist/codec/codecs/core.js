@@ -211,7 +211,9 @@ class CommerceCodec {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.ensureMegaMenu();
             const category = this.findCategory(args.slug);
-            category.products = yield this.getProducts(Object.assign(Object.assign({}, args), { category }));
+            if (category != null) {
+                category.products = yield this.getProducts(Object.assign(Object.assign({}, args), { category }));
+            }
             return category;
         });
     }
