@@ -30,7 +30,7 @@ Scopes:
 - `Categories`
 - `Customer groups`
 - `Product Selections`
-- `Prodcuts (published)`
+- `Products (published)`
 
 ![](../media/commercetoolsA.png)
 

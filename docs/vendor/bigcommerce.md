@@ -34,7 +34,7 @@ You can capture the store hash that is part of the API path: `https://api.bigcom
 ![](../media/bigcommerceB.png)
 
 Select the required scopes:
-- `Prodcuts`
+- `Products`
 - `Customers`
 
 ![](../media/bigcommerceC.png)
