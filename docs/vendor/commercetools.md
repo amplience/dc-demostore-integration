@@ -25,6 +25,15 @@ Connects to a commercetools instance.
 
 ## Configuration on the vendor side
 
-### White list domain for API access
+Scopes:
 
-### Access needed
+- `Categories`
+- `Customer groups`
+- `Product Selections`
+- `Prodcuts (published)`
+
+![](../media/commercetoolsA.png)
+
+Credentials:
+
+![](../media/commercetoolsB.png)

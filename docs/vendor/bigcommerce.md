@@ -22,6 +22,25 @@ Connects to a BigCommerce instance.
 
 ## Configuration on the vendor side
 
-### White list domain for API access
+### Create Store-level API account
 
-### Access needed
+Go to `Settings > Store-level API Tokens` and create API Account.
+
+![](../media/bigcommerceA.png)
+
+Select the account type V3 API token.
+You can capture the store hash that is part of the API path: `https://api.bigcommerce.com/stores/<store hash>/v3/`
+
+![](../media/bigcommerceB.png)
+
+Select the required scopes:
+- `Prodcuts`
+- `Customers`
+
+![](../media/bigcommerceC.png)
+
+### Get API credentials
+
+Your credentials can now be accessed (one time), you will need the API URL (`https://api.bigcommerce.com`), the API token and the store hash captured previously.
+
+![](../media/bigcommerceD.png)
