@@ -12,14 +12,14 @@ Connects to a SalesForce Commerce Cloud instance.
 
 ```json
 {
-	"vendor": "sfcc",
-	"codec_params": {
-		"api_url": "<sfcc api url>",
-		"auth_url": "<sfcc auth url>",
-		"site_id": "<sfcc site id>",
-		"client_id": "<sfcc client id>",
-		"client_secret": "<sfcc site secret>"
-	}
+   "vendor": "sfcc",
+   "codec_params": {
+      "api_url": "<sfcc api url>",
+      "auth_url": "<sfcc auth url>",
+      "site_id": "<sfcc site id>",
+      "client_id": "<sfcc client id>",
+      "client_secret": "<sfcc site secret>"
+   }
 }
 ```
 
@@ -37,67 +37,67 @@ As such, you'll need to edit the OCAPI settings, which can me found in Business 
 
 ```
 {
-	"_v": "21.3",
-	"clients": [
+   "_v": "21.3",
+   "clients": [
         {
-			"client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			"allowed_origins": [
-				"https://your.urlhere.com"
-			],
-			"resources": [
-				{
-					"resource_id": "/customers/*",
-					"methods": [
-						"get",
-						"patch"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)"
-				},
-				{
-					"resource_id": "/customers/auth",
-					"methods": [
-						"post",
-						"delete"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)"
-				},
-				{
-					"methods": [
-						"get"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/product_search"
-				},
-				{
-					"methods": [
-						"get"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/products/{id}"
-				},
+         "client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+         "allowed_origins": [
+            "https://your.urlhere.com"
+         ],
+         "resources": [
+            {
+               "resource_id": "/customers/*",
+               "methods": [
+                  "get",
+                  "patch"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)"
+            },
+            {
+               "resource_id": "/customers/auth",
+               "methods": [
+                  "post",
+                  "delete"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)"
+            },
+            {
+               "methods": [
+                  "get"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)",
+               "resource_id": "/product_search"
+            },
+            {
+               "methods": [
+                  "get"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)",
+               "resource_id": "/products/{id}"
+            },
                 {
-					"methods": [
-						"get"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/products/{id}/*"
-				},
+               "methods": [
+                  "get"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)",
+               "resource_id": "/products/{id}/*"
+            },
 
-				{
-					"methods": [
-						"get"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/categories/{id}"
-				}
-			]
-		}
+            {
+               "methods": [
+                  "get"
+               ],
+               "read_attributes": "(**)",
+               "write_attributes": "(**)",
+               "resource_id": "/categories/{id}"
+            }
+         ]
+      }
     ]
 }
 ```
