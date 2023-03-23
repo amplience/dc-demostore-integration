@@ -12,13 +12,13 @@ Connects to a Shopify instance.
 
 ```json
 {
-   "vendor": "shopify",
-   "codec_params": {
-      "access_token": "<storefront access token>",
-      "admin_access_token": "<admin access token>",
-      "version": "<api version, eg. 2023-01>",
-      "site_id": "<shopify site id>"
-   }
+	"vendor": "shopify",
+	"codec_params": {
+		"access_token": "<storefront access token>",
+		"admin_access_token": "<admin access token>",
+		"version": "<api version, eg. 2023-01>",
+		"site_id": "<shopify site id>"
+	}
 }
 ```
 
@@ -54,12 +54,11 @@ Now that you app has been created, you need to configure BOTH Admin & Storefront
 
 ![](../media/shopifyC.png)
 
-In each of those pages, select everything you want access to in each API. IN the screenshots, we've just selected the read access points, but you may want to add write access should you choose to update or add to any of the shopify methods already provided. More info on that [here](../dev/add-integration.md) and [here](../dev/modify-integration.md)
+In each of those pages, select everything you want access to in each API. IN the screenshots, we've just selected the read access points we need for our methods, but you may want to add write access should you choose to update or add to any of the shopify methods already provided. More info on that [here](../dev/add-integration.md) and [here](../dev/modify-integration.md)
 
 > Note! The Webhook version highlight in the Admin API integration screenshot is the `version` for your codec config at the top the page.
 
 ![](../media/shopifyD.png)
-![](../media/shopifyE.png)
 
 ### Get access tokens
 
