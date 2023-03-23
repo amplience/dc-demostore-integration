@@ -25,15 +25,18 @@ Connects to a commercetools instance.
 
 ## Configuration on the vendor side
 
-Scopes:
-
-- `Categories`
-- `Customer groups`
-- `Product Selections`
-- `Products (published)`
+You can create new API credentials in the `Settings > Developer settings` and then go to `Create new API client`.
 
 ![](../media/commercetoolsA.png)
 
-Credentials:
+Next you can select the required scopes:
+
+- `Categories`
+- `Customer groups`
+- `Products (published)`
 
 ![](../media/commercetoolsB.png)
+
+You can then access the credentials (one time) with all the required properties:
+
+![](../media/commercetoolsC.png)
