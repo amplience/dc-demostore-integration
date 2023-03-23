@@ -45,7 +45,7 @@ Concrete implementations of this interface are referred to as `Codec`s and are l
 -   [Shopify](./docs/vendor/shopify.md)
 -   [BigCommerce](./docs/vendor/bigcommerce.md)
 -   [CommerceTools](./docs/vendor/commercetools.md)
--   [Files](./docs/vendor/rest.md)
+-   [REST](./docs/vendor/rest.md)
 
 ## Development
 
