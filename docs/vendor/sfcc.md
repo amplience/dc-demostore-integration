@@ -35,7 +35,7 @@ As such, you'll need to edit the OCAPI settings, which can me found in Business 
 
 > NOTE: The OCAPI endpoints in the following `resources` array covers the methods currently implemented by dc-demostore-integration. Additional methods may require adding additional resources in the OCAPI settings.
 
-```
+```json
 {
    "_v": "21.3",
    "clients": [
