@@ -26,7 +26,7 @@ Connects to a Shopify instance.
 
 The Shopify integration requires both a storefront and an admin token, therefore you'll need to enable custom app development on your store, create a custom app **_and_** install the app in the store to generate those tokens. The steps are as follows
 
-### 1) Enable Custom Apps
+### Enable Custom Apps
 
 In the Settings for your store, click "Apps and sales channels", then click "Develop Apps" (highlighted below)
 
@@ -39,6 +39,8 @@ On the next screen, click "Allow custom app development"
 Finally, click "Allow custom app development" in that last screen.
 
 ![](../media/shopifyEnableDevApp3.png)
+
+### Create a custom app
 
 once you've done that, you'll be back on the "Apps and sales channels" settings page. Go aheand and click "Create an app"
 
@@ -58,6 +60,8 @@ In each of those pages, select everything you want access to in each API. IN the
 
 ![](../media/shopifyD.png)
 ![](../media/shopifyE.png)
+
+### Get access tokens
 
 At this point, if you go to the API Credentials Tab, you'll see that you already have an API key and secret, however we really need to tokens, so you'll need to install the app..
 
