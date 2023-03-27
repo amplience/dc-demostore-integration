@@ -1,10 +1,10 @@
 # Unit testing guidelines
 
-This project uses unit testing to ensure correct functionality of codecs and other classes. You can run `npm run test` to run the entire test suite. Consider using a plugin for your IDE that allows you to quickly run specific ject test groups with a debugger attached, as it will greatly speed up development.
+This project uses unit testing to ensure correct functionality of codecs and other classes. You can run `npm run test` to run the entire test suite. Consider using a plugin for your IDE that allows you to quickly run specific jest test groups with a debugger attached, as it will greatly speed up development.
 
 ## Codecs
 
-Codec unit testing is primarily done by mocking `axios` client responses, as all codec implementations should be using them, and real API responses can be used as the testing data. Codec tests are mandatory for being included in the project, and need to cover any edge cases that come up.
+Codec unit testing is primarily done by mocking `axios` client responses, as all codec implementations should be using axios, and real API responses can be used as the testing data. Codec tests are mandatory for being included in the project, and need to cover any edge cases that come up.
 
 ### dc-integration-tester and responses for unit testing
 
@@ -28,8 +28,7 @@ All codecs should have the following tests:
 - `getProduct`
   - Get a single product by ID.
 - `getProducts` (multiple)
-  - Get multiple products by ID. Returned data must be in the same order as the request.
-  - TODO: error on missing, return undefined, or flatten IDs that were returned?
+  - Get multiple products by ID. Returned data must be in the same order as the request, missing products come back as undefined.
 - `getProducts` (keyword)
   - Get multiple products by keyword.
   - Should fetch more than one page of products to test pagination.
@@ -37,13 +36,11 @@ All codecs should have the following tests:
   - Get multiple products by category.
   - Should fetch more than one page of products to test pagination.
 - `getProduct` (missing)
-  - Get a single product by ID, but the service doesn't find a match.
-  - TODO: error or return undefined?
+  - Get a single product by ID, but the service doesn't find a match. Should return undefined.
 - `getRawProducts`
-  - Get a single product by ID, without any conversion from the source format.
+  - Get a single product by ID, without any conversion from the source format. Same quirks as `getProduct`.
 - `getCategory`
-  - Get a category by slug.
-  - TODO: should get products in category? 
+  - Get a category by slug. Should fully hydrate `products` array.
 - `getCategoryTree`
   - Get a list of root level categories.
   - Sub-categories should be contained in children as a tree, should not appear at root level.
