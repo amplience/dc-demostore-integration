@@ -1,4 +1,4 @@
-# SalesForce Commerce Cloud
+# Salesforce Commerce Cloud
 
 ## `sfccCodec`
 
@@ -6,7 +6,7 @@ Location: `src/codec/codecs/sfcc`
 
 Schema: `https://demostore.amplience.com/site/integration/sfcc`
 
-Connects to a SalesForce Commerce Cloud instance.
+Connects to a Salesforce Commerce Cloud instance.
 
 ### Configuration
 
