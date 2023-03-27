@@ -139,7 +139,7 @@ Get a single product by ID. This method calls getProducts internally.
 
 ##### Edge Cases
 - Product does not exist:
-  - It will receive undefined from getProducts, not sure if we should throw when we see it though.
+  - It will receive undefined from getProducts, this will pass undefined as a result.
 
 #### `getProducts` (multiple)
 Get multiple products by ID. Returned data must be in the same order as the request.
@@ -189,7 +189,7 @@ Sub-categories should be contained in children as a tree, should not appear at r
 Get a list of customer groups.
 
 ##### Edge Cases
-- (none should just return [])
+- When no customer groups are present, it should just return [].
 
 ### Special edge cases
 - API error: 
