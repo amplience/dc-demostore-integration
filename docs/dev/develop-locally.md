@@ -1,7 +1,15 @@
 # Develop locally
 
+Developing for `dc-demostore-integration` is as easy as forking the repository, cloning it locally, and then committing and making a pull request back to the main project. 
+
+For help with specific aspects of development, see the following documents:
+
+- [Add an Integration](./add-integration.md)
+- [Modify an Integration](./modify-integration.md)
+- [Unit Testing](./unit-testing.md)
 
 ## Testing new integrations and changes
+
 As `dc-demostore-integration` is just a library, there isn't anything in this project that you can use to manually call and test the methods that you've implemented. For this purpose, we've created a tool called [`dc-integration-tester`](https://github.com/amplience/dc-integration-tester), which imports the `dc-demostore-integration` project and provides a command line interface for each of the codec methods you implement in this project.
 
 By default, the `dc-integration-tester` project will pull a version of `dc-demostore-integration` from Github. You can make it pull your development version by running `npm i <relative directory to dc-demostore-integration>`, which will allow you to test any changes you make to the integration library.
