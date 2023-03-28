@@ -8,6 +8,7 @@ Please consider these guidelines when filing a pull request:
 *  Tab indentation.
 *  Features and bug fixes should be covered by test cases.
 *  Follow styling from eslint config. The easiest way to do this is by using an eslint highlighting plugin.
+*  JSDoc comments for all methods.
 
 Pull Requests will be reviewed by internal Amplience team members. Generally, these are merged after two approvals.
 
