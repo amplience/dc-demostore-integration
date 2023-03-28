@@ -10,6 +10,60 @@ Codec unit testing is primarily done by mocking `axios` client responses, as all
 
 If you've written a codec already, then you can check the requests being made and the responses you're getting back with the `dc-integration-tester`, a tool to let you run methods on your integration codec. Run it with the environment variable `LOG_INTEGRATION` set to `1`, and each request the codec makes will be logged, along with the response. You should pipe stdout to a file so that it's easier to search through the requests and responses. You can do that by adding `>> file.txt` to the end of the command.
 
+You can store all your configurations in the file `<home>/.amplience/integrations.json` and quickly test using `dc-integration-tester` against any of the config:
+
+```json
+{
+	"commercetools": {
+		"vendor": "commercetools",
+		"codec_params": {
+			"project": "anyafinn",
+			"client_id": "<client id>",
+			"client_secret": "<client secret>",
+			"auth_url": "<auth url>",
+			"api_url": "<api url>",
+			"scope": "view_categories:anyafinn view_customer_groups:anyafinn view_published_products:anyafinn"
+		}
+	},
+	"sfcc": {
+		"vendor": "sfcc",
+		"codec_params": {
+			"api_url": "<api url>",
+			"auth_url": "<api url>",
+			"client_id": "<client id>",
+			"client_secret": "<client secret>",
+			"site_id": "<site id>"
+		}
+	},
+	"bigcommerce": {
+		"vendor": "bigcommerce",
+		"codec_params": {
+			"api_url": "https://api.bigcommerce.com",
+			"api_token": "<api token>",
+			"store_hash": "<store hash>"
+		}
+	},
+	"rest": {
+		"vendor": "rest",
+		"codec_params": {
+			"productURL": "<productURL>",
+			"categoryURL": "<categoryURL>",
+			"customerGroupURL": "<customerGroupURL>",
+			"translationsURL": "<translationsURL>"
+		}
+	},
+	"shopify": {
+		"vendor": "shopify",
+		"codec_params": {
+			"access_token": "<storefront access token>",
+            "admin_access_token": "<admin access token>",
+			"version": "2023-01",
+			"site_id": "<site id>"
+		}
+	}
+}
+```
+
 You can also get responses by querying the API manually, which is useful if you're focusing on tests before implementation.
 
 ![](../media/dc-integration-tester.png)
