@@ -7,7 +7,7 @@ Amplience Demo Store Integration is a service written in Node.js that is intende
 dc-demostore-integration uses codecs in order to determine how and where to get data from. It currently supports getting e-commerce data from:
 
 -   Commercetools
--   Big Commerce
+-   BigCommerce
 -   Shopify
 -   Salesforce Commerce Cloud
 -   REST
