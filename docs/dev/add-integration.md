@@ -4,7 +4,7 @@
 
 Commerce Codecs are focused on accessing commerce focused entities, such as products, categories and customer groups. Currently, they are the only codec type supported by this project, though that may change in the future.
 
-You can find a detailed description of all types and methods shared by Commerce Codecs [here.](./commerce-codec.md) You should reference this closely when implementing the commerce codec methods for your vendor.
+You can find a detailed description of all types and methods shared by Commerce Codecs [here](./commerce-codec.md). You should reference this closely when implementing the commerce codec methods for your vendor.
 
 ### Template Codec
 There is a [template commerce codec](../../src/codec/codecs/commerce/template.ts) that can be used as a starting point when making a new commerce codec. Copy this file into a new folder for your codec (with name `<vendor>/`) and rename it to `index.ts`. You can then begin implementing each commerce codec method.

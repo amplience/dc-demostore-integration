@@ -15,15 +15,15 @@ Some types also have a `slug`, such as categories. This is typically present whe
  * Base resource type with identifiable ID and Name.
  */
 export type Identifiable = {
-	id: string
-	name: string
+    id: string
+    name: string
 }
 
 /**
  * Commerce Object with a slug
  */
 export type CommerceObject = Identifiable & {
-	slug: string
+    slug: string
 }
 ```
 
@@ -37,8 +37,8 @@ Generally, we just want to return all existing group ids and names, so that they
  * Customer Group
  */
 export type CustomerGroup = Identifiable & {
-	// id: string (from Identifiable)
-	// name: string (from Identifiable)
+    // id: string (from Identifiable)
+    // name: string (from Identifiable)
 }
 ```
 
@@ -54,14 +54,14 @@ export type CustomerGroup = Identifiable & {
  * Product with descriptions, images, categories and variants.
  */
 export type Product = CommerceObject & {
-	// id: string (from Identifiable)
-	// name: string (from Identifiable)
-	// slug: string (from CommerceObject)
-	shortDescription?: string
-	longDescription?: string
-	imageSetId?: string
-	categories: Category[]
-	variants: Variant[]
+    // id: string (from Identifiable)
+    // name: string (from Identifiable)
+    // slug: string (from CommerceObject)
+    shortDescription?: string
+    longDescription?: string
+    imageSetId?: string
+    categories: Category[]
+    variants: Variant[]
 }
 ```
 
@@ -77,13 +77,13 @@ Represents a category of products, with identifiers, an image, tree structure (p
  * Category with images, products, children and a parent.
  */
 export type Category = CommerceObject & {
-	// id: string (from Identifiable)
-	// name: string (from Identifiable)
-	// slug: string (from CommerceObject)
-	parent?: Category
-	image?: Image
-	children: Category[]
-	products: Product[]
+    // id: string (from Identifiable)
+    // name: string (from Identifiable)
+    // slug: string (from CommerceObject)
+    parent?: Category
+    image?: Image
+    children: Category[]
+    products: Product[]
 }
 ```
 
@@ -101,21 +101,21 @@ Variants are versions of a product with unique sku, price and image.
  * Variant identified by SKU, with price, images and attributes.
  */
 export type Variant = {
-	id: string
-	sku: string
-	listPrice: string
-	salePrice: string
-	defaultImage?: Image
-	images: Image[]
-	attributes: Dictionary<string>
+    id: string
+    sku: string
+    listPrice: string
+    salePrice: string
+    defaultImage?: Image
+    images: Image[]
+    attributes: Dictionary<string>
 }
 
 /**
  * Simple image type with an URL and thumbnail URL.
  */
 export type Image = {
-	url: string
-	thumb?: string
+    url: string
+    thumb?: string
 }
 ```
 
@@ -128,12 +128,12 @@ Promotions are currently not used.
  * Promotion with description, code, an image and activity status.
  */
 export type Promotion = Identifiable & {
-	// id: string (from Identifiable)
-	// name: string (from Identifiable)
-	description: string
-	promoCode?: string
-	isActive: boolean
-	image?: Image
+    // id: string (from Identifiable)
+    // name: string (from Identifiable)
+    description: string
+    promoCode?: string
+    isActive: boolean
+    image?: Image
 }
 ```
 

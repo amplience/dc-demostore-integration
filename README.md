@@ -30,6 +30,7 @@ The `CommerceAPI` interface exposes these methods:
 -   `getCustomerGroups` (customer segmentation)
 
 Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`. Platform-specific e-commerce implementations are found in `src/codec/codecs/commerce`.
+You can find types and methods [here](./commerce-codec.md).
 
 There is a separate project called `dc-integration-tester` which provides a CLI for testing
 
