@@ -19,10 +19,6 @@ This extension was developed and tested with:
 -   Node version `14.x`
 -   NPM version `6.x`
 
-## How to use ths service
-
-Our [E-comm Tooklkit extension](https://github.com/amplience/dc-extension-ecomm-toolkit) is built using dc-demostore-integration as a middleware in Next.js.
-
 ## Features
 
 The `CommerceAPI` interface exposes these methods:
@@ -39,7 +35,47 @@ There is a separate project called `dc-integration-tester` which provides a CLI 
 
 There are also [Unit Tests](./docs/dev/unit-testing.md) for each method and vendor.
 
+## How to use the service
+
+As an example you can check our [eComm Toolkit extension](https://github.com/amplience/dc-extension-ecomm-toolkit) is built using dc-demostore-integration as a middleware in Next.js.
+
 ## Quick Start
+
+Using the `config` object for one of the commerce vendors, you can get the Commerce API:
+
+```typescript
+const commerceApi = await getCommerceAPI(config)
+```
+
+From there you can use any of the commerce methods:
+
+```typescript
+// Getting the category tree
+const categoryTree: Category[] = await commerceApi.getCategoryTree({})
+
+// Getting customer groups
+const customerGroups: CustomerGroup[] = await commerceApi.getCustomerGroups({})
+
+// Getting products by ids
+const products: Product[] = await commerceApi.getProducts({
+    productIds: ids
+})
+
+// Getting products by keyword
+const products: Product[] = await commerceApi.getProducts({
+    keyword: keywordInput.current.value
+})
+
+// Getting a category by slug
+const category: Category = await commerceApi.getCategory({
+    slug: catSlug
+})
+
+// Getting a product by id
+const product: Product = await commerceApi.getProduct({
+    id: productId
+})
+```
 
 ## Architecture Diagram
 
