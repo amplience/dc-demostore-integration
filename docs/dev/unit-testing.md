@@ -14,53 +14,53 @@ You can store all your configurations in the file `<home>/.amplience/integration
 
 ```json
 {
-	"commercetools": {
-		"vendor": "commercetools",
-		"codec_params": {
-			"project": "anyafinn",
-			"client_id": "<client id>",
-			"client_secret": "<client secret>",
-			"auth_url": "<auth url>",
-			"api_url": "<api url>",
-			"scope": "view_categories:anyafinn view_customer_groups:anyafinn view_published_products:anyafinn"
-		}
-	},
-	"sfcc": {
-		"vendor": "sfcc",
-		"codec_params": {
-			"api_url": "<api url>",
-			"auth_url": "<api url>",
-			"client_id": "<client id>",
-			"client_secret": "<client secret>",
-			"site_id": "<site id>"
-		}
-	},
-	"bigcommerce": {
-		"vendor": "bigcommerce",
-		"codec_params": {
-			"api_url": "https://api.bigcommerce.com",
-			"api_token": "<api token>",
-			"store_hash": "<store hash>"
-		}
-	},
-	"rest": {
-		"vendor": "rest",
-		"codec_params": {
-			"productURL": "<productURL>",
-			"categoryURL": "<categoryURL>",
-			"customerGroupURL": "<customerGroupURL>",
-			"translationsURL": "<translationsURL>"
-		}
-	},
-	"shopify": {
-		"vendor": "shopify",
-		"codec_params": {
-			"access_token": "<storefront access token>",
-            "admin_access_token": "<admin access token>",
-			"version": "2023-01",
-			"site_id": "<site id>"
-		}
-	}
+ . "commercetools": {
+ .  . "vendor": "commercetools",
+ .  . "codec_params": {
+ .  .  . "project": "anyafinn",
+ .  .  . "client_id": "<client id>",
+ .  .  . "client_secret": "<client secret>",
+ .  .  . "auth_url": "<auth url>",
+ .  .  . "api_url": "<api url>",
+ .  .  . "scope": "view_categories:anyafinn view_customer_groups:anyafinn view_published_products:anyafinn"
+ .  . }
+ . },
+ . "sfcc": {
+ .  . "vendor": "sfcc",
+ .  . "codec_params": {
+ .  .  . "api_url": "<api url>",
+ .  .  . "auth_url": "<api url>",
+ .  .  . "client_id": "<client id>",
+ .  .  . "client_secret": "<client secret>",
+ .  .  . "site_id": "<site id>"
+ .  . }
+ . },
+ . "bigcommerce": {
+ .  . "vendor": "bigcommerce",
+ .  . "codec_params": {
+ .  .  . "api_url": "https://api.bigcommerce.com",
+ .  .  . "api_token": "<api token>",
+ .  .  . "store_hash": "<store hash>"
+ .  . }
+ . },
+ . "rest": {
+ .  . "vendor": "rest",
+ .  . "codec_params": {
+ .  .  . "productURL": "<productURL>",
+ .  .  . "categoryURL": "<categoryURL>",
+ .  .  . "customerGroupURL": "<customerGroupURL>",
+ .  .  . "translationsURL": "<translationsURL>"
+ .  . }
+ . },
+ . "shopify": {
+ .  . "vendor": "shopify",
+ .  . "codec_params": {
+ .  .  . "access_token": "<storefront access token>",
+         "admin_access_token": "<admin access token>",
+ .  .  . "version": "2023-01",
+ .  .  . "site_id": "<site id>"
+ .  . }
+ . }
 }
 ```
 
