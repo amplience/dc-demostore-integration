@@ -56,7 +56,7 @@ export class BigCommerceCommerceCodecType extends CommerceCodecType {
 }
 
 /**
- * ommerce Codec that integrates with BigCommerce.
+ * Commerce Codec that integrates with BigCommerce.
  */
 export class BigCommerceCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>

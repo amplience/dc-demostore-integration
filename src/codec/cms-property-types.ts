@@ -57,6 +57,6 @@ export type ArrayProperty = Property & {
  * Common string validation patterns.
  */
 export const StringPatterns = {
-	anyUrl: ".+://.+",
-	httpUrl: "https?://.+"
+	anyUrl: '.+://.+',
+	httpUrl: 'https?://.+'
 }

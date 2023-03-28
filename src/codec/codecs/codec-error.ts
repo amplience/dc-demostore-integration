@@ -46,7 +46,7 @@ export interface CodecGenericErrorInfo {
  * @returns True if uppercase, false otherwise
  */
 const isUpper = (char: string): boolean => {
-	return char.toLowerCase() !== char;
+	return char.toLowerCase() !== char
 }
 
 /**
