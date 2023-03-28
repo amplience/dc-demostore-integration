@@ -9,7 +9,19 @@ You can find a detailed description of all types and methods shared by Commerce 
 ### Template Codec
 There is a [template commerce codec](../../src/codec/codecs/commerce/template.ts) that can be used as a starting point when making a new commerce codec. Copy this file into a new folder for your codec (with name `<vendor>/`) and rename it to `index.ts`. You can then begin implementing each commerce codec method.
 
-The template codec is very similar to the existing codecs for various vendors, so you can look at those for an example of how shared methods are used to query an API with OAuth, or how pagination should be handled.
+There are two components to a codec - its codec type, which describes how it is registered and found by users, and the codec itself. Each codec should have its own version of both, with unique names.
+
+The most important thing you should change is the vendor string that the codec type returns:
+```
+	get vendor(): string {
+		return 'template'
+	}
+```
+This will let users find your integration. `get properties()` describes what properties should be present in the vendor-specific config in JSON schema format.
+
+Alongside the methods in the template, it's important to implement `cacheCategoryTree` as it is required to fetch any category or the category tree. This method should fetch all categories for the given credentials in a tree structure.
+
+The template codec is very similar to the existing codecs for various vendors, so you can look at those for an example of how methods are implemented, how shared methods are used to query an API with OAuth, or how pagination should be handled.
 
 ### Useful Methods
 The existing Commerce Codecs share a bunch of helper methods that make it a lot easier to do common tasks, such as OAuth authentication. Here's a list of the ones you should be aware of:
