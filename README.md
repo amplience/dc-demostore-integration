@@ -79,6 +79,8 @@ const product: Product = await commerceApi.getProduct({
 
 ## Architecture Diagram
 
+![](./docs/media/architecture.png)
+
 ## Vendor specific information
 
 -   [Saleforce Commerce Cloud](./docs/vendor/sfcc.md)
