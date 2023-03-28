@@ -12,6 +12,8 @@ If you've written a codec already, then you can check the requests being made an
 
 You can also get responses by querying the API manually, which is useful if you're focusing on tests before implementation.
 
+![](../media/dc-integration-tester.png)
+
 ### Requests, responses, results and config
 
 To keep tests organised, API requests and responses, expected method results and codec config are always found in their own files in a `test/` folder.
