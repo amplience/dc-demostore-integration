@@ -10,7 +10,7 @@ Codec unit testing is primarily done by mocking `axios` client responses, as all
 
 If you've written a codec already, then you can check the requests being made and the responses you're getting back with the `dc-integration-tester`, a tool to let you run methods on your integration codec. Run it with the environment variable `LOG_INTEGRATION` set to `1`, and each request the codec makes will be logged, along with the response. You should pipe stdout to a file so that it's easier to search through the requests and responses. You can do that by adding `>> file.txt` to the end of the command.
 
-You can store all your configurations in the file `<home>/.amplience/integrations.json` and quickly test using `dc-integration-tester` against any of the config:
+You can store all your configurations in the file `<home>/.amplience/integrations.json` and quickly test using `dc-integration-tester` against any of the config. The format for existing commerce codecs is as follows:
 
 ```json
 {
@@ -64,9 +64,9 @@ You can store all your configurations in the file `<home>/.amplience/integration
 }
 ```
 
-You can also get responses by querying the API manually, which is useful if you're focusing on tests before implementation.
-
 ![](../media/dc-integration-tester.png)
+
+You can also get responses by querying the API manually using a tool like Insomnia, which is useful if you're focusing on tests before implementation.
 
 ### Requests, responses, results and config
 

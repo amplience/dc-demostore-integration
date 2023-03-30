@@ -13,6 +13,7 @@ import { getProductsArgError } from '../common'
  * Common codec configuration.
  */
 type CodecConfig = {
+	// == Example ==
     // productURL:         StringProperty
 }
 
@@ -33,6 +34,7 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 	 */
 	get properties(): CodecConfig {
 		return {
+			// == Example ==
 			// productURL: {
 			//     title: "Product file URL",
 			//     type: "string"
@@ -54,16 +56,14 @@ export class TemplateCommerceCodecType extends CommerceCodecType {
 export class TemplateCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
 
-	// instance variables
-	// products: Product[]
-	// categories: Category[]
+	// Instance variables.
+	// For example, a category tree you might fetch in `cacheMegaMenu`.
+	// categoryTree: Category[]
 
 	/**
 	 * @inheritdoc
 	 */
 	async init(codecType: CommerceCodecType): Promise<CommerceCodec> {
-		// this.products = await fetchFromURL(this.config.productURL, [])
-		// this.categoryTree = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
 	}
 
@@ -116,4 +116,5 @@ export class TemplateCommerceCodec extends CommerceCodec {
 }
 
 export default TemplateCommerceCodecType
+// New codecs should be registered in `/src/codecs/index.ts`.
 // registerCodec(new TemplateCommerceCodecType())
