@@ -27,7 +27,7 @@ export declare class BigCommerceCommerceCodecType extends CommerceCodecType {
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * ommerce Codec that integrates with BigCommerce.
+ * Commerce Codec that integrates with BigCommerce.
  */
 export declare class BigCommerceCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;

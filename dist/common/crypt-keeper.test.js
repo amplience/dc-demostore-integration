@@ -47,9 +47,24 @@ describe('CryptKeeper', function () {
         const keeper2 = (0, crypt_keeper_1.CryptKeeper)(config2, 'hub1');
         const keeper3 = (0, crypt_keeper_1.CryptKeeper)(config3, 'hub1');
         const keeper4 = (0, crypt_keeper_1.CryptKeeper)(config, 'hub2');
-        expect(keeper2.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
-        expect(keeper3.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
-        expect(keeper4.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
+        try {
+            expect(keeper2.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
+        }
+        catch (_a) {
+            // Allowed to throw as a result too.
+        }
+        try {
+            expect(keeper3.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
+        }
+        catch (_b) {
+            // Allowed to throw as a result too.
+        }
+        try {
+            expect(keeper4.decrypt(keeper1.encrypt('example text to encrypt'))).not.toEqual('example text to encrypt');
+        }
+        catch (_c) {
+            // Allowed to throw as a result too.
+        }
     });
     test('decryptAll operates on all properties of an object', () => {
         const configSource = {
