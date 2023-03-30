@@ -32,7 +32,7 @@ The `CommerceAPI` interface exposes these methods:
 Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`. Platform-specific e-Commerce implementations are found in `src/codec/codecs/commerce`.
 You can find types and methods [here](./docs/dev/commerce-codec.md).
 
-There is a separate project called `dc-integration-tester` which provides a CLI for testing
+There is a separate project called [`dc-integration-tester`](https://github.com/amplience/dc-integration-tester) which provides a CLI that lets you test the codecs in this project with your configuration, and potentially test new or modified codecs on your own copy of the codebase.
 
 There are also [Unit Tests](./docs/dev/unit-testing.md) for each method and vendor.
 

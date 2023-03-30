@@ -166,7 +166,7 @@ Get multiple products by keyword.
 
 ##### Edge Cases
 
--   Not really any.
+-   Vendors that don't support keyword filtering should implement it by fetching all products and filtering them in the codec.
 
 #### `getProducts` (category)
 
@@ -202,7 +202,8 @@ Sub-categories should be contained in children as a tree, should not appear at r
 
 ##### Edge Cases
 
--   No root categories is a weird one, right now it throws but I guess it is possible for there to be none. There could be some benefit in throwing as it generally isn't meant to be empty.
+-   If there is no tree of categories, just list all categories.
+-   If there are no categories at all, it is valid to return an empty array.
 
 #### `getCustomerGroups`
 
