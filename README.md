@@ -4,7 +4,7 @@ Amplience Demo Store Integration is a service written in Node.js that is intende
 
 -   Commerce Services
 
-dc-demostore-integration uses codecs in order to determine how and where to get data from. It currently supports getting e-commerce data from:
+`dc-demostore-integration` uses codecs in order to determine how and where to get data from. It currently supports getting e-commerce data from:
 
 -   Commercetools
 -   BigCommerce
@@ -29,7 +29,7 @@ The `CommerceAPI` interface exposes these methods:
 -   `getCategoryTree` (category structure)
 -   `getCustomerGroups` (customer segmentation)
 
-Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`. Platform-specific e-commerce implementations are found in `src/codec/codecs/commerce`.
+Concrete implementations of this interface are referred to as `Codec`s and are located in `src/codec/codecs`. Platform-specific e-Commerce implementations are found in `src/codec/codecs/commerce`.
 You can find types and methods [here](./docs/dev/commerce-codec.md).
 
 There is a separate project called `dc-integration-tester` which provides a CLI for testing
@@ -38,7 +38,7 @@ There are also [Unit Tests](./docs/dev/unit-testing.md) for each method and vend
 
 ## How to use the service
 
-As an example you can check our [eComm Toolkit extension](https://github.com/amplience/dc-extension-ecomm-toolkit) is built using dc-demostore-integration as a middleware in Next.js.
+As an example you can check our [eComm Toolkit extension](https://github.com/amplience/dc-extension-ecomm-toolkit) is built using `dc-demostore-integration` as a middleware in `Next.js`.
 
 ## Quick Start
 
