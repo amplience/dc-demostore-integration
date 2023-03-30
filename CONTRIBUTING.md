@@ -12,7 +12,7 @@ Please consider these guidelines when filing a pull request:
 
 Pull Requests will be reviewed by internal Amplience team members. Generally, these are merged after two approvals.
 
-To get started, see [Develop Locally.](./docs/dev/develop-locally.md)
+To get started, see [Develop Locally](./docs/dev/develop-locally.md).
 
 ## Commit Messages
 
