@@ -8,7 +8,7 @@ npm i @yourgithub/dc-demostore-integration
 
 That's really it.
 
-Or, if you're using it with our [E-comm Toolkit extension](https://github.com/amplience/dc-extension-ecomm-toolkit), update the dependency in that package.json to point to your fork.
+Or, if you're using it with our [eComm Toolkit Extension](https://github.com/amplience/dc-extension-ecomm-toolkit), update the dependency in that package.json to point to your fork.
 
 ```
 "@amplience/dc-demostore-integration": "git+https://github.com/yourgithub/dc-demostore-integration.git"
