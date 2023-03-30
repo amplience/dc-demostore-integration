@@ -48,6 +48,9 @@ export type CommerceOperation =
 	| 'getCustomerGroups'
 	| 'getRawProducts'
 
+/**
+ * Error type passed through the middleware as a response.
+ */
 export interface MiddlewareError {
 	type: string
 	message: string,

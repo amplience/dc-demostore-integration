@@ -42,7 +42,6 @@ describe('shopify integration', function () {
 	})
 
 	test('getProduct (by id)', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -57,7 +56,6 @@ describe('shopify integration', function () {
 	})
 
 	test('getProducts (multiple)', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))
@@ -80,7 +78,6 @@ describe('shopify integration', function () {
 	})
 
 	test('getProducts (keyword)', async () => {
-
 		// Setup with the right fixture
 		massMock(axios, requests, commerceProductsByKeywordRequests)
 		codec = new ShopifyCommerceCodec(flattenConfig(config))

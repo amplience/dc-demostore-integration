@@ -17,15 +17,6 @@ import {
 import { Dictionary } from 'lodash'
 
 /**
- * Find the first non-empty (not null or length 0) string in a list of strings.
- * @param strings List of strings to search
- * @returns The first non-empty string in the list
- */
-export const firstNonEmpty = (strings: string[]) => {
-	return strings.find(string => string !== '' && string != null)
-}
-
-/**
  * Extracts a Resource ID from a globally unique GraphQL ID.
  * @param id GUID
  * @returns Resource ID

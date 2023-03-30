@@ -62,7 +62,7 @@ type CodecConfig = {
 }
 
 /**
- * A template commerce codec type, useful as a starting point for a new integration.
+ * Commerce Codec Type that integrates with Shopify.
  */
 export class ShopifyCommerceCodecType extends CommerceCodecType {
 
@@ -110,7 +110,7 @@ export class ShopifyCommerceCodecType extends CommerceCodecType {
 }
 
 /**
- * A template commerce codec, useful as a starting point for a new integration.
+ * Commerce Codec that integrates with Shopify.
  */
 export class ShopifyCommerceCodec extends CommerceCodec {
 	declare config: CodecPropertyConfig<CodecConfig>
@@ -134,8 +134,6 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 			}
 		})
 
-		// this.products = await fetchFromURL(this.config.productURL, [])
-		// this.categoryTree = this.categories.filter(cat => !cat.parent)
 		return await super.init(codecType)
 	}
 
@@ -158,7 +156,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	 * @param query The GraphQL query string
 	 * @param variables Variables to use with the GraphQL query
 	 * @param isAdmin Whether the admin credentials must be used or not
-	 * @returns 
+	 * @returns GraphQL response data
 	 */
 	async gqlRequest<T>(query: string, variables: any, isAdmin = false): Promise<T> {
 		const url = 'graphql.json'
@@ -179,7 +177,7 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 		)).data)
 
 		if (result.data == null && result.errors) {
-			throw new CodecError(CodecErrorType.ApiGraphQL,this.fromGqlErrors(result.errors))
+			throw new CodecError(CodecErrorType.ApiGraphQL, this.fromGqlErrors(result.errors))
 		}
 
 		return result.data

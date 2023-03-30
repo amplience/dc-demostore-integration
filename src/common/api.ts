@@ -8,13 +8,6 @@ import {
 } from './types'
 
 /**
- * Common exception type, with a string message.
- */
-export class Exception {
-	exception: string
-}
-
-/**
  * Interface for a generic API.
  */
 // eslint-disable-next-line @typescript-eslint/ban-types

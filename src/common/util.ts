@@ -40,6 +40,11 @@ export const quote = (str: string) => `"${str}"`
 export const quoteProductIdString = (productIds: string) =>
 	productIds.split(',').map(quote).join(',')
 
+/**
+ * Flatten the codec config object.
+ * @param params Config object
+ * @returns Flattened config object
+ */
 export const flattenConfig = (params: any = undefined): any => {
 	let codec = params
 

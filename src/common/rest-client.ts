@@ -77,7 +77,7 @@ export const OAuthProperties: OAuthCodecConfiguration = {
 }
 
 /**
- * JSON schema properties describing APIConfiguration.
+ * JSON schema properties describing client credential OAuth properties.
  */
 export const ClientCredentialProperties: ClientCredentialsConfiguration = {
 	...OAuthProperties,

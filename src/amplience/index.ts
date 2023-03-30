@@ -4,10 +4,10 @@ import { CryptKeeper } from '../common/crypt-keeper'
 import { IntegrationError } from '../common/errors'
 
 /**
- * Get a content item from a Dynamic Content hub.
+ * Get a content item from a Dynamic Content hub and "decrypts" it.
  * @param hub Dynamic Content hub
  * @param args ID or key of the content item
- * @returns 
+ * @returns Decrypted content item from DC or null
  */
 export const getContentItem = async (hub: string, args: any): Promise<any> => {
 	const path = args.id && `id/${args.id}` || args.key && `key/${args.key}`

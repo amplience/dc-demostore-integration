@@ -226,12 +226,7 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	 */
 	async fetch(url: string): Promise<any> {
 		return logResponse('get', url, (await catchAxiosErrors(async () =>
-			await axios.get(url, {
-				baseURL: this.config.api_url,
-				params: {
-					client_id: this.config.client_id
-				}
-			})
+			await axios.get(url, this.axiosConfig())
 		)).data)
 	}
 

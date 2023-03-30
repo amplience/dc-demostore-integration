@@ -10,9 +10,9 @@ $ npm i @amplience/dc-demostore-integration
 
 ## Export middleware and init
 
-When using something like Next.js, or a similar route-based framework, this should be in `/pages/api/index.js`. This will essentially add the `/api` route tou your project.
+When using something like Next.js, or a similar route-based framework, this should be in `/pages/api/index.js`. This will essentially add the `/api` route to your project.
 
-You should also export an init function
+You should also export an init function.
 
 ```javascript
 import {

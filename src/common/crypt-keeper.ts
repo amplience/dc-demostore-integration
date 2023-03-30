@@ -3,9 +3,9 @@ import rot47 from 'rot47'
 import _ from 'lodash'
 
 /**
- * Reverses a string
- * @param str 
- * @returns 
+ * Reverses a string.
+ * @param str The string
+ * @returns The reverse of the input string
  */
 const reverseString = str => str.split('').reverse().join('')
 

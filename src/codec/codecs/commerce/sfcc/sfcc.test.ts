@@ -34,7 +34,6 @@ const sfccRequests: MockFixture = {
 			data: sfccSearchResult(300, 200, 1, 'Hit')
 		},
 		'https://test.sandbox.us03.dx.commercecloud.salesforce.com/s/-/dw/data/v22_4/sites/TestSite/customer_groups?start=0&count=1000': {
-			// TODO: needs auth
 			data: sfccCustomerGroups
 		}
 	},
