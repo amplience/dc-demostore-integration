@@ -93,13 +93,17 @@ const product: Product = await commerceApi.getProduct({
 
 ## Development
 
--   [Commerce Codecs](./docs/dev/commerce-codec.md)
--   [Import into project](./docs/dev/import.md)
--   [Host the service](./docs/dev/host.md)
--   [Develop locally](./docs/dev/develop-locally.md)
--   [Modify an integration](./docs/dev/modify-integration.md)
--   [Add an integration](./docs/dev/add-integration.md)
--   [Unit testing guidelines](./docs/dev/unit-testing.md)
+- **Types and methods**
+  - [Commerce Codecs](./docs/dev/commerce-codec.md)
+- **Project**
+  - [Import into project](./docs/dev/import.md)
+  - [Host the service](./docs/dev/host.md)
+  - [Develop locally](./docs/dev/develop-locally.md)
+- **Integration**
+  - [Modify an integration](./docs/dev/modify-integration.md)
+  - [Add an integration](./docs/dev/add-integration.md)
+- **Testing**
+  - [Unit testing guidelines](./docs/dev/unit-testing.md)
 
 ## License
 
