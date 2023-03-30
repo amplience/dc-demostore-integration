@@ -5,6 +5,6 @@ exports.StringPatterns = void 0;
  * Common string validation patterns.
  */
 exports.StringPatterns = {
-    anyUrl: ".+://.+",
-    httpUrl: "https?://.+"
+    anyUrl: '.+://.+',
+    httpUrl: 'https?://.+'
 };

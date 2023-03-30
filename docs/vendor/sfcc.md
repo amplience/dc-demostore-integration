@@ -12,14 +12,14 @@ Connects to a Salesforce Commerce Cloud instance.
 
 ```json
 {
-	"vendor": "sfcc",
-	"codec_params": {
-		"api_url": "<sfcc api url>",
-		"auth_url": "<sfcc auth url>",
-		"site_id": "<sfcc site id>",
-		"client_id": "<sfcc client id>",
-		"client_secret": "<sfcc site secret>"
-	}
+    "vendor": "sfcc",
+    "codec_params": {
+        "api_url": "<sfcc api url>",
+        "auth_url": "<sfcc auth url>",
+        "site_id": "<sfcc site id>",
+        "client_id": "<sfcc client id>",
+        "client_secret": "<sfcc site secret>"
+    }
 }
 ```
 
@@ -39,85 +39,84 @@ As such, you'll need to edit the OCAPI settings, which can me found in Business 
 
 ```json
 {
-	"_v": "21.3",
-	"clients": [
-		{
-			"client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			"allowed_origins": ["https://your.urlhere.com"],
-			"resources": [
-				{
-					"resource_id": "/customers/*",
-					"methods": ["get", "patch"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)"
-				},
-				{
-					"resource_id": "/customers/auth",
-					"methods": ["post", "delete"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)"
-				},
-				{
-					"methods": ["get"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/product_search"
-				},
-				{
-					"methods": ["get"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/products/{id}"
-				},
-				{
-					"methods": ["get"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/products/{id}/*"
-				},
-
-				{
-					"methods": ["get"],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/categories/{id}"
-				}
-			]
-		}
-	]
+    "_v": "21.3",
+    "clients": [
+        {
+            "client_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "allowed_origins": ["https://your.urlhere.com"],
+            "resources": [
+                {
+                    "resource_id": "/customers/*",
+                    "methods": ["get", "patch"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)"
+                },
+                {
+                    "resource_id": "/customers/auth",
+                    "methods": ["post", "delete"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)"
+                },
+                {
+                    "methods": ["get"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)",
+                    "resource_id": "/product_search"
+                },
+                {
+                    "methods": ["get"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)",
+                    "resource_id": "/products/{id}"
+                },
+                {
+                    "methods": ["get"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)",
+                    "resource_id": "/products/{id}/*"
+                },
+                {
+                    "methods": ["get"],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)",
+                    "resource_id": "/categories/{id}"
+                }
+            ]
+        }
+    ]
 }
 ```
 
 #### Admin > Site Development > OCAPI > Data settings
 
-```
+```json
 {
    "_v": "21.3",
    "clients":
    [
       {
-			"client_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
-			"allowed_origins": [
-				"https://ecomm-toolkit.dc-demostore.com"
-			],
-			"resources": [
-				{
-					"methods": [
-						"post"
-					],
-					"read_attributes": "(**)",
-					"write_attributes": "(**)",
-					"resource_id": "/product_search"
-				},
-{
-					"methods": [
-						"get"
-					],
-					"read_attributes": "(**)",
-					"resource_id": "/sites/{site_id}/customer_groups"
-				}
-			]
-		}
+            "client_id": "aaaaaaaaaaaaaaaaaaaaaaaa",
+            "allowed_origins": [
+                "https://ecomm-toolkit.dc-demostore.com"
+            ],
+            "resources": [
+                {
+                    "methods": [
+                        "post"
+                    ],
+                    "read_attributes": "(**)",
+                    "write_attributes": "(**)",
+                    "resource_id": "/product_search"
+                },
+                {
+                    "methods": [
+                        "get"
+                    ],
+                    "read_attributes": "(**)",
+                    "resource_id": "/sites/{site_id}/customer_groups"
+                }
+            ]
+        }
    ]
 }
 ```

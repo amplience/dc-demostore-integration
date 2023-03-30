@@ -12,13 +12,13 @@ Connects to a Shopify instance.
 
 ```json
 {
-	"vendor": "shopify",
-	"codec_params": {
-		"access_token": "<storefront access token>",
-		"admin_access_token": "<admin access token>",
-		"version": "<api version, eg. 2023-01>",
-		"site_id": "<shopify site id>"
-	}
+    "vendor": "shopify",
+    "codec_params": {
+        "access_token": "<storefront access token>",
+        "admin_access_token": "<admin access token>",
+        "version": "<api version, eg. 2023-01>",
+        "site_id": "<shopify site id>"
+    }
 }
 ```
 

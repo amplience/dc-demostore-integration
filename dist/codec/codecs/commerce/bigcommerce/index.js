@@ -54,7 +54,7 @@ class BigCommerceCommerceCodecType extends core_1.CommerceCodecType {
 }
 exports.BigCommerceCommerceCodecType = BigCommerceCommerceCodecType;
 /**
- * ommerce Codec that integrates with BigCommerce.
+ * Commerce Codec that integrates with BigCommerce.
  */
 class BigCommerceCommerceCodec extends core_1.CommerceCodec {
     /**

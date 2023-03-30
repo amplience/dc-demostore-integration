@@ -5,10 +5,3 @@ config/settings.yaml
 config/google_creds.json
 .vercel
 logs
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml
-Dockerfile.old
-localStorage/*
