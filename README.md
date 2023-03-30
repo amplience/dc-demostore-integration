@@ -93,6 +93,7 @@ const product: Product = await commerceApi.getProduct({
 
 ## Development
 
+-   [Commerce Codecs](./docs/dev/commerce-codec.md)
 -   [Import into project](./docs/dev/import.md)
 -   [Host the service](./docs/dev/host.md)
 -   [Develop locally](./docs/dev/develop-locally.md)

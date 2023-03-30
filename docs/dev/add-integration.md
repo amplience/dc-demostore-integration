@@ -12,10 +12,10 @@ There is a [template commerce codec](../../src/codec/codecs/commerce/template.ts
 There are two components to a codec - its codec type, which describes how it is registered and found by users, and the codec itself. Each codec should have its own version of both, with unique names.
 
 The most important thing you should change is the vendor string that the codec type returns:
-```
-	get vendor(): string {
-		return 'template'
-	}
+```ts
+    get vendor(): string {
+        return 'template'
+    }
 ```
 This will let users find your integration. `get properties()` describes what properties should be present in the vendor-specific config in JSON schema format.
 
