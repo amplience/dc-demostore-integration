@@ -53,7 +53,7 @@ exports.OAuthProperties = Object.assign(Object.assign({}, exports.APIProperties)
         pattern: cms_property_types_1.StringPatterns.httpUrl
     } });
 /**
- * JSON schema properties describing APIConfiguration.
+ * JSON schema properties describing client credential OAuth properties.
  */
 exports.ClientCredentialProperties = Object.assign(Object.assign({}, exports.OAuthProperties), { client_id: {
         title: 'Client ID',

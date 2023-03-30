@@ -8,9 +8,9 @@ const crypto_js_1 = __importDefault(require("crypto-js"));
 const rot47_1 = __importDefault(require("rot47"));
 const lodash_1 = __importDefault(require("lodash"));
 /**
- * Reverses a string
- * @param str
- * @returns
+ * Reverses a string.
+ * @param str The string
+ * @returns The reverse of the input string
  */
 const reverseString = str => str.split('').reverse().join('');
 /**

@@ -18,7 +18,7 @@ declare type CodecConfig = {
     site_id: StringProperty;
 };
 /**
- * A template commerce codec type, useful as a starting point for a new integration.
+ * Commerce Codec Type that integrates with Shopify.
  */
 export declare class ShopifyCommerceCodecType extends CommerceCodecType {
     /**
@@ -35,7 +35,7 @@ export declare class ShopifyCommerceCodecType extends CommerceCodecType {
     getApi(config: CodecPropertyConfig<CodecConfig>): Promise<CommerceAPI>;
 }
 /**
- * A template commerce codec, useful as a starting point for a new integration.
+ * Commerce Codec that integrates with Shopify.
  */
 export declare class ShopifyCommerceCodec extends CommerceCodec {
     config: CodecPropertyConfig<CodecConfig>;
@@ -59,7 +59,7 @@ export declare class ShopifyCommerceCodec extends CommerceCodec {
      * @param query The GraphQL query string
      * @param variables Variables to use with the GraphQL query
      * @param isAdmin Whether the admin credentials must be used or not
-     * @returns
+     * @returns GraphQL response data
      */
     gqlRequest<T>(query: string, variables: any, isAdmin?: boolean): Promise<T>;
     /**

@@ -41,7 +41,7 @@ export declare const APIProperties: APIConfiguration;
  */
 export declare const OAuthProperties: OAuthCodecConfiguration;
 /**
- * JSON schema properties describing APIConfiguration.
+ * JSON schema properties describing client credential OAuth properties.
  */
 export declare const ClientCredentialProperties: ClientCredentialsConfiguration;
 /**

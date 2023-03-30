@@ -196,14 +196,7 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
      */
     fetch(url) {
         return __awaiter(this, void 0, void 0, function* () {
-            return (0, common_2.logResponse)('get', url, (yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () {
-                return yield axios_1.default.get(url, {
-                    baseURL: this.config.api_url,
-                    params: {
-                        client_id: this.config.client_id
-                    }
-                });
-            }))).data);
+            return (0, common_2.logResponse)('get', url, (yield (0, codec_error_1.catchAxiosErrors)(() => __awaiter(this, void 0, void 0, function* () { return yield axios_1.default.get(url, this.axiosConfig()); }))).data);
         });
     }
     /**

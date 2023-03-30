@@ -3,6 +3,9 @@ import { CommerceAPI } from '../index';
  * Commerce API method names.
  */
 export declare type CommerceOperation = 'getProduct' | 'getProducts' | 'getCategory' | 'getCategoryTree' | 'getCustomerGroups' | 'getRawProducts';
+/**
+ * Error type passed through the middleware as a response.
+ */
 export interface MiddlewareError {
     type: string;
     message: string;

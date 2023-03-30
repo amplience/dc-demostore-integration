@@ -22,7 +22,7 @@ const mappers_1 = require("./mappers");
 const pagination_1 = require("../../pagination");
 const PAGE_SIZE = 100;
 /**
- * A template commerce codec type, useful as a starting point for a new integration.
+ * Commerce Codec Type that integrates with Shopify.
  */
 class ShopifyCommerceCodecType extends core_1.CommerceCodecType {
     /**
@@ -69,7 +69,7 @@ class ShopifyCommerceCodecType extends core_1.CommerceCodecType {
 }
 exports.ShopifyCommerceCodecType = ShopifyCommerceCodecType;
 /**
- * A template commerce codec, useful as a starting point for a new integration.
+ * Commerce Codec that integrates with Shopify.
  */
 class ShopifyCommerceCodec extends core_1.CommerceCodec {
     /**
@@ -92,8 +92,6 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
                     'X-Shopify-Access-Token': this.config.admin_access_token
                 }
             });
-            // this.products = await fetchFromURL(this.config.productURL, [])
-            // this.categoryTree = this.categories.filter(cat => !cat.parent)
             return yield _super.init.call(this, codecType);
         });
     }
@@ -114,7 +112,7 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
      * @param query The GraphQL query string
      * @param variables Variables to use with the GraphQL query
      * @param isAdmin Whether the admin credentials must be used or not
-     * @returns
+     * @returns GraphQL response data
      */
     gqlRequest(query, variables, isAdmin = false) {
         return __awaiter(this, void 0, void 0, function* () {

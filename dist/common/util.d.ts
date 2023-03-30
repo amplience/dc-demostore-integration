@@ -28,4 +28,9 @@ export declare const quote: (str: string) => string;
  * @returns Comma separated list with quoted items
  */
 export declare const quoteProductIdString: (productIds: string) => string;
+/**
+ * Flatten the codec config object.
+ * @param params Config object
+ * @returns Flattened config object
+ */
 export declare const flattenConfig: (params?: any) => any;

@@ -1,11 +1,5 @@
 import { GetCommerceObjectArgs, Product, GetProductsArgs, Category, CommonArgs, CustomerGroup } from './types';
 /**
- * Common exception type, with a string message.
- */
-export declare class Exception {
-    exception: string;
-}
-/**
  * Interface for a generic API.
  */
 export declare type API = {};

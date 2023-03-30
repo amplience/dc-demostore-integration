@@ -1,16 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapImage = exports.mapCategory = exports.mapPrice = exports.firstNonEmpty = void 0;
+exports.mapCustomerGroup = exports.mapProduct = exports.mapVariant = exports.mapImage = exports.mapCategory = exports.mapPrice = void 0;
 const util_1 = require("../../../../common/util");
-/**
- * Find the first non-empty (not null or length 0) string in a list of strings.
- * @param strings List of strings to search
- * @returns The first non-empty string in the list
- */
-const firstNonEmpty = (strings) => {
-    return strings.find(string => string !== '' && string != null);
-};
-exports.firstNonEmpty = firstNonEmpty;
 /**
  * Extracts a Resource ID from a globally unique GraphQL ID.
  * @param id GUID

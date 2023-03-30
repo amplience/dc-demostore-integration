@@ -1,12 +1,6 @@
 import { Category, CustomerGroup, Product, Variant, Image } from '../../../../common/types';
 import { ShopifyCollection, ShopifyImage, ShopifyPrice, ShopifyProduct, ShopifySegment, ShopifyVariant } from './types';
 /**
- * Find the first non-empty (not null or length 0) string in a list of strings.
- * @param strings List of strings to search
- * @returns The first non-empty string in the list
- */
-export declare const firstNonEmpty: (strings: string[]) => string;
-/**
  * Map a shopify price to the common price type.
  * @param price The shopify price
  * @returns The common price

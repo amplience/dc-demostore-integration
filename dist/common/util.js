@@ -40,6 +40,11 @@ exports.quote = quote;
  */
 const quoteProductIdString = (productIds) => productIds.split(',').map(exports.quote).join(',');
 exports.quoteProductIdString = quoteProductIdString;
+/**
+ * Flatten the codec config object.
+ * @param params Config object
+ * @returns Flattened config object
+ */
 const flattenConfig = (params = undefined) => {
     let codec = params;
     if (params.codec_params) {

@@ -60,7 +60,6 @@ const sfccRequests = {
         }, 'https://test.sandbox.us03.dx.commercecloud.salesforce.com/s/TestSite/dw/shop/v22_4/product_search?q=Hit&start=200&count=200': {
             data: (0, responses_1.sfccSearchResult)(300, 200, 1, 'Hit')
         }, 'https://test.sandbox.us03.dx.commercecloud.salesforce.com/s/-/dw/data/v22_4/sites/TestSite/customer_groups?start=0&count=1000': {
-            // TODO: needs auth
             data: responses_1.sfccCustomerGroups
         } }),
     post: {

@@ -17,10 +17,10 @@ const lodash_1 = __importDefault(require("lodash"));
 const crypt_keeper_1 = require("../common/crypt-keeper");
 const errors_1 = require("../common/errors");
 /**
- * Get a content item from a Dynamic Content hub.
+ * Get a content item from a Dynamic Content hub and "decrypts" it.
  * @param hub Dynamic Content hub
  * @param args ID or key of the content item
- * @returns
+ * @returns Decrypted content item from DC or null
  */
 const getContentItem = (hub, args) => __awaiter(void 0, void 0, void 0, function* () {
     const path = args.id && `id/${args.id}` || args.key && `key/${args.key}`;

@@ -20,7 +20,7 @@ export interface CodecApiErrorInfo {
     message: string;
 }
 /**
-* Codec error info for an HTTP error.
+* Codec error info for a GraphQL error.
 */
 export interface CodecGqlErrorInfo {
     message: string;
