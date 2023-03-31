@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getPageByQuery, getPageByQueryAxios, paginate } from './pagination'
+import { getPageByQuery, getPageByQueryAxios, paginate, paginateCursor } from './pagination'
 
 jest.mock('axios')
 
@@ -126,7 +126,6 @@ describe('getPageByQueryAxios', function() {
 })
 
 describe('paginate', function() {
-
 	const getPageMock = (total: number) => (page: number, pageSize: number) => {
 		const pageBase = page * pageSize
 		const remaining = Math.max(0, total - pageBase)
@@ -153,11 +152,7 @@ describe('paginate', function() {
 
 	test('paginate 2 pages', async () => {
 		const total = 30
-		const getPage = jest.fn().mockImplementation((page: number, pageSize: number) => {
-			const pageBase = page * pageSize
-			const remaining = Math.max(0, total - pageBase)
-			return Promise.resolve({ data: Array.from({length: Math.min(pageSize, remaining)}).map((_, index) => index + pageBase), total })
-		})
+		const getPage = jest.fn().mockImplementation(getPageMock(total))
 
 		const result = await paginate(getPage, 20, 0)
 
@@ -201,5 +196,83 @@ describe('paginate', function() {
 		}
 
 		expect(result).toEqual(Array.from({length: 200}).map((_, index) => index + 200))
+	})
+})
+
+describe('paginateCursor', function() {
+	const getPageMock = (total: number) => (cursor: string, pageSize: number) => {
+		const pageBase = cursor == null ? 0 : Number(cursor.substring(1))
+		const remaining = Math.max(0, total - pageBase)
+		return Promise.resolve({ 
+			data: Array.from({length: Math.min(pageSize, remaining)}).map((_, index) => index + pageBase),
+			hasNext: (remaining - pageSize) > 0,
+			nextCursor: (remaining - pageSize) > 0 ? 'C' + (pageBase + pageSize) : undefined
+		})
+	}
+
+	test('paginate 0 items', async () => {
+		const getPage = jest.fn().mockImplementation(() => Promise.resolve({ data: [], hasNext: false }))
+
+		const result = await paginateCursor(getPage, 20)
+
+		expect(getPage).toHaveBeenCalledWith(undefined, 20)
+		expect(result).toEqual({ data: [], hasNext: false })
+	})
+
+	test('paginate 1 item', async () => {
+		const getPage = jest.fn().mockImplementation(() => Promise.resolve({ data: [1], hasNext: false }))
+
+		const result = await paginateCursor(getPage, 20)
+
+		expect(getPage).toHaveBeenCalledWith(undefined, 20)
+		expect(result).toEqual({ data: [1], hasNext: false })
+	})
+
+	test('paginate 2 pages', async () => {
+		const total = 30
+		const getPage = jest.fn().mockImplementation(getPageMock(total))
+
+		const result = await paginateCursor(getPage, 20)
+
+		expect(getPage).toHaveBeenCalledWith(undefined, 20)
+		expect(getPage).toHaveBeenCalledWith('C20', 20)
+		expect(result).toEqual({data: Array.from({length: total}).map((_, index) => index), hasNext: false})
+	})
+
+	test('paginate 20 pages', async () => {
+		const total = 390
+		const getPage = jest.fn().mockImplementation(getPageMock(total))
+
+		const result = await paginateCursor(getPage, 20)
+
+		for (let i = 0; i < 20; i++){
+			expect(getPage).toHaveBeenCalledWith(i == 0 ? undefined : ('C' + (i * 20)), 20)
+		}
+
+		expect(result).toEqual({data: Array.from({length: total}).map((_, index) => index), hasNext: false})
+	})
+
+	test('paginate 10 items from last page', async () => {
+		const total = 390
+		const getPage = jest.fn().mockImplementation(getPageMock(total))
+
+		const result = await paginateCursor(getPage, 20, 'C380', 1)
+
+		expect(getPage).toHaveBeenCalledWith('C380', 20)
+
+		expect(result).toEqual({data: Array.from({length: 10}).map((_, index) => index + 380), hasNext: false})
+	})
+
+	test('paginate page 10-20 of 30', async () => {
+		const total = 600
+		const getPage = jest.fn().mockImplementation(getPageMock(total))
+
+		const result = await paginateCursor(getPage, 20, 'C200', 10)
+
+		for (let i = 10; i < 20; i++){
+			expect(getPage).toHaveBeenCalledWith(i == 0 ? undefined : ('C' + (i * 20)), 20)
+		}
+
+		expect(result).toEqual({data: Array.from({length: 200}).map((_, index) => index + 200), hasNext: true, nextCursor: 'C400'})
 	})
 })

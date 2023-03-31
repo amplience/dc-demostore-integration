@@ -174,6 +174,14 @@ export async function paginate<T>(
 	return result
 }
 
+/**
+ * Iterate through fetching pages and build an array out of the results.
+ * @param requestPage Method to use to request pages. Takes cursor and page size.
+ * @param pageSize Page size (default: 20)
+ * @param cursor Start cursor (default: null)
+ * @param pageCount Number of pages to fetch (default: all)
+ * @returns List of items fetched from the paginated endpoint
+ */
 export async function paginateCursor<T>(
 	requestPage: (cursor: string, pageSize: number) => Promise<GetPageResultCursor<T>>,
 	pageSize = 20,
