@@ -222,7 +222,9 @@ export class CommercetoolsCodec extends CommerceCodec {
 	async getRawProducts(args: GetProductsArgs, method = 'getRawProducts'): Promise<CTProduct[]> {
 		let products: CTProduct[] = []
 
-		if (args.productIds) {
+		if (args.productIds && args.productIds === '') {
+			products = []
+		} else if (args.productIds) {
 			const ids = args.productIds.split(',')
 			products = mapIdentifiers<CTProduct>(ids, await paginate(this.getPage(this.rest, `/product-projections/search?filter=id:${quoteProductIdString(args.productIds)}`)))
 		} else if (args.keyword) {

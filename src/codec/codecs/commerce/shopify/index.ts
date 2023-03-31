@@ -275,21 +275,17 @@ export class ShopifyCommerceCodec extends CommerceCodec {
 	async getRawProducts(args: GetProductsArgs): Promise<ShopifyProduct[]> {
 		let products: ShopifyProduct[] = []
 
-		// eslint-disable-next-line no-empty
-		if (args.productIds) {
+		if (args.productIds && args.productIds === '') {
+			products = []
+		} else if (args.productIds) {
 			products = await Promise.all(
 				args.productIds.split(',').map(this.getProductById.bind(this))
 			)
-		}
-		// eslint-disable-next-line no-empty
-		else if (args.keyword) {
+		} else if (args.keyword) {
 			products = await this.getProductsByKeyword(args.keyword)
-		}
-		// eslint-disable-next-line no-empty
-		else if (args.category) {
+		} else if (args.category) {
 			products = await this.getProductsByCategory(args.category.slug)
-		}
-		else {
+		} else {
 			throw getProductsArgError('getRawProducts')
 		}
 

@@ -282,7 +282,9 @@ export class SFCCCommerceCodec extends CommerceCodec {
 	async getRawProducts(args: GetProductsArgs, method = 'getRawProducts'): Promise<SFCCProduct[]> {
 		let products: SFCCProduct[] = []
 
-		if (args.productIds) {
+		if (args.productIds && args.productIds === '') {
+			products = []
+		} else if (args.productIds) {
 			products = await Promise.all(
 				args.productIds.split(',').map(this.getProductById.bind(this))
 			)

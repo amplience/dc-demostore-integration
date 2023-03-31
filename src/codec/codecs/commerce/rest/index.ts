@@ -1,11 +1,11 @@
-import { 
-	Category, 
-	CommerceAPI, 
-	CommonArgs, 
-	CustomerGroup, 
-	GetProductsArgs, 
-	Identifiable, 
-	Product 
+import {
+	Category,
+	CommerceAPI,
+	CommonArgs,
+	CustomerGroup,
+	GetProductsArgs,
+	Identifiable,
+	Product
 } from '../../../../common'
 import _ from 'lodash'
 import { Dictionary } from 'lodash'
@@ -19,10 +19,10 @@ import { getProductsArgError, mapIdentifiers } from '../../common'
  * REST Codec config properties.
  */
 type CodecConfig = {
-    productURL:         StringProperty
-    categoryURL:        StringProperty
-    customerGroupURL:   StringProperty
-    translationsURL:    StringProperty
+	productURL: StringProperty
+	categoryURL: StringProperty
+	customerGroupURL: StringProperty
+	translationsURL: StringProperty
 }
 
 /**
@@ -109,14 +109,14 @@ export class RestCommerceCodec extends CommerceCodec {
 	async getProducts(args: GetProductsArgs, raw = false): Promise<Product[]> {
 		await this.ensureCategoryTree()
 
-		if (args.productIds) {
+		if (args.productIds && args.productIds === '') {
+			return []
+		} else if (args.productIds) {
 			const ids = args.productIds.split(',')
 			return mapIdentifiers(ids, this.products.filter(prod => ids.includes(prod.id)))
-		}
-		else if (args.keyword) {
+		} else if (args.keyword) {
 			return this.products.filter(prod => prod.name.toLowerCase().indexOf(args.keyword.toLowerCase()) > -1)
-		}
-		else if (args.category) {
+		} else if (args.category) {
 			return [
 				..._.filter(this.products, prod => _.includes(_.map(prod.categories, 'id'), args.category.id))
 			]
