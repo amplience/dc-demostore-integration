@@ -1,6 +1,4 @@
-import { CONSTANTS } from '../../common/constants'
-import { ContentType, ContentTypeSchema, ValidationLevel } from 'dc-management-sdk-js'
-import _, { Dictionary } from 'lodash'
+import _ from 'lodash'
 import { Category } from '../../common/types'
 import { env } from 'process'
 import { CodecError, CodecErrorType } from './codec-error'
@@ -61,103 +59,6 @@ export interface CType {
     schemaUri: string
     iconUrl: string
     schema: CTypeSchema
-}
-
-/**
- * Demostore Content Types for Amplience
- */
-export const CTypes: Dictionary<CType> = {
-	demostoreconfig: {
-		label: 'demostore config',
-		schemaUri: CONSTANTS.demostoreConfigUri,
-		iconUrl: 'https://cdn-icons-png.flaticon.com/512/627/627495.png',
-		schema: {
-			properties: {
-				url: {
-					title: 'App deployment URL',
-					type: 'string',
-					minLength: 0,
-					maxLength: 200
-				},
-				algolia: {
-					title: 'Algolia configuration',
-					type: 'object',
-					allOf: [{ $ref: 'https://demostore.amplience.com/site/integration/algolia#/definitions/config' }]
-				},
-				cms: {
-					title: 'Amplience configuration',
-					type: 'object',
-					allOf: [{ $ref: 'https://demostore.amplience.com/site/integration/amplience#/definitions/config' }]
-				},
-				commerce: {
-					title: 'Commerce integration',
-					allOf: [
-						{ $ref: 'http://bigcontent.io/cms/schema/v1/core#/definitions/content-reference' },
-						{
-							'properties': {
-								'contentType': {
-									'enum': [
-										'https://demostore.amplience.com/site/integration/rest'
-									]
-								}
-							}
-						}
-					]
-				}
-			}
-		}
-	},
-	rest: {
-		label: 'generic rest commerce configuration',
-		schemaUri: `${CONSTANTS.demostoreIntegrationUri}/rest`,
-		iconUrl: '',
-		schema: { properties: {} }
-	},
-	automation: {
-		label: 'demostore automation',
-		schemaUri: 'https://demostore.amplience.com/site/automation',
-		iconUrl: 'https://cdn-icons-png.flaticon.com/512/3662/3662817.png',
-		schema: { properties: {} }
-	}
-}
-
-/**
- * Get an Amplience Content Type representing the given CType.
- * @param ctype Content Type Template
- * @returns Amplience Content Type
- */
-export const getContentType = (ctype: CType): ContentType => {
-	const contentType = new ContentType()
-	contentType.contentTypeUri = ctype.schemaUri
-	contentType.settings = {
-		label: ctype.label,
-		icons: [{
-			size: 256,
-			url: ctype.iconUrl
-		}]
-	}
-	return contentType
-}
-
-/**
- * Get an Amplience Content Type Schema representing the given CType.
- * @param ctype Content Type Template
- * @returns Amplience Content Type Schema
- */
-export const getContentTypeSchema = (ctype: CType): ContentTypeSchema => {
-	const schema = new ContentTypeSchema()
-	schema.schemaId = schema.id = ctype.schemaUri
-	schema.validationLevel = ValidationLevel.CONTENT_TYPE
-	schema.body = JSON.stringify({
-		id: ctype.schemaUri,
-		title: ctype.label,
-		description: ctype.label,
-		allOf: [{ '$ref': 'http://bigcontent.io/cms/schema/v1/core#/definitions/content' }],
-		type: 'object',
-		properties: ctype.schema.properties,
-		propertyOrder: Object.keys(ctype.schema.properties)
-	})
-	return schema
 }
 
 /**
