@@ -56,7 +56,6 @@ export const getCodec = async (config: any, type: CodecTypes): Promise<API> => {
 	const codecs = getCodecs(type)
 	let codec: CodecType
     
-	// novadev-450: https://ampliencedev.atlassian.net/browse/NOVADEV-450
 	if ('vendor' in config) {
 		const vendorCodec = codecs.find(codec => codec.vendor === config.vendor)
 		if (!vendorCodec) {

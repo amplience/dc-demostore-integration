@@ -44,24 +44,6 @@ export const logResponse = <T>(method: string, request: string, response: T): T 
 }
 
 /**
- * Amplience Content Type Schema Template
- */
-export interface CTypeSchema {
-    definitions?: any
-    properties: any
-}
-
-/**
- * Amplience Content Type Template
- */
-export interface CType {
-    label: string
-    schemaUri: string
-    iconUrl: string
-    schema: CTypeSchema
-}
-
-/**
  * Ensures a given array of identifiable objects has matching position to a list of IDs.
  * Missing items are replaced with null.
  * @param ids List of IDs
