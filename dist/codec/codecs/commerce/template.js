@@ -27,6 +27,7 @@ class TemplateCommerceCodecType extends core_1.CommerceCodecType {
      */
     get properties() {
         return {
+        // == Example ==
         // productURL: {
         //     title: "Product file URL",
         //     type: "string"
@@ -47,9 +48,9 @@ exports.TemplateCommerceCodecType = TemplateCommerceCodecType;
  * A template commerce codec, useful as a starting point for a new integration.
  */
 class TemplateCommerceCodec extends core_1.CommerceCodec {
-    // instance variables
-    // products: Product[]
-    // categories: Category[]
+    // Instance variables.
+    // For example, a category tree you might fetch in `cacheMegaMenu`.
+    // categoryTree: Category[]
     /**
      * @inheritdoc
      */
@@ -58,8 +59,6 @@ class TemplateCommerceCodec extends core_1.CommerceCodec {
             init: { get: () => super.init }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            // this.products = await fetchFromURL(this.config.productURL, [])
-            // this.categoryTree = this.categories.filter(cat => !cat.parent)
             return yield _super.init.call(this, codecType);
         });
     }
@@ -114,4 +113,5 @@ class TemplateCommerceCodec extends core_1.CommerceCodec {
 }
 exports.TemplateCommerceCodec = TemplateCommerceCodec;
 exports.default = TemplateCommerceCodecType;
+// New codecs should be registered in `/src/codecs/index.ts`.
 // registerCodec(new TemplateCommerceCodecType())

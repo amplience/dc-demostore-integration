@@ -8,6 +8,7 @@
     "clean": "rimraf dist",
     "lint": "eslint",
     "build": "eslint && npm run clean && tsc",
+    "prepare": "eslint && npm run clean && tsc",
     "server": "nodemon src/server.ts",
     "test": "jest --silent --verbose"
   },

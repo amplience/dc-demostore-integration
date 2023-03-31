@@ -249,7 +249,10 @@ class SFCCCommerceCodec extends core_1.CommerceCodec {
     getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
-            if (args.productIds) {
+            if (args.productIds && args.productIds === '') {
+                products = [];
+            }
+            else if (args.productIds) {
                 products = yield Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)));
             }
             else if (args.keyword) {

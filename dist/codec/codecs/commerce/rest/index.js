@@ -95,7 +95,10 @@ class RestCommerceCodec extends core_1.CommerceCodec {
     getProducts(args, raw = false) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.ensureCategoryTree();
-            if (args.productIds) {
+            if (args.productIds && args.productIds === '') {
+                return [];
+            }
+            else if (args.productIds) {
                 const ids = args.productIds.split(',');
                 return (0, common_1.mapIdentifiers)(ids, this.products.filter(prod => ids.includes(prod.id)));
             }

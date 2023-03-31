@@ -9,9 +9,9 @@ const methods = ['get', 'put', 'post', 'delete', 'patch'];
 const dataMethods = ['put', 'post', 'patch'];
 /**
  * Combine a base url with a relative url
- * @param baseUrl
- * @param relativeUrl
- * @returns
+ * @param baseUrl Base URL
+ * @param relativeUrl Relative URL
+ * @returns Combined URL
  */
 function combineUrls(baseUrl, relativeUrl) {
     if (!baseUrl)
@@ -19,12 +19,12 @@ function combineUrls(baseUrl, relativeUrl) {
     return relativeUrl ? baseUrl.replace(/\/+$/, '') + '/' + relativeUrl.replace(/^\/+/, '') : baseUrl;
 }
 /**
- * TODO
- * @param method
- * @param methodRequests
- * @param requests
- * @param baseConfig
- * @returns
+ * Get a mock axios method with the given set of mocked requests, requests out array, and base config.
+ * @param method HTTP method
+ * @param methodRequests Mocked requests for this method
+ * @param requests Array to place requests from calls into
+ * @param baseConfig Base axios configuration
+ * @returns Mocked axios method
  */
 function getMockAxios(method, methodRequests, requests, baseConfig) {
     return (url, config) => {
@@ -73,11 +73,11 @@ function getMockAxios(method, methodRequests, requests, baseConfig) {
     };
 }
 /**
- * TODO
- * @param axios
- * @param mockFixture
- * @param requests
- * @param baseConfig
+ * Mock the methods of an axios instance
+ * @param axios Axios instance
+ * @param mockFixture Fixture containing mocked requests and responses
+ * @param requests Array to place requests from calls into
+ * @param baseConfig Base axios configuration
  */
 function mockAxios(axios, mockFixture, requests, baseConfig = {}) {
     var _a;
@@ -107,10 +107,10 @@ function mockAxios(axios, mockFixture, requests, baseConfig = {}) {
 }
 exports.mockAxios = mockAxios;
 /**
- * TODO
- * @param axios
- * @param requests
- * @param mockFixture
+ * Mock the methods of the static axios class.
+ * @param axios Static axios object
+ * @param requests Array to place requests from calls into
+ * @param mockFixture Fixture containing mocked requests and responses
  */
 function massMock(axios, requests, mockFixture) {
     mockAxios(axios, mockFixture, requests);
@@ -127,9 +127,10 @@ function massMock(axios, requests, mockFixture) {
 }
 exports.massMock = massMock;
 /**
- * TODO
- * @param mappings
- * @returns
+ * Helper method that returns a function mapping from axios request data to a specific response.
+ * Useful for having POST data specific responses for requests to the same endpoint.
+ * @param mappings Data to response mapping
+ * @returns A method that finds a matching response given the input axios request config.
  */
 function dataToResponse(mappings) {
     return (config) => {

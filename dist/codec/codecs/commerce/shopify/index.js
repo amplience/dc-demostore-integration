@@ -222,15 +222,15 @@ class ShopifyCommerceCodec extends core_1.CommerceCodec {
     getRawProducts(args) {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
-            // eslint-disable-next-line no-empty
-            if (args.productIds) {
+            if (args.productIds && args.productIds === '') {
+                products = [];
+            }
+            else if (args.productIds) {
                 products = yield Promise.all(args.productIds.split(',').map(this.getProductById.bind(this)));
             }
-            // eslint-disable-next-line no-empty
             else if (args.keyword) {
                 products = yield this.getProductsByKeyword(args.keyword);
             }
-            // eslint-disable-next-line no-empty
             else if (args.category) {
                 products = yield this.getProductsByCategory(args.category.slug);
             }

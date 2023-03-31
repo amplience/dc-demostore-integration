@@ -42,24 +42,25 @@ interface DataResponseMapping {
     response: MockRequest;
 }
 /**
- * TODO
- * @param axios
- * @param mockFixture
- * @param requests
- * @param baseConfig
+ * Mock the methods of an axios instance
+ * @param axios Axios instance
+ * @param mockFixture Fixture containing mocked requests and responses
+ * @param requests Array to place requests from calls into
+ * @param baseConfig Base axios configuration
  */
 export declare function mockAxios(axios: AxiosInstance, mockFixture: MockFixture, requests: Request[], baseConfig?: {}): void;
 /**
- * TODO
- * @param axios
- * @param requests
- * @param mockFixture
+ * Mock the methods of the static axios class.
+ * @param axios Static axios object
+ * @param requests Array to place requests from calls into
+ * @param mockFixture Fixture containing mocked requests and responses
  */
 export declare function massMock(axios: AxiosStatic, requests: Request[], mockFixture: MockFixture): void;
 /**
- * TODO
- * @param mappings
- * @returns
+ * Helper method that returns a function mapping from axios request data to a specific response.
+ * Useful for having POST data specific responses for requests to the same endpoint.
+ * @param mappings Data to response mapping
+ * @returns A method that finds a matching response given the input axios request config.
  */
 export declare function dataToResponse(mappings: DataResponseMapping[]): (config: AxiosRequestConfig) => MockRequest;
 export {};

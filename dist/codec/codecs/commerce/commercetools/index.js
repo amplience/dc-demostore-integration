@@ -203,7 +203,10 @@ class CommercetoolsCodec extends core_1.CommerceCodec {
     getRawProducts(args, method = 'getRawProducts') {
         return __awaiter(this, void 0, void 0, function* () {
             let products = [];
-            if (args.productIds) {
+            if (args.productIds && args.productIds === '') {
+                products = [];
+            }
+            else if (args.productIds) {
                 const ids = args.productIds.split(',');
                 products = (0, common_2.mapIdentifiers)(ids, yield (0, pagination_1.paginate)(this.getPage(this.rest, `/product-projections/search?filter=id:${(0, util_1.quoteProductIdString)(args.productIds)}`)));
             }
