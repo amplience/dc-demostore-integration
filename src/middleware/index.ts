@@ -13,7 +13,7 @@ const getAPI = async (config: any): Promise<CommerceAPI> => {
 
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	const matchingCodec = getCodecs().find(
-		(c) => c.vendor === config.vendor || c.schemaUri === config._meta?.schema
+		(c) => c.vendor === config.vendor
 	)
 	if (matchingCodec) {
 		config = await matchingCodec.postProcess(config)

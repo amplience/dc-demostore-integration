@@ -1,8 +1,7 @@
 import _, { Dictionary } from 'lodash'
 import {
 	API, 
-	CommerceAPI, 
-	CONSTANTS
+	CommerceAPI 
 } from '../../common'
 import {
 	findInCategoryTree, 
@@ -53,24 +52,10 @@ export class CodecType {
 	}
 
 	/**
-	 * The schema URI for this codec.
-	 */
-	get schemaUri(): string {
-		return `${CONSTANTS.demostoreIntegrationUri}/${this.vendor}`
-	}
-
-	/**
 	 * The label for this codec.
 	 */
 	get label(): string {
 		return `${this.vendor} integration`
-	}
-
-	/**
-	 * The Icon URL that represents this codec.
-	 */
-	get iconUrl(): string {
-		return `https://demostore-catalog.s3.us-east-2.amazonaws.com/assets/${this.vendor}.png`
 	}
 
 	/**
