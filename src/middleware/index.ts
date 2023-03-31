@@ -1,6 +1,5 @@
-import { getContentItem, getContentItemFromConfigLocator } from '../amplience'
 import axios from 'axios'
-import { CommerceAPI, CONSTANTS, getCodecs, getCommerceCodec } from '../index'
+import { CommerceAPI, getCodecs, getCommerceCodec } from '../index'
 import { flattenConfig, isServer } from '../common/util'
 import { CodecError, CodecErrorType } from '../codec/codecs/codec-error'
 import { IntegrationError } from '../common/errors'
@@ -11,19 +10,6 @@ import { IntegrationError } from '../common/errors'
  * @returns API matching the configuration.
  */
 const getAPI = async (config: any): Promise<CommerceAPI> => {
-	// we are passed in an object here
-	//   - if it does not the key 'config_locator', it is assumed to be the config block for a codec
-	//   - else retrieve the object
-	//     - if the schema of the object is NOT the demostoreconfig, it is assumed to be the config block
-	//     - else retrieve the object with id <demostoreconfig.commerce.id>
-
-	if ('config_locator' in config) {
-		const [hub, _] = config.config_locator.split(':')
-		config = await getContentItemFromConfigLocator(config.config_locator)
-		if (config._meta.schema === CONSTANTS.demostoreConfigUri) {
-			config = await getContentItem(hub, config.commerce)
-		}
-	}
 
 	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	const matchingCodec = getCodecs().find(
