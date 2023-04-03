@@ -70,7 +70,6 @@ export class SFCCCommerceCodecType extends CommerceCodecType {
 	/**
 	 * @inheritdoc
 	 */
-	// novadev-582 Update SFCC codec to use client_id and client_secret to generate the api token if it doesn't exist
 	async postProcess(config: CodecConfig): Promise<CodecConfig> {
 		// apply any postprocessing required
 		return {
@@ -111,7 +110,6 @@ const mapCustomerGroup = (group: SFCCCustomerGroup): CustomerGroup =>
  * @param product SFCC product
  * @returns Product
  */
-// TODO: [NOVADEV-968] able to choose image size?
 const mapProduct = (product: SFCCProduct | null): Product => {
 	if (!product) {
 		return null

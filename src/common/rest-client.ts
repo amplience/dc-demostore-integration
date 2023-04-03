@@ -3,38 +3,48 @@ import { sleep } from '../common/util'
 import _ from 'lodash'
 import { logResponse } from '../codec/codecs/common'
 import { CodecPropertyConfig } from '../codec/codecs/core'
-import { HttpMethod } from 'dc-management-sdk-js'
 import { StringProperty, StringPatterns } from '../codec/cms-property-types'
 import { CodecError, CodecErrorType, catchAxiosErrors } from '../codec/codecs/codec-error'
+
+/**
+ * HTTP methods
+ */
+export enum HttpMethod {
+	GET = 'GET',
+	POST = 'POST',
+	PUT = 'PUT',
+	PATCH = 'PATCH',
+	DELETE = 'DELETE',
+}
 
 /**
  * Configuration interface with an API url.
  */
 export type APIConfiguration = {
-    api_url:        StringProperty
+	api_url: StringProperty
 }
 
 /**
  * Configuration interface with an API and Auth url.
  */
 export type OAuthCodecConfiguration = APIConfiguration & {
-    auth_url:       StringProperty
+	auth_url: StringProperty
 }
 
 /**
  * Configuration interface with an API, Auth and credentials.
  */
 export type ClientCredentialsConfiguration = OAuthCodecConfiguration & {
-    client_id:      StringProperty
-    client_secret:  StringProperty
+	client_id: StringProperty
+	client_secret: StringProperty
 }
 
 /**
  * Configuration interface with a username and password.
  */
 export type UsernamePasswordConfiguration = {
-    username:   StringProperty
-    password:   StringProperty
+	username: StringProperty
+	password: StringProperty
 }
 
 /**
@@ -97,7 +107,7 @@ export const ClientCredentialProperties: ClientCredentialsConfiguration = {
  * Interface for a REST client with all HTTP methods.
  */
 export type OAuthRestClientInterface = {
-    [Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
+	[Z in keyof typeof HttpMethod as Lowercase<Z>]: (config: AxiosRequestConfig | string) => Promise<any>
 }
 
 type AuthenticationStatus = 'NOT_LOGGED_IN' | 'LOGGING_IN' | 'LOGGED_IN'
@@ -151,16 +161,16 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 
 		// authentication
 		switch (status) {
-		case 'LOGGING_IN':
-			await sleep(100)
-			return await request(method)(config)
+			case 'LOGGING_IN':
+				await sleep(100)
+				return await request(method)(config)
 
-		case 'NOT_LOGGED_IN':
-			status = 'LOGGING_IN'
-			break
+			case 'NOT_LOGGED_IN':
+				status = 'LOGGING_IN'
+				break
 
-		case 'LOGGED_IN':
-			break
+			case 'LOGGED_IN':
+				break
 		}
 
 		authenticatedAxios = await authenticate()
@@ -170,7 +180,6 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 		}
 
 		try {
-			// console.log(`[ rest ] get ${config.url}`)
 			return logResponse(method, config.url, await (await authenticatedAxios.request({ method, ...config })).data)
 		} catch (error: any) {
 			if (error.response?.status === 429) {
@@ -181,11 +190,6 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 				// don't throw on a 404 just return an empty result set
 				return null
 			}
-
-			// if (error.stack) {
-			//     console.log(error.stack)
-			// }
-
 			throw new CodecError(CodecErrorType.ApiError, {
 				status: error.response?.status,
 				message: error.response?.data
@@ -194,11 +198,11 @@ export const OAuthRestClient = (config: CodecPropertyConfig<OAuthCodecConfigurat
 	}
 
 	return {
-		get:    request(HttpMethod.GET),
+		get: request(HttpMethod.GET),
 		delete: request(HttpMethod.DELETE),
-		put:    request(HttpMethod.PUT),
-		post:   request(HttpMethod.POST),
-		patch:  request(HttpMethod.PATCH)
+		put: request(HttpMethod.PUT),
+		post: request(HttpMethod.POST),
+		patch: request(HttpMethod.PATCH)
 	}
 }
 
