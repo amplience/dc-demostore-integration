@@ -1,3 +1,7 @@
+## :warning: Deprecated
+
+This project has been replaced with [`dc-integration-middleware`](https://github.com/amplience/dc-integration-middleware), this repository remains up so existing demostore projects can use the last released version.
+
 # @amplience/dc-demostore-integration
 
 Amplience Demo Store Integration is a service written in Node.js that is intended to manage a number of different types of services, including but not limited to:
