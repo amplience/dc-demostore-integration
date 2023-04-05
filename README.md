@@ -1,5 +1,7 @@
 # @amplience/dc-demostore-integration
 
+> Not: this package is not depracated in favor of `dc-integration-middleware` that you can find here: https://github.com/amplience/dc-integration-middleware
+
 Amplience Demo Store Integration is a service written in `Node.js` that is intended to manage a number of different types of services, including but not limited to:
 
 -   Commerce Services
