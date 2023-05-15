@@ -75,7 +75,7 @@ const restCodec = {
                         args.keyword && _.filter(products, prod => prod.name.toLowerCase().indexOf(args.keyword) > -1)
                 },
                 getCategory: (args: GetCommerceObjectArgs) => {
-                    let category = categories.find(cat => cat.slug === args.slug)
+                    let category = args.slug && categories.find(cat => cat.slug === args.slug) || args.id && categories.find(cat => cat.id === args.id)
                     if (category) {
                         return api.populateCategory(category)
                     }
